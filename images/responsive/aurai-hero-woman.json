@@ -1,0 +1,41 @@
+{
+  "generatedAI": false,
+  "method": "pillow-lanczos",
+  "source": "source-images/hero/aurai-embroidered-source.png",
+  "sourceSize": {
+    "width": 1024,
+    "height": 1536
+  },
+  "master": {
+    "width": 2560,
+    "height": 3840,
+    "path": "images/aurai-hero-woman.jpg"
+  },
+  "responsive": [
+    {
+      "width": 640,
+      "height": 960,
+      "path": "images/responsive/aurai-hero-woman-640.webp"
+    },
+    {
+      "width": 960,
+      "height": 1440,
+      "path": "images/responsive/aurai-hero-woman-960.webp"
+    },
+    {
+      "width": 1440,
+      "height": 2160,
+      "path": "images/responsive/aurai-hero-woman-1440.webp"
+    },
+    {
+      "width": 1920,
+      "height": 2880,
+      "path": "images/responsive/aurai-hero-woman-1920.webp"
+    },
+    {
+      "width": 2560,
+      "height": 3840,
+      "path": "images/responsive/aurai-hero-woman-2560.webp"
+    }
+  ]
+}
