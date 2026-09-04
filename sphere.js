@@ -9,165 +9,108 @@ void main() {
 const FRAGMENT_SHADER = `
 precision highp float;
 
+uniform sampler2D uPoster;
 uniform vec2 uResolution;
+uniform vec2 uPosterResolution;
 uniform float uTime;
 uniform vec2 uPointer;
 uniform float uPointerActive;
 uniform float uScroll;
-uniform float uSteps;
 
 #define PI 3.14159265359
 
-mat2 rotate2d(float angle) {
-  float c = cos(angle);
-  float s = sin(angle);
-  return mat2(c, -s, s, c);
-}
+vec2 containedPosterUv(vec2 screenUv, out float inside) {
+  float stageAspect = uResolution.x / max(uResolution.y, 1.0);
+  float posterAspect = uPosterResolution.x / max(uPosterResolution.y, 1.0);
+  vec2 uv = screenUv;
+  inside = 1.0;
 
-vec3 rotateObject(vec3 p) {
-  p.xz *= rotate2d(-0.34 - uTime * 0.085 - uPointer.x * 0.12);
-  p.yz *= rotate2d(0.18 + sin(uTime * 0.14) * 0.07 + uPointer.y * 0.1);
-  p.xy *= rotate2d(-0.08 + uScroll * 0.12);
-  return p;
-}
-
-float surfaceRadius(vec3 n) {
-  float broad = sin(n.x * 5.1 + n.y * 3.0 + n.z * 2.2 + uTime * 0.31) * 0.045;
-  float folded = sin(n.z * 7.0 - n.y * 5.2 + n.x * 2.6 - uTime * 0.21) * 0.024;
-  float vertical = cos(n.y * 8.0 + n.x * 2.5) * 0.018;
-  float breath = sin(uTime * 0.58) * 0.012;
-
-  vec3 pointerDirection = normalize(vec3(uPointer.x * 0.74, -uPointer.y * 0.68, 0.72));
-  float pointerLobe = pow(max(dot(n, pointerDirection), 0.0), 7.0) * 0.11 * uPointerActive;
-  float oppositeFold = pow(max(dot(n, -pointerDirection), 0.0), 5.0) * -0.028 * uPointerActive;
-  float scrollFold = sin(n.y * 4.0 - n.x * 3.5 + n.z * 2.0) * uScroll * 0.025;
-
-  return 0.84 + broad + folded + vertical + breath + pointerLobe + oppositeFold + scrollFold;
-}
-
-float sceneDistance(vec3 point) {
-  vec3 p = rotateObject(point);
-  float radius = length(p);
-  vec3 direction = p / max(radius, 0.0001);
-  return radius - surfaceRadius(direction);
-}
-
-vec3 estimateNormal(vec3 p) {
-  vec2 e = vec2(0.0015, 0.0);
-  return normalize(vec3(
-    sceneDistance(p + e.xyy) - sceneDistance(p - e.xyy),
-    sceneDistance(p + e.yxy) - sceneDistance(p - e.yxy),
-    sceneDistance(p + e.yyx) - sceneDistance(p - e.yyx)
-  ));
-}
-
-float softShadow(vec3 ro, vec3 rd) {
-  float result = 1.0;
-  float distanceAlongRay = 0.04;
-  for (int i = 0; i < 18; i++) {
-    vec3 p = ro + rd * distanceAlongRay;
-    float h = sceneDistance(p);
-    result = min(result, 14.0 * h / distanceAlongRay);
-    distanceAlongRay += clamp(h, 0.025, 0.14);
-    if (h < 0.001 || distanceAlongRay > 3.3) break;
+  if (stageAspect < posterAspect) {
+    float occupiedHeight = stageAspect / posterAspect;
+    uv.y = screenUv.y / occupiedHeight;
+    inside = step(screenUv.y, occupiedHeight);
+  } else {
+    float occupiedWidth = posterAspect / stageAspect;
+    float left = (1.0 - occupiedWidth) * 0.5;
+    uv.x = (screenUv.x - left) / occupiedWidth;
+    inside = step(left, screenUv.x) * step(screenUv.x, left + occupiedWidth);
   }
-  return clamp(result, 0.0, 1.0);
-}
 
-vec3 paper(vec2 uv) {
-  float vignette = smoothstep(1.45, 0.1, length(uv * vec2(0.8, 1.0)));
-  vec3 warm = vec3(0.953, 0.946, 0.918);
-  vec3 cool = vec3(0.918, 0.936, 0.944);
-  return mix(warm, cool, 0.12 + vignette * 0.1);
-}
-
-float ring(vec2 p, vec2 center, vec2 scale, float radius, float width) {
-  vec2 q = (p - center) * scale;
-  return 1.0 - smoothstep(width, width + 0.005, abs(length(q) - radius));
+  return uv;
 }
 
 void main() {
-  vec2 frag = gl_FragCoord.xy;
-  vec2 uv = (2.0 * frag - uResolution.xy) / min(uResolution.x, uResolution.y);
-  uv.x *= 0.96;
+  vec2 screenUv = vec2(
+    gl_FragCoord.x / uResolution.x,
+    1.0 - gl_FragCoord.y / uResolution.y
+  );
 
-  vec3 color = paper(uv);
-
-  float orbitA = ring(uv, vec2(0.03, -0.025), vec2(0.58, 1.0), 0.93, 0.0022);
-  float orbitB = ring(uv, vec2(-0.05, 0.025), vec2(1.0, 0.64), 0.92, 0.0018);
-  color = mix(color, vec3(0.27, 0.30, 0.31), (orbitA * 0.14 + orbitB * 0.11));
-
-  float groundShadow = exp(-pow(length((uv - vec2(0.08, -0.78)) * vec2(1.2, 4.3)), 2.0) * 3.2);
-  color *= 1.0 - groundShadow * 0.105;
-
-  vec3 rayOrigin = vec3(0.0, 0.02, 3.05);
-  vec3 rayDirection = normalize(vec3(uv * 0.88, -2.45));
-  float travel = 0.0;
-  float distanceToSurface = 0.0;
-  bool hit = false;
-
-  for (int i = 0; i < 80; i++) {
-    if (float(i) >= uSteps) break;
-    vec3 point = rayOrigin + rayDirection * travel;
-    distanceToSurface = sceneDistance(point);
-    if (distanceToSurface < 0.0014) {
-      hit = true;
-      break;
-    }
-    travel += distanceToSurface * 0.69;
-    if (travel > 5.1) break;
+  float inside;
+  vec2 posterUv = containedPosterUv(screenUv, inside);
+  if (inside < 0.5) {
+    gl_FragColor = vec4(0.0);
+    return;
   }
 
-  if (hit) {
-    vec3 point = rayOrigin + rayDirection * travel;
-    vec3 normal = estimateNormal(point);
-    vec3 view = normalize(-rayDirection);
-    vec3 lightDirection = normalize(vec3(-0.58, 0.8, 0.68));
-    vec3 secondLight = normalize(vec3(0.82, -0.18, 0.48));
+  vec2 sphereCenter = vec2(0.493, 0.515);
+  vec2 sphereShape = (posterUv - sphereCenter) / vec2(0.405, 0.49);
+  float sphereDistance = length(sphereShape);
+  float sphereMask = 1.0 - smoothstep(0.78, 1.08, sphereDistance);
 
-    float diffuse = max(dot(normal, lightDirection), 0.0);
-    float coolDiffuse = max(dot(normal, secondLight), 0.0);
-    float fresnel = pow(1.0 - max(dot(normal, view), 0.0), 2.35);
-    float sharpSpecular = pow(max(dot(reflect(-lightDirection, normal), view), 0.0), 78.0);
-    float softSpecular = pow(max(dot(reflect(-secondLight, normal), view), 0.0), 19.0);
-    float internalBand = 0.5 + 0.5 * sin(
-      normal.x * 13.0 + normal.y * 7.0 + normal.z * 9.0 + uTime * 0.36
-    );
-    float depth = clamp(1.0 - travel / 4.0, 0.0, 1.0);
+  vec2 radial = normalize(sphereShape + vec2(0.0001));
+  float fluidPhase = sin(
+    sphereShape.x * 5.2 + sphereShape.y * 4.1 + uTime * 0.72
+  );
+  float breath = sin(uTime * 0.53) * 0.00125;
+  posterUv += radial * (breath + fluidPhase * 0.00075) * sphereMask;
 
-    vec3 glassBase = mix(vec3(0.72, 0.78, 0.79), vec3(0.10, 0.31, 0.52), fresnel * 0.68);
-    glassBase = mix(glassBase, vec3(0.91, 0.94, 0.91), diffuse * 0.38);
-    glassBase = mix(glassBase, vec3(0.09, 0.46, 0.68), coolDiffuse * 0.22);
-    glassBase += vec3(0.12, 0.18, 0.22) * internalBand * 0.09;
+  vec2 scrollFold = vec2(
+    sin((sphereShape.y + 0.25) * PI * 2.2),
+    cos((sphereShape.x - 0.12) * PI * 1.8)
+  );
+  posterUv += scrollFold * uScroll * 0.0028 * sphereMask;
 
-    float cyanEdge = pow(fresnel, 1.35) * (0.42 + internalBand * 0.2);
-    float amberEdge = pow(1.0 - max(dot(normal, view), 0.0), 5.0) * max(-normal.x, 0.0);
-    vec3 spectral = vec3(0.07, 0.43, 0.7) * cyanEdge + vec3(0.55, 0.24, 0.09) * amberEdge * 0.32;
+  vec2 pointerUv = uPointer * 0.5 + 0.5;
+  float pointerInside;
+  vec2 pointerPosterUv = containedPosterUv(pointerUv, pointerInside);
+  float pointerDistance = distance(screenUv, pointerUv);
+  float pointerField = exp(-pointerDistance * pointerDistance * 82.0) * uPointerActive;
+  vec2 pointerDirection = (screenUv - pointerUv) / max(pointerDistance, 0.004);
+  float ripple = 0.72 + 0.28 * sin(pointerDistance * 92.0 - uTime * 3.2);
+  vec2 pointerOffset = pointerDirection * pointerField * ripple * 0.0105 * sphereMask;
+  posterUv += pointerOffset;
 
-    float shadow = softShadow(point + normal * 0.015, lightDirection);
-    glassBase *= 0.87 + shadow * 0.13;
-    glassBase += vec3(0.92, 0.97, 1.0) * sharpSpecular * 0.78;
-    glassBase += vec3(0.24, 0.48, 0.68) * softSpecular * 0.34;
-    glassBase += spectral;
+  posterUv = clamp(posterUv, vec2(0.001), vec2(0.999));
+  vec4 base = texture2D(uPoster, posterUv);
 
-    float rim = smoothstep(0.05, 0.78, fresnel);
-    float transparency = 0.93 - rim * 0.05;
-    color = mix(color, glassBase * (0.88 + depth * 0.12), transparency);
+  vec2 spectrumOffset = pointerDirection * pointerField * 0.0032 * sphereMask;
+  vec3 color = base.rgb;
+  color.r = texture2D(uPoster, clamp(posterUv + spectrumOffset, 0.001, 0.999)).r;
+  color.b = texture2D(uPoster, clamp(posterUv - spectrumOffset, 0.001, 0.999)).b;
 
-    float contour = smoothstep(0.49, 0.5, 0.5 + 0.5 * sin((normal.y + normal.x * 0.23) * 28.0));
-    color += vec3(0.08, 0.19, 0.29) * contour * fresnel * 0.055;
-  }
+  vec2 lightDirection = normalize(
+    (pointerPosterUv - sphereCenter) / vec2(0.405, 0.49) + vec2(0.0001)
+  );
+  float rimZone = smoothstep(0.34, 0.88, sphereDistance) * sphereMask;
+  float litRim = pow(max(dot(radial, lightDirection), 0.0), 5.0) * rimZone;
+  float shadedRim = pow(max(dot(radial, -lightDirection), 0.0), 4.0) * rimZone;
+  color += vec3(0.73, 0.84, 1.0) * litRim * 0.075 * uPointerActive * pointerInside;
+  color *= 1.0 - shadedRim * 0.028 * uPointerActive * pointerInside;
 
-  if (uPointerActive > 0.01) {
-    vec2 pointerUv = vec2(uPointer.x, -uPointer.y) * 0.44;
-    float pointerRing = 1.0 - smoothstep(0.005, 0.012, abs(length(uv - pointerUv) - 0.036));
-    color = mix(color, vec3(0.11, 0.27, 0.41), pointerRing * 0.44 * uPointerActive);
-  }
+  float movingSheen = pow(
+    max(0.0, 1.0 - abs(sphereShape.x * 0.8 + sphereShape.y * 0.58 - sin(uTime * 0.24) * 0.34)),
+    18.0
+  ) * sphereMask;
+  color += vec3(0.84, 0.92, 1.0) * movingSheen * 0.035;
 
-  float grain = fract(sin(dot(frag, vec2(12.9898, 78.233))) * 43758.5453);
-  color += (grain - 0.5) * 0.008;
-  color = pow(max(color, 0.0), vec3(0.96));
-  gl_FragColor = vec4(color, 1.0);
+  float pointerRing = 1.0 - smoothstep(
+    0.006,
+    0.012,
+    abs(pointerDistance - 0.047)
+  );
+  color = mix(color, vec3(0.08, 0.33, 0.92), pointerRing * 0.5 * uPointerActive);
+
+  gl_FragColor = vec4(color, base.a);
 }
 `;
 
@@ -178,7 +121,7 @@ const compileShader = (gl, type, source) => {
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     const message = gl.getShaderInfoLog(shader);
     gl.deleteShader(shader);
-    throw new Error(message || "Unable to compile WebGL shader.");
+    throw new Error(message || "Unable to compile the sphere shader.");
   }
   return shader;
 };
@@ -191,58 +134,39 @@ const createProgram = (gl) => {
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     const message = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
-    throw new Error(message || "Unable to link WebGL program.");
+    throw new Error(message || "Unable to link the sphere shader.");
   }
   return program;
+};
+
+const setStageMotion = (stage, pointer, scroll, reducedMotion) => {
+  const still = reducedMotion.matches;
+  const x = still ? 0 : pointer.x;
+  const y = still ? 0 : pointer.y;
+  const progress = still ? 0 : scroll;
+
+  stage.style.setProperty("--sphere-tilt-x", `${(-y * 3.6).toFixed(3)}deg`);
+  stage.style.setProperty("--sphere-tilt-y", `${(x * 4.8).toFixed(3)}deg`);
+  stage.style.setProperty("--sphere-shift-x", `${(x * 9.5).toFixed(3)}px`);
+  stage.style.setProperty("--sphere-shift-y", `${(y * 7 - progress * 8).toFixed(3)}px`);
+  stage.style.setProperty(
+    "--sphere-scale",
+    (1.006 + pointer.active * 0.01 - progress * 0.014).toFixed(4)
+  );
+  stage.style.setProperty("--light-x", `${(50 + x * 13).toFixed(2)}%`);
+  stage.style.setProperty("--light-y", `${(43 + y * 10).toFixed(2)}%`);
 };
 
 export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
   if (!canvas || !stage) return null;
 
-  const gl = canvas.getContext("webgl", {
-    alpha: false,
-    antialias: false,
-    depth: false,
-    powerPreference: "high-performance",
-    preserveDrawingBuffer: true
-  });
-
-  if (!gl) return null;
-
-  let program;
-  try {
-    program = createProgram(gl);
-  } catch (error) {
-    console.warn("Interactive level-set surface is unavailable.", error);
-    return null;
-  }
-
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array([-1, -1, 3, -1, -1, 3]),
-    gl.STATIC_DRAW
-  );
-
-  const position = gl.getAttribLocation(program, "aPosition");
-  const uniforms = {
-    resolution: gl.getUniformLocation(program, "uResolution"),
-    time: gl.getUniformLocation(program, "uTime"),
-    pointer: gl.getUniformLocation(program, "uPointer"),
-    pointerActive: gl.getUniformLocation(program, "uPointerActive"),
-    scroll: gl.getUniformLocation(program, "uScroll"),
-    steps: gl.getUniformLocation(program, "uSteps")
-  };
-
-  gl.useProgram(program);
-  gl.enableVertexAttribArray(position);
-  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  const poster = stage.querySelector(".sphere-poster");
+  if (!poster) return null;
 
   const finePointer = window.matchMedia("(pointer: fine)");
   const smallScreen = window.matchMedia("(max-width: 760px)");
   const state = {
-    pointer: { x: 0, y: 0 },
+    pointer: { x: 0, y: 0, active: 0 },
     pointerTarget: { x: 0, y: 0 },
     pointerActive: 0,
     pointerActiveTarget: 0,
@@ -252,13 +176,85 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     frame: 0,
     lastFrame: 0,
     start: performance.now(),
-    ready: false
+    textureReady: false,
+    canvasReady: false
   };
 
+  let gl = null;
+  let program = null;
+  let buffer = null;
+  let texture = null;
+  let uniforms = null;
+
+  try {
+    gl = canvas.getContext("webgl", {
+      alpha: true,
+      antialias: false,
+      depth: false,
+      premultipliedAlpha: true,
+      powerPreference: "high-performance",
+      preserveDrawingBuffer: false
+    });
+
+    if (gl) {
+      program = createProgram(gl);
+      buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 3, -1, -1, 3]),
+        gl.STATIC_DRAW
+      );
+
+      const position = gl.getAttribLocation(program, "aPosition");
+      uniforms = {
+        poster: gl.getUniformLocation(program, "uPoster"),
+        resolution: gl.getUniformLocation(program, "uResolution"),
+        posterResolution: gl.getUniformLocation(program, "uPosterResolution"),
+        time: gl.getUniformLocation(program, "uTime"),
+        pointer: gl.getUniformLocation(program, "uPointer"),
+        pointerActive: gl.getUniformLocation(program, "uPointerActive"),
+        scroll: gl.getUniformLocation(program, "uScroll")
+      };
+
+      gl.useProgram(program);
+      gl.enableVertexAttribArray(position);
+      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+      gl.clearColor(0, 0, 0, 0);
+
+      texture = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.uniform1i(uniforms.poster, 0);
+    }
+  } catch (error) {
+    console.warn("Interactive sphere enhancement is unavailable.", error);
+    gl = null;
+  }
+
+  const uploadPoster = () => {
+    if (!gl || !texture || !poster.naturalWidth || !poster.naturalHeight) return;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, poster);
+    state.textureReady = true;
+  };
+
+  if (poster.complete && poster.naturalWidth) uploadPoster();
+  else poster.addEventListener("load", uploadPoster, { once: true });
+
+  if (!gl) stage.classList.add("is-fallback");
+
   const resize = () => {
-    const bounds = stage.getBoundingClientRect();
-    const pixelBudget = smallScreen.matches ? 420000 : 920000;
-    let dpr = Math.min(window.devicePixelRatio || 1, smallScreen.matches ? 1.15 : 1.45);
+    if (!gl) return;
+    const bounds = canvas.getBoundingClientRect();
+    const pixelBudget = smallScreen.matches ? 360000 : 820000;
+    let dpr = Math.min(window.devicePixelRatio || 1, smallScreen.matches ? 1.1 : 1.35);
     const requestedPixels = bounds.width * bounds.height * dpr * dpr;
     if (requestedPixels > pixelBudget) dpr *= Math.sqrt(pixelBudget / requestedPixels);
     const width = Math.max(1, Math.round(bounds.width * dpr));
@@ -280,30 +276,42 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     if (now - state.lastFrame < minFrameTime) return;
     state.lastFrame = now;
 
-    resize();
-    const smoothing = mobile ? 0.09 : 0.075;
+    const smoothing = mobile ? 0.105 : 0.082;
     state.pointer.x += (state.pointerTarget.x - state.pointer.x) * smoothing;
     state.pointer.y += (state.pointerTarget.y - state.pointer.y) * smoothing;
-    state.pointerActive += (state.pointerActiveTarget - state.pointerActive) * 0.08;
+    state.pointerActive += (state.pointerActiveTarget - state.pointerActive) * 0.075;
+    state.pointer.active = state.pointerActive;
+    setStageMotion(stage, state.pointer, state.scroll, reducedMotionQuery);
 
-    const elapsed = reducedMotionQuery.matches ? 0.0 : (now - state.start) / 1000;
+    if (!gl || !program || !uniforms || !state.textureReady) return;
+
+    resize();
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(program);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    const elapsed = reducedMotionQuery.matches ? 0 : (now - state.start) / 1000;
     gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
+    gl.uniform2f(uniforms.posterResolution, poster.naturalWidth, poster.naturalHeight);
     gl.uniform1f(uniforms.time, elapsed);
     gl.uniform2f(uniforms.pointer, state.pointer.x, state.pointer.y);
-    gl.uniform1f(uniforms.pointerActive, reducedMotionQuery.matches ? 0 : state.pointerActive);
-    gl.uniform1f(uniforms.scroll, state.scroll);
-    gl.uniform1f(uniforms.steps, mobile ? 36 : 52);
+    gl.uniform1f(
+      uniforms.pointerActive,
+      reducedMotionQuery.matches ? 0 : state.pointerActive
+    );
+    gl.uniform1f(uniforms.scroll, reducedMotionQuery.matches ? 0 : state.scroll);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    if (!state.ready) {
-      state.ready = true;
+    if (!state.canvasReady) {
+      state.canvasReady = true;
       stage.classList.add("webgl-ready");
     }
   };
 
   const onPointerMove = (event) => {
     if (!finePointer.matches || reducedMotionQuery.matches) return;
-    const bounds = stage.getBoundingClientRect();
+    const bounds = canvas.getBoundingClientRect();
     state.pointerTarget.x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
     state.pointerTarget.y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
     state.pointerActiveTarget = 1;
@@ -329,11 +337,12 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
   const onContextLost = (event) => {
     event.preventDefault();
     stage.classList.remove("webgl-ready");
-    state.running = false;
-    cancelAnimationFrame(state.frame);
+    stage.classList.add("is-fallback");
+    gl = null;
   };
   canvas.addEventListener("webglcontextlost", onContextLost, false);
 
+  setStageMotion(stage, state.pointer, state.scroll, reducedMotionQuery);
   render();
 
   return {
@@ -344,11 +353,13 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       state.running = false;
       cancelAnimationFrame(state.frame);
       visibilityObserver.disconnect();
+      poster.removeEventListener("load", uploadPoster);
       stage.removeEventListener("pointermove", onPointerMove);
       stage.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("webglcontextlost", onContextLost);
-      gl.deleteBuffer(buffer);
-      gl.deleteProgram(program);
+      if (gl && buffer) gl.deleteBuffer(buffer);
+      if (gl && texture) gl.deleteTexture(texture);
+      if (gl && program) gl.deleteProgram(program);
     }
   };
 };

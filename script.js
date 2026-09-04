@@ -1,4 +1,4 @@
-import { initNonlinearSphere } from "/sphere.js";
+import { initNonlinearSphere } from "/sphere.js?v=20260904-6";
 
 const header = document.querySelector("[data-header]");
 const menuButton = document.querySelector(".menu-button");

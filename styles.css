@@ -1120,3 +1120,138 @@ blockquote p,
 @media (prefers-reduced-motion: reduce) and (max-width: 640px) {
   .display-name span { transform: translateY(1.35rem) scaleX(.665); }
 }
+
+/* Poster-faithful interactive depth layer */
+.sphere-stage {
+  --sphere-tilt-x: 0deg;
+  --sphere-tilt-y: 0deg;
+  --sphere-shift-x: 0px;
+  --sphere-shift-y: 0px;
+  --sphere-scale: 1.004;
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(1rem) scale(.992);
+  animation: sphere-stage-enter 1.15s cubic-bezier(.18, .78, .22, 1) .12s forwards;
+}
+
+.sphere-stage::before,
+.sphere-stage::after { display: none; }
+
+.sphere-poster,
+.sphere-canvas {
+  top: 0;
+  right: auto;
+  bottom: auto;
+  left: -6%;
+  width: 112%;
+  height: auto;
+  aspect-ratio: 997 / 720;
+  transform:
+    perspective(1150px)
+    translate3d(var(--sphere-shift-x), var(--sphere-shift-y), 0)
+    rotateX(var(--sphere-tilt-x))
+    rotateY(var(--sphere-tilt-y))
+    scale(var(--sphere-scale));
+  transform-origin: 50% 48%;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.sphere-poster {
+  filter: saturate(1.025) contrast(1.012);
+  transition: opacity .32s ease, transform .18s linear;
+}
+
+.sphere-canvas {
+  cursor: default;
+  transition: opacity .32s ease, transform .18s linear;
+}
+
+.sphere-stage.webgl-ready .sphere-poster { opacity: 0; }
+.sphere-stage.webgl-ready .sphere-canvas { opacity: 1; }
+.sphere-stage.is-fallback .sphere-poster { opacity: 1; }
+.sphere-stage.is-fallback .sphere-canvas { opacity: 0; }
+
+.display-name span {
+  opacity: 0;
+  animation: hero-word-enter .82s cubic-bezier(.2, .76, .2, 1) forwards;
+}
+
+.display-name span:last-child { animation-delay: .08s; }
+
+.hero-role,
+.hero-fields,
+.hero-statement,
+.hero-actions,
+.hero-meta {
+  opacity: 0;
+  animation: hero-copy-enter .72s cubic-bezier(.2, .76, .2, 1) forwards;
+}
+
+.hero-role { animation-delay: .18s; }
+.hero-fields { animation-delay: .23s; }
+.hero-statement { animation-delay: .28s; }
+.hero-actions { animation-delay: .34s; }
+.hero-meta { animation-delay: .4s; }
+
+@keyframes sphere-stage-enter {
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes hero-word-enter {
+  from { opacity: 0; filter: blur(.35rem); }
+  to { opacity: 1; filter: none; }
+}
+
+@keyframes hero-copy-enter {
+  from { opacity: 0; transform: translateY(.65rem); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sphere-stage,
+  .display-name span,
+  .hero-role,
+  .hero-fields,
+  .hero-statement,
+  .hero-actions,
+  .hero-meta {
+    opacity: 1;
+    animation: none;
+    filter: none;
+  }
+
+  .sphere-stage { transform: none; }
+  .sphere-poster,
+  .sphere-canvas { transition: opacity .01ms linear; }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-top: 5.35rem;
+    gap: 0;
+  }
+
+  .hero .display-name {
+    margin-top: .8rem;
+    font-size: clamp(9rem, 46vw, 11rem);
+  }
+
+  .display-name span {
+    transform: translateY(.8rem) scaleX(calc(.665 + var(--hero-progress, 0) * .025));
+  }
+
+  .hero-role { margin-top: 1.1rem; }
+  .hero-meta { margin-top: 1.25rem; }
+
+  .sphere-stage {
+    margin-top: 0;
+  }
+
+  .sphere-poster,
+  .sphere-canvas {
+    transform-origin: 51% 45%;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 7%, #000 23%);
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 7%, #000 23%);
+  }
+}
