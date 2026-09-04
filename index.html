@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f2ec" />
+    <meta name="theme-color" content="#f3f1ea" />
     <meta name="color-scheme" content="light" />
     <title>Jie Tian — Mathematics &amp; AI for Research</title>
     <meta
@@ -12,8 +12,8 @@
     />
     <link rel="canonical" href="https://yns34-hub.github.io/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" href="/assets/instrument-serif-latin-400-normal-DnYpCC2O.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/assets/inter-latin-wght-normal-Dx4kXJAl.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/assets/nimbus-sans-narrow-bold.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/assets/nimbus-sans-regular.otf" as="font" type="font/otf" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://yns34-hub.github.io/" />
     <meta property="og:title" content="Jie Tian — Mathematics &amp; AI for Research" />
@@ -58,14 +58,10 @@
 
     <header class="site-header" data-header>
       <div class="nav-shell">
-        <a class="wordmark" href="#top" aria-label="Jie Tian — home">
-          <span class="monogram" aria-hidden="true">JT</span>
-          <span>Jie Tian</span>
-        </a>
+        <a class="wordmark" href="#top" aria-label="Jie Tian — home">Jie Tian</a>
 
         <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">
           <span class="menu-label">Menu</span>
-          <span class="menu-lines" aria-hidden="true"><i></i><i></i></span>
         </button>
 
         <nav id="primary-navigation" class="primary-nav" aria-label="Primary navigation">
@@ -82,8 +78,11 @@
     <main id="main">
       <section id="top" class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow"><span></span> Mathematics × AI for Scientific Research</p>
-          <h1 id="hero-title">Jie Tian</h1>
+          <p class="eyebrow">Mathematics × AI for Scientific Research</p>
+          <h1 id="hero-title" class="display-name" aria-label="Jie Tian">
+            <span>Jie</span>
+            <span>Tian</span>
+          </h1>
           <p class="hero-role">Mathematics Master’s Student</p>
           <p class="hero-fields"><span>Nonlinear PDEs</span><i>·</i><span>AI for Mathematical Research</span></p>
           <p class="hero-statement">
@@ -102,50 +101,45 @@
           </div>
         </div>
 
-        <div class="math-visual" data-math-visual>
-          <div class="visual-index" aria-hidden="true">01 / LEVEL SETS</div>
-          <svg viewBox="0 0 720 720" role="img" aria-labelledby="visual-title visual-description">
-            <title id="visual-title">Abstract nonlinear level-set study</title>
-            <desc id="visual-description">Nested mathematical contours transform from irregular curves into ordered circular level sets.</desc>
-            <defs>
-              <linearGradient id="lineFade" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#173fbe" stop-opacity="0.08" />
-                <stop offset="0.54" stop-color="#173fbe" stop-opacity="0.82" />
-                <stop offset="1" stop-color="#173fbe" stop-opacity="0.12" />
-              </linearGradient>
-              <clipPath id="visualClip"><rect x="0" y="0" width="720" height="720" rx="2" /></clipPath>
-            </defs>
-            <g clip-path="url(#visualClip)">
-              <g class="visual-grid" aria-hidden="true">
-                <path d="M0 120H720M0 240H720M0 360H720M0 480H720M0 600H720" />
-                <path d="M120 0V720M240 0V720M360 0V720M480 0V720M600 0V720" />
-              </g>
-              <g class="contours contours-back" fill="none">
-                <path d="M53 404C56 238 164 76 335 56c178-21 326 83 342 241 18 182-103 328-272 355C222 681 50 590 53 404Z" />
-                <path d="M91 399C96 257 191 116 338 99c151-17 279 69 295 205 18 153-87 279-231 304-158 27-316-49-311-209Z" />
-                <path d="M138 395c5-117 82-231 203-246 126-15 232 58 247 169 15 125-72 227-191 247-128 22-264-39-259-170Z" />
-              </g>
-              <g class="contours contours-front" fill="none">
-                <path d="M187 391c7-92 67-181 159-193 99-13 186 46 197 134 12 97-56 177-149 193-101 18-216-31-207-134Z" />
-                <path d="M233 382c7-67 51-129 118-138 72-10 136 34 144 97 9 71-42 128-108 140-74 14-164-21-154-99Z" />
-                <path class="accent-contour" d="M279 375c5-40 32-79 73-84 45-6 84 21 89 60 6 43-25 79-66 87-46 8-103-14-96-63Z" />
-              </g>
-              <path class="rearrangement-axis" d="M64 640C213 568 309 478 371 357c60-117 151-207 288-276" fill="none" />
-              <g class="field-points" aria-hidden="true">
-                <circle cx="119" cy="575" r="3" /><circle cx="206" cy="521" r="3" />
-                <circle cx="292" cy="450" r="3" /><circle cx="371" cy="357" r="4" />
-                <circle cx="456" cy="253" r="3" /><circle cx="547" cy="164" r="3" />
-              </g>
-            </g>
-          </svg>
-          <div class="equation" aria-label="Negative divergence of a of x, u, gradient u equals H of x, u, gradient u">
-            −div <span>(</span>a(x, u, ∇u)<span>)</span> = H(x, u, ∇u)
+        <div class="sphere-stage" data-sphere-stage>
+          <img
+            class="sphere-poster"
+            src="/assets/nonlinear-sphere-poster.webp"
+            alt=""
+            width="900"
+            height="720"
+            fetchpriority="high"
+          />
+          <canvas class="sphere-canvas" data-sphere-canvas aria-hidden="true"></canvas>
+          <p class="visual-index">01 / Level sets</p>
+          <p class="field-definition" aria-hidden="true">φ(x, y, z) = c<sub>k</sub></p>
+          <span class="axis-label axis-z" aria-hidden="true">z</span>
+          <span class="axis-label axis-x" aria-hidden="true">x</span>
+          <span class="axis-label axis-y" aria-hidden="true">y</span>
+          <button
+            class="equation-node"
+            type="button"
+            aria-expanded="false"
+            aria-controls="equation-note"
+            aria-label="Show assumptions behind the model equation"
+          >
+            −div(a(x, u, ∇u)) = H(x, u, ∇u)
+          </button>
+          <div id="equation-note" class="equation-note" aria-hidden="true">
+            <span>Assumptions</span>
+            <span>Structure</span>
+            <span>Validation</span>
           </div>
-          <p class="visual-caption">Structure before computation. Assumptions before conclusions.</p>
+          <p class="visual-caption">Structure before computation.</p>
+          <div class="scroll-rail" aria-hidden="true"><span></span><small>Scroll</small></div>
+          <p class="sr-only">
+            An interactive three-dimensional nonlinear level-set surface rotates and deforms in response
+            to pointer movement. Motion is reduced when requested by the operating system.
+          </p>
         </div>
       </section>
 
-      <section id="about" class="section about-section reveal" aria-labelledby="about-title">
+      <section id="about" class="section about-section reveal" data-index="01" aria-labelledby="about-title">
         <header class="section-header">
           <p class="section-number">01</p>
           <h2 id="about-title">About</h2>
@@ -177,7 +171,7 @@
         </div>
       </section>
 
-      <section id="research" class="section research-section reveal" aria-labelledby="research-title">
+      <section id="research" class="section research-section reveal" data-index="02" aria-labelledby="research-title">
         <header class="section-header">
           <p class="section-number">02</p>
           <h2 id="research-title">Research</h2>
@@ -242,7 +236,7 @@
         </details>
       </section>
 
-      <section id="ai-research" class="section ai-section reveal" aria-labelledby="ai-title">
+      <section id="ai-research" class="section ai-section reveal" data-index="03" aria-labelledby="ai-title">
         <header class="section-header">
           <p class="section-number">03</p>
           <h2 id="ai-title">AI &amp; Research</h2>
@@ -274,7 +268,7 @@
         </div>
       </section>
 
-      <section id="projects" class="section project-section reveal" aria-labelledby="project-title">
+      <section id="projects" class="section project-section reveal" data-index="04" aria-labelledby="project-title">
         <header class="section-header">
           <p class="section-number">04</p>
           <h2 id="project-title">Featured Project</h2>
@@ -320,7 +314,7 @@
         <p class="project-note">Conceptual workflow · no live model connection · final mathematical judgment remains human</p>
       </section>
 
-      <section id="thinking" class="section thinking-section reveal" aria-labelledby="thinking-title">
+      <section id="thinking" class="section thinking-section reveal" data-index="05" aria-labelledby="thinking-title">
         <header class="section-header">
           <p class="section-number">05</p>
           <h2 id="thinking-title">Thinking</h2>
@@ -351,7 +345,7 @@
         </div>
       </section>
 
-      <section id="contact" class="section contact-section reveal" aria-labelledby="contact-title">
+      <section id="contact" class="section contact-section reveal" data-index="06" aria-labelledby="contact-title">
         <header class="section-header">
           <p class="section-number">06</p>
           <h2 id="contact-title">Contact</h2>
@@ -379,6 +373,6 @@
       <p>© 2026</p>
     </footer>
 
-    <script src="/script.js" defer></script>
+    <script type="module" src="/script.js"></script>
   </body>
 </html>
