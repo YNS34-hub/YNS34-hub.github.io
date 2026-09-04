@@ -674,6 +674,7 @@ body {
 .hero-copy {
   position: relative;
   z-index: 4;
+  min-width: 0;
   max-width: 34rem;
   padding-top: 0;
 }
@@ -1078,7 +1079,7 @@ blockquote p,
   .display-name span { transform: translateY(1.35rem) scaleX(calc(.665 + var(--hero-progress, 0) * .025)); }
   .hero-role { margin-top: 1.7rem; font-size: 1.35rem; }
   .hero-statement { max-width: 22rem; font-size: .98rem; }
-  .hero-actions { grid-template-columns: 1fr 1fr; }
+  .hero-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .button { padding-inline: .75rem; }
   .hero-meta { margin-top: 2rem; }
   .sphere-stage {
