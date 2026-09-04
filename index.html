@@ -29,7 +29,15 @@
       content="Nonlinear partial differential equations · AI-assisted mathematical research · responsible human–AI reasoning."
     />
     <script>document.documentElement.classList.add("js")</script>
-    <link rel="stylesheet" href="/styles.css?v=20260904-6" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/vendor/three.module.min.js",
+          "three/addons/": "/vendor/addons/"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="/styles.css?v=20260904-8" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -112,6 +120,12 @@
             fetchpriority="high"
           />
           <canvas class="sphere-canvas" data-sphere-canvas aria-hidden="true"></canvas>
+          <div class="sphere-technical" aria-hidden="true">
+            <span>01 / Nonlinear surface</span>
+            <strong>Ω ⊂ ℝ³</strong>
+          </div>
+          <p class="sphere-level-set" aria-hidden="true">φ(x, y, z) = c<sub>k</sub></p>
+          <p class="rotation-hint" aria-hidden="true">Drag to rotate <span>360°</span></p>
           <button
             class="equation-node"
             type="button"
@@ -128,8 +142,8 @@
           </div>
           <p class="visual-caption">Structure before computation.</p>
           <p class="sr-only">
-            An interactive three-dimensional nonlinear level-set surface rotates and deforms in response
-            to pointer movement. Motion is reduced when requested by the operating system.
+            A real three-dimensional nonlinear glass surface can be rotated through 360 degrees with
+            pointer or touch. A static poster is shown when reduced motion is requested.
           </p>
         </div>
       </section>
@@ -371,6 +385,6 @@
       <p>© 2026</p>
     </footer>
 
-    <script type="module" src="/script.js?v=20260904-6"></script>
+    <script type="module" src="/script.js?v=20260904-8"></script>
   </body>
 </html>

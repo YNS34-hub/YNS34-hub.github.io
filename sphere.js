@@ -1,365 +1,658 @@
-const VERTEX_SHADER = `
-attribute vec2 aPosition;
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
+import { SimplexNoise } from "three/addons/math/SimplexNoise.js";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 
-void main() {
-  gl_Position = vec4(aPosition, 0.0, 1.0);
-}
-`;
+const PAPER = 0xf3f1ea;
+const WORLD_X = new THREE.Vector3(1, 0, 0);
+const WORLD_Y = new THREE.Vector3(0, 1, 0);
+const EULER = new THREE.Euler(0, 0, 0, "YXZ");
+const ROTATION_Y = new THREE.Quaternion();
+const ROTATION_X = new THREE.Quaternion();
 
-const FRAGMENT_SHADER = `
-precision highp float;
+const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 
-uniform sampler2D uPoster;
-uniform vec2 uResolution;
-uniform vec2 uPosterResolution;
-uniform float uTime;
-uniform vec2 uPointer;
-uniform float uPointerActive;
-uniform float uScroll;
-
-#define PI 3.14159265359
-
-vec2 containedPosterUv(vec2 screenUv, out float inside) {
-  float stageAspect = uResolution.x / max(uResolution.y, 1.0);
-  float posterAspect = uPosterResolution.x / max(uPosterResolution.y, 1.0);
-  vec2 uv = screenUv;
-  inside = 1.0;
-
-  if (stageAspect < posterAspect) {
-    float occupiedHeight = stageAspect / posterAspect;
-    uv.y = screenUv.y / occupiedHeight;
-    inside = step(screenUv.y, occupiedHeight);
-  } else {
-    float occupiedWidth = posterAspect / stageAspect;
-    float left = (1.0 - occupiedWidth) * 0.5;
-    uv.x = (screenUv.x - left) / occupiedWidth;
-    inside = step(left, screenUv.x) * step(screenUv.x, left + occupiedWidth);
-  }
-
-  return uv;
-}
-
-void main() {
-  vec2 screenUv = vec2(
-    gl_FragCoord.x / uResolution.x,
-    1.0 - gl_FragCoord.y / uResolution.y
-  );
-
-  float inside;
-  vec2 posterUv = containedPosterUv(screenUv, inside);
-  if (inside < 0.5) {
-    gl_FragColor = vec4(0.0);
-    return;
-  }
-
-  vec2 sphereCenter = vec2(0.493, 0.515);
-  vec2 sphereShape = (posterUv - sphereCenter) / vec2(0.405, 0.49);
-  float sphereDistance = length(sphereShape);
-  float sphereMask = 1.0 - smoothstep(0.78, 1.08, sphereDistance);
-
-  vec2 radial = normalize(sphereShape + vec2(0.0001));
-  float fluidPhase = sin(
-    sphereShape.x * 5.2 + sphereShape.y * 4.1 + uTime * 0.72
-  );
-  float breath = sin(uTime * 0.53) * 0.00125;
-  posterUv += radial * (breath + fluidPhase * 0.00075) * sphereMask;
-
-  vec2 scrollFold = vec2(
-    sin((sphereShape.y + 0.25) * PI * 2.2),
-    cos((sphereShape.x - 0.12) * PI * 1.8)
-  );
-  posterUv += scrollFold * uScroll * 0.0028 * sphereMask;
-
-  vec2 pointerUv = uPointer * 0.5 + 0.5;
-  float pointerInside;
-  vec2 pointerPosterUv = containedPosterUv(pointerUv, pointerInside);
-  float pointerDistance = distance(screenUv, pointerUv);
-  float pointerField = exp(-pointerDistance * pointerDistance * 82.0) * uPointerActive;
-  vec2 pointerDirection = (screenUv - pointerUv) / max(pointerDistance, 0.004);
-  float ripple = 0.72 + 0.28 * sin(pointerDistance * 92.0 - uTime * 3.2);
-  vec2 pointerOffset = pointerDirection * pointerField * ripple * 0.0105 * sphereMask;
-  posterUv += pointerOffset;
-
-  posterUv = clamp(posterUv, vec2(0.001), vec2(0.999));
-  vec4 base = texture2D(uPoster, posterUv);
-
-  vec2 spectrumOffset = pointerDirection * pointerField * 0.0032 * sphereMask;
-  vec3 color = base.rgb;
-  color.r = texture2D(uPoster, clamp(posterUv + spectrumOffset, 0.001, 0.999)).r;
-  color.b = texture2D(uPoster, clamp(posterUv - spectrumOffset, 0.001, 0.999)).b;
-
-  vec2 lightDirection = normalize(
-    (pointerPosterUv - sphereCenter) / vec2(0.405, 0.49) + vec2(0.0001)
-  );
-  float rimZone = smoothstep(0.34, 0.88, sphereDistance) * sphereMask;
-  float litRim = pow(max(dot(radial, lightDirection), 0.0), 5.0) * rimZone;
-  float shadedRim = pow(max(dot(radial, -lightDirection), 0.0), 4.0) * rimZone;
-  color += vec3(0.73, 0.84, 1.0) * litRim * 0.075 * uPointerActive * pointerInside;
-  color *= 1.0 - shadedRim * 0.028 * uPointerActive * pointerInside;
-
-  float movingSheen = pow(
-    max(0.0, 1.0 - abs(sphereShape.x * 0.8 + sphereShape.y * 0.58 - sin(uTime * 0.24) * 0.34)),
-    18.0
-  ) * sphereMask;
-  color += vec3(0.84, 0.92, 1.0) * movingSheen * 0.035;
-
-  float pointerRing = 1.0 - smoothstep(
-    0.006,
-    0.012,
-    abs(pointerDistance - 0.047)
-  );
-  color = mix(color, vec3(0.08, 0.33, 0.92), pointerRing * 0.5 * uPointerActive);
-
-  gl_FragColor = vec4(color, base.a);
-}
-`;
-
-const compileShader = (gl, type, source) => {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const message = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(message || "Unable to compile the sphere shader.");
-  }
-  return shader;
+const seededRandom = (seed) => {
+  let state = seed >>> 0;
+  return () => {
+    state += 0x6d2b79f5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
 };
 
-const createProgram = (gl) => {
-  const program = gl.createProgram();
-  gl.attachShader(program, compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER));
-  gl.attachShader(program, compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER));
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const message = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(message || "Unable to link the sphere shader.");
+const CAVITIES = [
+  { direction: [0.47, 0.43, 0.77], depth: 0.155, radius: 0.3 },
+  { direction: [-0.62, 0.18, 0.77], depth: 0.125, radius: 0.24 },
+  { direction: [0.12, -0.73, 0.67], depth: 0.11, radius: 0.23 },
+  { direction: [0.81, 0.26, -0.53], depth: 0.18, radius: 0.32 },
+  { direction: [-0.6, 0.57, -0.56], depth: 0.145, radius: 0.28 },
+  { direction: [-0.08, -0.28, -0.96], depth: 0.185, radius: 0.31 }
+].map((cavity) => ({
+  ...cavity,
+  direction: new THREE.Vector3(...cavity.direction).normalize()
+}));
+
+export const buildNonlinearGeometry = (detail) => {
+  let geometry = new THREE.IcosahedronGeometry(1, detail);
+
+  // Weld the base icosphere before recalculating normals so the displaced
+  // surface remains continuous instead of exposing triangular facets.
+  geometry.deleteAttribute("normal");
+  geometry.deleteAttribute("uv");
+  geometry = mergeVertices(geometry, 1e-5);
+
+  const positions = geometry.getAttribute("position");
+  const noise = new SimplexNoise({ random: seededRandom(0x4a544e50) });
+  const direction = new THREE.Vector3();
+
+  for (let index = 0; index < positions.count; index += 1) {
+    direction.fromBufferAttribute(positions, index).normalize();
+    const { x, y, z } = direction;
+
+    const broad = noise.noise3d(x * 0.92 + 1.4, y * 0.92 - 0.8, z * 0.92 + 0.3);
+    const folded = noise.noise3d(x * 2.15 - 1.7, y * 2.15 + 2.1, z * 2.15 - 0.4);
+    const fine = noise.noise3d(x * 4.1 + 0.2, y * 4.1 - 2.8, z * 4.1 + 1.9);
+
+    let deformation = broad * 0.078 + folded * 0.032 + fine * 0.009;
+    deformation += x * y * 0.026 - y * z * 0.018 + x * z * 0.014;
+    deformation += Math.sin((x * 1.18 - z * 0.76 + y * 0.42) * Math.PI) * 0.018;
+
+    for (const cavity of CAVITIES) {
+      const angle = Math.acos(clamp(direction.dot(cavity.direction), -1, 1));
+      const depression = -cavity.depth * Math.exp(
+        -(angle * angle) / (2 * cavity.radius * cavity.radius)
+      );
+      const rimCenter = cavity.radius * 1.12;
+      const rimWidth = cavity.radius * 0.19;
+      const rim = cavity.depth * 0.31 * Math.exp(
+        -((angle - rimCenter) ** 2) / (2 * rimWidth * rimWidth)
+      );
+      deformation += depression + rim;
+    }
+
+    const radius = 1.55 * (1 + deformation);
+    const px = direction.x * radius * 1.035 + direction.y * direction.y * 0.025;
+    const py = direction.y * radius * 0.985 - direction.x * direction.z * 0.018;
+    const pz = direction.z * radius * 1.01 + direction.x * direction.y * 0.02;
+    positions.setXYZ(index, px, py, pz);
   }
-  return program;
+
+  positions.needsUpdate = true;
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  geometry.name = "Nonlinear level-set icosphere";
+  return geometry;
 };
 
-const setStageMotion = (stage, pointer, scroll, reducedMotion) => {
-  const still = reducedMotion.matches;
-  const x = still ? 0 : pointer.x;
-  const y = still ? 0 : pointer.y;
-  const progress = still ? 0 : scroll;
+const addBreathingDisplacement = (material, amplitude, phase) => {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uSurfaceTime = { value: 0 };
+    shader.uniforms.uBreathAmplitude = { value: amplitude };
+    shader.uniforms.uSurfacePhase = { value: phase };
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+        uniform float uSurfaceTime;
+        uniform float uBreathAmplitude;
+        uniform float uSurfacePhase;`
+      )
+      .replace(
+        "#include <begin_vertex>",
+        `vec3 transformed = vec3(position);
+        float surfaceWave = sin(
+          uSurfaceTime * 0.48 +
+          position.x * 1.34 +
+          position.y * 0.91 -
+          position.z * 1.12 +
+          uSurfacePhase
+        );
+        float secondaryWave = sin(
+          uSurfaceTime * 0.31 -
+          position.x * 0.72 +
+          position.y * 1.23 +
+          position.z * 0.83
+        );
+        transformed += objectNormal * (surfaceWave * 0.72 + secondaryWave * 0.28) * uBreathAmplitude;`
+      );
+    material.userData.surfaceShader = shader;
+  };
+  material.customProgramCacheKey = () => `nonlinear-breath-${amplitude}-${phase}`;
+};
 
-  stage.style.setProperty("--sphere-tilt-x", `${(-y * 3.6).toFixed(3)}deg`);
-  stage.style.setProperty("--sphere-tilt-y", `${(x * 4.8).toFixed(3)}deg`);
-  stage.style.setProperty("--sphere-shift-x", `${(x * 9.5).toFixed(3)}px`);
-  stage.style.setProperty("--sphere-shift-y", `${(y * 7 - progress * 8).toFixed(3)}px`);
-  stage.style.setProperty(
-    "--sphere-scale",
-    (1.006 + pointer.active * 0.01 - progress * 0.014).toFixed(4)
-  );
-  stage.style.setProperty("--light-x", `${(50 + x * 13).toFixed(2)}%`);
-  stage.style.setProperty("--light-y", `${(43 + y * 10).toFixed(2)}%`);
+const updateSurfaceTime = (material, time) => {
+  const shader = material.userData.surfaceShader;
+  if (shader) shader.uniforms.uSurfaceTime.value = time;
+};
+
+const createGlassMaterials = (mobile) => {
+  const outer = new THREE.MeshPhysicalMaterial({
+    name: "Clear nonlinear glass",
+    color: 0xf6f9fa,
+    metalness: 0,
+    roughness: mobile ? 0.085 : 0.055,
+    transmission: 1,
+    thickness: mobile ? 1.25 : 1.85,
+    ior: 1.465,
+    dispersion: mobile ? 0.018 : 0.036,
+    specularIntensity: 1,
+    specularColor: 0xffffff,
+    clearcoat: 0.78,
+    clearcoatRoughness: 0.06,
+    attenuationColor: 0xe4edf1,
+    attenuationDistance: 5.8,
+    envMapIntensity: mobile ? 1.2 : 1.42,
+    transparent: true,
+    opacity: 1,
+    side: THREE.FrontSide,
+    depthWrite: true
+  });
+
+  const inner = new THREE.MeshPhysicalMaterial({
+    name: "Inner refractive shell",
+    color: 0xdce7ec,
+    metalness: 0,
+    roughness: mobile ? 0.16 : 0.11,
+    transmission: mobile ? 0.72 : 0.84,
+    thickness: 0.74,
+    ior: 1.42,
+    dispersion: mobile ? 0 : 0.018,
+    clearcoat: 0.3,
+    clearcoatRoughness: 0.12,
+    attenuationColor: 0xd8e8ef,
+    attenuationDistance: 3.6,
+    envMapIntensity: 0.94,
+    transparent: true,
+    opacity: mobile ? 0.19 : 0.25,
+    side: THREE.BackSide,
+    depthWrite: false
+  });
+
+  addBreathingDisplacement(outer, mobile ? 0.0033 : 0.0055, 0);
+  addBreathingDisplacement(inner, mobile ? 0.002 : 0.0035, 1.7);
+  return { outer, inner };
+};
+
+const createOrbit = (radiusX, radiusY, opacity, color = 0x343a3e) => {
+  const curve = new THREE.EllipseCurve(0, 0, radiusX, radiusY, 0, Math.PI * 2);
+  const points = curve.getPoints(192).map((point) => new THREE.Vector3(point.x, point.y, 0));
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    color,
+    transparent: true,
+    opacity,
+    depthWrite: false,
+    toneMapped: false
+  });
+  return new THREE.LineLoop(geometry, material);
+};
+
+const disposeObject = (object) => {
+  object.traverse((child) => {
+    child.geometry?.dispose();
+    if (Array.isArray(child.material)) child.material.forEach((material) => material.dispose());
+    else child.material?.dispose();
+  });
+};
+
+const createFallbackController = (stage, reason) => {
+  stage.classList.remove("webgl-ready", "is-dragging");
+  stage.classList.add("is-fallback");
+  stage.dataset.renderMode = reason;
+  return {
+    setScroll() {},
+    rotateBy() {},
+    rotateTo() {},
+    getState() {
+      return { renderMode: reason, isThreeDimensional: false };
+    },
+    destroy() {}
+  };
 };
 
 export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
   if (!canvas || !stage) return null;
 
-  const poster = stage.querySelector(".sphere-poster");
-  if (!poster) return null;
+  const smallScreenQuery = window.matchMedia("(max-width: 760px)");
+  const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const lowPerformance = Boolean(
+    connection?.saveData ||
+    (navigator.deviceMemory && navigator.deviceMemory <= 1) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)
+  );
 
-  const finePointer = window.matchMedia("(pointer: fine)");
-  const smallScreen = window.matchMedia("(max-width: 760px)");
-  const state = {
-    pointer: { x: 0, y: 0, active: 0 },
-    pointerTarget: { x: 0, y: 0 },
-    pointerActive: 0,
-    pointerActiveTarget: 0,
-    scroll: 0,
-    visible: true,
-    running: true,
-    frame: 0,
-    lastFrame: 0,
-    start: performance.now(),
-    textureReady: false,
-    canvasReady: false
-  };
-
-  let gl = null;
-  let program = null;
-  let buffer = null;
-  let texture = null;
-  let uniforms = null;
-
-  try {
-    gl = canvas.getContext("webgl", {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      premultipliedAlpha: true,
-      powerPreference: "high-performance",
-      preserveDrawingBuffer: false
-    });
-
-    if (gl) {
-      program = createProgram(gl);
-      buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array([-1, -1, 3, -1, -1, 3]),
-        gl.STATIC_DRAW
-      );
-
-      const position = gl.getAttribLocation(program, "aPosition");
-      uniforms = {
-        poster: gl.getUniformLocation(program, "uPoster"),
-        resolution: gl.getUniformLocation(program, "uResolution"),
-        posterResolution: gl.getUniformLocation(program, "uPosterResolution"),
-        time: gl.getUniformLocation(program, "uTime"),
-        pointer: gl.getUniformLocation(program, "uPointer"),
-        pointerActive: gl.getUniformLocation(program, "uPointerActive"),
-        scroll: gl.getUniformLocation(program, "uScroll")
-      };
-
-      gl.useProgram(program);
-      gl.enableVertexAttribArray(position);
-      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-      gl.clearColor(0, 0, 0, 0);
-
-      texture = gl.createTexture();
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.uniform1i(uniforms.poster, 0);
-    }
-  } catch (error) {
-    console.warn("Interactive sphere enhancement is unavailable.", error);
-    gl = null;
+  if (reducedMotionQuery.matches) {
+    return createFallbackController(stage, "reduced-motion-poster");
+  }
+  if (lowPerformance) {
+    return createFallbackController(stage, "low-performance-poster");
   }
 
-  const uploadPoster = () => {
-    if (!gl || !texture || !poster.naturalWidth || !poster.naturalHeight) return;
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, poster);
-    state.textureReady = true;
+  const mobile = smallScreenQuery.matches || coarsePointerQuery.matches;
+  const contextAttributes = {
+    alpha: true,
+    antialias: !mobile,
+    depth: true,
+    powerPreference: "high-performance",
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: false
+  };
+  let webglContext = null;
+  let renderer;
+
+  try {
+    webglContext = canvas.getContext("webgl2", contextAttributes);
+    if (!webglContext) {
+      return createFallbackController(stage, "webgl-unavailable-poster");
+    }
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      context: webglContext,
+      ...contextAttributes
+    });
+  } catch (error) {
+    console.warn("The 3D glass sculpture is unavailable; showing its poster instead.", error);
+    return createFallbackController(stage, "webgl-unavailable-poster");
+  }
+
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = mobile ? 1.08 : 1.12;
+  renderer.transmissionResolutionScale = mobile ? 0.5 : 0.78;
+  renderer.shadowMap.enabled = !mobile;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.setClearColor(PAPER, 1);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(PAPER);
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 30);
+  camera.position.set(0, 0.06, 5.7);
+  camera.lookAt(0, 0, 0);
+
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  pmremGenerator.compileEquirectangularShader();
+  const roomEnvironment = new RoomEnvironment();
+  const environmentMap = pmremGenerator.fromScene(roomEnvironment, 0.045).texture;
+  scene.environment = environmentMap;
+  roomEnvironment.dispose();
+
+  RectAreaLightUniformsLib.init();
+  const keyLight = new THREE.RectAreaLight(0xffffff, 5.8, 4.8, 4.2);
+  keyLight.position.set(-3.2, 4.1, 4.6);
+  keyLight.lookAt(0, 0.15, 0);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.RectAreaLight(0xf8fbff, 2.35, 3.6, 4.5);
+  fillLight.position.set(4.2, 0.65, 3.2);
+  fillLight.lookAt(0, 0, 0);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.RectAreaLight(0xd7e7ff, 3.1, 3.2, 3.2);
+  rimLight.position.set(0.8, 2.7, -4.2);
+  rimLight.lookAt(0, 0, 0);
+  scene.add(rimLight);
+
+  if (!mobile) {
+    const shadowKey = new THREE.DirectionalLight(0xffffff, 0.72);
+    shadowKey.position.set(-3.4, 5.2, 4.1);
+    shadowKey.castShadow = true;
+    shadowKey.shadow.mapSize.set(512, 512);
+    shadowKey.shadow.camera.left = -2.7;
+    shadowKey.shadow.camera.right = 2.7;
+    shadowKey.shadow.camera.top = 2.7;
+    shadowKey.shadow.camera.bottom = -2.7;
+    shadowKey.shadow.camera.near = 1;
+    shadowKey.shadow.camera.far = 12;
+    shadowKey.shadow.bias = -0.00018;
+    shadowKey.shadow.normalBias = 0.035;
+    shadowKey.shadow.radius = 4;
+    scene.add(shadowKey);
+
+    const shadowFloor = new THREE.Mesh(
+      new THREE.PlaneGeometry(5.6, 4.8),
+      new THREE.ShadowMaterial({ color: 0x263845, opacity: 0.085, transparent: true })
+    );
+    shadowFloor.name = "Soft studio shadow receiver";
+    shadowFloor.rotation.x = -Math.PI / 2;
+    shadowFloor.position.set(0, -1.66, -0.08);
+    shadowFloor.receiveShadow = true;
+    scene.add(shadowFloor);
+  }
+
+  const presentationGroup = new THREE.Group();
+  presentationGroup.name = "Mathematical glass presentation";
+  presentationGroup.position.set(0.08, 0.08, 0);
+  scene.add(presentationGroup);
+
+  const sculptureGroup = new THREE.Group();
+  sculptureGroup.name = "360 degree nonlinear sculpture";
+  sculptureGroup.quaternion.setFromEuler(new THREE.Euler(-0.13, -0.42, 0.08, "YXZ"));
+  presentationGroup.add(sculptureGroup);
+
+  const detail = mobile ? 16 : 28;
+  const outerGeometry = buildNonlinearGeometry(detail);
+  const innerGeometry = outerGeometry.clone();
+  const materials = createGlassMaterials(mobile);
+
+  const outerMesh = new THREE.Mesh(outerGeometry, materials.outer);
+  outerMesh.name = "Outer physical glass surface";
+  outerMesh.renderOrder = 2;
+  outerMesh.castShadow = !mobile;
+  sculptureGroup.add(outerMesh);
+
+  const innerMesh = new THREE.Mesh(innerGeometry, materials.inner);
+  innerMesh.name = "Inner thickness shell";
+  innerMesh.scale.setScalar(0.875);
+  innerMesh.renderOrder = 1;
+  sculptureGroup.add(innerMesh);
+
+  const orbitGroup = new THREE.Group();
+  orbitGroup.name = "Level-set reference orbits";
+  orbitGroup.position.set(0.02, 0.02, -0.48);
+  const orbitA = createOrbit(2.18, 1.04, 0.095);
+  orbitA.rotation.set(0.22, -0.36, -0.12);
+  orbitGroup.add(orbitA);
+  const orbitB = createOrbit(1.78, 1.34, 0.052, 0x234e79);
+  orbitB.rotation.set(-0.48, 0.22, 0.62);
+  orbitGroup.add(orbitB);
+  presentationGroup.add(orbitGroup);
+
+  const state = {
+    running: true,
+    visible: true,
+    contextLost: false,
+    dragging: false,
+    pointerId: null,
+    lastPointerX: 0,
+    lastPointerY: 0,
+    pointerX: 0,
+    pointerY: 0,
+    pointerTargetX: 0,
+    pointerTargetY: 0,
+    velocityYaw: 0,
+    velocityPitch: 0,
+    scroll: 0,
+    frame: 0,
+    lastFrame: performance.now(),
+    lastRender: 0,
+    lastInteraction: performance.now(),
+    start: performance.now(),
+    ready: false
+  };
+  let controller = null;
+
+  const updateRotationMetadata = () => {
+    EULER.setFromQuaternion(sculptureGroup.quaternion, "YXZ");
+    stage.dataset.rotationX = THREE.MathUtils.radToDeg(EULER.x).toFixed(1);
+    stage.dataset.rotationY = THREE.MathUtils.radToDeg(EULER.y).toFixed(1);
+    stage.dataset.rotationZ = THREE.MathUtils.radToDeg(EULER.z).toFixed(1);
   };
 
-  if (poster.complete && poster.naturalWidth) uploadPoster();
-  else poster.addEventListener("load", uploadPoster, { once: true });
-
-  if (!gl) stage.classList.add("is-fallback");
+  const rotateRadians = (yaw, pitch) => {
+    ROTATION_Y.setFromAxisAngle(WORLD_Y, yaw);
+    ROTATION_X.setFromAxisAngle(WORLD_X, pitch);
+    sculptureGroup.quaternion.premultiply(ROTATION_Y);
+    sculptureGroup.quaternion.premultiply(ROTATION_X);
+    sculptureGroup.quaternion.normalize();
+    updateRotationMetadata();
+  };
 
   const resize = () => {
-    if (!gl) return;
-    const bounds = canvas.getBoundingClientRect();
-    const pixelBudget = smallScreen.matches ? 360000 : 820000;
-    let dpr = Math.min(window.devicePixelRatio || 1, smallScreen.matches ? 1.1 : 1.35);
-    const requestedPixels = bounds.width * bounds.height * dpr * dpr;
-    if (requestedPixels > pixelBudget) dpr *= Math.sqrt(pixelBudget / requestedPixels);
-    const width = Math.max(1, Math.round(bounds.width * dpr));
-    const height = Math.max(1, Math.round(bounds.height * dpr));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-      gl.viewport(0, 0, width, height);
+    const bounds = stage.getBoundingClientRect();
+    const width = Math.max(1, Math.round(bounds.width));
+    const height = Math.max(1, Math.round(bounds.height));
+    const aspect = width / height;
+    const pixelBudget = mobile ? 520000 : 1100000;
+    let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5);
+    const requestedPixels = width * height * pixelRatio * pixelRatio;
+    if (requestedPixels > pixelBudget) {
+      pixelRatio *= Math.sqrt(pixelBudget / requestedPixels);
     }
+    renderer.setPixelRatio(Math.max(0.75, pixelRatio));
+    renderer.setSize(width, height, false);
+    camera.aspect = aspect;
+    camera.position.z = aspect < 0.78 ? 6.65 : aspect < 1.05 ? 6.15 : 5.7;
+    camera.updateProjectionMatrix();
+    presentationGroup.scale.setScalar(aspect < 0.78 ? 0.94 : 1);
   };
 
-  const render = (now = performance.now()) => {
-    if (!state.running) return;
-    state.frame = requestAnimationFrame(render);
-    if (!state.visible || document.hidden) return;
-
-    const mobile = smallScreen.matches;
-    const minFrameTime = mobile ? 1000 / 30 : 1000 / 60;
-    if (now - state.lastFrame < minFrameTime) return;
-    state.lastFrame = now;
-
-    const smoothing = mobile ? 0.105 : 0.082;
-    state.pointer.x += (state.pointerTarget.x - state.pointer.x) * smoothing;
-    state.pointer.y += (state.pointerTarget.y - state.pointer.y) * smoothing;
-    state.pointerActive += (state.pointerActiveTarget - state.pointerActive) * 0.075;
-    state.pointer.active = state.pointerActive;
-    setStageMotion(stage, state.pointer, state.scroll, reducedMotionQuery);
-
-    if (!gl || !program || !uniforms || !state.textureReady) return;
-
-    resize();
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.useProgram(program);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    const elapsed = reducedMotionQuery.matches ? 0 : (now - state.start) / 1000;
-    gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
-    gl.uniform2f(uniforms.posterResolution, poster.naturalWidth, poster.naturalHeight);
-    gl.uniform1f(uniforms.time, elapsed);
-    gl.uniform2f(uniforms.pointer, state.pointer.x, state.pointer.y);
-    gl.uniform1f(
-      uniforms.pointerActive,
-      reducedMotionQuery.matches ? 0 : state.pointerActive
-    );
-    gl.uniform1f(uniforms.scroll, reducedMotionQuery.matches ? 0 : state.scroll);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-    if (!state.canvasReady) {
-      state.canvasReady = true;
-      stage.classList.add("webgl-ready");
-    }
+  const onPointerDown = (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    state.dragging = true;
+    state.pointerId = event.pointerId;
+    state.lastPointerX = event.clientX;
+    state.lastPointerY = event.clientY;
+    state.velocityYaw = 0;
+    state.velocityPitch = 0;
+    state.lastInteraction = performance.now();
+    stage.classList.add("is-dragging");
+    stage.dataset.dragState = "dragging";
+    canvas.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
   };
 
   const onPointerMove = (event) => {
-    if (!finePointer.matches || reducedMotionQuery.matches) return;
     const bounds = canvas.getBoundingClientRect();
-    state.pointerTarget.x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-    state.pointerTarget.y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
-    state.pointerActiveTarget = 1;
+    state.pointerTargetX = clamp(((event.clientX - bounds.left) / bounds.width - 0.5) * 2, -1, 1);
+    state.pointerTargetY = clamp(((event.clientY - bounds.top) / bounds.height - 0.5) * 2, -1, 1);
+
+    if (!state.dragging) {
+      state.lastInteraction = performance.now();
+      return;
+    }
+    if (event.pointerId !== state.pointerId) return;
+    const deltaX = event.clientX - state.lastPointerX;
+    const deltaY = event.clientY - state.lastPointerY;
+    const dragScale = mobile ? 0.0074 : 0.0065;
+    const yaw = deltaX * dragScale;
+    const pitch = deltaY * dragScale;
+    rotateRadians(yaw, pitch);
+    state.velocityYaw = yaw * 0.82;
+    state.velocityPitch = pitch * 0.82;
+    state.lastPointerX = event.clientX;
+    state.lastPointerY = event.clientY;
+    state.lastInteraction = performance.now();
+    event.preventDefault();
+  };
+
+  const endDrag = (event) => {
+    if (!state.dragging) return;
+    if (event?.pointerId !== undefined && event.pointerId !== state.pointerId) return;
+    if (state.pointerId !== null && canvas.hasPointerCapture?.(state.pointerId)) {
+      canvas.releasePointerCapture(state.pointerId);
+    }
+    state.dragging = false;
+    state.pointerId = null;
+    state.lastInteraction = performance.now();
+    stage.classList.remove("is-dragging");
+    stage.dataset.dragState = "inertia";
+  };
+
+  const onPointerEnter = () => {
+    state.lastInteraction = performance.now();
+    stage.classList.add("is-interacting");
   };
 
   const onPointerLeave = () => {
-    state.pointerTarget.x = 0;
-    state.pointerTarget.y = 0;
-    state.pointerActiveTarget = 0;
+    state.pointerTargetX = 0;
+    state.pointerTargetY = 0;
+    stage.classList.remove("is-interacting");
   };
 
-  stage.addEventListener("pointermove", onPointerMove, { passive: true });
-  stage.addEventListener("pointerleave", onPointerLeave, { passive: true });
+  const render = (now) => {
+    if (!state.running) return;
+    state.frame = requestAnimationFrame(render);
+    if (!state.visible || document.hidden || state.contextLost) return;
+
+    const targetFrameDuration = mobile ? 1000 / 30 : 1000 / 60;
+    if (now - state.lastRender < targetFrameDuration * 0.88) return;
+    state.lastRender = now;
+
+    const delta = clamp((now - state.lastFrame) / (1000 / 60), 0.25, 2.2);
+    state.lastFrame = now;
+    const elapsed = (now - state.start) / 1000;
+
+    state.pointerX += (state.pointerTargetX - state.pointerX) * (mobile ? 0.12 : 0.075);
+    state.pointerY += (state.pointerTargetY - state.pointerY) * (mobile ? 0.12 : 0.075);
+    presentationGroup.rotation.x += (-state.pointerY * 0.028 - presentationGroup.rotation.x) * 0.055;
+    presentationGroup.rotation.y += (state.pointerX * 0.036 - presentationGroup.rotation.y) * 0.055;
+    presentationGroup.position.y += (0.08 - state.scroll * 0.075 - presentationGroup.position.y) * 0.06;
+
+    if (!state.dragging) {
+      const hasInertia = Math.abs(state.velocityYaw) + Math.abs(state.velocityPitch) > 0.000025;
+      if (hasInertia) {
+        rotateRadians(state.velocityYaw * delta, state.velocityPitch * delta);
+        const decay = Math.pow(0.935, delta);
+        state.velocityYaw *= decay;
+        state.velocityPitch *= decay;
+      } else if (now - state.lastInteraction > 2600) {
+        rotateRadians(0.00034 * delta, Math.sin(elapsed * 0.17) * 0.000025 * delta);
+        stage.dataset.dragState = "idle-rotation";
+      } else {
+        stage.dataset.dragState = "resting";
+      }
+    }
+
+    updateSurfaceTime(materials.outer, elapsed);
+    updateSurfaceTime(materials.inner, elapsed);
+    renderer.render(scene, camera);
+
+    if (!state.ready) {
+      state.ready = true;
+      stage.classList.remove("is-fallback");
+      stage.classList.add("webgl-ready");
+      stage.dataset.renderMode = "three-webgl";
+    }
+  };
+
+  const onContextLost = (event) => {
+    event.preventDefault();
+    state.contextLost = true;
+    stage.classList.remove("webgl-ready", "is-dragging");
+    stage.classList.add("is-fallback");
+    stage.dataset.renderMode = "context-lost-poster";
+  };
+
+  const onVisibilityChange = () => {
+    state.lastFrame = performance.now();
+  };
+
+  const onReducedMotionChange = (event) => {
+    if (!event.matches) return;
+    controller?.destroy();
+    stage.classList.remove("webgl-ready", "is-dragging");
+    stage.classList.add("is-fallback");
+    stage.dataset.renderMode = "reduced-motion-poster";
+  };
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerup", endDrag);
+  canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("pointerenter", onPointerEnter, { passive: true });
+  canvas.addEventListener("pointerleave", onPointerLeave, { passive: true });
+  canvas.addEventListener("webglcontextlost", onContextLost, false);
+  document.addEventListener("visibilitychange", onVisibilityChange, { passive: true });
+  reducedMotionQuery.addEventListener?.("change", onReducedMotionChange);
+
+  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver.observe(stage);
 
   const visibilityObserver = new IntersectionObserver(
     ([entry]) => {
       state.visible = entry.isIntersecting;
+      state.lastFrame = performance.now();
     },
-    { rootMargin: "160px" }
+    { rootMargin: "180px" }
   );
   visibilityObserver.observe(stage);
 
-  const onContextLost = (event) => {
-    event.preventDefault();
-    stage.classList.remove("webgl-ready");
-    stage.classList.add("is-fallback");
-    gl = null;
-  };
-  canvas.addEventListener("webglcontextlost", onContextLost, false);
+  resize();
+  updateRotationMetadata();
+  stage.dataset.geometry = `icosahedron-${detail}`;
+  stage.dataset.vertexCount = String(outerGeometry.getAttribute("position").count);
+  stage.dataset.dragState = "resting";
 
-  setStageMotion(stage, state.pointer, state.scroll, reducedMotionQuery);
-  render();
+  try {
+    renderer.compile(scene, camera);
+    renderer.render(scene, camera);
+  } catch (error) {
+    console.warn("The physical glass material could not be rendered; showing its poster instead.", error);
+    renderer.dispose();
+    return createFallbackController(stage, "webgl-render-failed-poster");
+  }
 
-  return {
+  state.frame = requestAnimationFrame(render);
+
+  controller = {
     setScroll(progress) {
-      state.scroll = Math.max(0, Math.min(progress, 1));
+      state.scroll = clamp(progress, 0, 1);
+    },
+    rotateBy(yawDegrees = 0, pitchDegrees = 0) {
+      state.lastInteraction = performance.now();
+      rotateRadians(
+        THREE.MathUtils.degToRad(yawDegrees),
+        THREE.MathUtils.degToRad(pitchDegrees)
+      );
+    },
+    rotateTo(yawDegrees = 0, pitchDegrees = 0, rollDegrees = 0) {
+      EULER.set(
+        THREE.MathUtils.degToRad(pitchDegrees),
+        THREE.MathUtils.degToRad(yawDegrees),
+        THREE.MathUtils.degToRad(rollDegrees),
+        "YXZ"
+      );
+      sculptureGroup.quaternion.setFromEuler(EULER);
+      state.velocityYaw = 0;
+      state.velocityPitch = 0;
+      state.lastInteraction = performance.now();
+      updateRotationMetadata();
+    },
+    getState() {
+      return {
+        renderMode: stage.dataset.renderMode,
+        geometry: stage.dataset.geometry,
+        vertexCount: Number(stage.dataset.vertexCount),
+        rotation: {
+          x: Number(stage.dataset.rotationX),
+          y: Number(stage.dataset.rotationY),
+          z: Number(stage.dataset.rotationZ)
+        },
+        dragging: state.dragging,
+        isThreeDimensional: true
+      };
     },
     destroy() {
       state.running = false;
       cancelAnimationFrame(state.frame);
+      resizeObserver.disconnect();
       visibilityObserver.disconnect();
-      poster.removeEventListener("load", uploadPoster);
-      stage.removeEventListener("pointermove", onPointerMove);
-      stage.removeEventListener("pointerleave", onPointerLeave);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", endDrag);
+      canvas.removeEventListener("pointercancel", endDrag);
+      canvas.removeEventListener("pointerenter", onPointerEnter);
+      canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("webglcontextlost", onContextLost);
-      if (gl && buffer) gl.deleteBuffer(buffer);
-      if (gl && texture) gl.deleteTexture(texture);
-      if (gl && program) gl.deleteProgram(program);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      reducedMotionQuery.removeEventListener?.("change", onReducedMotionChange);
+      disposeObject(scene);
+      environmentMap.dispose();
+      pmremGenerator.dispose();
+      renderer.dispose();
+      if (window.__NONLINEAR_SPHERE__ === controller) delete window.__NONLINEAR_SPHERE__;
     }
   };
+
+  Object.defineProperty(window, "__NONLINEAR_SPHERE__", {
+    value: controller,
+    configurable: true
+  });
+
+  return controller;
 };

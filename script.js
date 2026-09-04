@@ -1,5 +1,3 @@
-import { initNonlinearSphere } from "/sphere.js?v=20260904-6";
-
 const header = document.querySelector("[data-header]");
 const menuButton = document.querySelector(".menu-button");
 const menuLabel = menuButton?.querySelector(".menu-label");
@@ -35,13 +33,30 @@ equationButton?.addEventListener("click", () => {
 });
 
 const sphereStage = document.querySelector("[data-sphere-stage]");
-const sphere = initNonlinearSphere(
-  document.querySelector("[data-sphere-canvas]"),
-  sphereStage,
-  reducedMotion
-);
+let sphere = null;
 
-if (!sphere) sphereStage?.classList.add("is-fallback");
+const loadNonlinearSphere = async () => {
+  if (reducedMotion.matches) {
+    sphereStage?.classList.add("is-fallback");
+    if (sphereStage) sphereStage.dataset.renderMode = "reduced-motion-poster";
+    return;
+  }
+
+  try {
+    const { initNonlinearSphere } = await import("/sphere.js?v=20260904-8");
+    sphere = initNonlinearSphere(
+      document.querySelector("[data-sphere-canvas]"),
+      sphereStage,
+      reducedMotion
+    );
+    if (!sphere) sphereStage?.classList.add("is-fallback");
+    updateScrollState();
+  } catch (error) {
+    console.warn("The interactive sculpture could not be loaded; showing its poster instead.", error);
+    sphereStage?.classList.add("is-fallback");
+    if (sphereStage) sphereStage.dataset.renderMode = "module-load-failed-poster";
+  }
+};
 
 let scrollFrame = 0;
 const updateScrollState = () => {
@@ -60,6 +75,12 @@ const requestScrollUpdate = () => {
 };
 
 updateScrollState();
+if ("requestIdleCallback" in window) {
+  window.requestIdleCallback(loadNonlinearSphere, { timeout: 1200 });
+} else {
+  window.setTimeout(loadNonlinearSphere, 120);
+}
+window.addEventListener("pagehide", () => sphere?.destroy(), { once: true });
 window.addEventListener("scroll", requestScrollUpdate, { passive: true });
 window.addEventListener("resize", requestScrollUpdate, { passive: true });
 

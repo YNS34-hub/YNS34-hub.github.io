@@ -6,14 +6,15 @@ Personal academic website for Jie Tian, focused on nonlinear partial differentia
 
 - `index.html` — semantic single-page portfolio
 - `styles.css` — responsive design system and layout
-- `script.js` — navigation, progressive reveal, and research-workflow interaction
-- `sphere.js` — dependency-free WebGL nonlinear level-set surface with adaptive quality and a static fallback
-- `assets/` — locally hosted subset fonts and the optimized sphere fallback
+- `script.js` — navigation, progressive reveal, research-workflow interaction, and deferred 3D loading
+- `sphere.js` — genuine Three.js geometry, physical glass rendering, 360° drag/inertia, and adaptive fallbacks
+- `assets/` — locally hosted subset fonts and the optimized sphere fallback poster
+- `vendor/` — the pinned browser-native Three.js runtime used by GitHub Pages
 - `favicon.svg` — JT monogram
 - `404.html`, `robots.txt`, `sitemap.xml` — GitHub Pages and search support
 - `design-qa.md` — visual, interaction, responsive, and accessibility verification record
 
-The production site has no runtime framework dependency and is served directly by GitHub Pages from the repository root. Vite is used only for local development and production-build verification.
+The site is served directly by GitHub Pages from the repository root. An import map points the browser to the pinned local Three.js runtime, while Vite is used for local development and production-build verification.
 
 ## Local development
 

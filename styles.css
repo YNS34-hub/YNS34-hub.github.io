@@ -1121,24 +1121,19 @@ blockquote p,
   .display-name span { transform: translateY(1.35rem) scaleX(.665); }
 }
 
-/* Poster-faithful interactive depth layer */
+/* Real Three.js mathematical glass sculpture */
 .sphere-stage {
-  --sphere-tilt-x: 0deg;
-  --sphere-tilt-y: 0deg;
-  --sphere-shift-x: 0px;
-  --sphere-shift-y: 0px;
-  --sphere-scale: 1.004;
   isolation: isolate;
   opacity: 0;
   transform: translateY(1rem) scale(.992);
   animation: sphere-stage-enter 1.15s cubic-bezier(.18, .78, .22, 1) .12s forwards;
+  user-select: none;
 }
 
 .sphere-stage::before,
 .sphere-stage::after { display: none; }
 
-.sphere-poster,
-.sphere-canvas {
+.sphere-poster {
   top: 0;
   right: auto;
   bottom: auto;
@@ -1146,31 +1141,95 @@ blockquote p,
   width: 112%;
   height: auto;
   aspect-ratio: 997 / 720;
-  transform:
-    perspective(1150px)
-    translate3d(var(--sphere-shift-x), var(--sphere-shift-y), 0)
-    rotateX(var(--sphere-tilt-x))
-    rotateY(var(--sphere-tilt-y))
-    scale(var(--sphere-scale));
-  transform-origin: 50% 48%;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
-}
-
-.sphere-poster {
+  object-fit: contain;
   filter: saturate(1.025) contrast(1.012);
-  transition: opacity .32s ease, transform .18s linear;
+  transition: opacity .32s ease;
 }
 
 .sphere-canvas {
-  cursor: default;
-  transition: opacity .32s ease, transform .18s linear;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  opacity: 0;
+  outline: none;
+  transition: opacity .32s ease;
 }
 
+.sphere-stage.is-dragging .sphere-canvas { cursor: grabbing; }
 .sphere-stage.webgl-ready .sphere-poster { opacity: 0; }
 .sphere-stage.webgl-ready .sphere-canvas { opacity: 1; }
 .sphere-stage.is-fallback .sphere-poster { opacity: 1; }
-.sphere-stage.is-fallback .sphere-canvas { opacity: 0; }
+.sphere-stage.is-fallback .sphere-canvas { opacity: 0; pointer-events: none; }
+
+.sphere-technical,
+.sphere-level-set,
+.rotation-hint {
+  position: absolute;
+  z-index: 4;
+  margin: 0;
+  pointer-events: none;
+  transition: color .22s ease, opacity .22s ease, transform .22s ease;
+}
+
+.sphere-technical {
+  top: 7.5%;
+  left: 5%;
+  color: var(--ink-soft);
+  font-size: .56rem;
+  font-weight: 700;
+  letter-spacing: .17em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.sphere-technical strong {
+  margin-top: .32rem;
+  display: block;
+  color: #363b3e;
+  font-family: var(--math);
+  font-size: .88rem;
+  font-weight: 400;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+.sphere-level-set {
+  top: 8.5%;
+  right: 4%;
+  color: #5b6062;
+  font-family: var(--math);
+  font-size: .8rem;
+  font-style: italic;
+}
+
+.rotation-hint {
+  left: 5%;
+  bottom: 7.5%;
+  color: var(--ink-soft);
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .66;
+}
+
+.rotation-hint span {
+  margin-left: .38rem;
+  color: var(--accent);
+}
+
+.sphere-stage.is-interacting .rotation-hint,
+.sphere-stage.is-dragging .rotation-hint {
+  color: var(--ink);
+  opacity: 1;
+  transform: translateX(.18rem);
+}
+
+.sphere-stage.is-fallback .sphere-technical,
+.sphere-stage.is-fallback .sphere-level-set,
+.sphere-stage.is-fallback .rotation-hint { display: none; }
 
 .display-name span {
   opacity: 0;
@@ -1224,6 +1283,13 @@ blockquote p,
   .sphere-stage { transform: none; }
   .sphere-poster,
   .sphere-canvas { transition: opacity .01ms linear; }
+
+  .sphere-canvas,
+  .sphere-technical,
+  .sphere-level-set,
+  .rotation-hint { display: none; }
+
+  .sphere-poster { opacity: 1; }
 }
 
 @media (max-width: 640px) {
@@ -1248,10 +1314,22 @@ blockquote p,
     margin-top: 0;
   }
 
-  .sphere-poster,
-  .sphere-canvas {
-    transform-origin: 51% 45%;
+  .sphere-poster {
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 7%, #000 23%);
     mask-image: linear-gradient(to bottom, transparent 0%, transparent 7%, #000 23%);
+  }
+
+  .sphere-canvas {
+    inset: -.35rem 0 0;
+    height: calc(100% + .35rem);
+  }
+
+  .sphere-technical,
+  .sphere-level-set { display: none; }
+
+  .rotation-hint {
+    left: 3%;
+    bottom: 6%;
+    font-size: .5rem;
   }
 }
