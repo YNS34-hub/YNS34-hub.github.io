@@ -1158,6 +1158,7 @@ blockquote p,
 }
 
 .sphere-stage.is-dragging .sphere-canvas { cursor: grabbing; }
+.sphere-canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
 .sphere-stage.webgl-ready .sphere-poster { opacity: 0; }
 .sphere-stage.webgl-ready .sphere-canvas { opacity: 1; }
 .sphere-stage.is-fallback .sphere-poster { opacity: 1; }

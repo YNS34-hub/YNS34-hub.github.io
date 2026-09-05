@@ -34,8 +34,14 @@ equationButton?.addEventListener("click", () => {
 
 const sphereStage = document.querySelector("[data-sphere-stage]");
 let sphere = null;
+let sphereLoadTicket = 0;
+let pageActive = true;
 
 const loadNonlinearSphere = async () => {
+  if (!pageActive) return;
+  const ticket = ++sphereLoadTicket;
+  sphere?.destroy();
+  sphere = null;
   if (reducedMotion.matches) {
     sphereStage?.classList.add("is-fallback");
     if (sphereStage) sphereStage.dataset.renderMode = "reduced-motion-poster";
@@ -43,7 +49,8 @@ const loadNonlinearSphere = async () => {
   }
 
   try {
-    const { initNonlinearSphere } = await import("/sphere.js?v=20260904-8");
+    const { initNonlinearSphere } = await import("/sphere.js?v=20260905-1");
+    if (ticket !== sphereLoadTicket || !pageActive) return;
     sphere = initNonlinearSphere(
       document.querySelector("[data-sphere-canvas]"),
       sphereStage,
@@ -52,6 +59,7 @@ const loadNonlinearSphere = async () => {
     if (!sphere) sphereStage?.classList.add("is-fallback");
     updateScrollState();
   } catch (error) {
+    if (ticket !== sphereLoadTicket || !pageActive) return;
     console.warn("The interactive sculpture could not be loaded; showing its poster instead.", error);
     sphereStage?.classList.add("is-fallback");
     if (sphereStage) sphereStage.dataset.renderMode = "module-load-failed-poster";
@@ -80,7 +88,17 @@ if ("requestIdleCallback" in window) {
 } else {
   window.setTimeout(loadNonlinearSphere, 120);
 }
-window.addEventListener("pagehide", () => sphere?.destroy(), { once: true });
+window.addEventListener("pagehide", () => {
+  pageActive = false;
+  sphereLoadTicket += 1;
+  sphere?.destroy();
+  sphere = null;
+});
+window.addEventListener("pageshow", (event) => {
+  pageActive = true;
+  if (event.persisted) loadNonlinearSphere();
+});
+reducedMotion.addEventListener?.("change", loadNonlinearSphere);
 window.addEventListener("scroll", requestScrollUpdate, { passive: true });
 window.addEventListener("resize", requestScrollUpdate, { passive: true });
 

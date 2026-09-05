@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "sync:vendor": "node scripts/sync-three.mjs",
+    "test:hero": "node scripts/check-hero.mjs",
+    "prebuild": "npm run sync:vendor",
     "build": "vite build",
     "preview": "vite preview"
   },

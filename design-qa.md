@@ -51,6 +51,20 @@
 - The cursor shown in the original visual reference remains removed.
 - Scientific labels stay quiet and outside the primary reading path; no HUD or simulated API behavior was introduced.
 
-## Final result
+## Production repair — 5 September 2026
 
-final result: passed
+- The first native-module deployment omitted `three.core.min.js` and `RectAreaLightTexturesLib.js`. This caused a module-load fallback even though the Vite build passed. Both are now included.
+- `npm run sync:vendor` recursively copies the runtime dependencies before every build. `npm run test:hero` independently checks the Pages import graph and watertight mesh topology.
+- Renderer teardown is idempotent and covers partially initialized scenes, PMREM render targets, observers, event listeners, and animation frames. Returning from the back-forward cache reinitializes the scene.
+- Offscreen/hidden rendering cancels RAF; mobile omits hover tracking. A sustained very low frame rate activates the poster. Keyboard arrow keys rotate the mesh with a visible focus outline.
+
+## Verification status
+
+- `npm install --offline --ignore-scripts --no-audit --no-fund`: passed using the already available package cache.
+- `npm run build`: passed. The separately loaded 3D chunk is 763 kB / 234 kB gzip in the Vite build; native Pages files are served from `vendor/`.
+- `npm run test:hero`: passed — eight native modules resolve; both meshes are closed manifolds with finite normals; reduced-motion and unavailable-WebGL branches pass without a renderer.
+- The local browser loads the 3D module successfully and enters `webgl-unavailable-poster`, with no new application console error. The cloud browser cannot create a WebGL2 context.
+- Previous screenshots show the fallback artwork. They do **not** validate the new GPU glass material, refraction, shadows, real pointer rotation, or mobile frame rate.
+- Source-level interaction review and geometry projection checks are not substitutes for a rendered 90°/180° drag test.
+
+Final result: build, native imports, mesh topology, and fallback checks passed. **GPU visual/interaction acceptance is not verified in this browser.**

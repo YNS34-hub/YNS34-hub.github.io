@@ -10,6 +10,7 @@ const WORLD_Y = new THREE.Vector3(0, 1, 0);
 const EULER = new THREE.Euler(0, 0, 0, "YXZ");
 const ROTATION_Y = new THREE.Quaternion();
 const ROTATION_X = new THREE.Quaternion();
+let areaLightsInitialized = false;
 
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
 
@@ -200,7 +201,7 @@ const disposeObject = (object) => {
 };
 
 const createFallbackController = (stage, reason) => {
-  stage.classList.remove("webgl-ready", "is-dragging");
+  stage.classList.remove("webgl-ready", "is-dragging", "is-interacting");
   stage.classList.add("is-fallback");
   stage.dataset.renderMode = reason;
   return {
@@ -256,382 +257,404 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       ...contextAttributes
     });
   } catch (error) {
+    renderer?.dispose();
     console.warn("The 3D glass sculpture is unavailable; showing its poster instead.", error);
     return createFallbackController(stage, "webgl-unavailable-poster");
   }
 
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = mobile ? 1.08 : 1.12;
-  renderer.transmissionResolutionScale = mobile ? 0.5 : 0.78;
-  renderer.shadowMap.enabled = !mobile;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  renderer.setClearColor(PAPER, 1);
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(PAPER);
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 30);
-  camera.position.set(0, 0.06, 5.7);
-  camera.lookAt(0, 0, 0);
-
-  const pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader();
-  const roomEnvironment = new RoomEnvironment();
-  const environmentMap = pmremGenerator.fromScene(roomEnvironment, 0.045).texture;
-  scene.environment = environmentMap;
-  roomEnvironment.dispose();
-
-  RectAreaLightUniformsLib.init();
-  const keyLight = new THREE.RectAreaLight(0xffffff, 5.8, 4.8, 4.2);
-  keyLight.position.set(-3.2, 4.1, 4.6);
-  keyLight.lookAt(0, 0.15, 0);
-  scene.add(keyLight);
-
-  const fillLight = new THREE.RectAreaLight(0xf8fbff, 2.35, 3.6, 4.5);
-  fillLight.position.set(4.2, 0.65, 3.2);
-  fillLight.lookAt(0, 0, 0);
-  scene.add(fillLight);
-
-  const rimLight = new THREE.RectAreaLight(0xd7e7ff, 3.1, 3.2, 3.2);
-  rimLight.position.set(0.8, 2.7, -4.2);
-  rimLight.lookAt(0, 0, 0);
-  scene.add(rimLight);
-
-  if (!mobile) {
-    const shadowKey = new THREE.DirectionalLight(0xffffff, 0.72);
-    shadowKey.position.set(-3.4, 5.2, 4.1);
-    shadowKey.castShadow = true;
-    shadowKey.shadow.mapSize.set(512, 512);
-    shadowKey.shadow.camera.left = -2.7;
-    shadowKey.shadow.camera.right = 2.7;
-    shadowKey.shadow.camera.top = 2.7;
-    shadowKey.shadow.camera.bottom = -2.7;
-    shadowKey.shadow.camera.near = 1;
-    shadowKey.shadow.camera.far = 12;
-    shadowKey.shadow.bias = -0.00018;
-    shadowKey.shadow.normalBias = 0.035;
-    shadowKey.shadow.radius = 4;
-    scene.add(shadowKey);
-
-    const shadowFloor = new THREE.Mesh(
-      new THREE.PlaneGeometry(5.6, 4.8),
-      new THREE.ShadowMaterial({ color: 0x263845, opacity: 0.085, transparent: true })
-    );
-    shadowFloor.name = "Soft studio shadow receiver";
-    shadowFloor.rotation.x = -Math.PI / 2;
-    shadowFloor.position.set(0, -1.66, -0.08);
-    shadowFloor.receiveShadow = true;
-    scene.add(shadowFloor);
-  }
-
-  const presentationGroup = new THREE.Group();
-  presentationGroup.name = "Mathematical glass presentation";
-  presentationGroup.position.set(0.08, 0.08, 0);
-  scene.add(presentationGroup);
-
-  const sculptureGroup = new THREE.Group();
-  sculptureGroup.name = "360 degree nonlinear sculpture";
-  sculptureGroup.quaternion.setFromEuler(new THREE.Euler(-0.13, -0.42, 0.08, "YXZ"));
-  presentationGroup.add(sculptureGroup);
-
-  const detail = mobile ? 16 : 28;
-  const outerGeometry = buildNonlinearGeometry(detail);
-  const innerGeometry = outerGeometry.clone();
-  const materials = createGlassMaterials(mobile);
-
-  const outerMesh = new THREE.Mesh(outerGeometry, materials.outer);
-  outerMesh.name = "Outer physical glass surface";
-  outerMesh.renderOrder = 2;
-  outerMesh.castShadow = !mobile;
-  sculptureGroup.add(outerMesh);
-
-  const innerMesh = new THREE.Mesh(innerGeometry, materials.inner);
-  innerMesh.name = "Inner thickness shell";
-  innerMesh.scale.setScalar(0.875);
-  innerMesh.renderOrder = 1;
-  sculptureGroup.add(innerMesh);
-
-  const orbitGroup = new THREE.Group();
-  orbitGroup.name = "Level-set reference orbits";
-  orbitGroup.position.set(0.02, 0.02, -0.48);
-  const orbitA = createOrbit(2.18, 1.04, 0.095);
-  orbitA.rotation.set(0.22, -0.36, -0.12);
-  orbitGroup.add(orbitA);
-  const orbitB = createOrbit(1.78, 1.34, 0.052, 0x234e79);
-  orbitB.rotation.set(-0.48, 0.22, 0.62);
-  orbitGroup.add(orbitB);
-  presentationGroup.add(orbitGroup);
-
-  const state = {
-    running: true,
-    visible: true,
-    contextLost: false,
-    dragging: false,
-    pointerId: null,
-    lastPointerX: 0,
-    lastPointerY: 0,
-    pointerX: 0,
-    pointerY: 0,
-    pointerTargetX: 0,
-    pointerTargetY: 0,
-    velocityYaw: 0,
-    velocityPitch: 0,
-    scroll: 0,
-    frame: 0,
-    lastFrame: performance.now(),
-    lastRender: 0,
-    lastInteraction: performance.now(),
-    start: performance.now(),
-    ready: false
+  const disposers = [];
+  let disposed = false;
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    for (const release of disposers.reverse()) release();
+    renderer.dispose();
+    canvas.removeAttribute("tabindex");
+    canvas.setAttribute("aria-hidden", "true");
   };
-  let controller = null;
-
-  const updateRotationMetadata = () => {
-    EULER.setFromQuaternion(sculptureGroup.quaternion, "YXZ");
-    stage.dataset.rotationX = THREE.MathUtils.radToDeg(EULER.x).toFixed(1);
-    stage.dataset.rotationY = THREE.MathUtils.radToDeg(EULER.y).toFixed(1);
-    stage.dataset.rotationZ = THREE.MathUtils.radToDeg(EULER.z).toFixed(1);
-  };
-
-  const rotateRadians = (yaw, pitch) => {
-    ROTATION_Y.setFromAxisAngle(WORLD_Y, yaw);
-    ROTATION_X.setFromAxisAngle(WORLD_X, pitch);
-    sculptureGroup.quaternion.premultiply(ROTATION_Y);
-    sculptureGroup.quaternion.premultiply(ROTATION_X);
-    sculptureGroup.quaternion.normalize();
-    updateRotationMetadata();
-  };
-
-  const resize = () => {
-    const bounds = stage.getBoundingClientRect();
-    const width = Math.max(1, Math.round(bounds.width));
-    const height = Math.max(1, Math.round(bounds.height));
-    const aspect = width / height;
-    const pixelBudget = mobile ? 520000 : 1100000;
-    let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5);
-    const requestedPixels = width * height * pixelRatio * pixelRatio;
-    if (requestedPixels > pixelBudget) {
-      pixelRatio *= Math.sqrt(pixelBudget / requestedPixels);
-    }
-    renderer.setPixelRatio(Math.max(0.75, pixelRatio));
-    renderer.setSize(width, height, false);
-    camera.aspect = aspect;
-    camera.position.z = aspect < 0.78 ? 6.65 : aspect < 1.05 ? 6.15 : 5.7;
-    camera.updateProjectionMatrix();
-    presentationGroup.scale.setScalar(aspect < 0.78 ? 0.94 : 1);
-  };
-
-  const onPointerDown = (event) => {
-    if (event.button !== undefined && event.button !== 0) return;
-    state.dragging = true;
-    state.pointerId = event.pointerId;
-    state.lastPointerX = event.clientX;
-    state.lastPointerY = event.clientY;
-    state.velocityYaw = 0;
-    state.velocityPitch = 0;
-    state.lastInteraction = performance.now();
-    stage.classList.add("is-dragging");
-    stage.dataset.dragState = "dragging";
-    canvas.setPointerCapture?.(event.pointerId);
-    event.preventDefault();
-  };
-
-  const onPointerMove = (event) => {
-    const bounds = canvas.getBoundingClientRect();
-    state.pointerTargetX = clamp(((event.clientX - bounds.left) / bounds.width - 0.5) * 2, -1, 1);
-    state.pointerTargetY = clamp(((event.clientY - bounds.top) / bounds.height - 0.5) * 2, -1, 1);
-
-    if (!state.dragging) {
-      state.lastInteraction = performance.now();
-      return;
-    }
-    if (event.pointerId !== state.pointerId) return;
-    const deltaX = event.clientX - state.lastPointerX;
-    const deltaY = event.clientY - state.lastPointerY;
-    const dragScale = mobile ? 0.0074 : 0.0065;
-    const yaw = deltaX * dragScale;
-    const pitch = deltaY * dragScale;
-    rotateRadians(yaw, pitch);
-    state.velocityYaw = yaw * 0.82;
-    state.velocityPitch = pitch * 0.82;
-    state.lastPointerX = event.clientX;
-    state.lastPointerY = event.clientY;
-    state.lastInteraction = performance.now();
-    event.preventDefault();
-  };
-
-  const endDrag = (event) => {
-    if (!state.dragging) return;
-    if (event?.pointerId !== undefined && event.pointerId !== state.pointerId) return;
-    if (state.pointerId !== null && canvas.hasPointerCapture?.(state.pointerId)) {
-      canvas.releasePointerCapture(state.pointerId);
-    }
-    state.dragging = false;
-    state.pointerId = null;
-    state.lastInteraction = performance.now();
-    stage.classList.remove("is-dragging");
-    stage.dataset.dragState = "inertia";
-  };
-
-  const onPointerEnter = () => {
-    state.lastInteraction = performance.now();
-    stage.classList.add("is-interacting");
-  };
-
-  const onPointerLeave = () => {
-    state.pointerTargetX = 0;
-    state.pointerTargetY = 0;
-    stage.classList.remove("is-interacting");
-  };
-
-  const render = (now) => {
-    if (!state.running) return;
-    state.frame = requestAnimationFrame(render);
-    if (!state.visible || document.hidden || state.contextLost) return;
-
-    const targetFrameDuration = mobile ? 1000 / 30 : 1000 / 60;
-    if (now - state.lastRender < targetFrameDuration * 0.88) return;
-    state.lastRender = now;
-
-    const delta = clamp((now - state.lastFrame) / (1000 / 60), 0.25, 2.2);
-    state.lastFrame = now;
-    const elapsed = (now - state.start) / 1000;
-
-    state.pointerX += (state.pointerTargetX - state.pointerX) * (mobile ? 0.12 : 0.075);
-    state.pointerY += (state.pointerTargetY - state.pointerY) * (mobile ? 0.12 : 0.075);
-    presentationGroup.rotation.x += (-state.pointerY * 0.028 - presentationGroup.rotation.x) * 0.055;
-    presentationGroup.rotation.y += (state.pointerX * 0.036 - presentationGroup.rotation.y) * 0.055;
-    presentationGroup.position.y += (0.08 - state.scroll * 0.075 - presentationGroup.position.y) * 0.06;
-
-    if (!state.dragging) {
-      const hasInertia = Math.abs(state.velocityYaw) + Math.abs(state.velocityPitch) > 0.000025;
-      if (hasInertia) {
-        rotateRadians(state.velocityYaw * delta, state.velocityPitch * delta);
-        const decay = Math.pow(0.935, delta);
-        state.velocityYaw *= decay;
-        state.velocityPitch *= decay;
-      } else if (now - state.lastInteraction > 2600) {
-        rotateRadians(0.00034 * delta, Math.sin(elapsed * 0.17) * 0.000025 * delta);
-        stage.dataset.dragState = "idle-rotation";
-      } else {
-        stage.dataset.dragState = "resting";
-      }
-    }
-
-    updateSurfaceTime(materials.outer, elapsed);
-    updateSurfaceTime(materials.inner, elapsed);
-    renderer.render(scene, camera);
-
-    if (!state.ready) {
-      state.ready = true;
-      stage.classList.remove("is-fallback");
-      stage.classList.add("webgl-ready");
-      stage.dataset.renderMode = "three-webgl";
-    }
-  };
-
-  const onContextLost = (event) => {
-    event.preventDefault();
-    state.contextLost = true;
-    stage.classList.remove("webgl-ready", "is-dragging");
-    stage.classList.add("is-fallback");
-    stage.dataset.renderMode = "context-lost-poster";
-  };
-
-  const onVisibilityChange = () => {
-    state.lastFrame = performance.now();
-  };
-
-  const onReducedMotionChange = (event) => {
-    if (!event.matches) return;
-    controller?.destroy();
-    stage.classList.remove("webgl-ready", "is-dragging");
-    stage.classList.add("is-fallback");
-    stage.dataset.renderMode = "reduced-motion-poster";
-  };
-
-  canvas.addEventListener("pointerdown", onPointerDown);
-  canvas.addEventListener("pointermove", onPointerMove);
-  canvas.addEventListener("pointerup", endDrag);
-  canvas.addEventListener("pointercancel", endDrag);
-  canvas.addEventListener("pointerenter", onPointerEnter, { passive: true });
-  canvas.addEventListener("pointerleave", onPointerLeave, { passive: true });
-  canvas.addEventListener("webglcontextlost", onContextLost, false);
-  document.addEventListener("visibilitychange", onVisibilityChange, { passive: true });
-  reducedMotionQuery.addEventListener?.("change", onReducedMotionChange);
-
-  const resizeObserver = new ResizeObserver(resize);
-  resizeObserver.observe(stage);
-
-  const visibilityObserver = new IntersectionObserver(
-    ([entry]) => {
-      state.visible = entry.isIntersecting;
-      state.lastFrame = performance.now();
-    },
-    { rootMargin: "180px" }
-  );
-  visibilityObserver.observe(stage);
-
-  resize();
-  updateRotationMetadata();
-  stage.dataset.geometry = `icosahedron-${detail}`;
-  stage.dataset.vertexCount = String(outerGeometry.getAttribute("position").count);
-  stage.dataset.dragState = "resting";
 
   try {
-    renderer.compile(scene, camera);
-    renderer.render(scene, camera);
-  } catch (error) {
-    console.warn("The physical glass material could not be rendered; showing its poster instead.", error);
-    renderer.dispose();
-    return createFallbackController(stage, "webgl-render-failed-poster");
-  }
+    renderer.debug.onShaderError = () => { throw new Error("Physical glass shader compilation failed"); };
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = mobile ? 1.08 : 1.12;
+    renderer.transmissionResolutionScale = mobile ? 0.5 : 0.78;
+    renderer.shadowMap.enabled = !mobile;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setClearColor(PAPER, 1);
 
-  state.frame = requestAnimationFrame(render);
+    const scene = new THREE.Scene();
+    disposers.push(() => disposeObject(scene));
+    scene.background = new THREE.Color(PAPER);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 30);
+    camera.position.set(0, 0.06, 5.7);
+    camera.lookAt(0, 0, 0);
 
-  controller = {
-    setScroll(progress) {
-      state.scroll = clamp(progress, 0, 1);
-    },
-    rotateBy(yawDegrees = 0, pitchDegrees = 0) {
-      state.lastInteraction = performance.now();
-      rotateRadians(
-        THREE.MathUtils.degToRad(yawDegrees),
-        THREE.MathUtils.degToRad(pitchDegrees)
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    disposers.push(() => pmremGenerator.dispose());
+    pmremGenerator.compileEquirectangularShader();
+    const roomEnvironment = new RoomEnvironment();
+    let environmentTarget;
+    try {
+      environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.045);
+    } finally {
+      roomEnvironment.dispose();
+    }
+    disposers.push(() => environmentTarget.dispose());
+    scene.environment = environmentTarget.texture;
+
+    if (!areaLightsInitialized) {
+      RectAreaLightUniformsLib.init();
+      areaLightsInitialized = true;
+    }
+    const keyLight = new THREE.RectAreaLight(0xffffff, 5.8, 4.8, 4.2);
+    keyLight.position.set(-3.2, 4.1, 4.6);
+    keyLight.lookAt(0, 0.15, 0);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.RectAreaLight(0xf8fbff, 2.35, 3.6, 4.5);
+    fillLight.position.set(4.2, 0.65, 3.2);
+    fillLight.lookAt(0, 0, 0);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.RectAreaLight(0xd7e7ff, 3.1, 3.2, 3.2);
+    rimLight.position.set(0.8, 2.7, -4.2);
+    rimLight.lookAt(0, 0, 0);
+    scene.add(rimLight);
+
+    if (!mobile) {
+      const shadowKey = new THREE.DirectionalLight(0xffffff, 0.72);
+      shadowKey.position.set(-3.4, 5.2, 4.1);
+      shadowKey.castShadow = true;
+      shadowKey.shadow.mapSize.set(512, 512);
+      shadowKey.shadow.camera.left = -2.7;
+      shadowKey.shadow.camera.right = 2.7;
+      shadowKey.shadow.camera.top = 2.7;
+      shadowKey.shadow.camera.bottom = -2.7;
+      shadowKey.shadow.camera.near = 1;
+      shadowKey.shadow.camera.far = 12;
+      shadowKey.shadow.bias = -0.00018;
+      shadowKey.shadow.normalBias = 0.035;
+      shadowKey.shadow.radius = 4;
+      scene.add(shadowKey);
+
+      const shadowFloor = new THREE.Mesh(
+        new THREE.PlaneGeometry(5.6, 4.8),
+        new THREE.ShadowMaterial({ color: 0x263845, opacity: 0.085, transparent: true })
       );
-    },
-    rotateTo(yawDegrees = 0, pitchDegrees = 0, rollDegrees = 0) {
-      EULER.set(
-        THREE.MathUtils.degToRad(pitchDegrees),
-        THREE.MathUtils.degToRad(yawDegrees),
-        THREE.MathUtils.degToRad(rollDegrees),
-        "YXZ"
-      );
-      sculptureGroup.quaternion.setFromEuler(EULER);
+      shadowFloor.name = "Soft studio shadow receiver";
+      shadowFloor.rotation.x = -Math.PI / 2;
+      shadowFloor.position.set(0, -1.66, -0.08);
+      shadowFloor.receiveShadow = true;
+      scene.add(shadowFloor);
+    }
+
+    const presentationGroup = new THREE.Group();
+    presentationGroup.name = "Mathematical glass presentation";
+    presentationGroup.position.set(0.08, 0.08, 0);
+    scene.add(presentationGroup);
+
+    const sculptureGroup = new THREE.Group();
+    sculptureGroup.name = "360 degree nonlinear sculpture";
+    sculptureGroup.quaternion.setFromEuler(new THREE.Euler(-0.13, -0.42, 0.08, "YXZ"));
+    presentationGroup.add(sculptureGroup);
+
+    const detail = mobile ? 16 : 28;
+    const outerGeometry = buildNonlinearGeometry(detail);
+    const innerGeometry = outerGeometry.clone();
+    const materials = createGlassMaterials(mobile);
+
+    const outerMesh = new THREE.Mesh(outerGeometry, materials.outer);
+    outerMesh.name = "Outer physical glass surface";
+    outerMesh.renderOrder = 2;
+    outerMesh.castShadow = !mobile;
+    sculptureGroup.add(outerMesh);
+
+    const innerMesh = new THREE.Mesh(innerGeometry, materials.inner);
+    innerMesh.name = "Inner thickness shell";
+    innerMesh.scale.setScalar(0.875);
+    innerMesh.renderOrder = 1;
+    sculptureGroup.add(innerMesh);
+
+    const orbitGroup = new THREE.Group();
+    orbitGroup.name = "Level-set reference orbits";
+    orbitGroup.position.set(0.02, 0.02, -0.48);
+    const orbitA = createOrbit(2.18, 1.04, 0.095);
+    orbitA.rotation.set(0.22, -0.36, -0.12);
+    orbitGroup.add(orbitA);
+    const orbitB = createOrbit(1.78, 1.34, 0.052, 0x234e79);
+    orbitB.rotation.set(-0.48, 0.22, 0.62);
+    orbitGroup.add(orbitB);
+    presentationGroup.add(orbitGroup);
+
+    const state = {
+      running: true,
+      visible: true,
+      contextLost: false,
+      dragging: false,
+      pointerId: null,
+      lastPointerX: 0,
+      lastPointerY: 0,
+      lastPointerTime: 0,
+      pointerX: 0,
+      pointerY: 0,
+      pointerTargetX: 0,
+      pointerTargetY: 0,
+      velocityYaw: 0,
+      velocityPitch: 0,
+      scroll: 0,
+      frame: 0,
+      lastFrame: performance.now(),
+      lastRender: 0,
+      lastInteraction: performance.now(),
+      elapsed: 0,
+      slowFrames: 0,
+      measuredFrames: 0,
+      ready: false
+    };
+    let controller = null;
+    disposers.push(() => {
+      state.running = false;
+      cancelAnimationFrame(state.frame);
+      state.frame = 0;
+      if (state.pointerId !== null && canvas.hasPointerCapture?.(state.pointerId)) {
+        canvas.releasePointerCapture(state.pointerId);
+      }
+      if (window.__NONLINEAR_SPHERE__ === controller) delete window.__NONLINEAR_SPHERE__;
+    });
+
+    const fallBack = (reason) => {
+      dispose();
+      createFallbackController(stage, reason);
+    };
+
+    const updateRotationMetadata = () => {
+      EULER.setFromQuaternion(sculptureGroup.quaternion, "YXZ");
+      stage.dataset.rotationX = THREE.MathUtils.radToDeg(EULER.x).toFixed(1);
+      stage.dataset.rotationY = THREE.MathUtils.radToDeg(EULER.y).toFixed(1);
+      stage.dataset.rotationZ = THREE.MathUtils.radToDeg(EULER.z).toFixed(1);
+    };
+
+    const rotateRadians = (yaw, pitch) => {
+      ROTATION_Y.setFromAxisAngle(WORLD_Y, yaw);
+      ROTATION_X.setFromAxisAngle(WORLD_X, pitch);
+      sculptureGroup.quaternion.premultiply(ROTATION_Y);
+      sculptureGroup.quaternion.premultiply(ROTATION_X);
+      sculptureGroup.quaternion.normalize();
+      updateRotationMetadata();
+    };
+
+    const resize = () => {
+      if (disposed) return;
+      const bounds = stage.getBoundingClientRect();
+      const width = Math.max(1, Math.round(bounds.width));
+      const height = Math.max(1, Math.round(bounds.height));
+      const aspect = width / height;
+      const pixelBudget = mobile ? 520000 : 1100000;
+      let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5);
+      const requestedPixels = width * height * pixelRatio * pixelRatio;
+      if (requestedPixels > pixelBudget) {
+        pixelRatio *= Math.sqrt(pixelBudget / requestedPixels);
+      }
+      renderer.setPixelRatio(Math.max(0.75, pixelRatio));
+      renderer.setSize(width, height, false);
+      camera.aspect = aspect;
+      camera.position.z = aspect < 0.78 ? 6.65 : aspect < 1.05 ? 6.15 : 5.7;
+      camera.updateProjectionMatrix();
+      presentationGroup.scale.setScalar(aspect < 0.78 ? 0.94 : 1);
+    };
+
+    const onPointerDown = (event) => {
+      if (disposed || event.isPrimary === false || state.dragging) return;
+      if (event.button !== undefined && event.button !== 0) return;
+      state.dragging = true;
+      state.pointerId = event.pointerId;
+      state.lastPointerX = event.clientX;
+      state.lastPointerY = event.clientY;
+      state.lastPointerTime = performance.now();
       state.velocityYaw = 0;
       state.velocityPitch = 0;
       state.lastInteraction = performance.now();
-      updateRotationMetadata();
-    },
-    getState() {
-      return {
-        renderMode: stage.dataset.renderMode,
-        geometry: stage.dataset.geometry,
-        vertexCount: Number(stage.dataset.vertexCount),
-        rotation: {
-          x: Number(stage.dataset.rotationX),
-          y: Number(stage.dataset.rotationY),
-          z: Number(stage.dataset.rotationZ)
-        },
-        dragging: state.dragging,
-        isThreeDimensional: true
-      };
-    },
-    destroy() {
-      state.running = false;
+      stage.classList.add("is-dragging");
+      stage.dataset.dragState = "dragging";
+      canvas.setPointerCapture?.(event.pointerId);
+      event.preventDefault();
+    };
+
+    const onPointerMove = (event) => {
+      if (disposed || event.isPrimary === false) return;
+      const bounds = canvas.getBoundingClientRect();
+      state.pointerTargetX = clamp(((event.clientX - bounds.left) / bounds.width - 0.5) * 2, -1, 1);
+      state.pointerTargetY = clamp(((event.clientY - bounds.top) / bounds.height - 0.5) * 2, -1, 1);
+
+      if (!state.dragging) {
+        state.lastInteraction = performance.now();
+        return;
+      }
+      if (event.pointerId !== state.pointerId) return;
+      const deltaX = event.clientX - state.lastPointerX;
+      const deltaY = event.clientY - state.lastPointerY;
+      const dragScale = mobile ? 0.0074 : 0.0065;
+      const yaw = deltaX * dragScale;
+      const pitch = deltaY * dragScale;
+      rotateRadians(yaw, pitch);
+      const now = performance.now();
+      const eventFrames = clamp((now - state.lastPointerTime) / (1000 / 60), 0.5, 4);
+      state.velocityYaw = clamp(yaw / eventFrames * 0.48, -0.022, 0.022);
+      state.velocityPitch = clamp(pitch / eventFrames * 0.48, -0.022, 0.022);
+      state.lastPointerTime = now;
+      state.lastPointerX = event.clientX;
+      state.lastPointerY = event.clientY;
+      state.lastInteraction = performance.now();
+      event.preventDefault();
+    };
+
+    const endDrag = (event) => {
+      if (!state.dragging) return;
+      if (event?.pointerId !== undefined && event.pointerId !== state.pointerId) return;
+      if (state.pointerId !== null && canvas.hasPointerCapture?.(state.pointerId)) {
+        canvas.releasePointerCapture(state.pointerId);
+      }
+      if (performance.now() - state.lastPointerTime > 100 || event?.type === "pointercancel") {
+        state.velocityYaw = 0;
+        state.velocityPitch = 0;
+      }
+      state.dragging = false;
+      state.pointerId = null;
+      state.lastInteraction = performance.now();
+      stage.classList.remove("is-dragging");
+      stage.dataset.dragState = "inertia";
+    };
+
+    const onPointerEnter = () => {
+      state.lastInteraction = performance.now();
+      stage.classList.add("is-interacting");
+    };
+
+    const onPointerLeave = () => {
+      state.pointerTargetX = 0;
+      state.pointerTargetY = 0;
+      stage.classList.remove("is-interacting");
+    };
+
+    const schedule = () => {
+      if (!disposed && state.running && state.visible && !document.hidden && !state.frame) {
+        state.frame = requestAnimationFrame(render);
+      }
+    };
+    const pause = () => {
       cancelAnimationFrame(state.frame);
-      resizeObserver.disconnect();
-      visibilityObserver.disconnect();
+      state.frame = 0;
+      state.lastFrame = performance.now();
+      stage.dataset.animationState = "paused";
+    };
+
+    const render = (now) => {
+      state.frame = 0;
+      if (disposed || !state.running || !state.visible || document.hidden || state.contextLost) return;
+      stage.dataset.animationState = "running";
+
+      const targetFrameDuration = mobile ? 1000 / 30 : 1000 / 60;
+      if (now - state.lastRender < targetFrameDuration * 0.88) { schedule(); return; }
+      state.lastRender = now;
+
+      const frameDuration = now - state.lastFrame;
+      const delta = clamp(frameDuration / (1000 / 60), 0.25, 2.2);
+      state.lastFrame = now;
+      state.elapsed += Math.min(frameDuration, 80) / 1000;
+      const elapsed = state.elapsed;
+      // Fall back only after sustained < 12 fps, excluding shader warm-up.
+      if (elapsed > 5 && !state.dragging) {
+        state.measuredFrames += 1;
+        if (frameDuration > 85) state.slowFrames += 1;
+        if (state.measuredFrames >= 120) {
+          if (state.slowFrames > 90) { fallBack("low-performance-poster"); return; }
+          state.measuredFrames = 0;
+          state.slowFrames = 0;
+        }
+      }
+
+      state.pointerX += (state.pointerTargetX - state.pointerX) * (mobile ? 0.12 : 0.075);
+      state.pointerY += (state.pointerTargetY - state.pointerY) * (mobile ? 0.12 : 0.075);
+      presentationGroup.rotation.x += ((mobile ? 0 : -state.pointerY * 0.028) - presentationGroup.rotation.x) * 0.055;
+      presentationGroup.rotation.y += ((mobile ? 0 : state.pointerX * 0.036) - presentationGroup.rotation.y) * 0.055;
+      presentationGroup.position.y += (0.08 - state.scroll * 0.075 - presentationGroup.position.y) * 0.06;
+
+      if (!state.dragging) {
+        const hasInertia = Math.abs(state.velocityYaw) + Math.abs(state.velocityPitch) > 0.000025;
+        if (hasInertia) {
+          rotateRadians(state.velocityYaw * delta, state.velocityPitch * delta);
+          const decay = Math.pow(0.935, delta);
+          state.velocityYaw *= decay;
+          state.velocityPitch *= decay;
+        } else if (now - state.lastInteraction > 2600) {
+          rotateRadians(0.00034 * delta, Math.sin(elapsed * 0.17) * 0.000025 * delta);
+          stage.dataset.dragState = "idle-rotation";
+        } else {
+          stage.dataset.dragState = "resting";
+        }
+      }
+
+      updateSurfaceTime(materials.outer, elapsed);
+      updateSurfaceTime(materials.inner, elapsed);
+      try {
+        renderer.render(scene, camera);
+      } catch (error) {
+        console.warn("The glass renderer stopped; retaining the poster.", error);
+        fallBack("webgl-render-failed-poster");
+        return;
+      }
+
+      if (!state.ready) {
+        state.ready = true;
+        stage.classList.remove("is-fallback");
+        stage.classList.add("webgl-ready");
+        stage.dataset.renderMode = "three-webgl";
+        canvas.removeAttribute("aria-hidden");
+        canvas.tabIndex = 0;
+      }
+      schedule();
+    };
+
+    const onContextLost = (event) => {
+      event.preventDefault();
+      state.contextLost = true;
+      fallBack("context-lost-poster");
+    };
+
+    const onVisibilityChange = () => {
+      pause();
+      schedule();
+    };
+
+    const onKeyDown = (event) => {
+      const turns = { ArrowLeft: [-0.15, 0], ArrowRight: [0.15, 0], ArrowUp: [0, -0.15], ArrowDown: [0, 0.15] };
+      if (!turns[event.key]) return;
+      event.preventDefault();
+      state.lastInteraction = performance.now();
+      state.velocityYaw = 0;
+      state.velocityPitch = 0;
+      rotateRadians(...turns[event.key]);
+    };
+
+    const onReducedMotionChange = (event) => {
+      if (!event.matches) return;
+      fallBack("reduced-motion-poster");
+    };
+
+    canvas.addEventListener("keydown", onKeyDown);
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", endDrag);
+    canvas.addEventListener("pointercancel", endDrag);
+    canvas.addEventListener("pointerenter", onPointerEnter, { passive: true });
+    canvas.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    canvas.addEventListener("webglcontextlost", onContextLost, false);
+    document.addEventListener("visibilitychange", onVisibilityChange, { passive: true });
+    reducedMotionQuery.addEventListener?.("change", onReducedMotionChange);
+
+    disposers.push(() => {
+      canvas.removeEventListener("keydown", onKeyDown);
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", endDrag);
@@ -641,18 +664,92 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       canvas.removeEventListener("webglcontextlost", onContextLost);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       reducedMotionQuery.removeEventListener?.("change", onReducedMotionChange);
-      disposeObject(scene);
-      environmentMap.dispose();
-      pmremGenerator.dispose();
-      renderer.dispose();
-      if (window.__NONLINEAR_SPHERE__ === controller) delete window.__NONLINEAR_SPHERE__;
+    });
+    const resizeObserver = new ResizeObserver(resize);
+    disposers.push(() => resizeObserver.disconnect());
+    resizeObserver.observe(stage);
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        state.visible = entry.isIntersecting;
+        pause();
+        schedule();
+      },
+      { rootMargin: "180px" }
+    );
+    disposers.push(() => visibilityObserver.disconnect());
+    visibilityObserver.observe(stage);
+
+    resize();
+    updateRotationMetadata();
+    stage.dataset.geometry = `icosahedron-${detail}`;
+    stage.dataset.vertexCount = String(outerGeometry.getAttribute("position").count);
+    stage.dataset.dragState = "resting";
+
+    try {
+      renderer.compile(scene, camera);
+      renderer.render(scene, camera);
+    } catch (error) {
+      console.warn("The physical glass material could not be rendered; showing its poster instead.", error);
+      dispose();
+      return createFallbackController(stage, "webgl-render-failed-poster");
     }
-  };
 
-  Object.defineProperty(window, "__NONLINEAR_SPHERE__", {
-    value: controller,
-    configurable: true
-  });
+    schedule();
 
-  return controller;
+    controller = {
+      setScroll(progress) {
+        state.scroll = clamp(progress, 0, 1);
+      },
+      rotateBy(yawDegrees = 0, pitchDegrees = 0) {
+        state.lastInteraction = performance.now();
+        rotateRadians(
+          THREE.MathUtils.degToRad(yawDegrees),
+          THREE.MathUtils.degToRad(pitchDegrees)
+        );
+      },
+      rotateTo(yawDegrees = 0, pitchDegrees = 0, rollDegrees = 0) {
+        EULER.set(
+          THREE.MathUtils.degToRad(pitchDegrees),
+          THREE.MathUtils.degToRad(yawDegrees),
+          THREE.MathUtils.degToRad(rollDegrees),
+          "YXZ"
+        );
+        sculptureGroup.quaternion.setFromEuler(EULER);
+        state.velocityYaw = 0;
+        state.velocityPitch = 0;
+        state.lastInteraction = performance.now();
+        updateRotationMetadata();
+      },
+      getState() {
+        return {
+          renderMode: stage.dataset.renderMode,
+          geometry: stage.dataset.geometry,
+          vertexCount: Number(stage.dataset.vertexCount),
+          rotation: {
+            x: Number(stage.dataset.rotationX),
+            y: Number(stage.dataset.rotationY),
+            z: Number(stage.dataset.rotationZ)
+          },
+          dragging: state.dragging,
+          isThreeDimensional: !disposed
+        };
+      },
+      destroy() {
+        dispose();
+        createFallbackController(stage, "stopped-poster");
+      }
+    };
+
+    Object.defineProperty(window, "__NONLINEAR_SPHERE__", {
+      value: controller,
+      configurable: true
+    });
+
+    return controller;
+  } catch (error) {
+    dispose();
+    console.warn("The 3D scene could not initialize; retaining the poster.", error);
+    return createFallbackController(stage, "webgl-render-failed-poster");
+  }
 };
