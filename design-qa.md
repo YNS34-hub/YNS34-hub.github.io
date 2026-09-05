@@ -65,4 +65,14 @@ Outputs include `report.json`, `desktop.png`, `angle-000.png`, `angle-90.png`, `
 
 ## Production status
 
-Local GPU acceptance is complete. The repair commit and Pages deployment must still be checked before production acceptance is recorded here.
+Repair commit: `039492172b76df7c072f25a7ce08c955c040c122`.
+
+- [CI run 33965797253](https://github.com/YNS34-hub/YNS34-hub.github.io/actions/runs/33965797253): completed successfully.
+- [Pages run 33965796572](https://github.com/YNS34-hub/YNS34-hub.github.io/actions/runs/33965796572): build and deployment completed successfully. The GitHub-managed Pages workflow emitted a Node 20 action-deprecation notice; it did not prevent deployment.
+- The entire GPU suite was rerun against `https://yns34-hub.github.io/` after deployment, using Chrome 152.0.7977.76 and the same GTX 1650 hardware WebGL2 renderer. It completed successfully.
+- `sphere.js?v=20260905-2`, `three.module.min.js`, `three.core.min.js` and `RectAreaLightTexturesLib.js` all returned HTTP 200 in the browser. No application console errors, shader warnings, module failures or HTTP errors were recorded.
+- Production mouse turns measured 90.0 / 180.0 / 44.7 degrees; inertia and idle motion passed. All three smaller widths, trusted touch events at 375/390, both reduced-motion cases, real context loss, reload recovery and disabled-WebGL fallback passed again.
+- Production Desktop and Mobile screenshots were opened and visually reviewed. They show `three-webgl` rendering and match the repaired local appearance; they are not fallback artwork.
+- Raw production evidence is in `../hero-evidence/production/`, including `report.json`, `desktop.png`, `hero-390.png` and the complete angle/fallback sequence. These files are deliberately outside the deployable site; the browser runner can regenerate them.
+
+Production GPU visual and interaction acceptance is complete for this Chrome/Windows hardware environment. Physical-phone performance and Safari remain outside the tested scope.
