@@ -722,7 +722,7 @@ body {
 .display-name span:last-child { margin-left: .025em; }
 
 .hero-role {
-  margin: .9rem 0 0;
+  margin: 3.15rem 0 0;
   font-family: var(--sans);
   font-size: clamp(1.35rem, 1.9vw, 1.85rem);
   font-weight: 700;

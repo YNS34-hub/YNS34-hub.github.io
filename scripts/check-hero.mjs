@@ -24,7 +24,7 @@ async function checkModule(relative) {
 await checkModule("sphere.js");
 console.log(`Pages import graph: ${visited.size} modules present.`);
 
-for (const detail of [16, 28]) {
+for (const detail of [24, 48]) {
   const geometry = buildNonlinearGeometry(detail);
   const p = geometry.getAttribute("position");
   const normals = geometry.getAttribute("normal");

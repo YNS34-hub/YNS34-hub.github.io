@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { SimplexNoise } from "three/addons/math/SimplexNoise.js";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
@@ -58,13 +57,13 @@ export const buildNonlinearGeometry = (detail) => {
     const folded = noise.noise3d(x * 2.15 - 1.7, y * 2.15 + 2.1, z * 2.15 - 0.4);
     const fine = noise.noise3d(x * 4.1 + 0.2, y * 4.1 - 2.8, z * 4.1 + 1.9);
 
-    let deformation = broad * 0.078 + folded * 0.032 + fine * 0.009;
+    let deformation = broad * 0.09 + folded * 0.022 + fine * 0.004;
     deformation += x * y * 0.026 - y * z * 0.018 + x * z * 0.014;
     deformation += Math.sin((x * 1.18 - z * 0.76 + y * 0.42) * Math.PI) * 0.018;
 
     for (const cavity of CAVITIES) {
       const angle = Math.acos(clamp(direction.dot(cavity.direction), -1, 1));
-      const depression = -cavity.depth * Math.exp(
+      const depression = -cavity.depth * 1.55 * Math.exp(
         -(angle * angle) / (2 * cavity.radius * cavity.radius)
       );
       const rimCenter = cavity.radius * 1.12;
@@ -120,62 +119,56 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
         );
         transformed += objectNormal * (surfaceWave * 0.72 + secondaryWave * 0.28) * uBreathAmplitude;`
       );
-    material.userData.surfaceShader = shader;
+    // Double-sided transmission compiles front and back programs; animate
+    // both so the refracted rear surface breathes with the visible front.
+    (material.userData.surfaceShaders ??= new Set()).add(shader);
+    // Screen-space transmission cannot see studio flags outside the camera.
+    // Supplement it with the same PMREM studio sampled along Snell's refracted
+    // world-space ray. This follows the XYZ surface normals as the mesh turns.
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <transmission_fragment>",
+      `#include <transmission_fragment>
+      #if defined(USE_TRANSMISSION) && defined(ENVMAP_TYPE_CUBE_UV)
+        vec3 studioRay = refract(-v, n, 1.0 / material.ior);
+        vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
+        totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, (gl_FrontFacing ? 0.35 : 1.0) * material.transmission);
+      #endif`
+    );
   };
   material.customProgramCacheKey = () => `nonlinear-breath-${amplitude}-${phase}`;
 };
 
 const updateSurfaceTime = (material, time) => {
-  const shader = material.userData.surfaceShader;
-  if (shader) shader.uniforms.uSurfaceTime.value = time;
+  for (const shader of material.userData.surfaceShaders || []) {
+    shader.uniforms.uSurfaceTime.value = time;
+  }
 };
 
 const createGlassMaterials = (mobile) => {
   const outer = new THREE.MeshPhysicalMaterial({
     name: "Clear nonlinear glass",
-    color: 0xf6f9fa,
+    color: 0xffffff,
     metalness: 0,
-    roughness: mobile ? 0.085 : 0.055,
+    roughness: mobile ? 0.028 : 0.016,
     transmission: 1,
-    thickness: mobile ? 1.25 : 1.85,
-    ior: 1.465,
+    thickness: 1.7,
+    ior: 1.52,
     dispersion: mobile ? 0.018 : 0.036,
     specularIntensity: 1,
     specularColor: 0xffffff,
-    clearcoat: 0.78,
+    clearcoat: 0.15,
     clearcoatRoughness: 0.06,
-    attenuationColor: 0xe4edf1,
-    attenuationDistance: 5.8,
-    envMapIntensity: mobile ? 1.2 : 1.42,
-    transparent: true,
+    attenuationColor: 0xf2f6f8,
+    attenuationDistance: 12,
+    envMapIntensity: 1,
+    transparent: false,
     opacity: 1,
-    side: THREE.FrontSide,
+    side: THREE.DoubleSide,
     depthWrite: true
   });
 
-  const inner = new THREE.MeshPhysicalMaterial({
-    name: "Inner refractive shell",
-    color: 0xdce7ec,
-    metalness: 0,
-    roughness: mobile ? 0.16 : 0.11,
-    transmission: mobile ? 0.72 : 0.84,
-    thickness: 0.74,
-    ior: 1.42,
-    dispersion: mobile ? 0 : 0.018,
-    clearcoat: 0.3,
-    clearcoatRoughness: 0.12,
-    attenuationColor: 0xd8e8ef,
-    attenuationDistance: 3.6,
-    envMapIntensity: 0.94,
-    transparent: true,
-    opacity: mobile ? 0.19 : 0.25,
-    side: THREE.BackSide,
-    depthWrite: false
-  });
-
   addBreathingDisplacement(outer, mobile ? 0.0033 : 0.0055, 0);
-  addBreathingDisplacement(inner, mobile ? 0.002 : 0.0035, 1.7);
-  return { outer, inner };
+  return { outer };
 };
 
 const createOrbit = (radiusX, radiusY, opacity, color = 0x343a3e) => {
@@ -183,9 +176,10 @@ const createOrbit = (radiusX, radiusY, opacity, color = 0x343a3e) => {
   const points = curve.getPoints(192).map((point) => new THREE.Vector3(point.x, point.y, 0));
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const material = new THREE.LineBasicMaterial({
-    color,
-    transparent: true,
-    opacity,
+    // Opaque, paper-blended ink participates in the transmission pass, so
+    // the stationary reference curves are visibly refracted by the glass.
+    color: new THREE.Color(PAPER).lerp(new THREE.Color(color), opacity * 2.5),
+    transparent: false,
     depthWrite: false,
     toneMapped: false
   });
@@ -204,6 +198,8 @@ const createFallbackController = (stage, reason) => {
   stage.classList.remove("webgl-ready", "is-dragging", "is-interacting");
   stage.classList.add("is-fallback");
   stage.dataset.renderMode = reason;
+  stage.dataset.animationState = "stopped";
+  stage.dataset.dragState = "disabled";
   return {
     setScroll() {},
     rotateBy() {},
@@ -256,6 +252,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       context: webglContext,
       ...contextAttributes
     });
+    stage.dataset.webglVersion = webglContext.getParameter(webglContext.VERSION);
   } catch (error) {
     renderer?.dispose();
     console.warn("The 3D glass sculpture is unavailable; showing its poster instead.", error);
@@ -277,10 +274,9 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     renderer.debug.onShaderError = () => { throw new Error("Physical glass shader compilation failed"); };
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = mobile ? 1.08 : 1.12;
+    renderer.toneMappingExposure = 1;
     renderer.transmissionResolutionScale = mobile ? 0.5 : 0.78;
-    renderer.shadowMap.enabled = !mobile;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false;
     renderer.setClearColor(PAPER, 1);
 
     const scene = new THREE.Scene();
@@ -293,12 +289,30 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     disposers.push(() => pmremGenerator.dispose());
     pmremGenerator.compileEquirectangularShader();
-    const roomEnvironment = new RoomEnvironment();
+    // Dark studio flags between broad softboxes give clear glass legible
+    // silver edges. The environment is lighting, never a sculpture texture.
+    const roomEnvironment = new THREE.Scene();
+    roomEnvironment.background = new THREE.Color(0x0b1118);
+    const softbox = (position, width, height, intensity, color = 0xffffff) => {
+      const panel = new THREE.Mesh(
+        new THREE.PlaneGeometry(width, height),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide })
+      );
+      panel.position.set(...position);
+      panel.lookAt(0, 0, 0);
+      roomEnvironment.add(panel);
+    };
+    softbox([-4, 3, 4], 3, 6, 4);
+    softbox([4, 1, 2], 1.2, 5, 2.5);
+    softbox([0, 5, -1], 5, 3, 3);
+    softbox([-1.5, 0, -5], 1.4, 7, 1.5);
+    softbox([1.3, 0.5, -5], 1.1, 6, 1.3);
+    softbox([4, -1, -3], 0.6, 4, 1.2, 0xe5edff);
     let environmentTarget;
     try {
-      environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.045);
+      environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.008);
     } finally {
-      roomEnvironment.dispose();
+      disposeObject(roomEnvironment);
     }
     disposers.push(() => environmentTarget.dispose());
     scene.environment = environmentTarget.texture;
@@ -307,47 +321,31 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       RectAreaLightUniformsLib.init();
       areaLightsInitialized = true;
     }
-    const keyLight = new THREE.RectAreaLight(0xffffff, 5.8, 4.8, 4.2);
+    const keyLight = new THREE.RectAreaLight(0xffffff, 2.5, 3, 4.2);
     keyLight.position.set(-3.2, 4.1, 4.6);
     keyLight.lookAt(0, 0.15, 0);
     scene.add(keyLight);
 
-    const fillLight = new THREE.RectAreaLight(0xf8fbff, 2.35, 3.6, 4.5);
+    const fillLight = new THREE.RectAreaLight(0xf8fbff, 0.8, 1.2, 4.5);
     fillLight.position.set(4.2, 0.65, 3.2);
     fillLight.lookAt(0, 0, 0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.RectAreaLight(0xd7e7ff, 3.1, 3.2, 3.2);
+    const rimLight = new THREE.RectAreaLight(0xe5edff, 1.2, 2, 3.2);
     rimLight.position.set(0.8, 2.7, -4.2);
     rimLight.lookAt(0, 0, 0);
     scene.add(rimLight);
 
-    if (!mobile) {
-      const shadowKey = new THREE.DirectionalLight(0xffffff, 0.72);
-      shadowKey.position.set(-3.4, 5.2, 4.1);
-      shadowKey.castShadow = true;
-      shadowKey.shadow.mapSize.set(512, 512);
-      shadowKey.shadow.camera.left = -2.7;
-      shadowKey.shadow.camera.right = 2.7;
-      shadowKey.shadow.camera.top = 2.7;
-      shadowKey.shadow.camera.bottom = -2.7;
-      shadowKey.shadow.camera.near = 1;
-      shadowKey.shadow.camera.far = 12;
-      shadowKey.shadow.bias = -0.00018;
-      shadowKey.shadow.normalBias = 0.035;
-      shadowKey.shadow.radius = 4;
-      scene.add(shadowKey);
-
-      const shadowFloor = new THREE.Mesh(
-        new THREE.PlaneGeometry(5.6, 4.8),
-        new THREE.ShadowMaterial({ color: 0x263845, opacity: 0.085, transparent: true })
-      );
-      shadowFloor.name = "Soft studio shadow receiver";
-      shadowFloor.rotation.x = -Math.PI / 2;
-      shadowFloor.position.set(0, -1.66, -0.08);
-      shadowFloor.receiveShadow = true;
-      scene.add(shadowFloor);
-    }
+    // An analytic feathered contact shadow avoids treating transmissive glass
+    // as an opaque occluder (and avoids a visibly clipped shadow-map frustum).
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.65), new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `varying vec2 vUv; void main() { vec2 p = (vUv - 0.5) * 2.0; float a = exp(-dot(p, p) * 4.5) * (1.0 - smoothstep(0.65, 1.0, length(p))); gl_FragColor = vec4(0.16, 0.18, 0.19, a * 0.13); }`
+    }));
+    shadow.name = "Feathered studio contact shadow";
+    shadow.position.set(0.08, -1.58, -0.5);
+    scene.add(shadow);
 
     const presentationGroup = new THREE.Group();
     presentationGroup.name = "Mathematical glass presentation";
@@ -359,26 +357,18 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     sculptureGroup.quaternion.setFromEuler(new THREE.Euler(-0.13, -0.42, 0.08, "YXZ"));
     presentationGroup.add(sculptureGroup);
 
-    const detail = mobile ? 16 : 28;
+    const detail = mobile ? 24 : 48;
     const outerGeometry = buildNonlinearGeometry(detail);
-    const innerGeometry = outerGeometry.clone();
     const materials = createGlassMaterials(mobile);
 
     const outerMesh = new THREE.Mesh(outerGeometry, materials.outer);
     outerMesh.name = "Outer physical glass surface";
     outerMesh.renderOrder = 2;
-    outerMesh.castShadow = !mobile;
     sculptureGroup.add(outerMesh);
-
-    const innerMesh = new THREE.Mesh(innerGeometry, materials.inner);
-    innerMesh.name = "Inner thickness shell";
-    innerMesh.scale.setScalar(0.875);
-    innerMesh.renderOrder = 1;
-    sculptureGroup.add(innerMesh);
 
     const orbitGroup = new THREE.Group();
     orbitGroup.name = "Level-set reference orbits";
-    orbitGroup.position.set(0.02, 0.02, -0.48);
+    orbitGroup.position.set(0.02, 0.02, -2);
     const orbitA = createOrbit(2.18, 1.04, 0.095);
     orbitA.rotation.set(0.22, -0.36, -0.12);
     orbitGroup.add(orbitA);
@@ -459,9 +449,9 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       renderer.setPixelRatio(Math.max(0.75, pixelRatio));
       renderer.setSize(width, height, false);
       camera.aspect = aspect;
-      camera.position.z = aspect < 0.78 ? 6.65 : aspect < 1.05 ? 6.15 : 5.7;
+      camera.position.z = mobile ? 6.7 : aspect < 0.78 ? 6.65 : aspect < 1.05 ? 6.15 : 5.7;
       camera.updateProjectionMatrix();
-      presentationGroup.scale.setScalar(aspect < 0.78 ? 0.94 : 1);
+      presentationGroup.scale.setScalar(mobile ? 0.92 : aspect < 0.78 ? 0.94 : 1);
     };
 
     const onPointerDown = (event) => {
@@ -596,7 +586,6 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       }
 
       updateSurfaceTime(materials.outer, elapsed);
-      updateSurfaceTime(materials.inner, elapsed);
       try {
         renderer.render(scene, camera);
       } catch (error) {
