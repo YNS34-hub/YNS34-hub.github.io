@@ -1,103 +1,82 @@
-# Jie Tian — Mathematics & AI for Research
+![Jie Tian — Mathematics and AI for Research](./docs/readme-cover.svg)
 
-Personal academic and project portfolio for **Jie Tian**, a mathematics master's student working on nonlinear partial differential equations and exploring how AI can support rigorous scientific reasoning.
+# Mathematics × AI for Research
 
-**Live site:** https://yns34-hub.github.io/
+A long-term personal lab for **nonlinear mathematics, AI-assisted scientific reasoning, and interactive research communication**.
 
-## Focus
+**Live:** https://yns34-hub.github.io/
 
-- Nonlinear partial differential equations
-- Orlicz growth and rearrangement methods
-- AI-assisted mathematical research
-- Human-in-the-loop verification and research workflows
-- Interactive web experiments for scientific and product communication
+---
 
-## What this repository contains
+## Overview
 
-The site is intentionally designed as a long-term academic portfolio rather than a generic developer landing page. It combines research communication with interactive visualization and selected AI-assisted workflow experiments.
+This repository is the source of a research-oriented web space rather than a conventional developer portfolio. It connects three threads:
 
-### Main sections
+- **Mathematics** — nonlinear elliptic PDEs, Orlicz growth, rearrangement and comparison methods
+- **AI-assisted research** — proof questioning, hidden-assumption checks, structured review workflows, human verification
+- **Interactive communication** — research ideas expressed through restrained motion, WebGL, and information design
 
-- **About** — research background and working principles
-- **Research** — nonlinear elliptic PDEs, Orlicz growth, comparison and rearrangement methods
-- **AI & Research** — how AI is used as a second reader rather than a mathematical oracle
-- **Projects** — structured AI-assisted research workflow experiments
-- **Thinking** — notes on human judgment, scientific questions, and AI-assisted reasoning
-- **Contact** — GitHub and LinkedIn
+## Interface system
 
-## 3D nonlinear glass object
+The site is built around an editorial layout with a small number of deliberate interactions:
 
-The hero visualization is a genuine WebGL / Three.js object rather than a 2D texture effect.
+- semantic single-page structure
+- responsive typography and spacing system
+- progressive section reveals
+- interactive research-workflow component
+- keyboard / reduced-motion considerations
+- search and GitHub Pages support
 
-It uses:
+## Nonlinear glass study
 
-- displaced 3D geometry generated from an icosphere
-- simplex-noise deformation and localized cavities
-- physical glass materials with transmission, IOR, dispersion, and clearcoat
-- environment lighting and adaptive shadows
-- real 360° pointer/touch rotation
-- mobile and reduced-motion fallbacks
+The hero object is a real **Three.js / WebGL2** surface, not a flat image distortion.
 
-The silhouette, lighting, reflections, and refraction change as the object rotates because the geometry is truly three-dimensional.
+It uses displaced icosphere geometry, simplex-noise deformation, localized cavities, physical transmission materials, environment lighting, adaptive shadows, and real 360° pointer/touch rotation. The silhouette, highlights, reflection and refraction therefore change with the object itself.
 
-## Tech stack
+## Stack
 
-- Semantic HTML
-- Modern CSS
-- JavaScript
-- Three.js / WebGL2
-- Vite for local verification
-- GitHub Pages for deployment
+`HTML` · `CSS` · `JavaScript` · `Three.js` · `WebGL2` · `Vite` · `GitHub Pages`
 
-## Repository structure
+## Repository map
 
 ```text
 .
-├── index.html        # semantic portfolio content
-├── styles.css        # responsive visual system
+├── index.html        # semantic content and page structure
+├── styles.css        # visual system and responsive layout
 ├── script.js         # navigation and interaction layer
-├── sphere.js         # nonlinear 3D geometry and glass renderer
-├── assets/           # fonts and fallback assets
+├── sphere.js         # nonlinear geometry + glass renderer
+├── assets/           # local assets and fallback poster
 ├── vendor/           # pinned browser-side Three.js runtime
-├── favicon.svg
+├── docs/             # project notes and repository presentation
+├── design-qa.md      # visual / interaction QA record
 ├── 404.html
 ├── robots.txt
-├── sitemap.xml
-└── design-qa.md      # visual / interaction QA notes
+└── sitemap.xml
 ```
 
-## Local development
+## Local run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Production verification:
+Verification build:
 
 ```bash
 npm run build
 ```
 
-## Project philosophy
+## Working principle
 
-> AI should augment rigorous human reasoning rather than replace it.
+> A convincing explanation is not the same as a proof.
 
-The portfolio reflects the same principle: interactive and AI-assisted tools are useful when their scope, assumptions, and verification boundaries remain explicit.
+AI is treated here as a second reader and exploratory instrument. Mathematical judgment, scope, assumptions, and final validation remain explicit.
 
-## Previous version
+## Archive
 
-The former graduation-memory website is preserved on the branch:
+The previous graduation-memory version is preserved on:
 
 ```text
 archive-before-academic-portfolio
 ```
-
-## Author
-
-**Jie Tian**  
-Mathematics Master's Student · School of Science · Harbin University of Science and Technology
-
-- Portfolio: https://yns34-hub.github.io/
-- GitHub: https://github.com/YNS34-hub
-- LinkedIn: https://www.linkedin.com/in/jie-tian-08278b433/
