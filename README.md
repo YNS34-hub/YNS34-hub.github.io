@@ -1,4 +1,4 @@
-![Jie Tian — Mathematics and AI for Research](./docs/readme-cover.svg)
+![Jie Tian — Mathematics and AI for Research](./docs/github-cover.png)
 
 # Mathematics × AI for Research
 
