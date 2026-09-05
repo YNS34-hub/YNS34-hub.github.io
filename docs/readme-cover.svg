@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Jie Tian — Mathematics and AI for Research">
+  <rect width="1200" height="360" fill="#f3f1ea"/>
+  <path d="M0 72H1200M0 288H1200" stroke="#d8d5cc" stroke-width="1"/>
+  <path d="M760 0V360" stroke="#d8d5cc" stroke-width="1"/>
+  <circle cx="955" cy="180" r="112" fill="none" stroke="#1f2427" stroke-width="1.5" opacity=".24"/>
+  <circle cx="955" cy="180" r="78" fill="none" stroke="#1f2427" stroke-width="1.5" opacity=".17"/>
+  <path d="M861 194c33-71 86-108 150-95 44 9 78 42 95 91-43 40-88 60-136 60-46 0-82-19-109-56Z" fill="#dfe8e8" stroke="#1f2427" stroke-width="1.4"/>
+  <path d="M878 178c36-35 77-53 123-50 35 2 67 16 96 42" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity=".68"/>
+  <text x="64" y="58" font-family="Arial,Helvetica,sans-serif" font-size="14" letter-spacing="3" fill="#5c6265">RESEARCH / SYSTEMS / VISUALIZATION</text>
+  <text x="64" y="159" font-family="Arial,Helvetica,sans-serif" font-size="54" font-weight="700" letter-spacing="-2" fill="#171a1c">JIE TIAN</text>
+  <text x="64" y="205" font-family="Arial,Helvetica,sans-serif" font-size="22" fill="#3f4548">MATHEMATICS × AI FOR RESEARCH</text>
+  <text x="64" y="258" font-family="Arial,Helvetica,sans-serif" font-size="15" fill="#6d7275">Nonlinear PDE · Scientific reasoning · Human-in-the-loop workflows · WebGL</text>
+  <text x="64" y="326" font-family="Arial,Helvetica,sans-serif" font-size="12" letter-spacing="2.4" fill="#85898b">YN S34 / LAB NOTE 01</text>
+</svg>
