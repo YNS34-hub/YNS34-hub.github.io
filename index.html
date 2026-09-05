@@ -37,7 +37,7 @@
         }
       }
     </script>
-    <link rel="stylesheet" href="/styles.css?v=20260904-8" />
+    <link rel="stylesheet" href="/styles.css?v=20260905-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -119,7 +119,7 @@
             height="720"
             fetchpriority="high"
           />
-          <canvas class="sphere-canvas" data-sphere-canvas aria-hidden="true"></canvas>
+          <canvas class="sphere-canvas" data-sphere-canvas aria-hidden="true" role="img" aria-label="Interactive nonlinear glass sculpture" aria-describedby="sphere-description"></canvas>
           <div class="sphere-technical" aria-hidden="true">
             <span>01 / Nonlinear surface</span>
             <strong>Ω ⊂ ℝ³</strong>
@@ -141,9 +141,9 @@
             <span>Validation</span>
           </div>
           <p class="visual-caption">Structure before computation.</p>
-          <p class="sr-only">
+          <p class="sr-only" id="sphere-description">
             A real three-dimensional nonlinear glass surface can be rotated through 360 degrees with
-            pointer or touch. A static poster is shown when reduced motion is requested.
+            pointer or touch, or using arrow keys when focused. A static poster is shown when reduced motion is requested.
           </p>
         </div>
       </section>
@@ -385,6 +385,6 @@
       <p>© 2026</p>
     </footer>
 
-    <script type="module" src="/script.js?v=20260904-8"></script>
+    <script type="module" src="/script.js?v=20260905-1"></script>
   </body>
 </html>
