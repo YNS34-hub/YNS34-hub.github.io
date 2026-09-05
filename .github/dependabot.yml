@@ -4,6 +4,19 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
+    open-pull-requests-limit: 3
+    groups:
+      production-updates:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      development-updates:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
