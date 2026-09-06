@@ -1,0 +1,10 @@
+# Local dependencies and generated builds
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+*.log
+
+# On-demand AI repository map
+.ai/repomix-output.xml

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://repomix.com/schemas/latest/schema.json",
+  "input": {
+    "maxFileSize": 1048576
+  },
+  "output": {
+    "filePath": ".ai/repomix-output.xml",
+    "style": "xml",
+    "filePathStyle": "target-relative",
+    "parsableStyle": true,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "files": true,
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "compress": true,
+    "topFilesLength": 10,
+    "showLineNumbers": true,
+    "truncateBase64": true,
+    "copyToClipboard": false,
+    "includeFullDirectoryStructure": false,
+    "tokenCountTree": false,
+    "git": {
+      "sortByChanges": true,
+      "sortByChangesMaxCommits": 100,
+      "includeDiffs": false,
+      "includeLogs": false,
+      "includeLogsCount": 50
+    }
+  },
+  "include": [
+    "**/*.js",
+    "**/*.mjs",
+    "**/*.cjs",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.jsx",
+    "**/*.html",
+    "**/*.css",
+    "**/*.scss",
+    "**/*.glsl",
+    "**/*.vert",
+    "**/*.frag",
+    "**/*.json",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.toml",
+    "**/*.md",
+    "**/*.txt",
+    "**/*.xml",
+    ".editorconfig",
+    ".nvmrc",
+    ".nojekyll",
+    ".gitignore"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDotIgnore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      ".git/**",
+      ".ai/**",
+      ".serena/**",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "coverage/**",
+      "out/**",
+      "tmp/**",
+      "temp/**",
+      ".tmp/**",
+      ".cache/**",
+      ".vite/**",
+      ".parcel-cache/**",
+      ".turbo/**",
+      ".next/**",
+      ".nuxt/**",
+      "vendor/**",
+      "package-lock.json",
+      "pnpm-lock.yaml",
+      "yarn.lock",
+      "**/*.min.js",
+      "**/*.map",
+      "**/*.{png,jpg,jpeg,gif,webp,avif,ico,bmp,tif,tiff,psd,ai}",
+      "**/*.{mp4,mov,avi,mkv,webm,m4v}",
+      "**/*.{mp3,wav,ogg,m4a,aac,flac}",
+      "**/*.{woff,woff2,ttf,otf,eot}",
+      "**/*.{zip,7z,rar,tar,gz,bz2,xz}",
+      "**/*.{exe,dll,so,dylib,bin}"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  },
+  "tokenCount": {
+    "encoding": "o200k_base"
+  }
+}
