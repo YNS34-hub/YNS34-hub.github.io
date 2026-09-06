@@ -49,7 +49,7 @@ const loadNonlinearSphere = async () => {
   }
 
   try {
-    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-rim-refinement");
+    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-evening-glass");
     if (ticket !== sphereLoadTicket || !pageActive) return;
     sphere = initNonlinearSphere(
       document.querySelector("[data-sphere-canvas]"),
