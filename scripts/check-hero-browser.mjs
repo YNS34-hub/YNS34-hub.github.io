@@ -35,6 +35,12 @@ try {
   const gpu = await page.evaluate(() => { const gl = document.querySelector('canvas').getContext('webgl2'); const ext = gl.getExtension('WEBGL_debug_renderer_info'); return { version: gl.getParameter(gl.VERSION), renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'unavailable' }; });
   record('WebGL2', gpu); assert.match(gpu.version, /WebGL 2/);
   await screenshot(page, 'desktop');
+  const performanceStart = await page.evaluate(() => ({ time: performance.now(), frames: window.__NONLINEAR_SPHERE__.getState().renderedFrames }));
+  await page.waitForTimeout(5000);
+  const performanceEnd = await page.evaluate(() => ({ time: performance.now(), frames: window.__NONLINEAR_SPHERE__.getState().renderedFrames, state: window.__NONLINEAR_SPHERE__.getState() }));
+  const renderedFps = (performanceEnd.frames - performanceStart.frames) * 1000 / (performanceEnd.time - performanceStart.time);
+  record('desktop-render-rate', { renderedFps, ...performanceEnd.state });
+  assert(renderedFps >= 45, `Desktop rendering below the 45 FPS acceptance floor: ${renderedFps}`);
 
   await page.evaluate(() => window.__NONLINEAR_SPHERE__.rotateTo(0, 0, 0));
   await page.waitForTimeout(100); await screenshot(page, 'angle-000');

@@ -122,9 +122,8 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
     // Double-sided transmission compiles front and back programs; animate
     // both so the refracted rear surface breathes with the visible front.
     (material.userData.surfaceShaders ??= new Set()).add(shader);
-    // Screen-space transmission cannot see studio flags outside the camera.
-    // Supplement it with the same PMREM studio sampled along Snell's refracted
-    // world-space ray. This follows the XYZ surface normals as the mesh turns.
+    // One PMREM sample gives the clear surface a studio reflection beyond the
+    // screen buffer. It is deliberately a single lookup, not ray tracing.
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <transmission_fragment>",
       `#include <transmission_fragment>
@@ -275,7 +274,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1;
-    renderer.transmissionResolutionScale = mobile ? 0.5 : 0.78;
+    renderer.transmissionResolutionScale = mobile ? 0.5 : 0.58;
     renderer.shadowMap.enabled = false;
     renderer.setClearColor(PAPER, 1);
 
@@ -400,6 +399,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       elapsed: 0,
       slowFrames: 0,
       measuredFrames: 0,
+      renderedFrames: 0,
       ready: false
     };
     let controller = null;
@@ -440,8 +440,8 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       const width = Math.max(1, Math.round(bounds.width));
       const height = Math.max(1, Math.round(bounds.height));
       const aspect = width / height;
-      const pixelBudget = mobile ? 520000 : 1100000;
-      let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5);
+      const pixelBudget = mobile ? 520000 : 1600000;
+      let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1);
       const requestedPixels = width * height * pixelRatio * pixelRatio;
       if (requestedPixels > pixelBudget) {
         pixelRatio *= Math.sqrt(pixelBudget / requestedPixels);
@@ -588,6 +588,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       updateSurfaceTime(materials.outer, elapsed);
       try {
         renderer.render(scene, camera);
+        state.renderedFrames += 1;
       } catch (error) {
         console.warn("The glass renderer stopped; retaining the poster.", error);
         fallBack("webgl-render-failed-poster");
@@ -678,6 +679,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     try {
       renderer.compile(scene, camera);
       renderer.render(scene, camera);
+      state.renderedFrames += 1;
     } catch (error) {
       console.warn("The physical glass material could not be rendered; showing its poster instead.", error);
       dispose();
@@ -721,7 +723,11 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
             z: Number(stage.dataset.rotationZ)
           },
           dragging: state.dragging,
-          isThreeDimensional: !disposed
+          isThreeDimensional: !disposed,
+          renderedFrames: state.renderedFrames,
+          drawCalls: renderer.info.render.calls,
+          pixelRatio: renderer.getPixelRatio(),
+          transmissionResolutionScale: renderer.transmissionResolutionScale
         };
       },
       destroy() {
