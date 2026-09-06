@@ -122,15 +122,17 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
     // Double-sided transmission compiles front and back programs; animate
     // both so the refracted rear surface breathes with the visible front.
     (material.userData.surfaceShaders ??= new Set()).add(shader);
-    // One PMREM sample gives the clear surface a studio reflection beyond the
-    // screen buffer. It is deliberately a single lookup, not ray tracing.
+    // Keep the native dispersed transmission dominant. One restrained PMREM
+    // lookup supplies offscreen studio light without painting the rear silver.
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <transmission_fragment>",
       `#include <transmission_fragment>
       #if defined(USE_TRANSMISSION) && defined(ENVMAP_TYPE_CUBE_UV)
         vec3 studioRay = refract(-v, n, 1.0 / material.ior);
         vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
-        totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, (gl_FrontFacing ? 0.35 : 1.0) * material.transmission);
+        float studioEdge = pow(1.0 - clamp(abs(dot(n, v)), 0.0, 1.0), 0.65);
+        float studioWeight = gl_FrontFacing ? mix(0.12, 0.85, studioEdge) : mix(0.35, 1.0, studioEdge);
+        totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, studioWeight * material.transmission);
       #endif`
     );
   };
@@ -148,18 +150,18 @@ const createGlassMaterials = (mobile) => {
     name: "Clear nonlinear glass",
     color: 0xffffff,
     metalness: 0,
-    roughness: mobile ? 0.028 : 0.016,
+    roughness: mobile ? 0.018 : 0.008,
     transmission: 1,
-    thickness: 1.7,
-    ior: 1.52,
-    dispersion: mobile ? 0.018 : 0.036,
+    thickness: 1.5,
+    ior: 1.5,
+    dispersion: mobile ? 0.025 : 0.055,
     specularIntensity: 1,
     specularColor: 0xffffff,
-    clearcoat: 0.15,
-    clearcoatRoughness: 0.06,
-    attenuationColor: 0xf2f6f8,
-    attenuationDistance: 12,
-    envMapIntensity: 1,
+    clearcoat: 0,
+    clearcoatRoughness: 0,
+    attenuationColor: 0xffffff,
+    attenuationDistance: Infinity,
+    envMapIntensity: 1.15,
     transparent: false,
     opacity: 1,
     side: THREE.DoubleSide,
@@ -288,10 +290,10 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     disposers.push(() => pmremGenerator.dispose());
     pmremGenerator.compileEquirectangularShader();
-    // Dark studio flags between broad softboxes give clear glass legible
-    // silver edges. The environment is lighting, never a sculpture texture.
+    // A neutral studio surround keeps the transmitted body colorless; narrow
+    // flags and cool/warm cards shape the rims in the precomputed PMREM only.
     const roomEnvironment = new THREE.Scene();
-    roomEnvironment.background = new THREE.Color(0x0b1118);
+    roomEnvironment.background = new THREE.Color(0x949a9e);
     const softbox = (position, width, height, intensity, color = 0xffffff) => {
       const panel = new THREE.Mesh(
         new THREE.PlaneGeometry(width, height),
@@ -301,12 +303,14 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       panel.lookAt(0, 0, 0);
       roomEnvironment.add(panel);
     };
-    softbox([-4, 3, 4], 3, 6, 4);
-    softbox([4, 1, 2], 1.2, 5, 2.5);
-    softbox([0, 5, -1], 5, 3, 3);
-    softbox([-1.5, 0, -5], 1.4, 7, 1.5);
-    softbox([1.3, 0.5, -5], 1.1, 6, 1.3);
-    softbox([4, -1, -3], 0.6, 4, 1.2, 0xe5edff);
+    softbox([-4, 3, 4], 2.4, 6, 5);
+    softbox([4, 1, 2], 0.8, 5, 3.8);
+    softbox([0, 5, -1], 5, 2.2, 4);
+    softbox([-1.5, 0, -5], 1.2, 7, 3.5);
+    softbox([1.3, 0.5, -5], 0.45, 6, 2.8, 0xb3d1ff);
+    softbox([2, -1, -5], 0.28, 4, 2.2, 0xffdfa0);
+    softbox([-0.55, 0, -4.8], 0.38, 7, 0.04);
+    softbox([0.65, 0, -4.8], 0.3, 6, 0.06);
     let environmentTarget;
     try {
       environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.008);
@@ -320,12 +324,12 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       RectAreaLightUniformsLib.init();
       areaLightsInitialized = true;
     }
-    const keyLight = new THREE.RectAreaLight(0xffffff, 2.5, 3, 4.2);
+    const keyLight = new THREE.RectAreaLight(0xffffff, 1.8, 2.4, 4.2);
     keyLight.position.set(-3.2, 4.1, 4.6);
     keyLight.lookAt(0, 0.15, 0);
     scene.add(keyLight);
 
-    const fillLight = new THREE.RectAreaLight(0xf8fbff, 0.8, 1.2, 4.5);
+    const fillLight = new THREE.RectAreaLight(0xf8fbff, 0.6, 0.8, 4.5);
     fillLight.position.set(4.2, 0.65, 3.2);
     fillLight.lookAt(0, 0, 0);
     scene.add(fillLight);
