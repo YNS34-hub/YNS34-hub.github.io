@@ -25,9 +25,9 @@ const seededRandom = (seed) => {
 };
 
 const CAVITIES = [
-  { direction: [0.42, 0.35, 0.84], depth: 0.17, radius: 0.38, rim: 0.52, bowlWidth: 0.67 },
-  { direction: [-0.58, 0.18, 0.79], depth: 0.145, radius: 0.32, rim: 0.48, bowlWidth: 0.68 },
-  { direction: [0.08, -0.67, 0.74], depth: 0.13, radius: 0.3, rim: 0.47, bowlWidth: 0.68 },
+  { direction: [0.39, 0.31, 0.87], depth: 0.195, radius: 0.43, rim: 0.5, bowlWidth: 0.7 },
+  { direction: [-0.56, 0.19, 0.81], depth: 0.165, radius: 0.37, rim: 0.48, bowlWidth: 0.7 },
+  { direction: [0.1, -0.64, 0.76], depth: 0.15, radius: 0.34, rim: 0.48, bowlWidth: 0.7 },
   { direction: [0.78, 0.3, -0.55], depth: 0.18, radius: 0.37, rim: 0.52, bowlWidth: 0.67 },
   { direction: [-0.58, 0.6, -0.55], depth: 0.15, radius: 0.33, rim: 0.49, bowlWidth: 0.68 },
   { direction: [-0.02, -0.37, -0.93], depth: 0.185, radius: 0.35, rim: 0.53, bowlWidth: 0.66 },
@@ -58,7 +58,7 @@ export const buildNonlinearGeometry = (detail) => {
     const folded = noise.noise3d(x * 2.15 - 1.7, y * 2.15 + 2.1, z * 2.15 - 0.4);
     const fine = noise.noise3d(x * 4.1 + 0.2, y * 4.1 - 2.8, z * 4.1 + 1.9);
 
-    let deformation = broad * 0.095 + folded * 0.016 + fine * 0.0015;
+    let deformation = broad * 0.065 + folded * 0.01 + fine * 0.0005;
     deformation += x * y * 0.026 - y * z * 0.018 + x * z * 0.014;
     deformation += Math.sin((x * 1.18 - z * 0.76 + y * 0.42) * Math.PI) * 0.018;
 
@@ -69,7 +69,7 @@ export const buildNonlinearGeometry = (detail) => {
         -(normalizedAngle * normalizedAngle) / (2 * cavity.bowlWidth * cavity.bowlWidth)
       );
       const rim = cavity.depth * cavity.rim * Math.exp(
-        -((normalizedAngle - 1.08) ** 2) / (2 * 0.29 * 0.29)
+        -((normalizedAngle - 1.08) ** 2) / (2 * 0.34 * 0.34)
       );
       deformation += depression + rim;
     }
@@ -131,7 +131,7 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
         vec3 studioRay = refract(-v, n, 1.0 / material.ior);
         vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
         float studioEdge = pow(1.0 - clamp(abs(dot(n, v)), 0.0, 1.0), 0.65);
-        float studioWeight = gl_FrontFacing ? mix(0.12, 0.85, studioEdge) : mix(0.35, 1.0, studioEdge);
+        float studioWeight = gl_FrontFacing ? mix(0.08, 0.85, studioEdge) : mix(0.22, 1.0, studioEdge);
         totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, studioWeight * material.transmission);
       #endif`
     );
@@ -150,18 +150,18 @@ const createGlassMaterials = (mobile) => {
     name: "Clear nonlinear glass",
     color: 0xffffff,
     metalness: 0,
-    roughness: mobile ? 0.018 : 0.008,
+    roughness: mobile ? 0.015 : 0.006,
     transmission: 1,
-    thickness: 1.5,
-    ior: 1.5,
-    dispersion: mobile ? 0.025 : 0.055,
+    thickness: 1.8,
+    ior: 1.49,
+    dispersion: mobile ? 0.02 : 0.04,
     specularIntensity: 1,
     specularColor: 0xffffff,
     clearcoat: 0,
     clearcoatRoughness: 0,
     attenuationColor: 0xffffff,
     attenuationDistance: Infinity,
-    envMapIntensity: 1.15,
+    envMapIntensity: 1.05,
     transparent: false,
     opacity: 1,
     side: THREE.DoubleSide,
@@ -304,11 +304,11 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       roomEnvironment.add(panel);
     };
     softbox([-4, 3, 4], 2.4, 6, 5);
-    softbox([4, 1, 2], 0.8, 5, 3.8);
+    softbox([4, 1, 2], 0.45, 5, 4.5);
     softbox([0, 5, -1], 5, 2.2, 4);
     softbox([-1.5, 0, -5], 1.2, 7, 3.5);
-    softbox([1.3, 0.5, -5], 0.45, 6, 2.8, 0xb3d1ff);
-    softbox([2, -1, -5], 0.28, 4, 2.2, 0xffdfa0);
+    softbox([1.3, 0.5, -5], 0.34, 6, 3.2, 0xc7ddff);
+    softbox([2, -1, -5], 0.14, 4, 2.1, 0xffedcb);
     softbox([-0.55, 0, -4.8], 0.38, 7, 0.04);
     softbox([0.65, 0, -4.8], 0.3, 6, 0.06);
     let environmentTarget;
@@ -344,7 +344,19 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.65), new THREE.ShaderMaterial({
       transparent: true, depthWrite: false,
       vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-      fragmentShader: `varying vec2 vUv; void main() { vec2 p = (vUv - 0.5) * 2.0; float a = exp(-dot(p, p) * 4.5) * (1.0 - smoothstep(0.65, 1.0, length(p))); gl_FragColor = vec4(0.16, 0.18, 0.19, a * 0.13); }`
+      fragmentShader: `varying vec2 vUv;
+        void main() {
+          vec2 p = (vUv - 0.5) * 2.0;
+          float fade = 1.0 - smoothstep(0.65, 1.0, length(p));
+          float shade = exp(-dot(p, p) * 4.5) * 0.16;
+          // A static soft crescent on the existing shadow card, not traced caustics.
+          float arcDistance = (length(p * vec2(1.15, 1.65) - vec2(0.06, -0.12)) - 0.56) * 12.0;
+          float arc = exp(-arcDistance * arcDistance);
+          float glow = arc * smoothstep(-0.1, 0.55, p.y) * 0.3;
+          float alpha = shade + glow;
+          vec3 tint = (vec3(0.16, 0.18, 0.19) * shade + vec3(1.0, 0.99, 0.95) * glow) / max(alpha, 0.0001);
+          gl_FragColor = vec4(tint, alpha * fade);
+        }`
     }));
     shadow.name = "Feathered studio contact shadow";
     shadow.position.set(0.08, -1.58, -0.5);
