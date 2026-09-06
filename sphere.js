@@ -25,12 +25,13 @@ const seededRandom = (seed) => {
 };
 
 const CAVITIES = [
-  { direction: [0.47, 0.43, 0.77], depth: 0.155, radius: 0.3 },
-  { direction: [-0.62, 0.18, 0.77], depth: 0.125, radius: 0.24 },
-  { direction: [0.12, -0.73, 0.67], depth: 0.11, radius: 0.23 },
-  { direction: [0.81, 0.26, -0.53], depth: 0.18, radius: 0.32 },
-  { direction: [-0.6, 0.57, -0.56], depth: 0.145, radius: 0.28 },
-  { direction: [-0.08, -0.28, -0.96], depth: 0.185, radius: 0.31 }
+  { direction: [0.42, 0.35, 0.84], depth: 0.17, radius: 0.38, rim: 0.52, bowlWidth: 0.67 },
+  { direction: [-0.58, 0.18, 0.79], depth: 0.145, radius: 0.32, rim: 0.48, bowlWidth: 0.68 },
+  { direction: [0.08, -0.67, 0.74], depth: 0.13, radius: 0.3, rim: 0.47, bowlWidth: 0.68 },
+  { direction: [0.78, 0.3, -0.55], depth: 0.18, radius: 0.37, rim: 0.52, bowlWidth: 0.67 },
+  { direction: [-0.58, 0.6, -0.55], depth: 0.15, radius: 0.33, rim: 0.49, bowlWidth: 0.68 },
+  { direction: [-0.02, -0.37, -0.93], depth: 0.185, radius: 0.35, rim: 0.53, bowlWidth: 0.66 },
+  { direction: [-0.9, -0.25, 0.35], depth: 0.105, radius: 0.25, rim: 0.44, bowlWidth: 0.7 }
 ].map((cavity) => ({
   ...cavity,
   direction: new THREE.Vector3(...cavity.direction).normalize()
@@ -57,19 +58,18 @@ export const buildNonlinearGeometry = (detail) => {
     const folded = noise.noise3d(x * 2.15 - 1.7, y * 2.15 + 2.1, z * 2.15 - 0.4);
     const fine = noise.noise3d(x * 4.1 + 0.2, y * 4.1 - 2.8, z * 4.1 + 1.9);
 
-    let deformation = broad * 0.09 + folded * 0.022 + fine * 0.004;
+    let deformation = broad * 0.095 + folded * 0.016 + fine * 0.0015;
     deformation += x * y * 0.026 - y * z * 0.018 + x * z * 0.014;
     deformation += Math.sin((x * 1.18 - z * 0.76 + y * 0.42) * Math.PI) * 0.018;
 
     for (const cavity of CAVITIES) {
       const angle = Math.acos(clamp(direction.dot(cavity.direction), -1, 1));
-      const depression = -cavity.depth * 1.55 * Math.exp(
-        -(angle * angle) / (2 * cavity.radius * cavity.radius)
+      const normalizedAngle = angle / cavity.radius;
+      const depression = -cavity.depth * 1.32 * Math.exp(
+        -(normalizedAngle * normalizedAngle) / (2 * cavity.bowlWidth * cavity.bowlWidth)
       );
-      const rimCenter = cavity.radius * 1.12;
-      const rimWidth = cavity.radius * 0.19;
-      const rim = cavity.depth * 0.31 * Math.exp(
-        -((angle - rimCenter) ** 2) / (2 * rimWidth * rimWidth)
+      const rim = cavity.depth * cavity.rim * Math.exp(
+        -((normalizedAngle - 1.08) ** 2) / (2 * 0.29 * 0.29)
       );
       deformation += depression + rim;
     }
