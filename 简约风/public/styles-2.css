@@ -1,0 +1,120 @@
+.diagram-controls input::-moz-range-track { background: #7b8978; height: 2px; }
+.diagram-controls input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border: 2px solid var(--field); outline: 1px solid var(--ink); background: var(--ink); border-radius: 50%; margin-top: -6px; }
+.diagram-controls input::-moz-range-thumb { width: 11px; height: 11px; border: 2px solid var(--field); outline: 1px solid var(--ink); background: var(--ink); border-radius: 50%; }
+.range-endpoints { display: flex; justify-content: space-between; font: 12px/1.5 var(--mono); color: var(--muted); }
+.follow-page { border: 0; border-bottom: 1px solid var(--ink); background: none; padding: 10px 0 6px; min-height: 44px; font-size: 12px; }
+.research-figure figcaption { margin-top: 22px; color: var(--muted); font: 12px/1.6 var(--sans); }
+.story-step { min-height: 480px; padding: 24px 0 80px; display: flex; flex-direction: column; justify-content: flex-start; }
+.story-step + .story-step { padding-top: 48px; }
+.story-step h3 { font-size: clamp(27px,2.6vw,39px); letter-spacing: -.025em; line-height: 1.17; margin-bottom: 26px; }
+.story-step p { font-size: 16px; line-height: 1.7; margin-bottom: 18px; }
+.story-step .text-link { align-self: flex-start; margin-top: 3px; }
+.story-step .quiet-note { color: var(--muted); font-size: 12px; max-width: 29ch; margin-top: 9px; }
+.mobile-only { display: none; }
+
+/* Open editorial entries replace a grid of cards. */
+.practice-index { position: relative; padding-block: 130px 124px; }
+.practice-heading { display: grid; grid-template-columns: 7fr 4fr; gap: 8.3%; align-items: end; margin-bottom: 70px; }
+.practice-heading h2 { font-size: clamp(54px,6.2vw,94px); line-height: 1.02; letter-spacing: -.05em; }
+.practice-heading > p { max-width: 34ch; font-size: 17px; line-height: 1.65; padding-bottom: 6px; }
+.work-list { border-top: 1px solid var(--ink); position: relative; }
+.work-list::before { position: absolute; content: ''; height: 2px; inset: -1px 0 auto; background: var(--accent); transform: scaleX(var(--work-progress,0)); transform-origin: left; }
+.work-row { display: grid; grid-template-columns: 2.5fr 5.5fr 3fr; gap: 40px; padding-block: 42px 48px; border-bottom: 1px solid var(--rule); text-decoration: none; transition: background-color 180ms var(--ease); }
+.work-row:hover { background: #edf0e7; }
+.work-meta { display: flex; flex-direction: column; align-items: flex-start; gap: 35px; padding-top: 8px; }
+.work-meta .utility { font-size: 12px; }
+.work-meta > span:last-child { font-size: 12px; line-height: 1.6; color: var(--muted); }
+.work-title h3 { font-size: clamp(29px,3.1vw,47px); line-height: 1.13; letter-spacing: -.025em; }
+.work-action { display: inline-flex; gap: 18px; margin-top: 27px; font-size: 12px; border-bottom: 1px solid transparent; }
+.work-row:hover .work-action { border-bottom-color: var(--ink); }
+.work-description { padding-top: 7px; font-size: 14px; line-height: 1.7; color: var(--muted); }
+
+/* The ending is a stable invitation. Its color plane is the only reveal. */
+.site-footer { position: relative; isolation: isolate; overflow: hidden; }
+.closing-field { position: absolute; z-index: -1; inset: 0; background: var(--field-end); clip-path: inset(var(--closing-inset,0%) 0 0); }
+.footer-content { padding-top: 36px; }
+.closing-top { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.closing-top > .text-link { font-size: 12px; }
+.closing-grid { display: grid; grid-template-columns: 7fr 4fr; gap: 8.3%; align-items: end; padding: 53px 0 76px; }
+.closing-grid h2 { font-size: clamp(51px,6.6vw,102px); line-height: 1.02; letter-spacing: -.05em; transform: translateY(var(--closing-shift,0px)); }
+.closing-contact { padding-bottom: 4px; }
+.closing-contact p { font-size: 17px; line-height: 1.55; margin-bottom: 20px; }
+.contact-primary { display: flex; gap: 56px; align-items: baseline; width: fit-content; font: 35px/1.4 var(--serif); text-decoration: none; }
+.contact-primary:hover { text-decoration: underline; }
+.email { display: inline-flex; align-items: center; min-height: 44px; font: 12px/1.5 var(--sans); text-decoration: none; }
+.email:hover { text-decoration: underline; }
+.footer-bottom { display: flex; gap: 32px; align-items: center; padding-block: 24px; border-top: 1px solid #b7c3b0; font: 12px/1.5 var(--sans); }
+.footer-bottom > span { margin-right: auto; }
+.footer-bottom nav { display: flex; gap: 25px; align-items: center; }
+.footer-bottom a { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; min-height: 44px; }
+.footer-bottom a:hover { text-decoration: underline; }
+.motion-toggle { border: 0; background: none; padding: 10px 0; font-size: 12px; min-height: 44px; }
+.motion-toggle::before { content: ''; width: 6px; height: 6px; display: inline-block; vertical-align: 1px; border: 1px solid var(--ink); margin-right: 8px; }
+.motion-toggle[aria-pressed='true']::before { background: var(--ink); }
+.motion-toggle:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* A readable long-form system, shared by actual research and project notes. */
+.article { padding: 76px 0 112px; }
+.article-header { padding-bottom: 58px; border-bottom: 1px solid var(--rule); }
+.breadcrumb { display: inline-flex; align-items: center; gap: 17px; font: 12px/1.5 var(--sans); text-decoration: none; min-height: 44px; margin-bottom: 32px; }
+.breadcrumb:hover { text-decoration: underline; }
+.article-header h1 { font-size: clamp(56px,7.2vw,110px); line-height: 1.04; letter-spacing: -.05em; max-width: 19ch; }
+.article-deck { font: 20px/1.6 var(--sans); max-width: 52ch; margin-top: 34px; }
+.article-meta { display: flex; flex-wrap: wrap; gap: 32px; margin-top: 34px; font: 12px/1.6 var(--mono); text-transform: uppercase; letter-spacing: .025em; }
+.article-meta > span + span { padding-left: 32px; border-left: 1px solid var(--rule); }
+.article-layout { display: grid; grid-template-columns: 3fr 7fr 1fr; gap: 5.5%; padding-top: 64px; align-items: start; }
+.article-aside { position: sticky; top: calc(var(--header-height) + 40px); }
+.article-aside nav { display: flex; flex-direction: column; align-items: start; }
+.article-aside .utility { margin-bottom: 23px; font-size: 12px; }
+.article-aside nav a { font-size: 12px; line-height: 1.5; padding-block: 10px; min-height: 40px; text-decoration: none; }
+.article-aside nav a:hover, .article-aside nav a.is-current { text-decoration: underline; }
+.aside-note { font: 12px/1.8 var(--mono); color: var(--muted); margin-top: 42px; }
+.prose { min-width: 0; max-width: 62ch; font-size: 18px; line-height: 1.75; }
+.prose section { scroll-margin-top: 125px; }
+.prose > section + section { margin-top: 68px; padding-top: 18px; }
+.prose h2 { font-size: clamp(29px,3vw,42px); line-height: 1.2; letter-spacing: -.025em; margin-bottom: 26px; }
+.prose p + p { margin-top: 20px; }
+.prose > section > p + .text-link { margin-top: 17px; }
+.prose .text-link { font-size: 14px; }
+.equation { padding: 38px 18px 24px; margin-block: 32px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.equation math { font-size: clamp(24px,2.5vw,34px); }
+.equation-note { display: block; text-align: center; margin-top: 24px; font: 12px/1.6 var(--sans); color: var(--muted); }
+.definition-list { margin: 34px 0 32px; }
+.definition-list > div { display: grid; grid-template-columns: 130px 1fr; gap: 20px; border-top: 1px solid var(--rule); padding: 21px 0; }
+.definition-list > div:last-child { border-bottom: 1px solid var(--rule); }
+.definition-list dt { font-size: 14px; }
+.definition-list dd { margin: 0; font-size: 15px; line-height: 1.7; }
+.editorial-note { padding: 23px 0 23px 24px; margin-block: 32px; border-left: 2px solid #91a18c; }
+.editorial-note .utility { font-size: 12px; }
+.editorial-note p { font-size: 15px; margin-top: 12px; color: var(--muted); }
+.prose details { border-top: 1px solid var(--rule); }
+.prose details:last-of-type { border-bottom: 1px solid var(--rule); }
+.prose summary { position: relative; list-style: none; padding: 20px 36px 20px 0; cursor: pointer; font-size: 15px; }
+.prose summary::-webkit-details-marker { display: none; }
+.prose summary::after { content: '+'; position: absolute; right: 4px; top: 16px; font-size: 22px; }
+.prose details[open] > summary::after { content: '-'; }
+.prose details > div { padding: 0 26px 23px 0; font-size: 15px; line-height: 1.7; }
+.identity-initial { display: inline-block; font: 152px/.9 var(--serif); letter-spacing: -.1em; margin: -8px 0 18px; }
+.identity-note > p:not(.aside-note) { font-size: 13px; }
+.identity-note .aside-note { margin-top: 23px; }
+.contact-list { list-style: none; padding: 0; margin: 28px 0 0; }
+.contact-list li { display: flex; gap: 20px; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule); padding-block: 15px; font-size: 14px; }
+.contact-list li:last-child { border-bottom: 1px solid var(--rule); }
+.contact-list li > span { color: var(--muted); }
+.contact-list a { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; }
+.inline-formula { font: italic 22px/1.7 var(--serif); padding-block: 24px; margin-block: 24px; border-block: 1px solid var(--rule); }
+.workflow-demo { margin-block: 34px 28px; }
+.workflow-tabs { display: none; }
+.js .workflow-tabs { display: grid; grid-template-columns: 1fr 1fr 1.45fr 1fr; border-block: 1px solid var(--rule); }
+.workflow-tabs button { display: block; position: relative; min-height: 58px; background: none; padding: 12px 4px; border: 0; font-size: 12px; }
+.workflow-tabs button + button { border-left: 1px solid var(--rule); }
+.workflow-tabs button[aria-selected='true'] { color: var(--paper); background: var(--ink); }
+.workflow-tabs button:not([aria-selected='true']):hover { background: var(--field); }
+.workflow-panel { margin: 0; padding: 34px 0 28px; border-bottom: 1px solid var(--rule); }
+.workflow-panel .utility { font-size: 12px; }
+.workflow-panel h3 { font-size: 37px; line-height: 1.15; letter-spacing: -.025em; margin: 21px 0; }
+.workflow-panel > p { font-size: 16px; line-height: 1.7; }
+.workflow-panel .workflow-output { margin-top: 27px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: 13px; line-height: 1.6; }
+.workflow-output > span { display: block; font: 12px/1.5 var(--mono); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 9px; }
+.not-found { padding-block: 100px 150px; }
+.not-found h1 { font-size: clamp(50px,7vw,100px); line-height: 1.07; letter-spacing: -.04em; margin-block: 28px; }
