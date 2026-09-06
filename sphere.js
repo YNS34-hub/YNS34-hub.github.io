@@ -131,7 +131,7 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
         vec3 studioRay = refract(-v, n, 1.0 / material.ior);
         vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
         float studioEdge = smoothstep(0.3, 0.8, 1.0 - clamp(abs(dot(n, v)), 0.0, 1.0));
-        float studioWeight = gl_FrontFacing ? mix(0.025, 0.55, studioEdge) : mix(0.04, 0.5, studioEdge);
+        float studioWeight = gl_FrontFacing ? mix(0.005, 0.62, studioEdge) : mix(0.008, 0.42, studioEdge);
         totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, studioWeight * material.transmission);
       #endif`
     );
@@ -150,18 +150,21 @@ const createGlassMaterials = (mobile) => {
     name: "Clear nonlinear glass",
     color: 0xffffff,
     metalness: 0,
-    roughness: mobile ? 0.015 : 0.008,
+    roughness: mobile ? 0.015 : 0.01,
     transmission: 1,
-    thickness: 1.48,
+    thickness: 1.15,
     ior: 1.5,
-    dispersion: mobile ? 0.025 : 0.055,
+    dispersion: mobile ? 0.025 : 0.065,
     specularIntensity: 1,
     specularColor: 0xffffff,
     clearcoat: 0,
     clearcoatRoughness: 0,
     attenuationColor: 0xffffff,
     attenuationDistance: Infinity,
-    envMapIntensity: 1.28,
+    envMapIntensity: 1,
+    // Scene clear colors bypass tone mapping. Preserve that warm backdrop in
+    // transmission instead of compressing it to gray inside this material.
+    toneMapped: false,
     transparent: false,
     opacity: 1,
     side: THREE.DoubleSide,
@@ -290,10 +293,10 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     disposers.push(() => pmremGenerator.dispose());
     pmremGenerator.compileEquirectangularShader();
-    // A neutral studio surround keeps the transmitted body colorless; narrow
-    // flags and cool/warm cards shape the rims in the precomputed PMREM only.
+    // The dark studio is reflection lighting, independent of the warm page.
+    // Local white cards define clear rims; native transmission carries the body.
     const roomEnvironment = new THREE.Scene();
-    roomEnvironment.background = new THREE.Color(0xf0f2f3);
+    roomEnvironment.background = new THREE.Color(0x30383e);
     const softbox = (position, width, height, intensity, color = 0xffffff) => {
       const panel = new THREE.Mesh(
         new THREE.PlaneGeometry(width, height),
@@ -303,18 +306,16 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       panel.lookAt(0, 0, 0);
       roomEnvironment.add(panel);
     };
-    softbox([-4, 3, 4], 2.4, 6, 6);
-    softbox([4, 1, 2], 0.2, 5, 2.5, 0x8cbbff);
-    softbox([0, 5, -1], 5, 2.2, 4.8);
-    softbox([-1.5, 0, -5], 1.2, 7, 4.5);
-    softbox([1.3, 0.5, -5], 0.22, 6, 2.8, 0x9fcaff);
-    softbox([2, -1, -5], 0.09, 4, 1.8, 0xffd68e);
-    softbox([-0.55, 0, -4.8], 0.38, 7, 0.04);
-    softbox([0.65, 0, -4.8], 0.3, 6, 0.06);
-    // Small frontal flags add reflected edge contrast without a gray surround.
-    softbox([-2, 0.6, 4.6], 0.65, 5, 0.025);
-    softbox([2.6, -0.6, 4], 0.65, 4, 0.035);
-    softbox([4, 0.5, -1], 0.65, 4, 0.03);
+    softbox([-4, 3, 4], 2.6, 5, 5.5);
+    softbox([0, 5, -1], 4.5, 2, 4);
+    softbox([-1.5, 0, -5], 1.7, 6, 3.5);
+    softbox([3.5, 1, 3], 0.22, 5, 7);
+    softbox([0.4, -0.5, -5], 0.16, 5, 6);
+    softbox([1.3, 0.5, -5], 0.16, 5, 2.5, 0x73aaff);
+    softbox([2, -1, -5], 0.065, 3.5, 1.8, 0xffce78);
+    softbox([-2, 0.6, 4.6], 0.65, 4, 0.012);
+    softbox([2.6, -0.6, 4], 0.5, 4, 0.016);
+    softbox([4, 0.5, -1], 0.5, 4, 0.015);
     let environmentTarget;
     try {
       environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.003);
@@ -328,17 +329,17 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       RectAreaLightUniformsLib.init();
       areaLightsInitialized = true;
     }
-    const keyLight = new THREE.RectAreaLight(0xffffff, 2.6, 2.4, 4.2);
+    const keyLight = new THREE.RectAreaLight(0xffffff, 2.8, 2, 4.2);
     keyLight.position.set(-3.2, 4.1, 4.6);
     keyLight.lookAt(0, 0.15, 0);
     scene.add(keyLight);
 
-    const fillLight = new THREE.RectAreaLight(0xf8fbff, 0.35, 0.8, 4.5);
+    const fillLight = new THREE.RectAreaLight(0xf8fbff, 0.15, 0.8, 4.5);
     fillLight.position.set(4.2, 0.65, 3.2);
     fillLight.lookAt(0, 0, 0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.RectAreaLight(0xd5e6ff, 1.9, 2, 3.2);
+    const rimLight = new THREE.RectAreaLight(0xd5e6ff, 2.4, 0.7, 3.2);
     rimLight.position.set(0.8, 2.7, -4.2);
     rimLight.lookAt(0, 0, 0);
     scene.add(rimLight);
