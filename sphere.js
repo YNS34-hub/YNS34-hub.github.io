@@ -25,13 +25,13 @@ const seededRandom = (seed) => {
 };
 
 const CAVITIES = [
-  { direction: [0.39, 0.31, 0.87], depth: 0.195, radius: 0.43, rim: 0.5, bowlWidth: 0.7 },
-  { direction: [-0.56, 0.19, 0.81], depth: 0.165, radius: 0.37, rim: 0.48, bowlWidth: 0.7 },
-  { direction: [0.1, -0.64, 0.76], depth: 0.15, radius: 0.34, rim: 0.48, bowlWidth: 0.7 },
-  { direction: [0.78, 0.3, -0.55], depth: 0.18, radius: 0.37, rim: 0.52, bowlWidth: 0.67 },
-  { direction: [-0.58, 0.6, -0.55], depth: 0.15, radius: 0.33, rim: 0.49, bowlWidth: 0.68 },
-  { direction: [-0.02, -0.37, -0.93], depth: 0.185, radius: 0.35, rim: 0.53, bowlWidth: 0.66 },
-  { direction: [-0.9, -0.25, 0.35], depth: 0.105, radius: 0.25, rim: 0.44, bowlWidth: 0.7 }
+  { direction: [0.38, 0.34, 0.86], depth: 0.34, radius: 0.64 },
+  { direction: [-0.55, 0.2, 0.81], depth: 0.315, radius: 0.59 },
+  { direction: [0.07, -0.62, 0.78], depth: 0.3, radius: 0.57 },
+  { direction: [0.78, 0.3, -0.55], depth: 0.25, radius: 0.56 },
+  { direction: [-0.58, 0.6, -0.55], depth: 0.23, radius: 0.53 },
+  { direction: [-0.02, -0.37, -0.93], depth: 0.265, radius: 0.59 },
+  { direction: [-0.92, -0.3, 0.24], depth: 0.19, radius: 0.45 }
 ].map((cavity) => ({
   ...cavity,
   direction: new THREE.Vector3(...cavity.direction).normalize()
@@ -55,29 +55,28 @@ export const buildNonlinearGeometry = (detail) => {
     const { x, y, z } = direction;
 
     const broad = noise.noise3d(x * 0.92 + 1.4, y * 0.92 - 0.8, z * 0.92 + 0.3);
-    const folded = noise.noise3d(x * 2.15 - 1.7, y * 2.15 + 2.1, z * 2.15 - 0.4);
-    const fine = noise.noise3d(x * 4.1 + 0.2, y * 4.1 - 2.8, z * 4.1 + 1.9);
-
-    let deformation = broad * 0.065 + folded * 0.01 + fine * 0.0005;
-    deformation += x * y * 0.026 - y * z * 0.018 + x * z * 0.014;
-    deformation += Math.sin((x * 1.18 - z * 0.76 + y * 0.42) * Math.PI) * 0.018;
+    let depressionSquared = 0;
+    let ridge = 0;
 
     for (const cavity of CAVITIES) {
       const angle = Math.acos(clamp(direction.dot(cavity.direction), -1, 1));
       const normalizedAngle = angle / cavity.radius;
-      const depression = -cavity.depth * 1.32 * Math.exp(
-        -(normalizedAngle * normalizedAngle) / (2 * cavity.bowlWidth * cavity.bowlWidth)
-      );
-      const rim = cavity.depth * cavity.rim * Math.exp(
-        -((normalizedAngle - 1.08) ** 2) / (2 * 0.34 * 0.34)
-      );
-      deformation += depression + rim;
+      // Compact, broad bowls meet the parent with zero slope. The norm blends
+      // overlapping depressions without stacking deep cuts through the sphere.
+      const bowl = Math.max(0, 1 - normalizedAngle * normalizedAngle);
+      const depression = cavity.depth * bowl * bowl;
+      depressionSquared += depression * depression;
+      ridge += cavity.depth * 0.27 * Math.exp(-((normalizedAngle - 1.02) ** 2) / (2 * 0.3 ** 2));
     }
 
+    // Saturation joins adjacent rims into broad shared ridges without inflated
+    // ring intersections. This work runs only while building the fixed mesh.
+    const deformation = broad * 0.014 - Math.sqrt(depressionSquared)
+      + 0.08 * Math.tanh(ridge / 0.08);
     const radius = 1.55 * (1 + deformation);
-    const px = direction.x * radius * 1.035 + direction.y * direction.y * 0.025;
-    const py = direction.y * radius * 0.985 - direction.x * direction.z * 0.018;
-    const pz = direction.z * radius * 1.01 + direction.x * direction.y * 0.02;
+    const px = direction.x * radius * 1.012;
+    const py = direction.y * radius * 0.997;
+    const pz = direction.z * radius;
     positions.setXYZ(index, px, py, pz);
   }
 
@@ -130,7 +129,7 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
       #if defined(USE_TRANSMISSION) && defined(ENVMAP_TYPE_CUBE_UV)
         vec3 studioRay = refract(-v, n, 1.0 / material.ior);
         vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
-        float studioEdge = smoothstep(0.3, 0.8, 1.0 - clamp(abs(dot(n, v)), 0.0, 1.0));
+        float studioEdge = smoothstep(0.18, 0.68, 1.0 - clamp(abs(dot(n, v)), 0.0, 1.0));
         float studioWeight = gl_FrontFacing ? mix(0.005, 0.62, studioEdge) : mix(0.008, 0.42, studioEdge);
         totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, studioWeight * material.transmission);
       #endif`
@@ -306,13 +305,13 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       panel.lookAt(0, 0, 0);
       roomEnvironment.add(panel);
     };
-    softbox([-4, 3, 4], 2.6, 5, 5.5);
-    softbox([0, 5, -1], 4.5, 2, 4);
-    softbox([-1.5, 0, -5], 1.7, 6, 3.5);
-    softbox([3.5, 1, 3], 0.22, 5, 7);
-    softbox([0.4, -0.5, -5], 0.16, 5, 6);
-    softbox([1.3, 0.5, -5], 0.16, 5, 2.5, 0x73aaff);
-    softbox([2, -1, -5], 0.065, 3.5, 1.8, 0xffce78);
+    softbox([-4, 3, 4], 1.5, 4.5, 3);
+    softbox([0, 5, -1], 3.8, 0.7, 3);
+    softbox([-1.5, 0, -5], 0.7, 5, 2.6);
+    softbox([3.5, 1, 3], 0.1, 5, 5);
+    softbox([0.4, -0.5, -5], 0.08, 5, 4);
+    softbox([1.3, 0.5, -5], 0.1, 5, 2.5, 0x73aaff);
+    softbox([2, -1, -5], 0.035, 3.5, 1.8, 0xffce78);
     softbox([-2, 0.6, 4.6], 0.65, 4, 0.012);
     softbox([2.6, -0.6, 4], 0.5, 4, 0.016);
     softbox([4, 0.5, -1], 0.5, 4, 0.015);
@@ -329,7 +328,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
       RectAreaLightUniformsLib.init();
       areaLightsInitialized = true;
     }
-    const keyLight = new THREE.RectAreaLight(0xffffff, 2.8, 2, 4.2);
+    const keyLight = new THREE.RectAreaLight(0xffffff, 2.5, 0.9, 3);
     keyLight.position.set(-3.2, 4.1, 4.6);
     keyLight.lookAt(0, 0.15, 0);
     scene.add(keyLight);

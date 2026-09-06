@@ -1175,7 +1175,7 @@ blockquote p,
 }
 
 .sphere-technical {
-  top: 7.5%;
+  top: 0;
   left: 5%;
   color: var(--ink-soft);
   font-size: .56rem;
@@ -1197,13 +1197,31 @@ blockquote p,
 }
 
 .sphere-level-set {
-  top: 8.5%;
+  top: 0;
   right: 4%;
   color: #5b6062;
   font-family: var(--math);
   font-size: .8rem;
   font-style: italic;
 }
+
+.sphere-technical,
+.sphere-level-set {
+  transition: transform .72s cubic-bezier(.2, .7, .2, 1), opacity .72s ease,
+    filter .72s ease, letter-spacing .72s ease;
+}
+
+.sphere-stage.is-dragging .sphere-technical,
+.sphere-stage.is-dragging .sphere-level-set {
+  opacity: .5;
+  filter: blur(.35px);
+  letter-spacing: .09em;
+}
+
+.sphere-stage.is-dragging .sphere-technical { transform: translate(-12px, -9px); }
+.sphere-stage.is-dragging .sphere-level-set { transform: translate(12px, -9px); }
+.sphere-technical strong { transition: letter-spacing .72s ease; }
+.sphere-stage.is-dragging .sphere-technical strong { letter-spacing: .08em; }
 
 .rotation-hint {
   left: 5%;

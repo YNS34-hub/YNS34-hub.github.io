@@ -24,14 +24,6 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeMenu();
 });
 
-const equationButton = document.querySelector(".equation-node");
-const equationNote = document.querySelector("#equation-note");
-equationButton?.addEventListener("click", () => {
-  const expanded = equationButton.getAttribute("aria-expanded") === "true";
-  equationButton.setAttribute("aria-expanded", String(!expanded));
-  equationNote?.setAttribute("aria-hidden", String(expanded));
-});
-
 const sphereStage = document.querySelector("[data-sphere-stage]");
 let sphere = null;
 let sphereLoadTicket = 0;
@@ -49,7 +41,7 @@ const loadNonlinearSphere = async () => {
   }
 
   try {
-    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-contrast-glass");
+    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-clear-cavities");
     if (ticket !== sphereLoadTicket || !pageActive) return;
     sphere = initNonlinearSphere(
       document.querySelector("[data-sphere-canvas]"),
