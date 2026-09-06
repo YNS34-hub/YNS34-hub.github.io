@@ -12,6 +12,10 @@ const ROTATION_X = new THREE.Quaternion();
 let areaLightsInitialized = false;
 
 const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+const smootherstep = (edge0, edge1, value) => {
+  const t = clamp((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * t * (t * (t * 6 - 15) + 10);
+};
 
 const seededRandom = (seed) => {
   let state = seed >>> 0;
@@ -24,17 +28,38 @@ const seededRandom = (seed) => {
   };
 };
 
+const BODY_LOBES = [
+  { direction: [0.84, 0.46, 0.28], spread: 0.78, strength: 0.1 },
+  { direction: [-0.68, -0.58, 0.45], spread: 0.88, strength: 0.075 },
+  { direction: [0.06, 0.82, -0.57], spread: 0.82, strength: -0.07 }
+].map((lobe) => ({
+  ...lobe,
+  direction: new THREE.Vector3(...lobe.direction).normalize()
+}));
+
 const CAVITIES = [
-  { direction: [0.47, 0.43, 0.77], depth: 0.155, radius: 0.3 },
-  { direction: [-0.62, 0.18, 0.77], depth: 0.125, radius: 0.24 },
-  { direction: [0.12, -0.73, 0.67], depth: 0.11, radius: 0.23 },
-  { direction: [0.81, 0.26, -0.53], depth: 0.18, radius: 0.32 },
-  { direction: [-0.6, 0.57, -0.56], depth: 0.145, radius: 0.28 },
-  { direction: [-0.08, -0.28, -0.96], depth: 0.185, radius: 0.31 }
+  // Two broad structural basins establish the primary, deliberately crowded face.
+  { direction: [0.16, 0.12, 0.98], depth: 0.19, radius: 0.42, rim: 0.44, ovality: 0.14, wobble: 0.07, phase: 0.2 },
+  { direction: [-0.64, 0.45, 0.63], depth: 0.175, radius: 0.38, rim: 0.43, ovality: 0.17, wobble: 0.06, phase: 1.1 },
+  // Four medium basins bridge the large forms without evenly tiling the sphere.
+  { direction: [0.7, 0.58, 0.42], depth: 0.14, radius: 0.32, rim: 0.4, ovality: 0.13, wobble: 0.08, phase: 2.2 },
+  { direction: [-0.58, -0.43, 0.69], depth: 0.14, radius: 0.31, rim: 0.4, ovality: 0.16, wobble: 0.07, phase: 0.7 },
+  { direction: [0.32, -0.72, 0.61], depth: 0.125, radius: 0.29, rim: 0.39, ovality: 0.11, wobble: 0.08, phase: 1.8 },
+  { direction: [0.87, -0.08, -0.49], depth: 0.15, radius: 0.32, rim: 0.41, ovality: 0.15, wobble: 0.06, phase: 2.8 },
+  // Small accents break the scale rhythm; the lower-left rear quadrant stays sparse.
+  { direction: [-0.12, 0.83, 0.55], depth: 0.075, radius: 0.18, rim: 0.31, ovality: 0.12, wobble: 0.09, phase: 2.5 },
+  { direction: [0.03, -0.84, 0.54], depth: 0.07, radius: 0.17, rim: 0.3, ovality: 0.14, wobble: 0.08, phase: 0.4 },
+  { direction: [-0.72, 0.53, -0.45], depth: 0.068, radius: 0.16, rim: 0.3, ovality: 0.16, wobble: 0.07, phase: 1.5 },
+  { direction: [0.12, -0.24, -0.96], depth: 0.08, radius: 0.19, rim: 0.32, ovality: 0.13, wobble: 0.08, phase: 2.9 }
 ].map((cavity) => ({
   ...cavity,
   direction: new THREE.Vector3(...cavity.direction).normalize()
-}));
+})).map((cavity) => {
+  const reference = Math.abs(cavity.direction.y) < 0.86 ? WORLD_Y : WORLD_X;
+  const tangentU = new THREE.Vector3().crossVectors(reference, cavity.direction).normalize();
+  const tangentV = new THREE.Vector3().crossVectors(cavity.direction, tangentU).normalize();
+  return { ...cavity, tangentU, tangentV };
+});
 
 export const buildNonlinearGeometry = (detail) => {
   let geometry = new THREE.IcosahedronGeometry(1, detail);
@@ -53,31 +78,54 @@ export const buildNonlinearGeometry = (detail) => {
     direction.fromBufferAttribute(positions, index).normalize();
     const { x, y, z } = direction;
 
-    const broad = noise.noise3d(x * 0.92 + 1.4, y * 0.92 - 0.8, z * 0.92 + 0.3);
-    const folded = noise.noise3d(x * 2.15 - 1.7, y * 2.15 + 2.1, z * 2.15 - 0.4);
-    const fine = noise.noise3d(x * 4.1 + 0.2, y * 4.1 - 2.8, z * 4.1 + 1.9);
+    const broad = noise.noise3d(x * 0.58 + 1.4, y * 0.58 - 0.8, z * 0.58 + 0.3);
+    const secondary = noise.noise3d(x * 1.32 - 1.7, y * 1.32 + 2.1, z * 1.32 - 0.4);
 
-    let deformation = broad * 0.09 + folded * 0.022 + fine * 0.004;
-    deformation += x * y * 0.026 - y * z * 0.018 + x * z * 0.014;
-    deformation += Math.sin((x * 1.18 - z * 0.76 + y * 0.42) * Math.PI) * 0.018;
+    let deformation = broad * 0.105 + secondary * 0.018;
+    deformation += x * y * 0.032 - y * z * 0.021 + x * z * 0.018;
+
+    for (const lobe of BODY_LOBES) {
+      const angle = Math.acos(clamp(direction.dot(lobe.direction), -1, 1));
+      const normalizedAngle = angle / lobe.spread;
+      deformation += lobe.strength * Math.exp(-0.5 * normalizedAngle * normalizedAngle);
+    }
+
+    let depressionPower = 0;
+    let rimPower = 0;
 
     for (const cavity of CAVITIES) {
       const angle = Math.acos(clamp(direction.dot(cavity.direction), -1, 1));
-      const depression = -cavity.depth * 1.55 * Math.exp(
-        -(angle * angle) / (2 * cavity.radius * cavity.radius)
+      if (angle > cavity.radius * 1.95) continue;
+
+      const azimuth = Math.atan2(
+        direction.dot(cavity.tangentV),
+        direction.dot(cavity.tangentU)
       );
-      const rimCenter = cavity.radius * 1.12;
-      const rimWidth = cavity.radius * 0.19;
-      const rim = cavity.depth * 0.31 * Math.exp(
-        -((angle - rimCenter) ** 2) / (2 * rimWidth * rimWidth)
+      const organicRadius = cavity.radius * (
+        1 +
+        Math.cos(azimuth * 2 + cavity.phase) * cavity.ovality +
+        Math.sin(azimuth * 3 - cavity.phase) * cavity.wobble
       );
-      deformation += depression + rim;
+      const t = angle / organicRadius;
+      const bowlWeight = 1 - smootherstep(0.12, 0.98, t);
+      const rimWeight = smootherstep(0.6, 0.9, t) * (1 - smootherstep(1.03, 1.55, t));
+      const rimVariation = 1 + 0.11 * Math.sin(azimuth * 2.0 + cavity.phase * 1.7);
+      const depression = cavity.depth * bowlWeight;
+      const rim = cavity.depth * cavity.rim * rimWeight * rimVariation;
+
+      // Fourth-power unions act as a smooth max: overlapping bowls and rims
+      // form one continuous implicit surface instead of visibly stacking.
+      depressionPower += depression ** 4;
+      rimPower += rim ** 4;
     }
 
+    deformation -= depressionPower ** 0.25;
+    deformation += rimPower ** 0.25;
+
     const radius = 1.55 * (1 + deformation);
-    const px = direction.x * radius * 1.035 + direction.y * direction.y * 0.025;
-    const py = direction.y * radius * 0.985 - direction.x * direction.z * 0.018;
-    const pz = direction.z * radius * 1.01 + direction.x * direction.y * 0.02;
+    const px = direction.x * radius * 1.065 + direction.y * direction.y * 0.025;
+    const py = direction.y * radius * 0.955 - direction.x * direction.z * 0.022;
+    const pz = direction.z * radius * 1.025 + direction.x * direction.y * 0.024;
     positions.setXYZ(index, px, py, pz);
   }
 

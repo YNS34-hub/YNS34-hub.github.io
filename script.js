@@ -49,7 +49,7 @@ const loadNonlinearSphere = async () => {
   }
 
   try {
-    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-2");
+    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-geometry");
     if (ticket !== sphereLoadTicket || !pageActive) return;
     sphere = initNonlinearSphere(
       document.querySelector("[data-sphere-canvas]"),
