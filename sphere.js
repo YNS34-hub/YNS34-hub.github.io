@@ -8,7 +8,7 @@ export const loadSculptureGeometry = async () => {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   if (window.matchMedia("(max-width: 760px), (pointer: coarse), (prefers-reduced-motion: reduce)").matches
     || connection?.saveData || navigator.deviceMemory <= 1 || navigator.hardwareConcurrency <= 2) return null;
-  const gltf = await new GLTFLoader().loadAsync(new URL("./assets/nonlinear-glass.glb", import.meta.url).href);
+  const gltf = await new GLTFLoader().loadAsync(new URL("./assets/nonlinear-glass.glb", import.meta.url).href + "?v=20260907-ice");
   try {
     const meshes = [];
     gltf.scene.updateMatrixWorld(true);
@@ -150,7 +150,8 @@ const addBreathingDisplacement = (material, amplitude, phase) => {
         vec3 studioRay = refract(-v, n, 1.0 / material.ior);
         vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
         float studioEdge = smoothstep(0.18, 0.68, 1.0 - clamp(abs(dot(n, v)), 0.0, 1.0));
-        float studioWeight = gl_FrontFacing ? mix(0.005, 0.62, studioEdge) : mix(0.008, 0.42, studioEdge);
+        studioTransmission *= mix(vec3(1.0), vec3(0.52, 0.84, 1.2), studioEdge * 0.5);
+        float studioWeight = gl_FrontFacing ? mix(0.005, 0.44, studioEdge) : mix(0.008, 0.3, studioEdge);
         totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, studioWeight * material.transmission);
       #endif`
     );
@@ -169,13 +170,13 @@ const createGlassMaterials = (mobile) => {
     name: "Clear nonlinear glass",
     color: 0xffffff,
     metalness: 0,
-    roughness: mobile ? 0.015 : 0.01,
+    roughness: mobile ? 0.015 : 0.009,
     transmission: 1,
-    thickness: 1.15,
+    thickness: 1.3,
     ior: 1.5,
-    dispersion: mobile ? 0.025 : 0.065,
+    dispersion: mobile ? 0.025 : 0.07,
     specularIntensity: 1,
-    specularColor: 0xffffff,
+    specularColor: 0xf5fbff,
     clearcoat: 0,
     clearcoatRoughness: 0,
     attenuationColor: 0xffffff,
@@ -296,7 +297,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.12;
-    renderer.transmissionResolutionScale = mobile ? 0.5 : 0.58;
+    renderer.transmissionResolutionScale = mobile ? 0.5 : 1;
     renderer.shadowMap.enabled = false;
     renderer.setClearColor(PAPER, 1);
 
@@ -313,7 +314,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
     // The dark studio is reflection lighting, independent of the warm page.
     // Local white cards define clear rims; native transmission carries the body.
     const roomEnvironment = new THREE.Scene();
-    roomEnvironment.background = new THREE.Color(0x30383e);
+    roomEnvironment.background = new THREE.Color(0x1e2f43);
     const softbox = (position, width, height, intensity, color = 0xffffff) => {
       const panel = new THREE.Mesh(
         new THREE.PlaneGeometry(width, height),
@@ -323,19 +324,19 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
       panel.lookAt(0, 0, 0);
       roomEnvironment.add(panel);
     };
-    softbox([-4, 3, 4], 1.5, 4.5, 3);
-    softbox([0, 5, -1], 3.8, 0.7, 3);
-    softbox([-1.5, 0, -5], 0.7, 5, 2.6);
+    softbox([-4, 3, 4], 0.65, 4.5, 4, 0xedf7ff);
+    softbox([0, 5, -1], 3.8, 0.3, 4, 0xe6f3ff);
+    softbox([-1.5, 0, -5], 0.3, 5, 3.5, 0xe8f6ff);
     softbox([3.5, 1, 3], 0.1, 5, 5);
     softbox([0.4, -0.5, -5], 0.08, 5, 4);
-    softbox([1.3, 0.5, -5], 0.1, 5, 2.5, 0x73aaff);
-    softbox([2, -1, -5], 0.035, 3.5, 1.8, 0xffce78);
+    softbox([1.3, 0.5, -5], 0.18, 5, 3.2, 0x7ed0ff);
+    softbox([3, -1, 3], 0.09, 3.5, 2.5, 0xa7dcff);
     softbox([-2, 0.6, 4.6], 0.65, 4, 0.012);
     softbox([2.6, -0.6, 4], 0.5, 4, 0.016);
     softbox([4, 0.5, -1], 0.5, 4, 0.015);
     let environmentTarget;
     try {
-      environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.003);
+      environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.002, 0.1, 100, { size: mobile ? 256 : 1024 });
     } finally {
       disposeObject(roomEnvironment);
     }
@@ -346,7 +347,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
       RectAreaLightUniformsLib.init();
       areaLightsInitialized = true;
     }
-    const keyLight = new THREE.RectAreaLight(0xffffff, 2.5, 0.9, 3);
+    const keyLight = new THREE.RectAreaLight(0xf0f9ff, 2.5, 0.55, 3);
     keyLight.position.set(-3.2, 4.1, 4.6);
     keyLight.lookAt(0, 0.15, 0);
     scene.add(keyLight);
@@ -356,7 +357,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
     fillLight.lookAt(0, 0, 0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.RectAreaLight(0xd5e6ff, 2.4, 0.7, 3.2);
+    const rimLight = new THREE.RectAreaLight(0xb6ddff, 2.8, 0.6, 3.2);
     rimLight.position.set(0.8, 2.7, -4.2);
     rimLight.lookAt(0, 0, 0);
     scene.add(rimLight);
@@ -376,7 +377,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
           float arc = exp(-arcDistance * arcDistance);
           float glow = arc * smoothstep(-0.1, 0.55, p.y) * 0.3;
           float alpha = shade + glow;
-          vec3 tint = (vec3(0.16, 0.18, 0.19) * shade + vec3(1.0, 0.99, 0.95) * glow) / max(alpha, 0.0001);
+          vec3 tint = (vec3(0.16, 0.18, 0.19) * shade + vec3(0.8, 0.94, 1.0) * glow) / max(alpha, 0.0001);
           gl_FragColor = vec4(tint, alpha * fade);
         }`
     }));
@@ -435,6 +436,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
       lastFrame: performance.now(),
       lastRender: 0,
       lastInteraction: performance.now(),
+      lastMotion: performance.now() - 500,
       elapsed: 0,
       slowFrames: 0,
       measuredFrames: 0,
@@ -480,7 +482,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
       const height = Math.max(1, Math.round(bounds.height));
       const aspect = width / height;
       const pixelBudget = mobile ? 520000 : 1600000;
-      let pixelRatio = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1);
+      let pixelRatio = mobile ? Math.min(window.devicePixelRatio || 1, 1) : 1.5;
       const requestedPixels = width * height * pixelRatio * pixelRatio;
       if (requestedPixels > pixelBudget) {
         pixelRatio *= Math.sqrt(pixelBudget / requestedPixels);
@@ -582,6 +584,15 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculpture
       state.frame = 0;
       if (disposed || !state.running || !state.visible || document.hidden || state.contextLost) return;
       stage.dataset.animationState = "running";
+
+      // Idle rotation keeps the optical quality. Only active drag / inertia
+      // uses the smaller buffer, with a 400 ms quiet period before restoring.
+      const moving = state.dragging || Math.abs(state.velocityYaw) + Math.abs(state.velocityPitch) > 0.000025;
+      if (moving) state.lastMotion = now;
+      const transmissionScale = mobile ? 0.5 : now - state.lastMotion < 400 ? 0.6 : 1;
+      if (renderer.transmissionResolutionScale !== transmissionScale) {
+        renderer.transmissionResolutionScale = transmissionScale;
+      }
 
       const targetFrameDuration = mobile ? 1000 / 30 : 1000 / 60;
       if (now - state.lastRender < targetFrameDuration * 0.88) { schedule(); return; }

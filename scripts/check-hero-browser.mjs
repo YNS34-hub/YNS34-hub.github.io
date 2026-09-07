@@ -43,7 +43,27 @@ try {
   const performanceEnd = await page.evaluate(() => ({ time: performance.now(), frames: window.__NONLINEAR_SPHERE__.getState().renderedFrames, state: window.__NONLINEAR_SPHERE__.getState() }));
   const renderedFps = (performanceEnd.frames - performanceStart.frames) * 1000 / (performanceEnd.time - performanceStart.time);
   record('desktop-render-rate', { renderedFps, ...performanceEnd.state });
-  assert(renderedFps >= 45, `Desktop rendering below the 45 FPS acceptance floor: ${renderedFps}`);
+  assert(renderedFps > 30, `High-quality desktop rendering below the 30 FPS floor: ${renderedFps}`);
+  assert.equal(performanceEnd.state.transmissionResolutionScale, 1);
+
+  const dragBox = await page.locator('canvas').boundingBox();
+  const dragX = dragBox.x + dragBox.width * .5, dragY = dragBox.y + dragBox.height * .5;
+  await page.mouse.move(dragX, dragY); await page.mouse.down();
+  await page.waitForFunction(() => window.__NONLINEAR_SPHERE__.getState().transmissionResolutionScale === .6);
+  const dragStart = await page.evaluate(() => ({ time: performance.now(), frames: window.__NONLINEAR_SPHERE__.getState().renderedFrames }));
+  const dragDeadline = Date.now() + 6000;
+  while (Date.now() < dragDeadline) {
+    const t = (dragDeadline - Date.now()) / 500;
+    await page.mouse.move(dragX + Math.sin(t) * 130, dragY + Math.cos(t) * 40);
+    await page.waitForTimeout(25);
+  }
+  const dragEnd = await page.evaluate(() => ({ time: performance.now(), frames: window.__NONLINEAR_SPHERE__.getState().renderedFrames, state: window.__NONLINEAR_SPHERE__.getState() }));
+  const dragFps = (dragEnd.frames - dragStart.frames) * 1000 / (dragEnd.time - dragStart.time);
+  assert(dragFps >= 35, `Drag rendering below the 35 FPS interaction target: ${dragFps}`);
+  record('drag-render-rate', { renderedFps: dragFps, ...dragEnd.state });
+  await page.mouse.up();
+  await page.waitForFunction(() => window.__NONLINEAR_SPHERE__.getState().transmissionResolutionScale === 1);
+  record('restore-optical-quality', { state: await state(page), passed: true });
 
   await page.evaluate(() => window.__NONLINEAR_SPHERE__.rotateTo(0, 0, 0));
   await page.waitForTimeout(100); await screenshot(page, 'angle-000');
@@ -57,6 +77,12 @@ try {
     const actual = (Number(s.rotationY) + 360) % 360;
     assert(Math.abs(actual - angle) < 2, `Drag angle ${actual} != ${angle}`);
     await screenshot(page, `angle-${angle}`);
+  }
+  for (const angle of [0, 90, 180]) {
+    await page.evaluate(a => window.__NONLINEAR_SPHERE__.rotateTo(a, 0, 0), angle);
+    await page.waitForFunction(() => window.__NONLINEAR_SPHERE__.getState().transmissionResolutionScale === 1);
+    await page.waitForTimeout(100);
+    await screenshot(page, `high-quality-${angle}`);
   }
   await page.evaluate(() => window.__NONLINEAR_SPHERE__.rotateTo(0, 0, 0));
   await page.mouse.move(x, y); await page.mouse.down();

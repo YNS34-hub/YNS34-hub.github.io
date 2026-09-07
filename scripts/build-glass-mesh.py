@@ -15,7 +15,7 @@ from skimage.measure import marching_cubes
 import trimesh
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--resolution', type=int, default=192)
+parser.add_argument('--resolution', type=int, default=224)
 parser.add_argument('--triangles', type=int, default=80000)
 args = parser.parse_args()
 root = Path(__file__).resolve().parent.parent
@@ -38,38 +38,54 @@ cavities = [
     ((-.60, .65, -.47), .52, .47, 1.30),
     ((-.66, -.55, -.50), .57, .49, 1.28),
     ((.51, -.55, -.66), .54, .47, 1.29),
+    ((-.10, .86, .50), .31, .22, 1.46),
 ]
 field = (np.sqrt(x*x + y*y + z*z) - 1.55).astype(np.float32)
 cuts = []
-for direction, width, depth, center in cavities:
+for index, (direction, width, depth, center) in enumerate(cavities):
     n = np.array(direction, dtype=np.float32); n /= np.linalg.norm(n)
+    e1 = np.cross(n, np.array([0., 1., 0.], dtype=np.float32)); e1 /= np.linalg.norm(e1)
+    e2 = np.cross(n, e1)
     along = x*n[0] + y*n[1] + z*n[2]
-    tangent = np.sqrt(np.maximum(x*x + y*y + z*z - along*along, 0))
+    u = x*e1[0] + y*e1[1] + z*e1[2]
+    v = x*e2[0] + y*e2[1] + z*e2[2]
+    # Smooth local Cartesian warps, not high-frequency surface noise. Each
+    # bowl has a subtly different oval shoulder and a drifting lip plane.
+    aspect = float(1 + .07 * np.cos(index * 1.7))
+    local_u = (u + .08*v*v/width) / aspect
+    local_v = (v + .055*u*v/width) * aspect
+    tangent = np.sqrt(local_u*local_u + local_v*local_v)
+    lip_plane = 1.40 + .045*np.tanh(u/width) - .03*np.tanh(v/width)
+    lip_thickness = .10 * (1 + .22*np.tanh(u/width) + .12*np.tanh(v/width))
     # Rounded lip volume has its own cross-section, independent of radial rays.
-    lip = np.sqrt((tangent - width*.91)**2 + (along - 1.40)**2) - .095
-    field = smooth_min(field, lip, .105)
-    cutter = (np.sqrt((tangent/width)**2 + ((along-center)/depth)**2) - 1) * depth
+    lip = np.sqrt((tangent - width*.91)**2 + (along - lip_plane)**2) - lip_thickness
+    field = smooth_min(field, lip, .14)
+    # Reserve a continuous glass web between neighboring interior shoulders.
+    cutter = (np.sqrt((tangent/(width*.93))**2 + ((along-center)/depth)**2) - 1) * depth
     cuts.append(cutter.astype(np.float32))
-for cutter in cuts:
-    field = -smooth_min(-field, cutter, .105)
+void = cuts[0]
+for cutter in cuts[1:]:
+    void = smooth_min(void, cutter, .025)
+field = -smooth_min(-field, void, .105)
 del cuts
 
 vertices, faces, _, _ = marching_cubes(field, 0, spacing=(step,)*3, allow_degenerate=False)
 vertices += axis[0]
 mesh = trimesh.Trimesh(vertices, faces, process=True)
 mesh.fix_normals()
-trimesh.smoothing.filter_taubin(mesh, lamb=.45, nu=.5, iterations=6)
+trimesh.smoothing.filter_taubin(mesh, lamb=.45, nu=.5, iterations=10)
 mesh = mesh.simplify_quadric_decimation(face_count=args.triangles)
 mesh.fix_normals()
 # Sample the implicit surface gradient for continuous optical normals instead
 # of letting irregular decimation triangles introduce sparkle-shaped facets.
-normal_field = gaussian_filter(field, .85)
+normal_field = gaussian_filter(field, 1.15)
 coordinates = ((mesh.vertices - axis[0]) / step).T
 normals = np.column_stack([map_coordinates(gradient, coordinates, order=1)
                            for gradient in np.gradient(normal_field, step)])
 normals /= np.linalg.norm(normals, axis=1)[:, None]
 mesh.vertex_normals = normals
 assert mesh.is_watertight and mesh.is_winding_consistent and mesh.volume > 0
+assert mesh.euler_number == 2, f'Keep a closed sphere topology without through-tunnels: Euler={mesh.euler_number}'
 assert len(mesh.split()) == 1, 'The sculpture must remain one connected solid'
 assert 50000 <= len(mesh.faces) <= 100000
 assert np.isfinite(mesh.vertex_normals).all()

@@ -41,7 +41,7 @@ const loadNonlinearSphere = async () => {
   }
 
   try {
-    const { initNonlinearSphere, loadSculptureGeometry } = await import("/sphere.js?v=20260907-volumetric-glass");
+    const { initNonlinearSphere, loadSculptureGeometry } = await import("/sphere.js?v=20260907-ice-glass");
     if (ticket !== sphereLoadTicket || !pageActive) return;
     const geometry = await loadSculptureGeometry();
     try {
