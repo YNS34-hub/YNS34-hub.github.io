@@ -3,6 +3,9 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildNonlinearGeometry, initNonlinearSphere } from "../sphere.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { Raycaster, Vector3, DoubleSide } from "three";
+import { parseAst } from "rollup/parseAst";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const visited = new Set();
@@ -12,7 +15,8 @@ async function checkModule(relative) {
   if (visited.has(relative)) return;
   visited.add(relative);
   const code = await readFile(path.join(root, relative), "utf8");
-  for (const [, specifier] of code.matchAll(/\bfrom\s*["']([^"']+)["']/g)) {
+  for (const declaration of parseAst(code).body.filter(node => node.source)) {
+    const specifier = declaration.source.value;
     let dependency;
     if (specifier === "three") dependency = "vendor/three.module.min.js";
     else if (specifier.startsWith("three/addons/")) dependency = specifier.replace("three/addons/", "vendor/addons/");
@@ -24,8 +28,23 @@ async function checkModule(relative) {
 await checkModule("sphere.js");
 console.log(`Pages import graph: ${visited.size} modules present.`);
 
-for (const detail of [24, 48]) {
-  const geometry = buildNonlinearGeometry(detail);
+const bytes = await readFile(path.join(root, "assets/nonlinear-glass.glb"));
+const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), "");
+const meshes = [];
+gltf.scene.traverse(object => { if (object.isMesh) meshes.push(object); });
+assert.equal(meshes.length, 1, "GLB must have a single sculpture mesh");
+const desktop = meshes[0];
+assert(desktop.geometry.index.count / 3 >= 50000 && desktop.geometry.index.count / 3 <= 100000);
+const metadata = JSON.parse(await readFile(path.join(root, "assets/nonlinear-glass.mesh.json"), "utf8"));
+assert.equal(desktop.geometry.index.count / 3, metadata.triangles);
+desktop.material.side = DoubleSide;
+desktop.updateMatrixWorld(true);
+const ray = new Raycaster(new Vector3(), new Vector3(...metadata.undercutProof.direction));
+const hits = ray.intersectObject(desktop).map(hit => hit.distance);
+const crossings = hits.filter((distance, i) => i === 0 || distance - hits[i - 1] > 1e-5);
+assert(crossings.length >= 3, "GLB must retain real undercut lips, not a radial height field");
+
+for (const [label, geometry] of [["Mobile detail 24", buildNonlinearGeometry(24)], ["Desktop GLB", desktop.geometry]]) {
   const p = geometry.getAttribute("position");
   const normals = geometry.getAttribute("normal");
   const indices = geometry.index.array;
@@ -44,9 +63,10 @@ for (const detail of [24, 48]) {
   const radii = Array.from({ length: p.count }, (_, i) => Math.hypot(p.getX(i), p.getY(i), p.getZ(i)));
   assert(Math.max(...radii) - Math.min(...radii) > 0.4, "Geometry lost its nonlinear deformation");
   assert.equal(geometry.getAttribute("uv"), undefined, "This geometry must not rely on a poster UV map");
-  console.log(`Detail ${detail}: ${p.count} vertices, ${indices.length / 3} triangles, closed manifold, finite normals.`);
+  console.log(`${label}: ${p.count} vertices, ${indices.length / 3} triangles, closed manifold, finite normals.`);
   geometry.dispose();
 }
+desktop.material.dispose();
 
 globalThis.window = { matchMedia: () => ({ matches: false }) };
 const stage = { dataset: {}, classList: { add() {}, remove() {} } };

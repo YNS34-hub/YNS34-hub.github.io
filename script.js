@@ -41,13 +41,20 @@ const loadNonlinearSphere = async () => {
   }
 
   try {
-    const { initNonlinearSphere } = await import("/sphere.js?v=20260906-clear-cavities");
+    const { initNonlinearSphere, loadSculptureGeometry } = await import("/sphere.js?v=20260907-volumetric-glass");
     if (ticket !== sphereLoadTicket || !pageActive) return;
-    sphere = initNonlinearSphere(
-      document.querySelector("[data-sphere-canvas]"),
-      sphereStage,
-      reducedMotion
-    );
+    const geometry = await loadSculptureGeometry();
+    try {
+      if (ticket !== sphereLoadTicket || !pageActive) return;
+      sphere = initNonlinearSphere(
+        document.querySelector("[data-sphere-canvas]"),
+        sphereStage,
+        reducedMotion,
+        geometry
+      );
+    } finally {
+      geometry?.dispose();
+    }
     if (!sphere) sphereStage?.classList.add("is-fallback");
     updateScrollState();
   } catch (error) {

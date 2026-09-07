@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseAst } from "rollup/parseAst";
 
 // Pages serves native modules from the repository root. Vite resolves npm
 // dependencies differently, so keep the ENTIRE browser import graph in sync.
@@ -11,6 +12,7 @@ const visited = new Set();
 const addons = [
   "environments/RoomEnvironment.js",
   "lights/RectAreaLightUniformsLib.js",
+  "loaders/GLTFLoader.js",
   "math/SimplexNoise.js",
   "utils/BufferGeometryUtils.js"
 ];
@@ -23,7 +25,9 @@ async function copyModule(relative) {
   await mkdir(path.dirname(output), { recursive: true });
   await copyFile(input, output);
   const code = await readFile(input, "utf8");
-  for (const [, specifier] of code.matchAll(/\bfrom\s*["']([^"']+)["']/g)) {
+  // Parse real module declarations; loader documentation also contains "from" URLs.
+  for (const declaration of parseAst(code).body.filter(node => node.source)) {
+    const specifier = declaration.source.value;
     if (specifier.startsWith(".")) {
       await copyModule(path.posix.normalize(path.posix.join(path.posix.dirname(relative), specifier)));
     } else if (specifier.startsWith("three/addons/")) {

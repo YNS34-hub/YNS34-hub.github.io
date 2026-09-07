@@ -20,7 +20,7 @@ const record = (name, data) => { report.checks.push({ name, ...data }); console.
 const watch = page => {
   page.on('pageerror', e => report.errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') report.errors.push(m.text()); if (m.type() === 'warning') report.warnings.push(m.text()); });
-  page.on('response', r => { if (/sphere\.js|three\.(module|core)\.min\.js|RectAreaLightTexturesLib/.test(r.url())) report.responses.push({ url: r.url(), status: r.status() }); if (r.status() >= 400) report.errors.push(`${r.status()} ${r.url()}`); });
+  page.on('response', r => { if (/sphere\.js|three\.(module|core)\.min\.js|RectAreaLightTexturesLib|GLTFLoader|nonlinear-glass.*\.glb/.test(r.url())) report.responses.push({ url: r.url(), status: r.status() }); if (r.status() >= 400) report.errors.push(`${r.status()} ${r.url()}`); });
 };
 const screenshot = async (page, name, hero = false) => {
   assert.equal((await state(page)).renderMode, 'three-webgl', 'Refuse to label a fallback as WebGL evidence');
@@ -32,6 +32,9 @@ try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
   const page = await context.newPage(); watch(page);
   await page.goto(url); await ready(page);
+  assert.equal((await state(page)).geometry, 'volumetric-glb', 'Desktop must display the GLB, not procedural geometry');
+  const triangles = Number((await state(page)).triangleCount);
+  assert(triangles >= 50000 && triangles <= 100000);
   const gpu = await page.evaluate(() => { const gl = document.querySelector('canvas').getContext('webgl2'); const ext = gl.getExtension('WEBGL_debug_renderer_info'); return { version: gl.getParameter(gl.VERSION), renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'unavailable' }; });
   record('WebGL2', gpu); assert.match(gpu.version, /WebGL 2/);
   await screenshot(page, 'desktop');
@@ -70,10 +73,26 @@ try {
   assert.equal(idle2.dragState, 'idle-rotation'); assert(Math.abs(Number(idle2.rotationY) - Number(idle1.rotationY)) > .5);
   record('idle-rotation', { before: idle1, after2s: idle2 });
 
+  await page.evaluate(() => window.__NONLINEAR_SPHERE__.rotateTo(0, 0, 0));
+  await page.locator('canvas').focus();
+  await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowUp');
+  const keyboard = await state(page);
+  assert(Math.abs(Number(keyboard.rotationY)) > 1 && Math.abs(Number(keyboard.rotationX)) > 1);
+  record('keyboard-rotation', keyboard);
+  await page.locator('#contact').scrollIntoViewIfNeeded(); await page.waitForTimeout(600);
+  const pausedFrames = await page.evaluate(() => window.__NONLINEAR_SPHERE__.getState().renderedFrames);
+  await page.waitForTimeout(600);
+  assert.equal(await page.evaluate(() => window.__NONLINEAR_SPHERE__.getState().renderedFrames), pausedFrames);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' })); await page.waitForTimeout(600);
+  assert(await page.evaluate(() => window.__NONLINEAR_SPHERE__.getState().renderedFrames) > pausedFrames);
+  record('offscreen-pause-resume', { passed: true });
+
   for (const width of [375, 390, 768]) {
     const mobile = width < 760;
     const device = await browser.newContext({ viewport: { width, height: mobile ? 844 : 1024 }, deviceScaleFactor: 1, hasTouch: mobile, isMobile: mobile });
     const p = await device.newPage(); watch(p);
+    let glbRequests = 0;
+    p.on('request', request => { if (/\.glb(?:\?|$)/.test(request.url())) glbRequests++; });
     await p.addInitScript(() => { window.__qaPointers = []; document.addEventListener('pointerdown', e => window.__qaPointers.push({ type: e.pointerType, trusted: e.isTrusted }), true); });
     await p.goto(url); await ready(p);
     const layout = await p.evaluate(() => ({ width: innerWidth, clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
@@ -81,6 +100,7 @@ try {
     record(`responsive-${width}`, { ...layout, state: await state(p) });
     await screenshot(p, `hero-${width}`, true);
     if (mobile) {
+      assert.equal(glbRequests, 0, 'Mobile must not download the desktop mesh');
       await p.locator('canvas').scrollIntoViewIfNeeded();
       const b = await p.locator('canvas').boundingBox();
       const tx = b.x + b.width * .2, ty = b.y + b.height * .45;
@@ -116,11 +136,38 @@ try {
   assert.equal(report.errors.length, 0, report.errors.join('\n'));
   assert(report.responses.every(r => r.status === 200 || r.status === 304));
   if (url.startsWith('https:')) {
-    for (const module of ['sphere.js', 'three.module.min.js', 'three.core.min.js', 'RectAreaLightTexturesLib.js']) {
+    for (const module of ['sphere.js', 'three.module.min.js', 'three.core.min.js', 'RectAreaLightTexturesLib.js', 'GLTFLoader.js']) {
       assert(report.responses.some(r => new URL(r.url).pathname.endsWith(`/${module}`)), `Missing production module: ${module}`);
     }
   }
   await context.close();
+
+  // An unavailable asset must keep the poster, never quietly use a desktop
+  // procedural sphere or create a late renderer after the page is dismissed.
+  const failures = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const failedPage = await failures.newPage();
+  await failedPage.route(/\.glb(?:\?|$)/, route => route.fulfill({ status: 404, body: 'Missing test model' }));
+  await failedPage.goto(url);
+  await failedPage.waitForFunction(() => document.querySelector('[data-sphere-stage]').dataset.renderMode === 'module-load-failed-poster');
+  assert.equal(await failedPage.evaluate(() => !!window.__NONLINEAR_SPHERE__), false);
+  record('missing-glb-fallback', await state(failedPage));
+  await failures.close();
+
+  const race = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const racePage = await race.newPage();
+  let requestStarted;
+  const started = new Promise(resolve => { requestStarted = resolve; });
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  await racePage.route(/\.glb(?:\?|$)/, async route => { requestStarted(); await gate; await route.continue(); });
+  await racePage.goto(url); await started;
+  await racePage.emulateMedia({ reducedMotion: 'reduce' });
+  const completedAsset = racePage.waitForResponse(/\.glb(?:\?|$)/);
+  release(); await (await completedAsset).finished(); await racePage.waitForTimeout(500);
+  assert.equal((await state(racePage)).renderMode, 'reduced-motion-poster');
+  assert.equal(await racePage.evaluate(() => !!window.__NONLINEAR_SPHERE__), false);
+  record('cancel-pending-glb', { passed: true });
+  await race.close();
 
   const disabled = await chromium.launch({ ...launch, args: ['--disable-webgl'] });
   try {

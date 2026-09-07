@@ -2,6 +2,26 @@ import * as THREE from "three";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { SimplexNoise } from "three/addons/math/SimplexNoise.js";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+export const loadSculptureGeometry = async () => {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (window.matchMedia("(max-width: 760px), (pointer: coarse), (prefers-reduced-motion: reduce)").matches
+    || connection?.saveData || navigator.deviceMemory <= 1 || navigator.hardwareConcurrency <= 2) return null;
+  const gltf = await new GLTFLoader().loadAsync(new URL("./assets/nonlinear-glass.glb", import.meta.url).href);
+  try {
+    const meshes = [];
+    gltf.scene.updateMatrixWorld(true);
+    gltf.scene.traverse((object) => { if (object.isMesh) meshes.push(object); });
+    if (meshes.length !== 1 || !meshes[0].geometry.index) throw new Error("Expected one indexed sculpture mesh");
+    const geometry = meshes[0].geometry.clone().applyMatrix4(meshes[0].matrixWorld);
+    geometry.name = "Volumetric glass GLB";
+    geometry.computeBoundingSphere();
+    return geometry;
+  } finally {
+    disposeObject(gltf.scene);
+  }
+};
 
 const PAPER = 0xf3f1ea;
 const WORLD_X = new THREE.Vector3(1, 0, 0);
@@ -161,9 +181,7 @@ const createGlassMaterials = (mobile) => {
     attenuationColor: 0xffffff,
     attenuationDistance: Infinity,
     envMapIntensity: 1,
-    // Scene clear colors bypass tone mapping. Preserve that warm backdrop in
-    // transmission instead of compressing it to gray inside this material.
-    toneMapped: false,
+    toneMapped: true,
     transparent: false,
     opacity: 1,
     side: THREE.DoubleSide,
@@ -214,7 +232,7 @@ const createFallbackController = (stage, reason) => {
   };
 };
 
-export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
+export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculptureGeometry = null) => {
   if (!canvas || !stage) return null;
 
   const smallScreenQuery = window.matchMedia("(max-width: 760px)");
@@ -277,7 +295,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     renderer.debug.onShaderError = () => { throw new Error("Physical glass shader compilation failed"); };
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1;
+    renderer.toneMappingExposure = 1.12;
     renderer.transmissionResolutionScale = mobile ? 0.5 : 0.58;
     renderer.shadowMap.enabled = false;
     renderer.setClearColor(PAPER, 1);
@@ -377,7 +395,8 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
     presentationGroup.add(sculptureGroup);
 
     const detail = mobile ? 24 : 48;
-    const outerGeometry = buildNonlinearGeometry(detail);
+    if (!mobile && !sculptureGeometry) throw new Error("Desktop sculpture GLB was not loaded");
+    const outerGeometry = mobile ? buildNonlinearGeometry(detail) : sculptureGeometry.clone();
     const materials = createGlassMaterials(mobile);
 
     const outerMesh = new THREE.Mesh(outerGeometry, materials.outer);
@@ -692,8 +711,9 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
 
     resize();
     updateRotationMetadata();
-    stage.dataset.geometry = `icosahedron-${detail}`;
+    stage.dataset.geometry = mobile ? `icosahedron-${detail}` : "volumetric-glb";
     stage.dataset.vertexCount = String(outerGeometry.getAttribute("position").count);
+    stage.dataset.triangleCount = String(outerGeometry.index.count / 3);
     stage.dataset.dragState = "resting";
 
     try {
@@ -737,6 +757,7 @@ export const initNonlinearSphere = (canvas, stage, reducedMotionQuery) => {
           renderMode: stage.dataset.renderMode,
           geometry: stage.dataset.geometry,
           vertexCount: Number(stage.dataset.vertexCount),
+          triangleCount: Number(stage.dataset.triangleCount),
           rotation: {
             x: Number(stage.dataset.rotationX),
             y: Number(stage.dataset.rotationY),
