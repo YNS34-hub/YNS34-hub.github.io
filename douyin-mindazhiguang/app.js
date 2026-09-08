@@ -1,4 +1,4 @@
-const COVER_CHUNKS={post01:3,post02:2,post03:3,post04:4,post05:5};
+const COVER_CHUNKS={post01:1,post02:1,post03:1,post04:1,post05:1};
 async function loadCover(key,selector){try{const parts=await Promise.all(Array.from({length:COVER_CHUNKS[key]},(_,i)=>fetch(`assets/${key}_${i}.b64`).then(r=>{if(!r.ok)throw new Error(r.status);return r.text();})));const el=document.querySelector(selector);if(el)el.style.backgroundImage=`linear-gradient(180deg,rgba(3,8,10,.03),rgba(3,8,10,.28)),url("data:image/webp;base64,${parts.join('')}")`;}catch(e){console.warn('cover load failed',key,e);}}
 [['post01','.w1 .fill'],['post02','.w2 .fill'],['post03','.w3 .fill'],['post04','.w4 .fill'],['post05','.w5 .fill']].forEach(([k,s])=>loadCover(k,s));
 
