@@ -1,0 +1,14 @@
+[
+  {
+    "id": "palace-study-01",
+    "title": "Palace Study \u2014 No. 01",
+    "artist": "The Memory Palace",
+    "album": "Original Spatial Studies",
+    "cover": "/media/generated/nocturne.webp",
+    "src": "/media/generated/palace-study.wav",
+    "year": "2026",
+    "favorite": false,
+    "source": "static",
+    "duration": 36
+  }
+]

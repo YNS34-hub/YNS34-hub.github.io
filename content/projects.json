@@ -1,0 +1,106 @@
+[
+  {
+    "id": "the-memory-palace",
+    "title": "The Memory Palace",
+    "subtitle": "A world that continues to grow with me.",
+    "description": "An explorable digital museum connecting mathematical research, projects, music, images and unfinished ideas. The original academic portfolio and nonlinear glass study remain preserved at /legacy/. This gallery is a new chapter of the same personal site.",
+    "category": "project",
+    "github": "https://github.com/YNS34-hub/YNS34-hub.github.io",
+    "demo": "/",
+    "cover": "/assets/nonlinear-sphere-clean.webp",
+    "year": "2026",
+    "date": "2026-07-14",
+    "featured": true,
+    "roomType": "installation",
+    "roomRule": "memory",
+    "tags": ["React", "TypeScript", "Three.js", "Spatial web"],
+    "status": "Active · public",
+    "links": [
+      {
+        "label": "Original academic portfolio",
+        "url": "/legacy/"
+      },
+      {
+        "label": "Graduation memory",
+        "url": "/Benjamin/"
+      }
+    ]
+  },
+  {
+    "id": "reviewer-first-audit",
+    "title": "Reviewer-First Audit",
+    "subtitle": "Questions before conclusions.",
+    "description": "A private mathematical manuscript revision prototype built around explicit evidence, dependency tracking, semantic preservation and human sign-off. My role includes problem definition, workflow design, system architecture, AI-agent-assisted implementation and acceptance criteria. Validation is pending. The interactive five-step review lens is a conceptual workflow; it has no live model connection and makes no automatic mathematical conclusions.",
+    "category": "project",
+    "cover": "/media/generated/level-sets.webp",
+    "year": "2026",
+    "featured": true,
+    "roomType": "white-cube",
+    "roomRule": "compressing",
+    "tags": ["Research workflow", "Evidence", "Human validation"],
+    "status": "Private prototype · validation pending"
+  },
+  {
+    "id": "void-echo",
+    "title": "VOID//ECHO",
+    "subtitle": "An early exploration of immersive web space.",
+    "description": "An experimental immersive 3D website exploring atmosphere, narrative and interactive visual systems. Built with Next.js, React, TypeScript, Three.js, React Three Fiber, Framer Motion, GSAP and Lenis. Displayed here as part of my creative history, with its original visual direction preserved in the repository. Gallery artwork is an original spatial interpretation, not a project screenshot.",
+    "category": "project",
+    "github": "https://github.com/YNS34-hub/void-echo",
+    "cover": "/media/generated/nocturne.webp",
+    "year": "2026",
+    "date": "2026-05-06",
+    "featured": true,
+    "roomType": "black-box",
+    "roomRule": "mirror",
+    "tags": ["Next.js", "Three.js", "React Three Fiber", "GSAP"],
+    "status": "Experimental · public"
+  },
+  {
+    "id": "big-mouth-burger",
+    "title": "Big Mouth Burger",
+    "subtitle": "Product storytelling as a visual experiment.",
+    "description": "A fictional food-brand concept exploring product storytelling, motion, visual hierarchy and consumer-facing interface design through a 3D burger interaction. A concept project rather than a real commercial brand. The gallery cover is an original geometric study, not a product screenshot.",
+    "category": "project",
+    "github": "https://github.com/YNS34-hub/big-mouth-burger",
+    "cover": "/media/generated/threshold.webp",
+    "year": "2026",
+    "date": "2026-05-06",
+    "featured": false,
+    "roomType": "installation",
+    "tags": ["TypeScript", "3D", "Motion", "Interface design"],
+    "status": "Concept · public"
+  },
+  {
+    "id": "giannis-fansite",
+    "title": "Giannis / Editorial",
+    "subtitle": "An athlete's story in rhythm and scale.",
+    "description": "A fan-made Giannis Antetokounmpo editorial website exploring athlete storytelling, responsive composition and high-impact visual presentation. Unofficial fan work with no affiliation to the athlete or team. The gallery cover is an original architectural study, not an athlete photograph.",
+    "category": "project",
+    "github": "https://github.com/YNS34-hub/giannis-fansite",
+    "demo": "https://yns34-hub.github.io/giannis-fansite/",
+    "cover": "/media/generated/colonnade.webp",
+    "year": "2026",
+    "date": "2026-06-11",
+    "featured": false,
+    "roomType": "white-cube",
+    "tags": ["Editorial", "HTML", "CSS", "Responsive"],
+    "status": "Fan-made visual project · public"
+  },
+  {
+    "id": "sci-fi-portfolio",
+    "title": "Sci-Fi Portfolio",
+    "subtitle": "Ten studies in interactive interfaces.",
+    "description": "An original science-fiction-inspired interactive web portfolio containing ten independent project interfaces and their previews. It is shown as an earlier creative experiment, with its separate original art direction available in the public repository.",
+    "category": "project",
+    "github": "https://github.com/YNS34-hub/sci-fi-portfolio",
+    "cover": "/media/generated/nocturne.webp",
+    "year": "2026",
+    "date": "2026-09-05",
+    "featured": false,
+    "roomType": "black-box",
+    "roomRule": "impossible",
+    "tags": ["React", "Vite", "TypeScript", "Interactive art"],
+    "status": "Experiment · public"
+  }
+]

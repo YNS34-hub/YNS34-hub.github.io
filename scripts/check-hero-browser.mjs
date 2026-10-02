@@ -5,7 +5,7 @@ import path from 'node:path';
 // Optional GPU acceptance suite. Install Playwright separately or supply its
 // module URL; ordinary CI intentionally does not claim GPU visual acceptance.
 const { chromium } = await import(process.env.HERO_PLAYWRIGHT_MODULE || 'playwright');
-const url = process.env.HERO_QA_URL || 'http://127.0.0.1:4173/';
+const url = process.env.HERO_QA_URL || 'http://127.0.0.1:4173/legacy/';
 const output = path.resolve(process.env.HERO_QA_OUTPUT || '../hero-evidence/browser');
 await mkdir(output, { recursive: true });
 const launch = { headless: true, ...(process.env.HERO_CHROME_PATH ? { executablePath: process.env.HERO_CHROME_PATH } : { channel: 'chrome' }) };

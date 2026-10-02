@@ -3,8 +3,12 @@ node_modules/
 dist/
 build/
 coverage/
+qa-artifacts/
 .vite/
 *.log
 
 # On-demand AI repository map
 .ai/repomix-output.xml
+
+# TypeScript build metadata
+*.tsbuildinfo

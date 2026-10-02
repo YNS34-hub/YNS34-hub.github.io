@@ -1,0 +1,52 @@
+[
+  {
+    "id": "threshold",
+    "title": "Threshold",
+    "src": "/media/generated/threshold.webp",
+    "description": "An original procedural architectural study. Pale colonnades converge on a quiet aperture, where a blue horizon enters the white interior.",
+    "tags": ["Architecture", "Light", "Original"],
+    "category": "Architecture",
+    "source": "Original numerical artwork · The Memory Palace",
+    "date": "2026-10-02"
+  },
+  {
+    "id": "level-sets",
+    "title": "Level Sets",
+    "src": "/media/generated/level-sets.webp",
+    "description": "Nested contours on a blue-white field, generated from a smooth nonlinear scalar function. A visual companion to rearrangement and symmetrization; an illustration rather than a mathematical result.",
+    "tags": ["Mathematics", "Contours", "Original"],
+    "category": "Mathematical art",
+    "source": "Original numerical artwork · The Memory Palace",
+    "date": "2026-10-02"
+  },
+  {
+    "id": "nocturne",
+    "title": "Nocturne",
+    "src": "/media/generated/nocturne.webp",
+    "description": "A silent night window above water, rendered as a restrained original geometric composition. The listening room's first light.",
+    "tags": ["Night", "Architecture", "Original"],
+    "category": "Spatial study",
+    "source": "Original numerical artwork · The Memory Palace",
+    "date": "2026-10-02"
+  },
+  {
+    "id": "colonnade",
+    "title": "Colonnade",
+    "src": "/media/generated/colonnade.webp",
+    "description": "Light passes between an endless sequence of warm white architectural fins. An original study in repetition, shadow and scale.",
+    "tags": ["Architecture", "Repetition", "Original"],
+    "category": "Architecture",
+    "source": "Original numerical artwork · The Memory Palace",
+    "date": "2026-10-02"
+  },
+  {
+    "id": "blue-hour",
+    "title": "Blue Hour",
+    "src": "/media/generated/blue-hour.webp",
+    "description": "A luminous ice-blue horizon composed from layered parametric waves. Quiet numerical terrain suspended between an image and a place.",
+    "tags": ["Landscape", "Generative", "Original"],
+    "category": "Mathematical art",
+    "source": "Original numerical artwork · The Memory Palace",
+    "date": "2026-10-02"
+  }
+]

@@ -1,0 +1,76 @@
+[
+  {
+    "id": "echodate-ai",
+    "title": "EchoDate AI",
+    "subtitle": "An unfinished future for a local assistant.",
+    "description": "A private, unfinished AI social-assistant concept exploring user preferences, contact-level context, approval boundaries, human takeover and privacy-oriented storage. It is not presented as a finished or validated product. The unfinished structure is part of the archive's character: an idea kept available for a later return.",
+    "category": "archive",
+    "cover": "/media/generated/threshold.webp",
+    "year": "2026",
+    "featured": true,
+    "roomType": "archive",
+    "roomRule": "memory",
+    "tags": ["Local-first", "AI assistant", "Human takeover", "WIP"],
+    "status": "Private prototype · work in progress"
+  },
+  {
+    "id": "buzz-reference",
+    "title": "Buzz / Reference",
+    "subtitle": "External open-source work, held for study.",
+    "description": "A fork of block/buzz, a hive-mind communication platform. Original authorship remains with its upstream maintainers. This repository is kept for learning and reference; it is not claimed as my original project.",
+    "category": "archive",
+    "github": "https://github.com/YNS34-hub/buzz",
+    "links": [
+      {
+        "label": "Original project · block/buzz",
+        "url": "https://github.com/block/buzz"
+      }
+    ],
+    "year": "2026",
+    "date": "2026-07-27",
+    "featured": false,
+    "roomType": "archive",
+    "tags": ["Fork", "External reference", "Communication"],
+    "status": "External fork · upstream authorship"
+  },
+  {
+    "id": "design-systems-reference",
+    "title": "Design Systems / Reference",
+    "subtitle": "A collected language for interfaces.",
+    "description": "A fork of VoltAgent/awesome-design-md collecting DESIGN.md files inspired by brand design systems. Original authorship and maintenance belong to the upstream contributors. It is a learning reference, not an original project of mine.",
+    "category": "archive",
+    "github": "https://github.com/YNS34-hub/awesome-design",
+    "links": [
+      {
+        "label": "Original collection · VoltAgent",
+        "url": "https://github.com/VoltAgent/awesome-design-md"
+      }
+    ],
+    "year": "2026",
+    "date": "2026-05-02",
+    "featured": false,
+    "roomType": "archive",
+    "tags": ["Fork", "External reference", "Design systems"],
+    "status": "External fork · upstream authorship"
+  },
+  {
+    "id": "image-prompts-reference",
+    "title": "Image Prompts / Reference",
+    "subtitle": "A study shelf for visual prompting.",
+    "description": "A fork of EvoLinkAI/awesome-gpt-image-2-API-and-Prompts. Original prompt examples and project authorship remain with the upstream contributors. Kept for reference and experimentation, with no original ownership claim.",
+    "category": "archive",
+    "github": "https://github.com/YNS34-hub/awesome-gpt-image-2-prompts",
+    "links": [
+      {
+        "label": "Original collection · EvoLinkAI",
+        "url": "https://github.com/EvoLinkAI/awesome-gpt-image-2-API-and-Prompts"
+      }
+    ],
+    "year": "2026",
+    "date": "2026-04-25",
+    "featured": false,
+    "roomType": "archive",
+    "tags": ["Fork", "External reference", "Image prompts"],
+    "status": "External fork · upstream authorship"
+  }
+]

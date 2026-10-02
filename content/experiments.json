@@ -1,0 +1,46 @@
+[
+  {
+    "id": "nonlinear-glass-study",
+    "title": "Nonlinear Glass Study",
+    "subtitle": "A mathematical surface, held in light.",
+    "description": "The original portfolio's genuine WebGL nonlinear glass surface is preserved with its geometry, local assets and interactive rotation. Displaced geometry, physical transmission and environment lighting make the silhouette and refraction change in three dimensions. The palace's glass core continues this visual research.",
+    "category": "experiment",
+    "cover": "/assets/nonlinear-sphere-clean.webp",
+    "demo": "/legacy/",
+    "github": "https://github.com/YNS34-hub/YNS34-hub.github.io",
+    "year": "2026",
+    "featured": true,
+    "roomType": "installation",
+    "roomRule": "gravity",
+    "tags": ["Three.js", "Physical glass", "Geometry", "WebGL"],
+    "status": "Interactive visual study"
+  },
+  {
+    "id": "human-ai-review-lens",
+    "title": "The Review Lens",
+    "subtitle": "Question → challenge → verify → refine → human judgment.",
+    "description": "The original five-step AI-assisted mathematical review workflow, retained as an interactive conceptual exhibit. AI observations are prompts for verification. The researcher checks each claim, decides what belongs in the manuscript and retains final mathematical judgment. There is no live model integration in this exhibit.",
+    "category": "experiment",
+    "cover": "/media/generated/level-sets.webp",
+    "year": "2026",
+    "featured": true,
+    "roomType": "installation",
+    "roomRule": "loop",
+    "tags": ["AI-assisted research", "Reasoning", "Human verification"],
+    "status": "Conceptual workflow · interactive"
+  },
+  {
+    "id": "memory-architecture",
+    "title": "Memory Architecture",
+    "subtitle": "The same door. A changing relationship.",
+    "description": "A new palace-specific creative coding experiment: procedural rooms have stable identities while local visits alter small details. The world keeps a browser-local memory of your exploration. No account or server is involved. Clearing browser storage returns the rooms to their first encounter.",
+    "category": "experiment",
+    "cover": "/media/generated/threshold.webp",
+    "year": "2026",
+    "featured": false,
+    "roomType": "anomaly",
+    "roomRule": "memory",
+    "tags": ["Deterministic generation", "Local memory", "Spatial interaction"],
+    "status": "Palace installation · evolving"
+  }
+]

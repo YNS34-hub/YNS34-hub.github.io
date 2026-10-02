@@ -1,0 +1,85 @@
+[
+  {
+    "id": "atrium",
+    "number": "01",
+    "title": "THE ATRIUM",
+    "subtitle": "A place to begin. A place to return.",
+    "type": "installation",
+    "color": "#dbe7e9"
+  },
+  {
+    "id": "projects",
+    "number": "02",
+    "title": "PROJECT GALLERY",
+    "subtitle": "Ideas made tangible.",
+    "type": "white-cube",
+    "color": "#e4e7e3"
+  },
+  {
+    "id": "research",
+    "number": "03",
+    "title": "RESEARCH HALL",
+    "subtitle": "Mathematics as an exhibit.",
+    "type": "white-cube",
+    "color": "#d8e5ed"
+  },
+  {
+    "id": "music",
+    "number": "04",
+    "title": "LISTENING ROOM",
+    "subtitle": "A room that belongs to a song.",
+    "type": "listening",
+    "color": "#493d32"
+  },
+  {
+    "id": "wallpapers",
+    "number": "05",
+    "title": "WALLPAPER ARCHIVE",
+    "subtitle": "Images held in space.",
+    "type": "image-gallery",
+    "color": "#e8e5df"
+  },
+  {
+    "id": "experiments",
+    "number": "06",
+    "title": "AI PLAYGROUND",
+    "subtitle": "Questions, tools and living experiments.",
+    "type": "installation",
+    "color": "#d6e4e5"
+  },
+  {
+    "id": "archive",
+    "number": "07",
+    "title": "UNFINISHED FUTURES",
+    "subtitle": "Some ideas are waiting for their time.",
+    "type": "archive",
+    "color": "#c8cac8"
+  },
+  {
+    "id": "corridor",
+    "number": "08",
+    "title": "INFINITE CORRIDOR",
+    "subtitle": "The next door is always there.",
+    "type": "anomaly",
+    "rule": "impossible",
+    "color": "#e6ecee"
+  },
+  {
+    "id": "cinema",
+    "number": "09",
+    "title": "WALLPAPER CINEMA",
+    "subtitle": "An image becomes a place.",
+    "type": "black-box",
+    "color": "#1d252b"
+  },
+  {
+    "id": "memory",
+    "number": "—",
+    "title": "THE QUIET ROOM",
+    "subtitle": "You have been here before.",
+    "type": "anomaly",
+    "rule": "memory",
+    "color": "#d2e5ee",
+    "hidden": true
+  }
+]

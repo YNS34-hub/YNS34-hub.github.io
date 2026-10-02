@@ -1,0 +1,166 @@
+import { MathUtils, Vector3 } from "three";
+import { resolveRoomPlan } from "./roomPlan";
+
+export type Footprint =
+  | { x: number; z: number; radius: number }
+  | { x: number; z: number; halfWidth: number; halfDepth: number };
+const CLEARANCE = 0.3;
+
+export function roomBounds(roomId: string): [number, number, number, number] {
+  const plan = resolveRoomPlan(roomId);
+  if (roomId === "atrium") return [-20.7, 20.7, -24.4, 25];
+  if (roomId === "corridor") return [-3.08, 3.08, -Infinity, Infinity];
+  if (plan.rule === "floating") return [-1.3, 1.3, -15.6, 15.6];
+  if (plan.rule === "gravity") return [-8.5, 8.5, -15.6, 15.6];
+  if (plan.rule === "impossible") return [-25.5, 25.5, -24.6, 24.6];
+  if (roomId === "cinema") return [-12.4, 12.4, -14.8, 16];
+  return [-12.4, 12.4, -15.6, 15.6];
+}
+
+export function roomFootprints(roomId: string): Footprint[] {
+  const plan = resolveRoomPlan(roomId);
+  if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
+  if (plan.type === "listening")
+    return [
+      { x: 0, z: 2.4, radius: 1.55 },
+      { x: 0, z: -5.6, halfWidth: 2.05, halfDepth: 1.05 },
+      ...[-5.4, 5.4].map((x) => ({
+        x,
+        z: 2.8,
+        halfWidth: 2.28,
+        halfDepth: 1.32,
+      })),
+      ...[-5.2, 5.2].map((x) => ({
+        x,
+        z: -9.6,
+        halfWidth: 0.83,
+        halfDepth: 0.73,
+      })),
+      { x: -10.2, z: -5, halfWidth: 0.9, halfDepth: 4.05 },
+    ];
+  if (plan.rule === "impossible")
+    return [
+      { x: -9.5, z: 11, halfWidth: 7.8, halfDepth: 0.68 },
+      { x: 9.5, z: 11, halfWidth: 7.8, halfDepth: 0.68 },
+    ];
+  if (
+    plan.rule === "floating" ||
+    plan.rule === "gravity" ||
+    roomId === "corridor" ||
+    roomId === "cinema"
+  )
+    return [];
+  if (plan.rule === "memory")
+    return [-4, 0, 4].map((x) => ({ x, z: -6, radius: 0.65 }));
+  if (plan.type === "image-gallery" || roomId.startsWith("wallpapers"))
+    return [{ x: 0, z: -1, halfWidth: 2.7, halfDepth: 1.05 }];
+  if (roomId.startsWith("archive"))
+    return Array.from({ length: 6 }, (_, i) => ({
+      x: i % 2 ? 8 : -8,
+      z: 6.7 - Math.floor(i / 2) * 8.3,
+      halfWidth: 2.7,
+      halfDepth: 1.95,
+    }));
+  if (
+    roomId.startsWith("projects") ||
+    roomId.startsWith("research") ||
+    roomId.startsWith("experiments") ||
+    plan.type === "installation"
+  ) {
+    const footprints: Footprint[] = [
+      { x: 0, z: -3, radius: roomId.startsWith("experiments") ? 3.55 : 3.3 },
+    ];
+    if (roomId.startsWith("research"))
+      footprints.push(
+        ...[7, -4].map((z) => ({ x: 0, z, halfWidth: 2.2, halfDepth: 0.65 })),
+      );
+    if (roomId.startsWith("projects") || roomId.startsWith("experiments"))
+      footprints.push(
+        ...Array.from({ length: 6 }, (_, i) => ({
+          x: i % 2 ? 10 : -10,
+          z: 7.1 - Math.floor(i / 2) * 8.7,
+          halfWidth: 1.35,
+          halfDepth: 3.15,
+        })),
+      );
+    return footprints;
+  }
+  return plan.item && !plan.rule
+    ? [{ x: 0, z: -9, halfWidth: 3.1, halfDepth: 0.7 }]
+    : [];
+}
+
+/** Furniture footprints are expanded by eye-camera clearance, without rigid-body overhead. */
+export function keepClear(
+  position: Vector3,
+  roomId: string,
+  footprints = roomFootprints(roomId),
+) {
+  for (const obstacle of footprints) {
+    const dx = position.x - obstacle.x,
+      dz = position.z - obstacle.z;
+    if ("radius" in obstacle) {
+      const distance = Math.hypot(dx, dz);
+      if (distance < obstacle.radius) {
+        position.x =
+          obstacle.x + (distance > 0.001 ? dx / distance : 1) * obstacle.radius;
+        position.z =
+          obstacle.z + (distance > 0.001 ? dz / distance : 0) * obstacle.radius;
+      }
+    } else if (
+      Math.abs(dx) < obstacle.halfWidth &&
+      Math.abs(dz) < obstacle.halfDepth
+    ) {
+      if (obstacle.halfWidth - Math.abs(dx) < obstacle.halfDepth - Math.abs(dz))
+        position.x = obstacle.x + (dx < 0 ? -1 : 1) * obstacle.halfWidth;
+      else position.z = obstacle.z + (dz < 0 ? -1 : 1) * obstacle.halfDepth;
+    }
+  }
+  const [minX, maxX, minZ, maxZ] = roomBounds(roomId);
+  position.x = MathUtils.clamp(position.x, minX, maxX);
+  position.z = MathUtils.clamp(position.z, minZ, maxZ);
+  position.y = 1.65;
+}
+
+/** A temporary waypoint leads around a blocking object, then resumes the original destination. */
+export function tourWaypoint(
+  from: Vector3,
+  target: Vector3,
+  obstacles: Footprint[],
+  result: Vector3,
+) {
+  const directionX = target.x - from.x,
+    directionZ = target.z - from.z;
+  const length = Math.hypot(directionX, directionZ);
+  result.copy(target);
+  if (length < 0.05) return result;
+  const nx = directionX / length,
+    nz = directionZ / length;
+  let nearest = Infinity;
+  for (const obstacle of obstacles) {
+    const radius =
+      "radius" in obstacle
+        ? obstacle.radius
+        : Math.hypot(obstacle.halfWidth, obstacle.halfDepth);
+    const dx = obstacle.x - from.x,
+      dz = obstacle.z - from.z;
+    const along = dx * nx + dz * nz;
+    const lateral = dx * -nz + dz * nx;
+    if (
+      along < -0.05 ||
+      along > length ||
+      Math.abs(lateral) > radius + CLEARANCE ||
+      along > nearest
+    )
+      continue;
+    nearest = along;
+    // Deterministic side choice prevents oscillation when a target is directly behind the core.
+    const side = lateral > 0.03 ? -1 : 1;
+    result.set(
+      obstacle.x - nz * side * (radius + 0.75) - nx * 0.35,
+      1.65,
+      obstacle.z + nx * side * (radius + 0.75) - nz * 0.35,
+    );
+  }
+  return result;
+}

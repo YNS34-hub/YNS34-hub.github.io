@@ -1,0 +1,42 @@
+[
+  {
+    "id": "question",
+    "number": "01",
+    "label": "Question",
+    "title": "State the question precisely.",
+    "copy": "Separate the mathematical problem, the claimed result, and the assumptions that connect them.",
+    "tags": ["scope", "claim", "hypotheses"]
+  },
+  {
+    "id": "challenge",
+    "number": "02",
+    "label": "Challenge assumptions",
+    "title": "Make the assumptions visible.",
+    "copy": "Ask which hypotheses are essential, which are implicit, and where a proof may be using more than it states.",
+    "tags": ["hidden assumptions", "definitions", "edge cases"]
+  },
+  {
+    "id": "verify",
+    "number": "03",
+    "label": "Verify reasoning",
+    "title": "Trace every dependency.",
+    "copy": "Check proof steps, test implications, inspect boundary cases, and explore whether a counterexample could break the argument.",
+    "tags": ["proof steps", "implications", "counterexamples"]
+  },
+  {
+    "id": "refine",
+    "number": "04",
+    "label": "Refine argument",
+    "title": "Improve the argument’s surface.",
+    "copy": "Clarify notation, manuscript structure, academic English, LaTeX presentation, and citation coherence without changing the mathematics.",
+    "tags": ["notation", "language", "citations"]
+  },
+  {
+    "id": "human",
+    "number": "05",
+    "label": "Human validation",
+    "title": "Return judgment to the researcher.",
+    "copy": "Treat every AI observation as a prompt for checking. The researcher verifies the mathematics and decides what belongs in the manuscript.",
+    "tags": ["verification", "judgment", "accountability"]
+  }
+]
