@@ -1,0 +1,802 @@
+import * as THREE from "three";
+import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
+import { SimplexNoise } from "three/addons/math/SimplexNoise.js";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+export const loadSculptureGeometry = async () => {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (window.matchMedia("(max-width: 760px), (pointer: coarse), (prefers-reduced-motion: reduce)").matches
+    || connection?.saveData || navigator.deviceMemory <= 1 || navigator.hardwareConcurrency <= 2) return null;
+  const gltf = await new GLTFLoader().loadAsync(new URL("./assets/nonlinear-glass.glb", import.meta.url).href + "?v=20260907-ice");
+  try {
+    const meshes = [];
+    gltf.scene.updateMatrixWorld(true);
+    gltf.scene.traverse((object) => { if (object.isMesh) meshes.push(object); });
+    if (meshes.length !== 1 || !meshes[0].geometry.index) throw new Error("Expected one indexed sculpture mesh");
+    const geometry = meshes[0].geometry.clone().applyMatrix4(meshes[0].matrixWorld);
+    geometry.name = "Volumetric glass GLB";
+    geometry.computeBoundingSphere();
+    return geometry;
+  } finally {
+    disposeObject(gltf.scene);
+  }
+};
+
+const PAPER = 0xf3f1ea;
+const WORLD_X = new THREE.Vector3(1, 0, 0);
+const WORLD_Y = new THREE.Vector3(0, 1, 0);
+const EULER = new THREE.Euler(0, 0, 0, "YXZ");
+const ROTATION_Y = new THREE.Quaternion();
+const ROTATION_X = new THREE.Quaternion();
+let areaLightsInitialized = false;
+
+const clamp = (value, minimum, maximum) => Math.min(maximum, Math.max(minimum, value));
+
+const seededRandom = (seed) => {
+  let state = seed >>> 0;
+  return () => {
+    state += 0x6d2b79f5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+};
+
+const CAVITIES = [
+  { direction: [0.38, 0.34, 0.86], depth: 0.34, radius: 0.64 },
+  { direction: [-0.55, 0.2, 0.81], depth: 0.315, radius: 0.59 },
+  { direction: [0.07, -0.62, 0.78], depth: 0.3, radius: 0.57 },
+  { direction: [0.78, 0.3, -0.55], depth: 0.25, radius: 0.56 },
+  { direction: [-0.58, 0.6, -0.55], depth: 0.23, radius: 0.53 },
+  { direction: [-0.02, -0.37, -0.93], depth: 0.265, radius: 0.59 },
+  { direction: [-0.92, -0.3, 0.24], depth: 0.19, radius: 0.45 }
+].map((cavity) => ({
+  ...cavity,
+  direction: new THREE.Vector3(...cavity.direction).normalize()
+}));
+
+export const buildNonlinearGeometry = (detail) => {
+  let geometry = new THREE.IcosahedronGeometry(1, detail);
+
+  // Weld the base icosphere before recalculating normals so the displaced
+  // surface remains continuous instead of exposing triangular facets.
+  geometry.deleteAttribute("normal");
+  geometry.deleteAttribute("uv");
+  geometry = mergeVertices(geometry, 1e-5);
+
+  const positions = geometry.getAttribute("position");
+  const noise = new SimplexNoise({ random: seededRandom(0x4a544e50) });
+  const direction = new THREE.Vector3();
+
+  for (let index = 0; index < positions.count; index += 1) {
+    direction.fromBufferAttribute(positions, index).normalize();
+    const { x, y, z } = direction;
+
+    const broad = noise.noise3d(x * 0.92 + 1.4, y * 0.92 - 0.8, z * 0.92 + 0.3);
+    let depressionSquared = 0;
+    let ridge = 0;
+
+    for (const cavity of CAVITIES) {
+      const angle = Math.acos(clamp(direction.dot(cavity.direction), -1, 1));
+      const normalizedAngle = angle / cavity.radius;
+      // Compact, broad bowls meet the parent with zero slope. The norm blends
+      // overlapping depressions without stacking deep cuts through the sphere.
+      const bowl = Math.max(0, 1 - normalizedAngle * normalizedAngle);
+      const depression = cavity.depth * bowl * bowl;
+      depressionSquared += depression * depression;
+      ridge += cavity.depth * 0.27 * Math.exp(-((normalizedAngle - 1.02) ** 2) / (2 * 0.3 ** 2));
+    }
+
+    // Saturation joins adjacent rims into broad shared ridges without inflated
+    // ring intersections. This work runs only while building the fixed mesh.
+    const deformation = broad * 0.014 - Math.sqrt(depressionSquared)
+      + 0.08 * Math.tanh(ridge / 0.08);
+    const radius = 1.55 * (1 + deformation);
+    const px = direction.x * radius * 1.012;
+    const py = direction.y * radius * 0.997;
+    const pz = direction.z * radius;
+    positions.setXYZ(index, px, py, pz);
+  }
+
+  positions.needsUpdate = true;
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  geometry.name = "Nonlinear level-set icosphere";
+  return geometry;
+};
+
+const addBreathingDisplacement = (material, amplitude, phase) => {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uSurfaceTime = { value: 0 };
+    shader.uniforms.uBreathAmplitude = { value: amplitude };
+    shader.uniforms.uSurfacePhase = { value: phase };
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+        uniform float uSurfaceTime;
+        uniform float uBreathAmplitude;
+        uniform float uSurfacePhase;`
+      )
+      .replace(
+        "#include <begin_vertex>",
+        `vec3 transformed = vec3(position);
+        float surfaceWave = sin(
+          uSurfaceTime * 0.48 +
+          position.x * 1.34 +
+          position.y * 0.91 -
+          position.z * 1.12 +
+          uSurfacePhase
+        );
+        float secondaryWave = sin(
+          uSurfaceTime * 0.31 -
+          position.x * 0.72 +
+          position.y * 1.23 +
+          position.z * 0.83
+        );
+        transformed += objectNormal * (surfaceWave * 0.72 + secondaryWave * 0.28) * uBreathAmplitude;`
+      );
+    // Double-sided transmission compiles front and back programs; animate
+    // both so the refracted rear surface breathes with the visible front.
+    (material.userData.surfaceShaders ??= new Set()).add(shader);
+    // Keep the native dispersed transmission dominant. One restrained PMREM
+    // lookup supplies offscreen studio light without painting the rear silver.
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <transmission_fragment>",
+      `#include <transmission_fragment>
+      #if defined(USE_TRANSMISSION) && defined(ENVMAP_TYPE_CUBE_UV)
+        vec3 studioRay = refract(-v, n, 1.0 / material.ior);
+        vec3 studioTransmission = textureCubeUV(envMap, envMapRotation * studioRay, material.roughness).rgb;
+        float studioEdge = smoothstep(0.18, 0.68, 1.0 - clamp(abs(dot(n, v)), 0.0, 1.0));
+        studioTransmission *= mix(vec3(1.0), vec3(0.52, 0.84, 1.2), studioEdge * 0.5);
+        float studioWeight = gl_FrontFacing ? mix(0.005, 0.44, studioEdge) : mix(0.008, 0.3, studioEdge);
+        totalDiffuse = mix(totalDiffuse, studioTransmission * material.diffuseColor, studioWeight * material.transmission);
+      #endif`
+    );
+  };
+  material.customProgramCacheKey = () => `nonlinear-breath-${amplitude}-${phase}`;
+};
+
+const updateSurfaceTime = (material, time) => {
+  for (const shader of material.userData.surfaceShaders || []) {
+    shader.uniforms.uSurfaceTime.value = time;
+  }
+};
+
+const createGlassMaterials = (mobile) => {
+  const outer = new THREE.MeshPhysicalMaterial({
+    name: "Clear nonlinear glass",
+    color: 0xffffff,
+    metalness: 0,
+    roughness: mobile ? 0.015 : 0.009,
+    transmission: 1,
+    thickness: 1.3,
+    ior: 1.5,
+    dispersion: mobile ? 0.025 : 0.07,
+    specularIntensity: 1,
+    specularColor: 0xf5fbff,
+    clearcoat: 0,
+    clearcoatRoughness: 0,
+    attenuationColor: 0xffffff,
+    attenuationDistance: Infinity,
+    envMapIntensity: 1,
+    toneMapped: true,
+    transparent: false,
+    opacity: 1,
+    side: THREE.DoubleSide,
+    depthWrite: true
+  });
+
+  addBreathingDisplacement(outer, mobile ? 0.0033 : 0.0055, 0);
+  return { outer };
+};
+
+const createOrbit = (radiusX, radiusY, opacity, color = 0x343a3e) => {
+  const curve = new THREE.EllipseCurve(0, 0, radiusX, radiusY, 0, Math.PI * 2);
+  const points = curve.getPoints(192).map((point) => new THREE.Vector3(point.x, point.y, 0));
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const material = new THREE.LineBasicMaterial({
+    // Opaque, paper-blended ink participates in the transmission pass, so
+    // the stationary reference curves are visibly refracted by the glass.
+    color: new THREE.Color(PAPER).lerp(new THREE.Color(color), opacity * 2.5),
+    transparent: false,
+    depthWrite: false,
+    toneMapped: false
+  });
+  return new THREE.LineLoop(geometry, material);
+};
+
+const disposeObject = (object) => {
+  object.traverse((child) => {
+    child.geometry?.dispose();
+    if (Array.isArray(child.material)) child.material.forEach((material) => material.dispose());
+    else child.material?.dispose();
+  });
+};
+
+const createFallbackController = (stage, reason) => {
+  stage.classList.remove("webgl-ready", "is-dragging", "is-interacting");
+  stage.classList.add("is-fallback");
+  stage.dataset.renderMode = reason;
+  stage.dataset.animationState = "stopped";
+  stage.dataset.dragState = "disabled";
+  return {
+    setScroll() {},
+    rotateBy() {},
+    rotateTo() {},
+    getState() {
+      return { renderMode: reason, isThreeDimensional: false };
+    },
+    destroy() {}
+  };
+};
+
+export const initNonlinearSphere = (canvas, stage, reducedMotionQuery, sculptureGeometry = null) => {
+  if (!canvas || !stage) return null;
+
+  const smallScreenQuery = window.matchMedia("(max-width: 760px)");
+  const coarsePointerQuery = window.matchMedia("(pointer: coarse)");
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const lowPerformance = Boolean(
+    connection?.saveData ||
+    (navigator.deviceMemory && navigator.deviceMemory <= 1) ||
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)
+  );
+
+  if (reducedMotionQuery.matches) {
+    return createFallbackController(stage, "reduced-motion-poster");
+  }
+  if (lowPerformance) {
+    return createFallbackController(stage, "low-performance-poster");
+  }
+
+  const mobile = smallScreenQuery.matches || coarsePointerQuery.matches;
+  const contextAttributes = {
+    alpha: true,
+    antialias: !mobile,
+    depth: true,
+    powerPreference: "high-performance",
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: false
+  };
+  let webglContext = null;
+  let renderer;
+
+  try {
+    webglContext = canvas.getContext("webgl2", contextAttributes);
+    if (!webglContext) {
+      return createFallbackController(stage, "webgl-unavailable-poster");
+    }
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      context: webglContext,
+      ...contextAttributes
+    });
+    stage.dataset.webglVersion = webglContext.getParameter(webglContext.VERSION);
+  } catch (error) {
+    renderer?.dispose();
+    console.warn("The 3D glass sculpture is unavailable; showing its poster instead.", error);
+    return createFallbackController(stage, "webgl-unavailable-poster");
+  }
+
+  const disposers = [];
+  let disposed = false;
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    for (const release of disposers.reverse()) release();
+    renderer.dispose();
+    canvas.removeAttribute("tabindex");
+    canvas.setAttribute("aria-hidden", "true");
+  };
+
+  try {
+    renderer.debug.onShaderError = () => { throw new Error("Physical glass shader compilation failed"); };
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.transmissionResolutionScale = mobile ? 0.5 : 1;
+    renderer.shadowMap.enabled = false;
+    renderer.setClearColor(PAPER, 1);
+
+    const scene = new THREE.Scene();
+    disposers.push(() => disposeObject(scene));
+    scene.background = new THREE.Color(PAPER);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 30);
+    camera.position.set(0, 0.06, 5.7);
+    camera.lookAt(0, 0, 0);
+
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    disposers.push(() => pmremGenerator.dispose());
+    pmremGenerator.compileEquirectangularShader();
+    // The dark studio is reflection lighting, independent of the warm page.
+    // Local white cards define clear rims; native transmission carries the body.
+    const roomEnvironment = new THREE.Scene();
+    roomEnvironment.background = new THREE.Color(0x1e2f43);
+    const softbox = (position, width, height, intensity, color = 0xffffff) => {
+      const panel = new THREE.Mesh(
+        new THREE.PlaneGeometry(width, height),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide })
+      );
+      panel.position.set(...position);
+      panel.lookAt(0, 0, 0);
+      roomEnvironment.add(panel);
+    };
+    softbox([-4, 3, 4], 0.65, 4.5, 4, 0xedf7ff);
+    softbox([0, 5, -1], 3.8, 0.3, 4, 0xe6f3ff);
+    softbox([-1.5, 0, -5], 0.3, 5, 3.5, 0xe8f6ff);
+    softbox([3.5, 1, 3], 0.1, 5, 5);
+    softbox([0.4, -0.5, -5], 0.08, 5, 4);
+    softbox([1.3, 0.5, -5], 0.18, 5, 3.2, 0x7ed0ff);
+    softbox([3, -1, 3], 0.09, 3.5, 2.5, 0xa7dcff);
+    softbox([-2, 0.6, 4.6], 0.65, 4, 0.012);
+    softbox([2.6, -0.6, 4], 0.5, 4, 0.016);
+    softbox([4, 0.5, -1], 0.5, 4, 0.015);
+    let environmentTarget;
+    try {
+      environmentTarget = pmremGenerator.fromScene(roomEnvironment, 0.002, 0.1, 100, { size: mobile ? 256 : 1024 });
+    } finally {
+      disposeObject(roomEnvironment);
+    }
+    disposers.push(() => environmentTarget.dispose());
+    scene.environment = environmentTarget.texture;
+
+    if (!areaLightsInitialized) {
+      RectAreaLightUniformsLib.init();
+      areaLightsInitialized = true;
+    }
+    const keyLight = new THREE.RectAreaLight(0xf0f9ff, 2.5, 0.55, 3);
+    keyLight.position.set(-3.2, 4.1, 4.6);
+    keyLight.lookAt(0, 0.15, 0);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.RectAreaLight(0xf8fbff, 0.15, 0.8, 4.5);
+    fillLight.position.set(4.2, 0.65, 3.2);
+    fillLight.lookAt(0, 0, 0);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.RectAreaLight(0xb6ddff, 2.8, 0.6, 3.2);
+    rimLight.position.set(0.8, 2.7, -4.2);
+    rimLight.lookAt(0, 0, 0);
+    scene.add(rimLight);
+
+    // An analytic feathered contact shadow avoids treating transmissive glass
+    // as an opaque occluder (and avoids a visibly clipped shadow-map frustum).
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.65), new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `varying vec2 vUv;
+        void main() {
+          vec2 p = (vUv - 0.5) * 2.0;
+          float fade = 1.0 - smoothstep(0.65, 1.0, length(p));
+          float shade = exp(-dot(p, p) * 4.5) * 0.16;
+          // A static soft crescent on the existing shadow card, not traced caustics.
+          float arcDistance = (length(p * vec2(1.15, 1.65) - vec2(0.06, -0.12)) - 0.56) * 12.0;
+          float arc = exp(-arcDistance * arcDistance);
+          float glow = arc * smoothstep(-0.1, 0.55, p.y) * 0.3;
+          float alpha = shade + glow;
+          vec3 tint = (vec3(0.16, 0.18, 0.19) * shade + vec3(0.8, 0.94, 1.0) * glow) / max(alpha, 0.0001);
+          gl_FragColor = vec4(tint, alpha * fade);
+        }`
+    }));
+    shadow.name = "Feathered studio contact shadow";
+    shadow.position.set(0.08, -1.58, -0.5);
+    scene.add(shadow);
+
+    const presentationGroup = new THREE.Group();
+    presentationGroup.name = "Mathematical glass presentation";
+    presentationGroup.position.set(0.08, 0.08, 0);
+    scene.add(presentationGroup);
+
+    const sculptureGroup = new THREE.Group();
+    sculptureGroup.name = "360 degree nonlinear sculpture";
+    sculptureGroup.quaternion.setFromEuler(new THREE.Euler(-0.13, -0.42, 0.08, "YXZ"));
+    presentationGroup.add(sculptureGroup);
+
+    const detail = mobile ? 24 : 48;
+    if (!mobile && !sculptureGeometry) throw new Error("Desktop sculpture GLB was not loaded");
+    const outerGeometry = mobile ? buildNonlinearGeometry(detail) : sculptureGeometry.clone();
+    const materials = createGlassMaterials(mobile);
+
+    const outerMesh = new THREE.Mesh(outerGeometry, materials.outer);
+    outerMesh.name = "Outer physical glass surface";
+    outerMesh.renderOrder = 2;
+    sculptureGroup.add(outerMesh);
+
+    const orbitGroup = new THREE.Group();
+    orbitGroup.name = "Level-set reference orbits";
+    orbitGroup.position.set(0.02, 0.02, -2);
+    const orbitA = createOrbit(2.18, 1.04, 0.095);
+    orbitA.rotation.set(0.22, -0.36, -0.12);
+    orbitGroup.add(orbitA);
+    const orbitB = createOrbit(1.78, 1.34, 0.052, 0x234e79);
+    orbitB.rotation.set(-0.48, 0.22, 0.62);
+    orbitGroup.add(orbitB);
+    presentationGroup.add(orbitGroup);
+
+    const state = {
+      running: true,
+      visible: true,
+      contextLost: false,
+      dragging: false,
+      pointerId: null,
+      lastPointerX: 0,
+      lastPointerY: 0,
+      lastPointerTime: 0,
+      pointerX: 0,
+      pointerY: 0,
+      pointerTargetX: 0,
+      pointerTargetY: 0,
+      velocityYaw: 0,
+      velocityPitch: 0,
+      scroll: 0,
+      frame: 0,
+      lastFrame: performance.now(),
+      lastRender: 0,
+      lastInteraction: performance.now(),
+      lastMotion: performance.now() - 500,
+      elapsed: 0,
+      slowFrames: 0,
+      measuredFrames: 0,
+      renderedFrames: 0,
+      ready: false
+    };
+    let controller = null;
+    disposers.push(() => {
+      state.running = false;
+      cancelAnimationFrame(state.frame);
+      state.frame = 0;
+      if (state.pointerId !== null && canvas.hasPointerCapture?.(state.pointerId)) {
+        canvas.releasePointerCapture(state.pointerId);
+      }
+      if (window.__NONLINEAR_SPHERE__ === controller) delete window.__NONLINEAR_SPHERE__;
+    });
+
+    const fallBack = (reason) => {
+      dispose();
+      createFallbackController(stage, reason);
+    };
+
+    const updateRotationMetadata = () => {
+      EULER.setFromQuaternion(sculptureGroup.quaternion, "YXZ");
+      stage.dataset.rotationX = THREE.MathUtils.radToDeg(EULER.x).toFixed(1);
+      stage.dataset.rotationY = THREE.MathUtils.radToDeg(EULER.y).toFixed(1);
+      stage.dataset.rotationZ = THREE.MathUtils.radToDeg(EULER.z).toFixed(1);
+    };
+
+    const rotateRadians = (yaw, pitch) => {
+      ROTATION_Y.setFromAxisAngle(WORLD_Y, yaw);
+      ROTATION_X.setFromAxisAngle(WORLD_X, pitch);
+      sculptureGroup.quaternion.premultiply(ROTATION_Y);
+      sculptureGroup.quaternion.premultiply(ROTATION_X);
+      sculptureGroup.quaternion.normalize();
+      updateRotationMetadata();
+    };
+
+    const resize = () => {
+      if (disposed) return;
+      const bounds = stage.getBoundingClientRect();
+      const width = Math.max(1, Math.round(bounds.width));
+      const height = Math.max(1, Math.round(bounds.height));
+      const aspect = width / height;
+      const pixelBudget = mobile ? 520000 : 1600000;
+      let pixelRatio = mobile ? Math.min(window.devicePixelRatio || 1, 1) : 1.5;
+      const requestedPixels = width * height * pixelRatio * pixelRatio;
+      if (requestedPixels > pixelBudget) {
+        pixelRatio *= Math.sqrt(pixelBudget / requestedPixels);
+      }
+      renderer.setPixelRatio(Math.max(0.75, pixelRatio));
+      renderer.setSize(width, height, false);
+      camera.aspect = aspect;
+      camera.position.z = mobile ? 6.7 : aspect < 0.78 ? 6.65 : aspect < 1.05 ? 6.15 : 5.7;
+      camera.updateProjectionMatrix();
+      presentationGroup.scale.setScalar(mobile ? 0.92 : aspect < 0.78 ? 0.94 : 1);
+    };
+
+    const onPointerDown = (event) => {
+      if (disposed || event.isPrimary === false || state.dragging) return;
+      if (event.button !== undefined && event.button !== 0) return;
+      state.dragging = true;
+      state.pointerId = event.pointerId;
+      state.lastPointerX = event.clientX;
+      state.lastPointerY = event.clientY;
+      state.lastPointerTime = performance.now();
+      state.velocityYaw = 0;
+      state.velocityPitch = 0;
+      state.lastInteraction = performance.now();
+      stage.classList.add("is-dragging");
+      stage.dataset.dragState = "dragging";
+      canvas.setPointerCapture?.(event.pointerId);
+      event.preventDefault();
+    };
+
+    const onPointerMove = (event) => {
+      if (disposed || event.isPrimary === false) return;
+      const bounds = canvas.getBoundingClientRect();
+      state.pointerTargetX = clamp(((event.clientX - bounds.left) / bounds.width - 0.5) * 2, -1, 1);
+      state.pointerTargetY = clamp(((event.clientY - bounds.top) / bounds.height - 0.5) * 2, -1, 1);
+
+      if (!state.dragging) {
+        state.lastInteraction = performance.now();
+        return;
+      }
+      if (event.pointerId !== state.pointerId) return;
+      const deltaX = event.clientX - state.lastPointerX;
+      const deltaY = event.clientY - state.lastPointerY;
+      const dragScale = mobile ? 0.0074 : 0.0065;
+      const yaw = deltaX * dragScale;
+      const pitch = deltaY * dragScale;
+      rotateRadians(yaw, pitch);
+      const now = performance.now();
+      const eventFrames = clamp((now - state.lastPointerTime) / (1000 / 60), 0.5, 4);
+      state.velocityYaw = clamp(yaw / eventFrames * 0.48, -0.022, 0.022);
+      state.velocityPitch = clamp(pitch / eventFrames * 0.48, -0.022, 0.022);
+      state.lastPointerTime = now;
+      state.lastPointerX = event.clientX;
+      state.lastPointerY = event.clientY;
+      state.lastInteraction = performance.now();
+      event.preventDefault();
+    };
+
+    const endDrag = (event) => {
+      if (!state.dragging) return;
+      if (event?.pointerId !== undefined && event.pointerId !== state.pointerId) return;
+      if (state.pointerId !== null && canvas.hasPointerCapture?.(state.pointerId)) {
+        canvas.releasePointerCapture(state.pointerId);
+      }
+      if (performance.now() - state.lastPointerTime > 100 || event?.type === "pointercancel") {
+        state.velocityYaw = 0;
+        state.velocityPitch = 0;
+      }
+      state.dragging = false;
+      state.pointerId = null;
+      state.lastInteraction = performance.now();
+      stage.classList.remove("is-dragging");
+      stage.dataset.dragState = "inertia";
+    };
+
+    const onPointerEnter = () => {
+      state.lastInteraction = performance.now();
+      stage.classList.add("is-interacting");
+    };
+
+    const onPointerLeave = () => {
+      state.pointerTargetX = 0;
+      state.pointerTargetY = 0;
+      stage.classList.remove("is-interacting");
+    };
+
+    const schedule = () => {
+      if (!disposed && state.running && state.visible && !document.hidden && !state.frame) {
+        state.frame = requestAnimationFrame(render);
+      }
+    };
+    const pause = () => {
+      cancelAnimationFrame(state.frame);
+      state.frame = 0;
+      state.lastFrame = performance.now();
+      stage.dataset.animationState = "paused";
+    };
+
+    const render = (now) => {
+      state.frame = 0;
+      if (disposed || !state.running || !state.visible || document.hidden || state.contextLost) return;
+      stage.dataset.animationState = "running";
+
+      // Idle rotation keeps the optical quality. Only active drag / inertia
+      // uses the smaller buffer, with a 400 ms quiet period before restoring.
+      const moving = state.dragging || Math.abs(state.velocityYaw) + Math.abs(state.velocityPitch) > 0.000025;
+      if (moving) state.lastMotion = now;
+      const transmissionScale = mobile ? 0.5 : now - state.lastMotion < 400 ? 0.6 : 1;
+      if (renderer.transmissionResolutionScale !== transmissionScale) {
+        renderer.transmissionResolutionScale = transmissionScale;
+      }
+
+      const targetFrameDuration = mobile ? 1000 / 30 : 1000 / 60;
+      if (now - state.lastRender < targetFrameDuration * 0.88) { schedule(); return; }
+      state.lastRender = now;
+
+      const frameDuration = now - state.lastFrame;
+      const delta = clamp(frameDuration / (1000 / 60), 0.25, 2.2);
+      state.lastFrame = now;
+      state.elapsed += Math.min(frameDuration, 80) / 1000;
+      const elapsed = state.elapsed;
+      // Fall back only after sustained < 12 fps, excluding shader warm-up.
+      if (elapsed > 5 && !state.dragging) {
+        state.measuredFrames += 1;
+        if (frameDuration > 85) state.slowFrames += 1;
+        if (state.measuredFrames >= 120) {
+          if (state.slowFrames > 90) { fallBack("low-performance-poster"); return; }
+          state.measuredFrames = 0;
+          state.slowFrames = 0;
+        }
+      }
+
+      state.pointerX += (state.pointerTargetX - state.pointerX) * (mobile ? 0.12 : 0.075);
+      state.pointerY += (state.pointerTargetY - state.pointerY) * (mobile ? 0.12 : 0.075);
+      presentationGroup.rotation.x += ((mobile ? 0 : -state.pointerY * 0.028) - presentationGroup.rotation.x) * 0.055;
+      presentationGroup.rotation.y += ((mobile ? 0 : state.pointerX * 0.036) - presentationGroup.rotation.y) * 0.055;
+      presentationGroup.position.y += (0.08 - state.scroll * 0.075 - presentationGroup.position.y) * 0.06;
+
+      if (!state.dragging) {
+        const hasInertia = Math.abs(state.velocityYaw) + Math.abs(state.velocityPitch) > 0.000025;
+        if (hasInertia) {
+          rotateRadians(state.velocityYaw * delta, state.velocityPitch * delta);
+          const decay = Math.pow(0.935, delta);
+          state.velocityYaw *= decay;
+          state.velocityPitch *= decay;
+        } else if (now - state.lastInteraction > 2600) {
+          rotateRadians(0.00034 * delta, Math.sin(elapsed * 0.17) * 0.000025 * delta);
+          stage.dataset.dragState = "idle-rotation";
+        } else {
+          stage.dataset.dragState = "resting";
+        }
+      }
+
+      updateSurfaceTime(materials.outer, elapsed);
+      try {
+        renderer.render(scene, camera);
+        state.renderedFrames += 1;
+      } catch (error) {
+        console.warn("The glass renderer stopped; retaining the poster.", error);
+        fallBack("webgl-render-failed-poster");
+        return;
+      }
+
+      if (!state.ready) {
+        state.ready = true;
+        stage.classList.remove("is-fallback");
+        stage.classList.add("webgl-ready");
+        stage.dataset.renderMode = "three-webgl";
+        canvas.removeAttribute("aria-hidden");
+        canvas.tabIndex = 0;
+      }
+      schedule();
+    };
+
+    const onContextLost = (event) => {
+      event.preventDefault();
+      state.contextLost = true;
+      fallBack("context-lost-poster");
+    };
+
+    const onVisibilityChange = () => {
+      pause();
+      schedule();
+    };
+
+    const onKeyDown = (event) => {
+      const turns = { ArrowLeft: [-0.15, 0], ArrowRight: [0.15, 0], ArrowUp: [0, -0.15], ArrowDown: [0, 0.15] };
+      if (!turns[event.key]) return;
+      event.preventDefault();
+      state.lastInteraction = performance.now();
+      state.velocityYaw = 0;
+      state.velocityPitch = 0;
+      rotateRadians(...turns[event.key]);
+    };
+
+    const onReducedMotionChange = (event) => {
+      if (!event.matches) return;
+      fallBack("reduced-motion-poster");
+    };
+
+    canvas.addEventListener("keydown", onKeyDown);
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", endDrag);
+    canvas.addEventListener("pointercancel", endDrag);
+    canvas.addEventListener("pointerenter", onPointerEnter, { passive: true });
+    canvas.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    canvas.addEventListener("webglcontextlost", onContextLost, false);
+    document.addEventListener("visibilitychange", onVisibilityChange, { passive: true });
+    reducedMotionQuery.addEventListener?.("change", onReducedMotionChange);
+
+    disposers.push(() => {
+      canvas.removeEventListener("keydown", onKeyDown);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", endDrag);
+      canvas.removeEventListener("pointercancel", endDrag);
+      canvas.removeEventListener("pointerenter", onPointerEnter);
+      canvas.removeEventListener("pointerleave", onPointerLeave);
+      canvas.removeEventListener("webglcontextlost", onContextLost);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      reducedMotionQuery.removeEventListener?.("change", onReducedMotionChange);
+    });
+    const resizeObserver = new ResizeObserver(resize);
+    disposers.push(() => resizeObserver.disconnect());
+    resizeObserver.observe(stage);
+
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        state.visible = entry.isIntersecting;
+        pause();
+        schedule();
+      },
+      { rootMargin: "180px" }
+    );
+    disposers.push(() => visibilityObserver.disconnect());
+    visibilityObserver.observe(stage);
+
+    resize();
+    updateRotationMetadata();
+    stage.dataset.geometry = mobile ? `icosahedron-${detail}` : "volumetric-glb";
+    stage.dataset.vertexCount = String(outerGeometry.getAttribute("position").count);
+    stage.dataset.triangleCount = String(outerGeometry.index.count / 3);
+    stage.dataset.dragState = "resting";
+
+    try {
+      renderer.compile(scene, camera);
+      renderer.render(scene, camera);
+      state.renderedFrames += 1;
+    } catch (error) {
+      console.warn("The physical glass material could not be rendered; showing its poster instead.", error);
+      dispose();
+      return createFallbackController(stage, "webgl-render-failed-poster");
+    }
+
+    schedule();
+
+    controller = {
+      setScroll(progress) {
+        state.scroll = clamp(progress, 0, 1);
+      },
+      rotateBy(yawDegrees = 0, pitchDegrees = 0) {
+        state.lastInteraction = performance.now();
+        rotateRadians(
+          THREE.MathUtils.degToRad(yawDegrees),
+          THREE.MathUtils.degToRad(pitchDegrees)
+        );
+      },
+      rotateTo(yawDegrees = 0, pitchDegrees = 0, rollDegrees = 0) {
+        EULER.set(
+          THREE.MathUtils.degToRad(pitchDegrees),
+          THREE.MathUtils.degToRad(yawDegrees),
+          THREE.MathUtils.degToRad(rollDegrees),
+          "YXZ"
+        );
+        sculptureGroup.quaternion.setFromEuler(EULER);
+        state.velocityYaw = 0;
+        state.velocityPitch = 0;
+        state.lastInteraction = performance.now();
+        updateRotationMetadata();
+      },
+      getState() {
+        return {
+          renderMode: stage.dataset.renderMode,
+          geometry: stage.dataset.geometry,
+          vertexCount: Number(stage.dataset.vertexCount),
+          triangleCount: Number(stage.dataset.triangleCount),
+          rotation: {
+            x: Number(stage.dataset.rotationX),
+            y: Number(stage.dataset.rotationY),
+            z: Number(stage.dataset.rotationZ)
+          },
+          dragging: state.dragging,
+          isThreeDimensional: !disposed,
+          renderedFrames: state.renderedFrames,
+          drawCalls: renderer.info.render.calls,
+          pixelRatio: renderer.getPixelRatio(),
+          transmissionResolutionScale: renderer.transmissionResolutionScale
+        };
+      },
+      destroy() {
+        dispose();
+        createFallbackController(stage, "stopped-poster");
+      }
+    };
+
+    Object.defineProperty(window, "__NONLINEAR_SPHERE__", {
+      value: controller,
+      configurable: true
+    });
+
+    return controller;
+  } catch (error) {
+    dispose();
+    console.warn("The 3D scene could not initialize; retaining the poster.", error);
+    return createFallbackController(stage, "webgl-render-failed-poster");
+  }
+};
