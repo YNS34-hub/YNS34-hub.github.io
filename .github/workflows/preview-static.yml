@@ -1,0 +1,46 @@
+name: Build static mobile preview
+
+on:
+  push:
+    branches:
+      - memory-palace-preview
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout preview source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck and build relative preview
+        run: |
+          npx tsc -b
+          npx vite build --base=./
+          node scripts/postbuild.mjs
+
+      - name: Publish compiled files to preview branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b memory-palace-static-preview
+          git add -A
+          git commit -m "Build static Memory Palace preview"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin memory-palace-static-preview
