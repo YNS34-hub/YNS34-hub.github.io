@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://yns34-hub.github.io/sitemap.xml

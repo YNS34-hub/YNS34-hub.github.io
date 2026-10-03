@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大嘴堡情报局 — Silicon Valley · AI · Business</title>
+<meta name="description" content="大嘴堡情报局 — 聚焦硅谷、AI、Claude Code、ChatGPT 与商业干货的内容主页。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="native-scroll">
+<canvas id="fluid"></canvas>
+<div class="grain"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-ring"><span>PLAY ▶</span></div>
+
+<nav>
+  <a class="logo brand-lockup" href="#top"><img src="data:image/jpeg;base64,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" alt="大嘴堡情报局头像"><span>大嘴堡情报局<sup>AI</sup></span></a>
+  <div class="nav-meta">抖音号 62134495304 — <span id="clock">00:00:00</span></div>
+  <div class="nav-right">
+    <a class="nav-link" href="#works">内容</a>
+    <a class="nav-link" href="#about">关于</a>
+    <a class="nav-link" href="#contact">抖音</a>
+  </div>
+</nav>
+
+<div id="shell">
+<header class="hero" id="top">
+  <div class="hero-tag">大嘴堡情报局 © 2026 — AI · TECH · BUSINESS</div>
+  <div class="hero-side">关注 13・粉丝 480・获赞 7495</div>
+  <h1 id="heroTitle">
+    <span class="row"><span class="line" data-text="SILICON"></span></span>
+    <span class="row outline"><span class="line" data-text="VALLEY"></span></span>
+    <span class="row acid"><span class="line" data-text="INTEL"></span></span>
+  </h1>
+  <div class="hero-foot">
+    <div class="hero-roles">AI BUSINESS <em>/</em> CLAUDE CODE <em>/</em> CHATGPT <em>/</em> TECH INTELLIGENCE</div>
+    <div class="scroll-hint"><i></i>SCROLL 向下看内容</div>
+  </div>
+</header>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="marquee">
+    <span>SILICON VALLEY INTEL</span><span class="o">硅谷商业干货</span><span class="a">●</span>
+    <span class="o">Claude Code · ChatGPT · AI</span><span>减少信息差</span><span class="a">●</span>
+  </div>
+</div>
+
+<section id="works">
+  <div class="sec-head" data-reveal>
+    <span class="num">(01)</span>
+    <h2>Popular Posts</h2>
+    <span class="cn">热门内容</span>
+  </div>
+  <div class="works-grid" id="worksGrid">
+    <article class="work w1" data-work>
+      <div class="thumb"><div class="fill"></div><div class="reveal-mask"></div>
+        <span class="idx">置顶 · № 01</span><span class="dur">9.3万播放</span></div>
+      <div class="meta">
+        <h3>AI to $1M<small>AI 商 业 案 例</small></h3>
+        <span class="tags">AI · BUSINESS</span>
+      </div>
+    </article>
+    <article class="work w2" data-work>
+      <div class="thumb"><div class="fill"></div><div class="reveal-mask"></div>
+        <span class="idx">置顶 · № 02</span><span class="dur">6.2万播放</span></div>
+      <div class="meta">
+        <h3>Stop Using ChatGPT<small>AI 工 具 与 方 法</small></h3>
+        <span class="tags">CHATGPT · WORKFLOW</span>
+      </div>
+    </article>
+    <article class="work w3" data-work>
+      <div class="thumb"><div class="fill"></div><div class="reveal-mask"></div>
+        <span class="idx">№ 03</span><span class="dur">代码审查</span></div>
+      <div class="meta">
+        <h3>Claude Code<small>代 码 审 查 · 第 7 讲</small></h3>
+        <span class="tags">CLAUDE CODE 入门</span>
+      </div>
+    </article>
+    <article class="work w4" data-work>
+      <div class="thumb"><div class="fill"></div><div class="reveal-mask"></div>
+        <span class="idx">№ 04</span><span class="dur">上下文管理</span></div>
+      <div class="meta">
+        <h3>Context Mgmt<small>上 下 文 管 理 · 第 6 讲</small></h3>
+        <span class="tags">CLAUDE CODE 入门</span>
+      </div>
+    </article>
+    <article class="work w5" data-work>
+      <div class="thumb"><div class="fill"></div><div class="reveal-mask"></div>
+        <span class="idx">№ 05</span><span class="dur">620 播放</span></div>
+      <div class="meta">
+        <h3>GPT 6 Astra<small>穿 越 艰 难 · 抵 达 星 辰</small></h3>
+        <span class="tags">MODEL WATCH · AI</span>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="about">
+  <div class="sec-head" data-reveal>
+    <span class="num">(02)</span>
+    <h2>About</h2>
+    <span class="cn">情报局简介</span>
+  </div>
+  <div class="manifesto" id="manifesto">
+    <p class="big" id="manifestoText">专注搬运 / 精翻硅谷顶级大佬的<span class="hl">商业干货</span>，围绕 AI、Claude Code、ChatGPT 与前沿模型，把值得看的内容重新整理成更清晰、更高密度的中文<span class="hl">信息</span>。</p>
+    <p class="en">Curating and translating high-signal Silicon Valley conversations on AI, coding and business.</p>
+    <div class="stats">
+      <div class="stat" data-reveal><b>48</b><span>作品 Posts</span></div>
+      <div class="stat" data-reveal><b>480</b><span>粉丝 Followers</span></div>
+      <div class="stat" data-reveal><b>7495</b><span>获赞 Likes</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head" data-reveal>
+    <span class="num">(03)</span>
+    <h2>Channels</h2>
+    <span class="cn">内容方向</span>
+  </div>
+  <div class="svc" data-reveal>
+    <a class="svc-row" href="#works"><span class="n">01</span><h3>Silicon Valley</h3><span class="cn">硅谷内容精翻</span><span class="arr">→</span></a>
+    <a class="svc-row" href="#works"><span class="n">02</span><h3>AI Business</h3><span class="cn">AI 商业干货</span><span class="arr">→</span></a>
+    <a class="svc-row" href="#works"><span class="n">03</span><h3>Claude Code</h3><span class="cn">AI 编程工具</span><span class="arr">→</span></a>
+    <a class="svc-row" href="#works"><span class="n">04</span><h3>Model Watch</h3><span class="cn">前沿模型动态</span><span class="arr">→</span></a>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="cta-cn" data-reveal>把有价值的信息，翻译成你真正能用的东西</div>
+  <h2 data-reveal>Follow <span class="outline">Douyin</span></h2>
+  <a class="mail-btn" href="https://www.douyin.com/user/self?from_tab_name=main" target="_blank" rel="noopener" data-magnetic><span>大嘴堡情报局 · 抖音号 62134495304 ↗</span></a>
+  <div class="foot-meta">
+    <span>© 2026 大嘴堡情报局</span>
+    <span>关注 13 / 粉丝 480 / 获赞 7495</span>
+    <span>AI · TECH · BUSINESS</span>
+  </div>
+  <!-- 当前 CTA 使用用户提供的 /user/self 登录态链接。正式公开部署前建议替换为“分享主页”得到的公开个人主页链接。 -->
+</footer>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>
