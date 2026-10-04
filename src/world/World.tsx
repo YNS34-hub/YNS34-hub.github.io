@@ -18,6 +18,7 @@ import { usePalaceStore } from "../systems/store";
 import Atrium from "../rooms/Atrium";
 import GalleryRoom from "../rooms/Galleries";
 import Corridor from "../rooms/Corridor";
+import { VisualLab } from "../rooms/VisualLab";
 import { WallpaperCinema } from "../rooms/Wallpapers";
 import {
   PersonalProjects,
@@ -232,6 +233,8 @@ function Scene({
           <Atrium />
         ) : roomId === "corridor" ? (
           <Corridor />
+        ) : ["liquid-web", "editorial", "experiments"].includes(baseRoom) ? (
+          <VisualLab roomId={roomId} />
         ) : baseRoom === "projects" ? (
           <PersonalProjects />
         ) : baseRoom === "research" ? (

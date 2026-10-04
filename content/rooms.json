@@ -42,10 +42,10 @@
   {
     "id": "experiments",
     "number": "06",
-    "title": "AI PLAYGROUND",
-    "subtitle": "Questions, tools and living experiments.",
+    "title": "VISUAL LAB",
+    "subtitle": "Websites, motion and collected experiments.",
     "type": "installation",
-    "color": "#d6e4e5"
+    "color": "#244447"
   },
   {
     "id": "archive",
@@ -57,7 +57,7 @@
   },
   {
     "id": "imagined-worlds",
-    "title": "AI VISUAL ARCHIVE",
+    "title": "VISUAL COLLECTION",
     "subtitle": "Imagined worlds I have kept.",
     "type": "image-gallery",
     "color": "#0b1530",
@@ -99,10 +99,10 @@
     "id": "corridor",
     "number": "08",
     "title": "INFINITE CORRIDOR",
-    "subtitle": "The next door is always there.",
+    "subtitle": "A passage through the things I keep.",
     "type": "anomaly",
     "rule": "impossible",
-    "color": "#e6ecee"
+    "color": "#142537"
   },
   {
     "id": "cinema",
@@ -189,5 +189,21 @@
     "subtitle": "A place for saved cosmic visual studies.",
     "type": "image-gallery",
     "color": "#070c21"
+  },
+  {
+    "id": "liquid-web",
+    "number": "15",
+    "title": "LIQUID WEB",
+    "subtitle": "My collected websites in space.",
+    "type": "installation",
+    "color": "#244447"
+  },
+  {
+    "id": "editorial",
+    "number": "16",
+    "title": "THE EDITORIAL STUDIO",
+    "subtitle": "Typography, people and warm visual references.",
+    "type": "image-gallery",
+    "color": "#57452e"
   }
 ]

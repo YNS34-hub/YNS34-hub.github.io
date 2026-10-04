@@ -17,21 +17,25 @@ export default function CinemaControls() {
     usePalaceStore
       .getState()
       .enterRoom(
-        library.personal.visuals.some((x) => x.id === selected?.id)
-          ? "imagined-worlds"
-          : "wallpapers",
+        library.personal.projects.some((x) => x.id === selected?.id)
+          ? selected?.category === "liquid-web"
+            ? "liquid-web"
+            : "projects"
+          : library.personal.research.some((x) => x.id === selected?.id)
+            ? "research"
+            : library.personal.visuals.some((x) => x.id === selected?.id)
+              ? "imagined-worlds"
+              : "wallpapers",
       );
   const move = (direction: number) => {
     const index = images.findIndex((x) => x.id === selected?.id);
     if (images.length)
-      usePalaceStore
-        .getState()
-        .update({
-          cinemaImage:
-            images[
-              (Math.max(0, index) + direction + images.length) % images.length
-            ],
-        });
+      usePalaceStore.getState().update({
+        cinemaImage:
+          images[
+            (Math.max(0, index) + direction + images.length) % images.length
+          ],
+      });
   };
   useEffect(() => {
     const key = (event: KeyboardEvent) => {

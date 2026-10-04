@@ -66,6 +66,9 @@ export function resolveRoomPlan(id: string): RoomPlan {
         "portraits",
         "unfinished",
         "my-collection",
+        "corridor",
+        "liquid-web",
+        "editorial",
       ].includes(baseId) ||
       id === "cinema",
   };

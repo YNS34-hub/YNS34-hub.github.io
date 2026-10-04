@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useId } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Color, Group, MeshPhysicalMaterial, PointLight, Vector3 } from "three";
 import { imageAtmospheres } from "../world/imageAtmosphere";
@@ -57,7 +57,7 @@ function Exit() {
     />
   );
 }
-function ProjectScreen({
+export function ProjectScreen({
   item,
   position,
   width = 12,
@@ -513,21 +513,22 @@ export function VisualWall({
   rotation?: [number, number, number];
 }) {
   const texture = useImageTexture(item.displaySrc || item.src);
+  const atmosphereId = useId();
   const light = useRef<PointLight>(null);
   const frame = useRef<Group>(null);
   const tint = useRef(new Color(item.color || "#679ac3"));
   useEffect(() => {
     if (frame.current) {
       frame.current.updateWorldMatrix(true, false);
-      imageAtmospheres.set(item.id, {
+      imageAtmospheres.set(atmosphereId, {
         position: frame.current.getWorldPosition(new Vector3()),
         color: tint.current,
       });
     }
     return () => {
-      imageAtmospheres.delete(item.id);
+      imageAtmospheres.delete(atmosphereId);
     };
-  }, [item.id]);
+  }, [item.id, atmosphereId]);
   useEffect(() => {
     if (texture?.image && !item.color) {
       try {
@@ -681,7 +682,10 @@ export function ImaginedWorlds({ roomId }: { roomId: string }) {
           : undefined;
   const collection = category
     ? works.filter((x) => x.category === category)
-    : works;
+    : [
+        ...works.filter((x) => x.category === "cosmic"),
+        ...works.filter((x) => x.category !== "cosmic"),
+      ];
   const images = collection.slice(page * 5, page * 5 + 5);
   const roof = useRef<Group>(null);
   const aqua = category === "glass";
@@ -722,7 +726,7 @@ export function ImaginedWorlds({ roomId }: { roomId: string }) {
         subtitle={
           category === "portrait"
             ? "JIE TIAN / SAVED VISUAL WORKS / PROVENANCE ON EACH WORK"
-            : "JIE TIAN / AI-ASSISTED VISUAL STUDIES / 2026"
+            : "JIE TIAN / SAVED VISUAL WORKS / PROVENANCE ON EACH WORK"
         }
       />
       {images[0] && (
@@ -800,6 +804,9 @@ export function PersonalArchive({
   unfinished?: boolean;
 }) {
   const parts = useRef<Group>(null);
+  const studies = useLibraryStore((s) => s.personal.projects)
+    .filter((work) => work.category === "liquid-web")
+    .slice(4, 6);
   const reduced = usePalaceStore((s) => s.reducedMotion);
   useFrame(({ clock }) => {
     if (parts.current && !reduced)
@@ -893,6 +900,27 @@ export function PersonalArchive({
               </group>
             ))}
       </group>
+      {unfinished && (
+        <group>
+          {studies.map((work, i) => (
+            <VisualWall
+              key={work.id}
+              item={work}
+              position={[i ? 6.2 : -6.2, 3.7, -7 - i * 3]}
+              width={7.2}
+              height={4.5}
+              rotation={[0, i ? -0.2 : 0.2, i ? 0.04 : -0.04]}
+            />
+          ))}
+          <Label
+            text="OPEN STUDIES / PLACES TO RETURN TO"
+            position={[0, 0.03, -4]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            size={0.17}
+            color="#6b91bd"
+          />
+        </group>
+      )}
       {unfinished && (
         <Label
           text="SOME THINGS ARE STILL BECOMING."

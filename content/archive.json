@@ -40,7 +40,9 @@
       "External reference",
       "Communication"
     ],
-    "status": "External fork · upstream authorship"
+    "status": "External fork · upstream authorship",
+    "cover": "/media/archives/buzz-reference.jpg",
+    "coverCaption": "Rendered repository README / REFERENCE / upstream authorship retained"
   },
   {
     "id": "design-systems-reference",
@@ -64,7 +66,9 @@
       "External reference",
       "Design systems"
     ],
-    "status": "External fork · upstream authorship"
+    "status": "External fork · upstream authorship",
+    "cover": "/media/archives/design-systems-reference.jpg",
+    "coverCaption": "Rendered repository README / REFERENCE / upstream authorship retained"
   },
   {
     "id": "image-prompts-reference",
@@ -88,6 +92,8 @@
       "External reference",
       "Image prompts"
     ],
-    "status": "External fork · upstream authorship"
+    "status": "External fork · upstream authorship",
+    "cover": "/media/archives/image-prompts-reference.jpg",
+    "coverCaption": "Rendered repository README / REFERENCE / upstream authorship retained"
   }
 ]

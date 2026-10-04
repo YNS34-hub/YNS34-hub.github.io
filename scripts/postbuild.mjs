@@ -128,6 +128,15 @@ for (const room of rooms.filter((room) => room.id !== "atrium")) {
 const personal = JSON.parse(
   await readFile(path.join(dist, "personal-media/manifest.json"), "utf8"),
 );
+const selected = JSON.parse(
+  await readFile(path.join(root, "content/selected-collection.json"), "utf8"),
+);
+for (const key of Object.keys(personal))
+  personal[key] = [
+    ...new Map(
+      [...selected[key], ...personal[key]].map((item) => [item.id, item]),
+    ).values(),
+  ];
 for (const [base, count] of [
   ["wallpapers", personal.wallpapers.length],
   ["imagined-worlds", personal.visuals.length],
@@ -137,6 +146,20 @@ for (const [base, count] of [
     personal.visuals.filter((x) => x.category === "portrait").length,
   ],
   ["cosmic", personal.visuals.filter((x) => x.category === "cosmic").length],
+  [
+    "liquid-web",
+    personal.projects.filter((x) => x.category === "liquid-web").length,
+  ],
+  [
+    "experiments",
+    personal.projects.filter((x) => x.category === "liquid-web").length,
+  ],
+  [
+    "editorial",
+    personal.visuals.filter((x) =>
+      ["editorial", "portrait"].includes(x.category),
+    ).length,
+  ],
   ["projects", Math.max(0, personal.projects.length - 2) + 5],
   ["research", Math.max(0, personal.research.length - 2) + 5],
 ]) {

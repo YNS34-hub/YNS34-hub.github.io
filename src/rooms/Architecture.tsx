@@ -27,6 +27,8 @@ export function RoomShell({
     archive: ["#3a4944", "#222b29", "#303b37"],
     unfinished: ["#1b222b", "#10171f", "#222a32"],
     collection: ["#253e4d", "#142835", "#20313b"],
+    liquid: ["#244447", "#101e28", "#193039"],
+    editorial: ["#57452e", "#221e1c", "#39302b"],
   };
   const selected = palette ? colors[palette] : undefined;
   const concrete =

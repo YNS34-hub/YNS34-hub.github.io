@@ -50,7 +50,8 @@ export default function Settings() {
           onChange={(e) => s.update({ mute: e.target.checked })}
         />
       </div>
-      {(
+      {// Per-room playback is optional; normal player controls always remain available.
+      (
         [
           ["musicVolume", "Music"],
           ["ambientVolume", "Atmosphere"],
@@ -89,6 +90,17 @@ export default function Settings() {
           <option value="tour">Cinematic tour</option>
           <option value="index">2D collection index</option>
         </select>
+      </div>
+      <div className="setting-row">
+        <label htmlFor="room-soundtracks">
+          Room soundtracks<small>Enter a room to play its assigned song.</small>
+        </label>
+        <input
+          id="room-soundtracks"
+          type="checkbox"
+          checked={s.roomSoundtracks}
+          onChange={(e) => s.update({ roomSoundtracks: e.target.checked })}
+        />
       </div>
       <div className="settings-note">
         <span className="status-dot" /> {s.effectiveQuality.toUpperCase()} ·{" "}

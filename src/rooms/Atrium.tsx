@@ -419,8 +419,8 @@ export default function Atrium() {
         rotation={[0, -Math.PI / 2, 0]}
       />
       <Door
-        id="experiments"
-        title="AI Playground"
+        id="liquid-web"
+        title="Liquid Web / Visual Lab"
         number="06"
         position={[-21.34, 0, 15]}
         rotation={[0, Math.PI / 2, 0]}

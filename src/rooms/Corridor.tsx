@@ -4,6 +4,8 @@ import * as THREE from "three";
 import { usePalaceStore } from "../systems/store";
 import { Door, Label } from "../world/primitives";
 import { allContent, rooms } from "../content/catalog";
+import { useLibraryStore } from "../systems/library";
+import { VisualWall } from "./PersonalRooms";
 import {
   corridorSeed as seed,
   CORRIDOR_SEGMENT_LENGTH as LENGTH,
@@ -139,6 +141,9 @@ export default function Corridor() {
   const [center, setCenter] = useState(0);
   const viewed = usePalaceStore((state) => state.viewed.length);
   const reducedMotion = usePalaceStore((state) => state.reducedMotion);
+  const visuals = useLibraryStore((state) => state.personal.visuals);
+  const sites = useLibraryStore((state) => state.personal.projects);
+  const collection = [...visuals, ...sites];
   const chunks = useMemo(
     () => Array.from({ length: 5 }, (_, i) => center + i - 2),
     [center],
@@ -250,24 +255,29 @@ export default function Corridor() {
     <group>
       <Instances
         parts={architecture.walls}
-        color="#e1e4e0"
+        color="#203449"
         castShadow
         unfold
         reducedMotion={reducedMotion}
       />
-      <Instances parts={architecture.floor} color="#b6c0bf" roughness={0.32} />
+      <Instances parts={architecture.floor} color="#172735" roughness={0.25} />
       <Instances
         parts={architecture.ceiling}
-        color="#bac5c4"
+        color="#0c1b2b"
         unfold
         reducedMotion={reducedMotion}
         castShadow
       />
-      <Instances parts={architecture.light} color="#e7f2fa" emission={0.35} />
-      <Instances parts={architecture.trim} color="#929f9e" roughness={0.5} />
+      <Instances parts={architecture.light} color="#82b9d9" emission={0.55} />
+      <Instances
+        parts={architecture.trim}
+        color="#bd925f"
+        roughness={0.35}
+        emission={0.3}
+      />
       <Instances
         parts={architecture.portals}
-        color="#a2b5ba"
+        color="#538396"
         roughness={0.46}
         unfold
         reducedMotion={reducedMotion}
@@ -286,10 +296,32 @@ export default function Corridor() {
         const secret = chunk === -2 && viewed >= 3;
         return (
           <group key={chunk}>
+            {collection.length > 0 &&
+              [-1, 1].map((side, index) => {
+                const work =
+                  collection[(address + index * 7) % collection.length];
+                return (
+                  <VisualWall
+                    key={`${chunk}-${side}`}
+                    item={work}
+                    position={[side * 3.43, 4.2, z - 6.4]}
+                    width={7.6}
+                    height={4.8}
+                    rotation={[0, (-side * Math.PI) / 2, 0]}
+                  />
+                );
+              })}
+            <pointLight
+              position={[0, 4.5, z + 6.5]}
+              color={chunk % 2 ? "#deb278" : "#7cb4d0"}
+              intensity={18}
+              distance={18}
+            />
             <Door
               {...left}
               position={[-WING, 0, z]}
               rotation={[0, Math.PI / 2, 0]}
+              dark
             />
             <Door
               id={secret ? "memory" : right.id}
@@ -297,14 +329,14 @@ export default function Corridor() {
               number={secret ? "—" : right.number}
               position={[WING, 0, z]}
               rotation={[0, -Math.PI / 2, 0]}
-              dark={secret}
+              dark
             />
             <Label
               text={`${chunk < 0 ? "−" : "+"}${String(Math.abs(chunk)).padStart(3, "0")} / ∞`}
               position={[-2.5, 0.02, z + 4.5]}
               rotation={[-Math.PI / 2, 0, 0]}
               size={0.15}
-              color="#72868c"
+              color="#86aabd"
             />
             {chunk === 0 && (
               <>
@@ -313,7 +345,7 @@ export default function Corridor() {
                   position={[-3.46, 2.05, 7.4]}
                   rotation={[0, Math.PI / 2, 0]}
                   size={0.28}
-                  color="#485c62"
+                  color="#d0dfdf"
                   maxWidth={4.7}
                 />
                 <Label
@@ -321,7 +353,7 @@ export default function Corridor() {
                   position={[3.46, 1.8, 6.4]}
                   rotation={[0, -Math.PI / 2, 0]}
                   size={0.15}
-                  color="#687d83"
+                  color="#c1a885"
                   maxWidth={4.7}
                 />
               </>

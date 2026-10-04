@@ -28,6 +28,46 @@ export function roomLighting(plan: RoomPlan, roomId: string) {
       dark: boolean;
     }
   > = {
+    corridor: {
+      background: "#102131",
+      sky: "#81b3d2",
+      ground: "#162937",
+      key: "#c7a67c",
+      keyIntensity: 0.65,
+      environment: 0.38,
+      hemisphere: 0.58,
+      dark: true,
+    },
+    "liquid-web": {
+      background: "#162c35",
+      sky: "#90c8cf",
+      ground: "#14252e",
+      key: "#b8dadd",
+      keyIntensity: 0.8,
+      environment: 0.4,
+      hemisphere: 0.55,
+      dark: true,
+    },
+    experiments: {
+      background: "#162c35",
+      sky: "#90c8cf",
+      ground: "#14252e",
+      key: "#b8dadd",
+      keyIntensity: 0.8,
+      environment: 0.4,
+      hemisphere: 0.55,
+      dark: true,
+    },
+    editorial: {
+      background: "#30261f",
+      sky: "#c3b39d",
+      ground: "#302b28",
+      key: "#ebc28c",
+      keyIntensity: 0.7,
+      environment: 0.38,
+      hemisphere: 0.5,
+      dark: true,
+    },
     projects: {
       background: "#18283d",
       sky: "#89aad7",

@@ -108,12 +108,12 @@ describe("the local museum catalog", () => {
         JSON.stringify({
           wallpapers: [],
           visuals: [
-            { category: "glass" },
-            { category: "glass" },
-            { category: "glass" },
-            { category: "glass" },
-            { category: "glass" },
-            { category: "glass" },
+            { id: "glass-1", category: "glass" },
+            { id: "glass-2", category: "glass" },
+            { id: "glass-3", category: "glass" },
+            { id: "glass-4", category: "glass" },
+            { id: "glass-5", category: "glass" },
+            { id: "glass-6", category: "glass" },
           ],
           projects: [],
           research: [],

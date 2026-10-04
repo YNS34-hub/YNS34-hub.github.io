@@ -37,6 +37,12 @@ export function roomFootprints(roomId: string): Footprint[] {
   if (roomId === "my-collection")
     return [{ x: 0, z: -2, halfWidth: 4.8, halfDepth: 2 }];
   if (
+    ["liquid-web", "editorial", "experiments"].includes(
+      roomId.split("-page-")[0],
+    )
+  )
+    return [];
+  if (
     [
       "archive",
       "unfinished",

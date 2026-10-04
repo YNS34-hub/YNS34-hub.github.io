@@ -1,4 +1,14 @@
-import { readdir, readFile, writeFile, mkdir, cp, rm } from "node:fs/promises";
+import {
+  readdir,
+  readFile,
+  writeFile,
+  mkdir,
+  cp,
+  rm,
+  lstat,
+  realpath,
+} from "node:fs/promises";
+import { parseFile } from "music-metadata";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 const root = process.env.PALACE_MEDIA_ROOT
@@ -80,18 +90,82 @@ for (const folder of folders) {
       order: Number(info.order) || 0,
       color: /^#[0-9a-f]{6}$/i.test(info.color || "") ? info.color : undefined,
     };
-    if (folder === "music")
+    if (folder === "music") {
+      let tags;
+      try {
+        tags = await parseFile(path.join(dir, file));
+      } catch {
+        console.warn(`Could not read audio tags: ${file}`);
+      }
+      const cover = tags?.common.picture?.[0];
+      let coverUrl;
+      if (cover && /^image\/(jpeg|png|webp)$/.test(cover.format)) {
+        const ext = cover.format.split("/")[1];
+        const name = `${id}.${ext}`;
+        await mkdir(path.join(output, "music", "artwork"), { recursive: true });
+        await writeFile(
+          path.join(output, "music", "artwork", name),
+          cover.data,
+        );
+        coverUrl = `/personal-media/music/artwork/${name}`;
+      }
       result.music.push({
         ...base,
-        artist: String(info.artist || "Unknown artist"),
-        album: String(info.album || "Personal collection"),
+        title: String(info.title || tags?.common.title || stem),
+        artist: String(info.artist || tags?.common.artist || "Unknown artist"),
+        album: String(
+          info.album || tags?.common.album || "Personal collection",
+        ),
+        cover: coverUrl,
+        duration: tags?.format.duration,
+        roomIds: Array.isArray(info.rooms)
+          ? info.rooms.filter(
+              (x) => typeof x === "string" && /^[a-z-]+$/.test(x),
+            )
+          : [],
         source: "static",
         src,
-        year: String(info.year || "2026"),
+        year: String(info.year || tags?.common.year || "2026"),
       });
-    else {
+    } else {
+      let projectUrl;
+      if (folder === "projects" && typeof info.projectFile === "string") {
+        const project = path.resolve(dir, info.projectFile);
+        const relative = path.relative(dir, project);
+        if (
+          !relative.startsWith("..") &&
+          !path.isAbsolute(relative) &&
+          /\.html$/i.test(relative)
+        ) {
+          const stat = await lstat(project);
+          const actualRelative = path.relative(
+            await realpath(dir),
+            await realpath(project),
+          );
+          if (
+            stat.isFile() &&
+            !stat.isSymbolicLink() &&
+            !actualRelative.startsWith("..") &&
+            !path.isAbsolute(actualRelative)
+          ) {
+            await mkdir(path.dirname(path.join(output, folder, relative)), {
+              recursive: true,
+            });
+            await cp(project, path.join(output, folder, relative));
+            projectUrl = `/personal-media/projects/${relative.split(path.sep).map(encodeURIComponent).join("/")}`;
+          }
+        }
+      }
       const item = {
         ...base,
+        projectUrl,
+        github:
+          typeof info.github === "string" &&
+          /^https:\/\/github\.com\/YNS34-hub\/[\w.-]+\/(?:blob|tree)\/[^\s]+$/.test(
+            info.github,
+          )
+            ? info.github
+            : undefined,
         src,
         description: String(info.description || ""),
         tags: Array.isArray(info.tags) ? info.tags.map(String) : [],

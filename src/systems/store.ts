@@ -24,6 +24,7 @@ interface PalaceState {
   reducedMotion: boolean;
   sensitivity: number;
   mute: boolean;
+  roomSoundtracks: boolean;
   musicVolume: number;
   ambientVolume: number;
   uiVolume: number;
@@ -64,7 +65,7 @@ export function resolvePalaceRoute(pathname: string, search = "") {
   }
   const index = new URLSearchParams(search).get("view") === "index";
   const procedural =
-    /^(?:(?:projects|research|experiments|archive|wallpapers|imagined-worlds|cosmic|glass-life|portraits)-page-\d{1,6}|anomaly-(?:mirror|gravity|floating|compressing|impossible|loop))$/.test(
+    /^(?:(?:projects|research|experiments|archive|wallpapers|imagined-worlds|cosmic|glass-life|portraits|liquid-web|editorial)-page-\d{1,6}|anomaly-(?:mirror|gravity|floating|compressing|impossible|loop))$/.test(
       path[0] || "",
     );
   const exhibit = allContent.some((item) => `exhibit-${item.id}` === path[0]);
@@ -106,6 +107,7 @@ export const usePalaceStore = create<PalaceState>()(
         window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       sensitivity: 0.65,
       mute: false,
+      roomSoundtracks: true,
       musicVolume: 0.65,
       ambientVolume: 0.12,
       uiVolume: 0.18,
@@ -151,9 +153,10 @@ export const usePalaceStore = create<PalaceState>()(
         }));
         if (typeof window !== "undefined") {
           const state = usePalaceStore.getState();
-          const path = focus
-            ? `/${contentRoom(focus)}/${encodeURIComponent(focus.id)}`
-            : roomPath(state.roomId);
+          const path =
+            focus && allContent.some((item) => item.id === focus.id)
+              ? `/${contentRoom(focus)}/${encodeURIComponent(focus.id)}`
+              : roomPath(state.roomId);
           window.history.replaceState({}, "", routeURL(path, state.mode));
         }
       },
@@ -220,6 +223,7 @@ export const usePalaceStore = create<PalaceState>()(
         reducedMotion: s.reducedMotion,
         sensitivity: s.sensitivity,
         mute: s.mute,
+        roomSoundtracks: s.roomSoundtracks,
         musicVolume: s.musicVolume,
         ambientVolume: s.ambientVolume,
         uiVolume: s.uiVolume,

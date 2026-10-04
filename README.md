@@ -88,7 +88,23 @@ WASD / 方向键移动，鼠标拖动查看，Shift 加速，M 打开 Guide，ES
 npm run build:public
 ```
 
-这个命令生成空的私人 manifest，排除私人目录的所有文件。GitHub Actions 使用它验证 / 发布公开版本；线上访客仍可以本地导入。公开后，本机运行 `npm run media:register` 恢复私人预览。商业歌曲没有进入公开仓库。
+这个命令生成空的私人 manifest，排除私人目录的所有文件。已明确选入展馆的图片和网站截图由 `content/selected-collection.json` 与 `public/media/selected/` 提供，因此公开版本也有真实视觉内容。GitHub Actions 使用它验证 / 发布公开版本；线上访客仍可以本地导入。公开后，本机运行 `npm run media:register` 恢复私人预览。商业歌曲和私有网站 HTML 没有进入公开仓库。
+
+## 视觉收藏与房间配乐
+
+当前精选作品来自 Jie Tian 指定的图片文件夹，按 **User-selected visual reference** 标注，不冒认 AI 生成来源或原作者。此前来源不明的 DeepSeek 图片已从活动收藏中移除。冰雪电影画面进入壁纸库，深蓝与红色画面进入 Visual Collection，暖色排版参考进入 Editorial Studio。
+
+**LIQUID WEB** 将 8 个真实网站预览放在巨型主屏和两侧展墙，超过容量会延伸至第二展翼。公开版本展示预览并提供原仓库 SOURCE；本机私人版本也能 ENTER PROJECT 打开原 HTML。原仓库仍保持私有。首页有该展区的入口，Guide 与长廊也可进入。
+
+音乐目录在 build 时自动读取 artist / title / album / artwork / duration。可以在 `personal-media/music/collection.json` 指定配乐房间：
+
+```json
+{
+  "song.mp3": {"rooms": ["music", "archive"], "favorite": true}
+}
+```
+
+浏览器收藏里的歌曲也能在 **RECORD NOTES → ROOM SOUNDTRACK** 选择房间，绑定保存在 IndexedDB。第一次点击或按键后，进入指定房间开始本机播放；展翼沿用母房间配乐，切换歌曲使用现有 crossfade。Settings → Room soundtracks 可关闭自动配乐，Mute 始终生效。没有音频的梁博偏好条目不会自动播放，未指定配乐的房间保留当前歌曲。
 
 ## 验证与结构
 

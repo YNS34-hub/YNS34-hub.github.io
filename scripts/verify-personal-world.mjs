@@ -45,6 +45,7 @@ page.on("request", (r) => {
 });
 const ready = async () => {
   await page.locator(".world-ready").waitFor();
+  await page.waitForFunction(() => Boolean(window.__PALACE_DEBUG__?.camera));
   await page.waitForTimeout(1000);
 };
 const photograph = async (name) => {
@@ -56,6 +57,10 @@ async function travel(title, id) {
   await page.getByRole("button", { name: new RegExp(title) }).click();
   await page.waitForURL("**/" + id);
   await ready();
+  await page.waitForFunction(
+    (room) => window.__PALACE_DEBUG__?.roomId === room,
+    id,
+  );
 }
 async function walk() {
   const start = await page.evaluate(
@@ -83,10 +88,13 @@ try {
     ["RESEARCH VAULT", "research"],
     ["PERSONAL LISTENING ROOM", "music"],
     ["THE WALLPAPER VAULT", "wallpapers"],
-    ["AI VISUAL ARCHIVE", "imagined-worlds"],
+    ["VISUAL COLLECTION", "imagined-worlds"],
     ["THE ARCHIVE", "archive"],
     ["UNFINISHED WING", "unfinished"],
     ["MY COLLECTION", "my-collection"],
+    ["LIQUID WEB", "liquid-web"],
+    ["THE EDITORIAL STUDIO", "editorial"],
+    ["INFINITE CORRIDOR", "corridor"],
   ]) {
     await travel(title, id);
     await walk();
@@ -177,6 +185,7 @@ try {
   await ready();
   await page.getByRole("button", { name: "OPEN COLLECTION" }).click();
   assert.ok((await page.locator(".record-list").innerText()).includes("梁博"));
+  const musicCount = await page.locator(".record-row").count();
   await page
     .getByLabel("Import local audio files")
     .setInputFiles(
@@ -184,9 +193,12 @@ try {
         "public/media/generated/palace-study.wav",
     );
   await page.waitForFunction(
-    () => document.querySelectorAll(".record-row").length === 5,
+    (count) => document.querySelectorAll(".record-row").length === count + 1,
+    musicCount,
   );
   await page.locator(".record-title").last().click();
+  await page.getByRole("button", { name: "Repeat: off", exact: true }).click();
+  await page.getByRole("button", { name: "Repeat: all", exact: true }).click();
   await page
     .getByRole("button", { name: "Pause music", exact: true })
     .first()
@@ -217,7 +229,9 @@ try {
     assert.ok(
       Number(await page.getByLabel("Track progress").getAttribute("max")) > 3,
     );
-    await page.getByRole("button", { name: "Close record editor" }).click();
+    await page.getByLabel("Play in rooms").selectOption(["editorial"]);
+    await page.getByRole("button", { name: "SAVE NOTES" }).click();
+    await page.locator(".metadata-form").waitFor({ state: "hidden" });
     report.checks.push(
       "MP3 title, artist, album, attached artwork and duration read from file tags.",
     );
@@ -226,7 +240,7 @@ try {
   await page.reload();
   await ready();
   await page.getByRole("button", { name: "OPEN COLLECTION" }).click();
-  assert.equal(await page.locator(".record-row").count(), 5);
+  assert.equal(await page.locator(".record-row").count(), musicCount + 1);
   await page.locator(".record-title").last().click();
   await page
     .getByRole("button", { name: "Pause music", exact: true })
@@ -240,6 +254,45 @@ try {
   report.checks.push(
     "Local audio import/playback and library restoration; Liang Bo shelf contains metadata only.",
   );
+  if (process.env.PALACE_AUDIO_FIXTURE) {
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Unmute all sound" }).click();
+    await travel("THE EDITORIAL STUDIO", "editorial");
+    await page.locator(".now-playing-open").click();
+    await page
+      .getByRole("button", { name: "Pause music", exact: true })
+      .first()
+      .waitFor();
+    assert.equal(
+      await page.locator(".record-information h3").innerText(),
+      "Local metadata study",
+    );
+    await page.waitForFunction(
+      () =>
+        Number(document.querySelector('[aria-label="Track progress"]').value) >
+        0.2,
+    );
+    await page.keyboard.press("Escape");
+    await travel("THE ARCHIVE", "archive");
+    await page.getByRole("button", { name: "OPEN COLLECTION" }).click();
+    await page
+      .getByRole("button", { name: "Pause music", exact: true })
+      .first()
+      .waitFor();
+    assert.equal(
+      await page.locator(".record-information h3").innerText(),
+      "Welcome Home, Son",
+    );
+    await page.waitForFunction(
+      () =>
+        Number(document.querySelector('[aria-label="Track progress"]').value) >
+        0.2,
+    );
+    await photograph("assigned-room-music");
+    report.checks.push(
+      "Room assignment saved in IndexedDB survives reload; entering Editorial plays its imported fixture, entering Archive crossfades to the complete user song Welcome Home, Son.",
+    );
+  }
   assert.deepEqual(report.errors, []);
   assert.deepEqual(report.external, []);
 } finally {
