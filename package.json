@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:browser": "node scripts/check-palace.mjs",
     "test:audio-travel": "node scripts/check-audio-travel.mjs",
+    "qa:visual": "node scripts/capture-art-direction.mjs",
     "sync:github": "node scripts/sync-github.mjs",
     "sync:vendor": "node scripts/sync-three.mjs",
     "test:hero": "node scripts/check-hero.mjs"

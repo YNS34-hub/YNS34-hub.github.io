@@ -36,9 +36,13 @@ export default function Player({ roomId }: { roomId: string }) {
     } else {
       const plan = resolveRoomPlan(roomId);
       camera.position.set(
-        plan.type === "listening" ? 0.8 : 0,
+        plan.type === "listening" ? 1.5 : 0,
         EYE,
-        plan.rule === "impossible" ? 21 : 13.8,
+        plan.rule === "impossible"
+          ? 21
+          : plan.type === "listening"
+            ? 10.8
+            : 13.8,
       );
       camera.lookAt(
         0,
@@ -118,11 +122,9 @@ export default function Player({ roomId }: { roomId: string }) {
       );
     };
     const lock = () =>
-      usePalaceStore
-        .getState()
-        .update({
-          pointerLocked: document.pointerLockElement === gl.domElement,
-        });
+      usePalaceStore.getState().update({
+        pointerLocked: document.pointerLockElement === gl.domElement,
+      });
     document.addEventListener("keydown", down);
     document.addEventListener("keyup", up);
     window.addEventListener("blur", blur);

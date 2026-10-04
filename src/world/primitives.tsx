@@ -11,7 +11,11 @@ import {
   TextureLoader,
   type EulerTuple,
   type Vector3Tuple,
+  type WebGLProgramParametersWithUniforms,
 } from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { museum } from "./artDirection";
+import { useSurfaceTexture } from "./materials";
 import type { ContentItem } from "../content/types";
 import { usePalaceStore } from "../systems/store";
 import { setWalkTarget } from "./walkTarget";
@@ -30,12 +34,14 @@ export interface BlockProps {
   castShadow?: boolean;
   receiveShadow?: boolean;
   onClick?: (event: ThreeEvent<MouseEvent>) => void;
+  map?: Texture | null;
+  bevel?: number;
 }
 export function Block({
   position,
   rotation,
   scale = [1, 1, 1],
-  color = "#e4e5e2",
+  color = museum.wall,
   roughness = 0.76,
   metalness = 0,
   opacity = 1,
@@ -44,18 +50,36 @@ export function Block({
   castShadow = false,
   receiveShadow = true,
   onClick,
+  map,
+  bevel = 0.022,
 }: BlockProps) {
+  const tier = usePalaceStore((s) => s.effectiveQuality);
+  const [width, height, depth] = scale;
+  const geometry = useMemo(
+    () =>
+      new RoundedBoxGeometry(
+        width,
+        height,
+        depth,
+        1,
+        tier === "low"
+          ? 0
+          : Math.min(bevel, Math.min(width, height, depth) * 0.16),
+      ),
+    [width, height, depth, bevel, tier],
+  );
+  useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh
       position={position}
       rotation={rotation}
-      scale={scale}
+      geometry={geometry}
       castShadow={castShadow}
       receiveShadow={receiveShadow}
       onClick={onClick}
     >
-      <boxGeometry />
       <meshStandardMaterial
+        map={map}
         color={color}
         roughness={roughness}
         metalness={metalness}
@@ -86,10 +110,10 @@ export function ContactShadow({
     canvas.width = canvas.height = 64;
     const context = canvas.getContext("2d")!;
     const gradient = context.createRadialGradient(32, 32, 1, 32, 32, 32);
-    gradient.addColorStop(0, "#18313ef0");
-    gradient.addColorStop(0.2, "#18313eaa");
-    gradient.addColorStop(0.55, "#18313e45");
-    gradient.addColorStop(1, "#18313e00");
+    gradient.addColorStop(0, "#202522f0");
+    gradient.addColorStop(0.2, "#202522aa");
+    gradient.addColorStop(0.55, "#20252245");
+    gradient.addColorStop(1, "#20252200");
     context.fillStyle = gradient;
     context.fillRect(0, 0, 64, 64);
     return new CanvasTexture(canvas);
@@ -269,6 +293,24 @@ export function useImageTexture(src?: string) {
   return texture;
 }
 
+function galleryPrint(shader: WebGLProgramParametersWithUniforms) {
+  shader.vertexShader = "varying vec3 vPrintPosition;\n" + shader.vertexShader;
+  shader.vertexShader = shader.vertexShader.replace(
+    "#include <begin_vertex>",
+    "#include <begin_vertex>\nvPrintPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;",
+  );
+  shader.fragmentShader =
+    "varying vec3 vPrintPosition;\n" + shader.fragmentShader;
+  shader.fragmentShader = shader.fragmentShader.replace(
+    "#include <tonemapping_fragment>",
+    `float printPresence = 1.0 - smoothstep(5.0, 17.0, distance(cameraPosition, vPrintPosition));
+    float printLuma = dot(gl_FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    gl_FragColor.rgb = mix(vec3(printLuma), gl_FragColor.rgb, mix(0.36, 1.0, printPresence));
+    gl_FragColor.rgb *= mix(0.86, 1.0, printPresence);
+    #include <tonemapping_fragment>`,
+  );
+}
+
 export function Picture({
   src,
   width = 5,
@@ -277,6 +319,8 @@ export function Picture({
   rotation,
   color = "#8c9da0",
   fit = "contain",
+  museumPrint = false,
+  texture: providedTexture,
 }: {
   src?: string;
   width?: number;
@@ -285,8 +329,14 @@ export function Picture({
   rotation?: EulerTuple;
   color?: string;
   fit?: "contain" | "cover";
+  museumPrint?: boolean;
+  texture?: Texture | null;
 }) {
-  const texture = useImageTexture(src);
+  const loadedTexture = useImageTexture(
+    providedTexture !== undefined ? undefined : src,
+  );
+  const texture =
+    providedTexture === undefined ? loadedTexture : providedTexture;
   const aspect = texture?.image
     ? texture.image.width / texture.image.height
     : width / height;
@@ -305,6 +355,10 @@ export function Picture({
         color={texture ? "#ffffff" : color}
         toneMapped={false}
         side={DoubleSide}
+        onBeforeCompile={museumPrint ? galleryPrint : undefined}
+        customProgramCacheKey={() =>
+          museumPrint ? "museum-print-v1" : "picture-v1"
+        }
       />
     </mesh>
   );
@@ -313,7 +367,7 @@ export function Picture({
 export function Floor({
   width = 28,
   depth = 34,
-  color = "#d5d8d6",
+  color = museum.floor,
   opacity = 1,
 }: {
   width?: number;
@@ -321,6 +375,7 @@ export function Floor({
   color?: string;
   opacity?: number;
 }) {
+  const stone = useSurfaceTexture("stone");
   return (
     <mesh
       position={[0, -0.035, 0]}
@@ -336,8 +391,10 @@ export function Floor({
       <planeGeometry args={[width, depth]} />
       <meshStandardMaterial
         color={color}
-        roughness={0.32}
-        metalness={0.13}
+        bumpMap={stone}
+        bumpScale={0.014}
+        roughness={0.38}
+        metalness={0.045}
         transparent={opacity < 1}
         opacity={opacity}
       />
@@ -362,8 +419,8 @@ export function Door({
 }) {
   const [hovered, setHovered] = useState(false);
   const frame = useRef<Mesh>(null);
-  const unlit = useMemo(() => new Color(dark ? "#53696b" : "#d3e0df"), [dark]);
-  const lit = useMemo(() => new Color("#b3e1ec"), []);
+  const unlit = useMemo(() => new Color(dark ? "#363e3c" : "#8e9b99"), [dark]);
+  const lit = useMemo(() => new Color("#b5cdd3"), []);
   useEffect(
     () =>
       frame.current
@@ -391,19 +448,32 @@ export function Door({
     <group position={position} rotation={rotation}>
       <Block
         position={[-1.57, 2.45, 0]}
-        scale={[0.32, 4.9, 0.46]}
-        color={dark ? "#282d2c" : "#e4e6e2"}
+        scale={[0.32, 4.9, 0.66]}
+        color={dark ? "#454b45" : museum.wall}
+        castShadow
       />
       <Block
         position={[1.57, 2.45, 0]}
-        scale={[0.32, 4.9, 0.46]}
-        color={dark ? "#282d2c" : "#e4e6e2"}
+        scale={[0.32, 4.9, 0.66]}
+        color={dark ? "#454b45" : museum.wall}
+        castShadow
       />
       <Block
         position={[0, 4.73, 0]}
-        scale={[3.45, 0.36, 0.46]}
-        color={dark ? "#282d2c" : "#e4e6e2"}
+        scale={[3.45, 0.36, 0.66]}
+        color={dark ? "#454b45" : museum.wall}
+        castShadow
       />
+      {[-1, 1].map((side) => (
+        <Block
+          key={side}
+          position={[side * 1.42, 2.25, 0.1]}
+          scale={[0.06, 4.5, 0.34]}
+          color={museum.metal}
+          metalness={0.45}
+          roughness={0.5}
+        />
+      ))}
       <mesh
         ref={frame}
         position={[0, 2.25, 0.045]}
@@ -416,19 +486,19 @@ export function Door({
       >
         <planeGeometry args={[2.8, 4.5]} />
         <meshStandardMaterial
-          color={dark ? "#53696b" : "#d3e0df"}
+          color={dark ? "#363e3c" : "#8e9b99"}
           roughness={0.7}
-          emissive={dark ? "#142427" : "#718986"}
-          emissiveIntensity={hovered ? 0.4 : 0.13}
+          emissive={dark ? "#273a3c" : "#819597"}
+          emissiveIntensity={hovered ? 0.16 : 0.025}
           side={DoubleSide}
         />
       </mesh>
       <Block
         position={[0, 4.53, 0.045]}
         scale={[2.85, 0.028, 0.08]}
-        color="#c5e3e8"
-        emissive="#c5e3e8"
-        emissiveIntensity={1.2}
+        color="#d6e2e2"
+        emissive="#d6e2e2"
+        emissiveIntensity={0.55}
       />
       <Label
         text={number}
@@ -527,6 +597,7 @@ export function Exhibit({
               width={4.4}
               height={kind === "poster" ? 4.5 : 2.65}
               position={[0, 2.95, 0.06]}
+              museumPrint={item.category === "project"}
             />
           ) : (
             <>

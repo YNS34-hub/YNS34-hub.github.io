@@ -131,6 +131,17 @@ describe("the local museum catalog", () => {
       expect(
         await readFile(resolve(output, "sitemap.xml"), "utf8"),
       ).not.toContain("/memory/");
+      for (const room of rooms.filter((room) => room.hidden)) {
+        const hiddenPage = await readFile(
+          resolve(output, room.id, "index.html"),
+          "utf8",
+        );
+        expect(hiddenPage).toContain(`https://yns34-hub.github.io/${room.id}/`);
+        expect(hiddenPage).toContain('name="robots" content="noindex, follow"');
+        expect(await readFile(resolve(output, "sitemap.xml"), "utf8")).not.toContain(
+          `/${room.id}/`,
+        );
+      }
     } finally {
       await rm(output, { recursive: true, force: true });
     }

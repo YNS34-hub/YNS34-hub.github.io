@@ -24,6 +24,7 @@ export interface ContentItem {
   github?: string;
   demo?: string;
   cover?: string;
+  coverCaption?: string;
   video?: string;
   year: string;
   featured: boolean;

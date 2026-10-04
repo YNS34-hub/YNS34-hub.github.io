@@ -8,6 +8,16 @@ Jie Tian 的可进入数字艺术馆。非线性数学研究、公开项目、�
 
 > A convincing explanation is not the same as a proof.
 
+## Desktop art direction
+
+本轮沿现有架构完成桌面视觉重构：暖白墙体、石材地面与深色天花形成材质层级，保留主大厅构图与连续的冰蓝厚玻璃。Listening Room 改为以唱盘与专辑装置为中心的 Audiophile Listening Gallery；真实项目界面成为项目馆的展品，靠近后恢复原色。长廊由正常建筑逐步转向异常比例与偏移结构。
+
+![Listening Gallery — actual browser capture](docs/visual/music.png)
+
+[材质、照明与空间设计说明](docs/art-direction.md) · [实际截图、前后对比与验证范围](docs/visual-qa.md)。Audit 的展示图来自真实离线渲染器，使用明确标注的合成元数据，不包含论文、私人评审或真实 case。
+
+在运行 Vite 开发服务器后，使用 `npm run qa:visual` 生成实际浏览器截图。`PALACE_STORY=1 PALACE_MOVEMENT=1 npm run qa:visual` 还检查长廊阶段、特殊房间、主动播放、Focus、导览、桌面索引、真实 WASD 和碰撞边界；这些截图使用 SwiftShader，不能替代独立显卡上的 FPS 测量。生产功能回归仍使用 `npm run test:browser` 和 `npm run test:audio-travel`。
+
 ## 开发与验证
 
 需要 **Node.js 22.12+**。
@@ -63,6 +73,7 @@ content/
   "github": "https://github.com/YNS34-hub/my-project",
   "demo": "https://example.com/",
   "cover": "/media/projects/my-project.webp",
+  "coverCaption": "Actual interface / project screenshot",
   "video": "/media/video/my-project.mp4",
   "year": "2026",
   "date": "2026-10-02",
@@ -128,7 +139,7 @@ Listening Room 的 **IMPORT MUSIC** 用 File API 读取本机文件，尝试解�
 
 **IMPORT IMAGES** 接受 JPG、PNG、WEBP、AVIF，在本机读取并保存到 IndexedDB，不上传。可查看原比例全屏、来源、标签与收藏日期，点击 **ENTER WALLPAPER CINEMA** 将图像带入建筑。Cinema 使用投影、层次与克制的主色适应，不声称重建真实 3D 世界。
 
-内置五幅图像是本项目原创数值艺术：建筑光线追踪、标量场等值线、参数地形与夜间几何构图。用于项目展览时明确标注为艺术解释，不冒充真实项目截图。
+内置五幅收藏图像是本项目原创数值艺术：建筑光线追踪、标量场等值线、参数地形与夜间几何构图。真实项目的封面优先使用运行后的界面截图；来源与版本记录在 [项目视觉素材说明](public/media/projects/README.md)。
 
 ## 房间模板与特殊规则
 
@@ -146,11 +157,11 @@ Listening Room 的 **IMPORT MUSIC** 用 File API 读取本机文件，尝试解�
 | `loop` | 重复访问时小细节改变 |
 | `memory` | 本地访问记忆、灯光与隐藏空间 |
 
-长廊按区段编号和种子生成，保持五个相邻的 22 米区段，用实例化构件复用楼板、柱与玻璃碎片。离开房间后卸载几何、材质和纹理；同一扇门再次进入保持一致。建筑壳在 `src/rooms/Architecture.tsx`，模板与规则在 `src/rooms/Galleries.tsx`，入口映射在 `src/world/World.tsx`。少量记忆空间通过探索解锁，Guide 不直接显示隐藏房间。
+长廊按区段编号和种子生成，保持五个相邻的 22 米区段，用实例化构件复用楼板、柱与偏移门框。正常区段逐渐演变成层高变化、错位光槽与倾斜结构。离开房间后卸载几何、材质和纹理；同一扇门再次进入保持一致。建筑壳在 `src/rooms/Architecture.tsx`，异常构件在 `src/rooms/SpecialArchitecture.tsx`，模板与规则在 `src/rooms/Galleries.tsx`，入口映射在 `src/world/World.tsx`。少量记忆空间通过探索解锁，Guide 不直接显示隐藏房间。
 
 ## 性能与舒适度
 
-Automatic 根据设备与实际帧耗调整档位，用户也可手动选择 High / Medium / Low。High 的 DPR 上限 1.6，Medium 上限 1.25，Low 为 0.85（触控设备最高 0.8）；中高档使用 1024 阴影，低档关闭阴影与 MSAA。持续低于 42 FPS 时自动降档，较长时间高于 57 FPS 后谨慎升档。档位还控制玻璃复杂度、纹理预算与建筑细节。低档不用原始 80,000 三角形 GLB；移动端始终使用轻量材质与纹理预算。纹理最长边为 Low 768 / Medium 1280 / High 2048。渲染器首次创建时决定 MSAA，运行中降档同时降低 DPR、关闭阴影并缩减折射缓冲区。移动端采用较低预算和触控 Tour。局部加载、实例化、距离细节、视锥裁剪、纹理尺寸控制与卸载回收限制资源。镜面使用有限模拟，无递归镜面、重型 SSR、远程 HDR 或重型后期。
+Automatic 根据设备与实际帧耗调整档位，用户也可手动选择 High / Medium / Low。High 的 DPR 上限 1.6，Medium 上限 1.25，Low 为 0.85（触控设备最高 0.8）；High / Medium 使用 2048 / 1024 阴影，低档关闭阴影与 MSAA。持续低于 42 FPS 时自动降档，较长时间高于 57 FPS 后谨慎升档。档位还控制玻璃复杂度、纹理预算与建筑细节。低档不用原始 80,000 三角形 GLB；移动端始终使用轻量材质与纹理预算。纹理最长边为 Low 768 / Medium 1280 / High 2048。渲染器首次创建时决定 MSAA，运行中降档同时降低 DPR、关闭阴影并缩减折射缓冲区。移动端采用较低预算和触控 Tour。局部加载、实例化、距离细节、视锥裁剪、纹理尺寸控制与卸载回收限制资源。镜面使用有限模拟，无递归镜面、重型 SSR、远程 HDR 或重型后期。
 
 视角 FOV 60°，眼高 1.65 米，正常速度 2.7 米/秒，Shift 速度 4.45 米/秒，有加减速惯性、无镜头晃动。生成资产的来源和可选 Python 再生成方法在 `public/media/generated/README.md`；构建不需要 Python。
 

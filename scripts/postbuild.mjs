@@ -50,7 +50,8 @@ await writeFile(path.join(dist, "index.html"), home);
 await writeFile(path.join(dist, "404.html"), home);
 await writeFile(path.join(dist, ".nojekyll"), "");
 const routeList = ["/"];
-const renderRoute = async (route, title, description, item) => {
+let generatedRoutes = 1;
+const renderRoute = async (route, title, description, item, indexable = true) => {
   const url = `${origin}/${route}/`;
   let html = home
     .replace(
@@ -77,6 +78,12 @@ const renderRoute = async (route, title, description, item) => {
       /<meta\s+property="og:url"\s+content="[^"]*"\s*\/>/,
       `<meta property="og:url" content="${url}" />`,
     );
+  if (!indexable) {
+    html = html.replace(
+      "</head>",
+      '<meta name="robots" content="noindex, follow" /></head>',
+    );
+  }
   if (item) {
     const semantic = `<article id="static-collection" style="max-width:52rem;margin:4rem auto;padding:2rem;font:16px/1.7 sans-serif"><nav><a href="/">The Memory Palace</a></nav><h1>${escape(item.title)}</h1><p>${escape(item.subtitle)}</p><p>${escape(item.description)}</p>${item.abstract ? `<h2>Research note</h2><p>${escape(item.abstract)}</p>` : ""}${item.equation ? `<p>${escape(item.equation)}</p>` : ""}<p>${escape(item.status)} · ${escape(item.year)}</p><p>${item.tags.map(escape).join(" · ")}</p>${item.github ? `<p><a href="${escape(item.github)}">GitHub repository</a></p>` : ""}${item.demo ? `<p><a href="${escape(item.demo)}">Open exhibit</a></p>` : ""}${(item.links || []).map((link) => `<p><a href="${escape(link.url)}">${escape(link.label)}</a></p>`).join("")}</article>`;
     html = html.replace(collection, semantic);
@@ -99,12 +106,12 @@ const renderRoute = async (route, title, description, item) => {
   const folder = path.join(dist, route);
   await mkdir(folder, { recursive: true });
   await writeFile(path.join(folder, "index.html"), html);
-  routeList.push(`/${route}/`);
+  generatedRoutes += 1;
+  if (indexable) routeList.push(`/${route}/`);
 };
-for (const room of rooms.filter(
-  (room) => !room.hidden && room.id !== "atrium",
-)) {
-  await renderRoute(room.id, room.title, room.subtitle);
+for (const room of rooms.filter((room) => room.id !== "atrium")) {
+  // Hidden rooms remain directly shareable without appearing in the public index.
+  await renderRoute(room.id, room.title, room.subtitle, undefined, !room.hidden);
 }
 for (const [items, section] of [
   [projects, "projects"],
@@ -127,5 +134,5 @@ await writeFile(
   `User-agent: *\nAllow: /\nSitemap: ${origin}/sitemap.xml\n`,
 );
 console.log(
-  `Static collection, ${routeList.length} shareable routes, sitemap and GitHub Pages fallback generated. Legacy routes preserved.`,
+  `Static collection, ${generatedRoutes} shareable routes (${routeList.length} indexed), sitemap and GitHub Pages fallback generated. Legacy routes preserved.`,
 );

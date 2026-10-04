@@ -66,16 +66,31 @@ describe("accessible movement around architecture", () => {
     expect(roomBounds("anomaly-floating")).toEqual([-1.3, 1.3, -15.6, 15.6]);
   });
   it("keeps the eye out of furniture and preserves a usable door opening", () => {
-    const fromSofa = new Vector3(5.4, 3, 2.8);
-    keepClear(fromSofa, "music");
-    expect(Math.abs(fromSofa.z - 2.8)).toBeGreaterThanOrEqual(1.32);
-    expect(fromSofa.y).toBe(1.65);
+    const fromBench = new Vector3(6.2, 3, 4.6);
+    keepClear(fromBench, "music");
+    expect(Math.abs(fromBench.z - 4.6)).toBeCloseTo(0.85, 6);
+    expect(fromBench.y).toBe(1.65);
     const opening = new Vector3(0, 1.65, 11);
     keepClear(opening, "anomaly-impossible");
     expect(opening).toEqual(new Vector3(0, 1.65, 11));
     const wall = new Vector3(8, 1.65, 11);
     keepClear(wall, "anomaly-impossible");
     expect(Math.abs(wall.z - 11)).toBeCloseTo(0.68, 6);
+  });
+  it("keeps the tapered room walkable and the eye inside its narrowing walls", () => {
+    for (const z of [14, 10, 4, -2, -8, -14, -15.6]) {
+      for (const x of [-12, 12]) {
+        const position = new Vector3(x, 1.65, z);
+        keepClear(position, "anomaly-compressing");
+        expect(Math.abs(position.x)).toBeLessThanOrEqual(9.45);
+        const taper = Math.max(0, Math.min(1, (10 - z) / 24));
+        expect(Math.abs(position.x)).toBeLessThanOrEqual(9.45 - taper * 7.3);
+        expect(position.y).toBe(1.65);
+      }
+      const center = new Vector3(0, 1.65, z);
+      keepClear(center, "anomaly-compressing");
+      expect(center.z).toBe(z);
+    }
   });
   it("leads touch exploration around the core to a destination behind it", () => {
     const position = new Vector3(0, 1.65, 10);

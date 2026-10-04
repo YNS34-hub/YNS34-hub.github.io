@@ -20,6 +20,12 @@ import {
 } from "../world/primitives";
 import { setWalkTarget } from "../world/walkTarget";
 import { RoomShell } from "./Architecture";
+import { ProjectInstallation } from "./ProjectInstallation";
+import {
+  CompressionArchitecture,
+  MirrorArchitecture,
+  ImpossibleArchitecture,
+} from "./SpecialArchitecture";
 import { resolveRoomPlan, type RoomPlan } from "../world/roomPlan";
 
 const ICE = "#b1d9ec";
@@ -138,29 +144,33 @@ function MuseumHeading({
   title,
   subtitle,
   dark = false,
+  position = [-10.6, 7.9, -16.54],
 }: {
   title: string;
   subtitle: string;
   dark?: boolean;
+  position?: THREE.Vector3Tuple;
 }) {
   return (
-    <group>
+    <group position={position}>
       <Label
         text={title}
-        position={[0, 6.85, -16.54]}
-        size={0.56}
+        position={[0, 0, 0]}
+        align="left"
+        size={0.46}
         color={dark ? "#dce7ea" : INK}
         maxWidth={22}
       />
       <Label
         text={subtitle}
-        position={[0, 5.9, -16.52]}
-        size={0.18}
+        position={[0, -0.66, 0.02]}
+        align="left"
+        size={0.15}
         color={dark ? "#83979f" : "#849198"}
         maxWidth={20}
       />
       <Block
-        position={[0, 5.35, -16.5]}
+        position={[1.65, -1.12, 0.04]}
         scale={[3.3, 0.016, 0.025]}
         color={dark ? "#476b7b" : "#b9c8cd"}
       />
@@ -218,6 +228,11 @@ function WingNavigation({
 
 function ProjectGallery({ page = 0 }: { page?: number }) {
   const items = projects.slice(page * 6, page * 6 + 6);
+  const hero =
+    items.find((item) => item.featured && item.roomType === "white-cube") ||
+    items.find((item) => item.featured) ||
+    items[0];
+  const sideWorks = items.filter((item) => item.id !== hero?.id);
   return (
     <group>
       <RoomShell width={28} depth={34} height={10.5} />
@@ -225,34 +240,23 @@ function ProjectGallery({ page = 0 }: { page?: number }) {
         title="WORKS IN THE WORLD"
         subtitle="01 / PROJECT GALLERY        CODE, MADE SPATIAL."
       />
-      <Block
-        position={[0, 0.2, -3]}
-        scale={[5.8, 0.4, 5.8]}
-        color="#e1e5e4"
-        roughness={0.48}
-      />
-      <ThoughtSculpture />
-      <Label
-        text="A collection of possibilities."
-        position={[0, 0.68, 0.04]}
-        size={0.17}
-        color="#7d919a"
-      />
-      {items.map((item, i) => {
+      {hero && <ProjectInstallation item={hero} />}
+      {sideWorks.map((item, i) => {
         const side = i % 2 === 0 ? -1 : 1;
         return (
           <group key={item.id}>
             <Block
               position={[side * 10.25, 2.7, 7.1 - Math.floor(i / 2) * 8.7]}
               scale={[0.17, 5.4, 6.1]}
-              color="#e7e9e4"
+              color="#deded5"
+              castShadow
             />
             <Exhibit
               item={item}
               position={[side * 10.05, 0, 7.1 - Math.floor(i / 2) * 8.7]}
               rotation={[0, side === -1 ? Math.PI / 2 : -Math.PI / 2, 0]}
               index={i}
-              kind={item.roomType === "installation" ? "sculpture" : "screen"}
+              kind="screen"
             />
           </group>
         );
@@ -404,10 +408,11 @@ function ExperimentGallery({ page = 0 }: { page?: number }) {
 function UnfinishedGallery({ page = 0 }: { page?: number }) {
   return (
     <group>
-      <RoomShell width={28} depth={34} height={9.5} />
+      <RoomShell width={28} depth={34} height={9.5} dark />
       <MuseumHeading
         title="UNFINISHED FUTURES"
         subtitle="06 / THE ARCHIVE        NOTHING HERE HAS STOPPED BECOMING."
+        dark
       />
       {[-10, 10].map((x) => (
         <group key={x}>
@@ -461,11 +466,20 @@ function UnfinishedGallery({ page = 0 }: { page?: number }) {
       <Label
         text="TO BE CONTINUED."
         position={[0, 2.4, -16.54]}
-        color="#8b9a9f"
+        color="#9eaaa7"
         size={0.34}
       />
       <WingNavigation collection="archive" page={page} count={archive.length} />
-      <Exit />
+      <spotLight
+        position={[-4, 8, 5]}
+        target-position={[0, 0, -6]}
+        intensity={240}
+        distance={28}
+        color="#d8e6ea"
+        angle={0.8}
+        penumbra={1}
+      />
+      <Exit dark />
     </group>
   );
 }
@@ -607,7 +621,7 @@ function GravityArchitecture() {
     );
   });
   return (
-    <group ref={frame} position={[0, 4.5, 0]}>
+    <group ref={frame} name="gravity-architecture" position={[0, 4.5, 0]}>
       <Block position={[-9.2, 0, 0]} scale={[0.18, 9.2, 32]} color="#e7ece9" />
       <Block position={[9.2, 0, 0]} scale={[0.18, 9.2, 32]} color="#e7ece9" />
       <Block position={[0, 4.6, 0]} scale={[18.4, 0.18, 32]} color="#e7ece9" />
@@ -638,6 +652,30 @@ function GravityArchitecture() {
             position={[0, -4.35, 0]}
             scale={[18, 0.16, 0.18]}
             color="#bac8ce"
+          />
+        </group>
+      ))}
+      {[-1, 1].map((side) => (
+        <group key={side}>
+          <Block
+            position={[side * 8.95, 0, 0]}
+            scale={[0.035, 8.3, 30]}
+            color="#829897"
+            roughness={0.5}
+          />
+          <Block
+            position={[side * 8.84, 3.7, 0]}
+            scale={[0.06, 0.09, 30]}
+            color="#dcebe8"
+            emissive="#d6e8ef"
+            emissiveIntensity={0.45}
+          />
+          <Label
+            text={side < 0 ? "00° / ORIGINAL DATUM" : "90° / ANOTHER FLOOR"}
+            position={[side * 8.87, -1.5, -3]}
+            rotation={[0, side < 0 ? Math.PI / 2 : -Math.PI / 2, 0]}
+            size={0.23}
+            color="#5c7373"
           />
         </group>
       ))}
@@ -702,26 +740,47 @@ function AnomalyRoom({ rule, plan }: { rule: RoomRule; plan?: RoomPlan }) {
             />
           ))}
           <Block position={[0, 5, -17]} scale={[28, 10, 0.3]} color="#111d26" />
-          <ambientLight intensity={0.65} color="#bed6e3" />
-          {Array.from({ length: quality === "low" ? 6 : 12 }, (_, i) => (
-            <mesh
-              key={i}
-              position={[
-                Math.sin(i * 2.4) * (6 + (i % 3)),
-                2 + (i % 4) * 1.6,
-                8 - i * 2.4,
-              ]}
-              rotation={[i * 0.2, i * 0.4, 0.2]}
-            >
-              <boxGeometry args={[1 + (i % 2), 1 + (i % 2), 0.08]} />
-              <meshStandardMaterial
-                color="#c5d8e2"
-                wireframe
-                transparent
-                opacity={0.3}
-              />
-            </mesh>
-          ))}
+          <ambientLight intensity={0.12} color="#bed6e3" />
+          {allContent
+            .filter((work) => work.cover)
+            .slice(0, quality === "low" ? 3 : 5)
+            .map((work, i) => (
+              <group
+                key={work.id}
+                position={[
+                  i % 2 ? 6.9 : -6.9,
+                  3.0 + (i % 3) * 1.1,
+                  8 - i * 4.3,
+                ]}
+                rotation={[0.04, i % 2 ? -0.32 : 0.32, i % 2 ? -0.08 : 0.08]}
+                onClick={(event) => {
+                  if (event.delta < 5) {
+                    event.stopPropagation();
+                    usePalaceStore.getState().focusItem(work);
+                  }
+                }}
+              >
+                <Block
+                  scale={[4.9, 3.1, 0.08]}
+                  color="#8caaa9"
+                  roughness={0.46}
+                  metalness={0.3}
+                />
+                <Picture
+                  src={work.cover}
+                  width={4.76}
+                  height={2.96}
+                  position={[0, 0, 0.048]}
+                  museumPrint
+                />
+                <Label
+                  text={work.title.toUpperCase()}
+                  position={[0, -1.82, 0.049]}
+                  size={0.1}
+                  color="#bfd1cb"
+                />
+              </group>
+            ))}
         </>
       ) : (
         rule !== "gravity" && (
@@ -737,93 +796,29 @@ function AnomalyRoom({ rule, plan }: { rule: RoomRule; plan?: RoomPlan }) {
         title={title}
         subtitle={subtitle}
         dark={rule === "mirror" || rule === "floating"}
+        position={rule === "impossible" ? [-20, 13.5, -25.54] : undefined}
       />
       {(rule === "floating" || rule === "gravity") && <InvisibleWalkSurface />}
       {rule === "mirror" && (
-        <>
-          {Array.from({ length: quality === "low" ? 5 : 9 }, (_, i) => (
-            <group key={i} position={[0, 0, 7 - i * 2.8]}>
-              <Block
-                position={[-8.5, 4, 0]}
-                scale={[0.08, 8, 0.08]}
-                color="#91b6c7"
-              />
-              <Block
-                position={[8.5, 4, 0]}
-                scale={[0.08, 8, 0.08]}
-                color="#91b6c7"
-              />
-              <Block
-                position={[0, 8, 0]}
-                scale={[17, 0.08, 0.08]}
-                color="#91b6c7"
-              />
-              {[-1, 1].map((side) => (
-                <mesh key={side} position={[side * 7.9, 3.3, 0]}>
-                  <torusKnotGeometry args={[0.72, 0.045, 64, 6]} />
-                  <meshStandardMaterial
-                    color={ICE}
-                    transparent
-                    opacity={Math.max(0.08, 0.64 - i * 0.055)}
-                    roughness={0.25}
-                  />
-                </mesh>
-              ))}
-            </group>
-          ))}
-          <pointLight
-            position={[0, 6, -8]}
-            color={ICE}
-            intensity={14}
-            distance={25}
-          />
-        </>
+        <MirrorArchitecture item={item} low={quality === "low"} />
       )}
       {rule === "gravity" && <GravityArchitecture />}
-      {rule === "compressing" &&
-        Array.from({ length: 9 }, (_, i) => {
-          const width = 20 - i * 1.65;
-          const height = 9 - i * 0.48;
-          return (
-            <group key={i} position={[0, 0, 10 - i * 3]}>
-              <Block
-                position={[-width / 2, height / 2, 0]}
-                scale={[0.2, height, 0.32]}
-                color="#d3dddf"
-              />
-              <Block
-                position={[width / 2, height / 2, 0]}
-                scale={[0.2, height, 0.32]}
-                color="#d3dddf"
-              />
-              <Block
-                position={[0, height, 0]}
-                scale={[width, 0.2, 0.32]}
-                color="#d3dddf"
-              />
-            </group>
-          );
-        })}
+      {rule === "compressing" && <CompressionArchitecture />}
       {rule === "impossible" && (
         <>
+          <ImpossibleArchitecture />
           <Block position={[-9.5, 3, 11]} scale={[15, 6, 0.75]} color={PAPER} />
           <Block position={[9.5, 3, 11]} scale={[15, 6, 0.75]} color={PAPER} />
           <Block position={[0, 5.5, 11]} scale={[4, 1, 0.75]} color={PAPER} />
           {[-22, -11, 11, 22].map((x) => (
             <Block
               key={x}
+              castShadow
               position={[x, 8, -13]}
               scale={[0.7, 16, 0.7]}
               color="#dde2df"
             />
           ))}
-          <Label
-            text="A room larger than its entrance."
-            position={[0, 9.6, -25.6]}
-            size={0.7}
-            color="#a9b9c0"
-            maxWidth={36}
-          />
         </>
       )}
       {rule === "loop" && (
@@ -865,15 +860,22 @@ function AnomalyRoom({ rule, plan }: { rule: RoomRule; plan?: RoomPlan }) {
         </>
       )}
       {item && rule !== "loop" && (
-        <Exhibit
-          item={item}
-          position={[
-            0,
-            rule === "floating" ? 0.8 : 0,
-            rule === "impossible" ? -20 : -13,
-          ]}
-          kind={rule === "floating" ? "sculpture" : "poster"}
-        />
+        <group
+          position={[0, 0, rule === "impossible" ? -20 : -13]}
+          scale={rule === "impossible" ? [2.25, 2.25, 1] : [1, 1, 1]}
+        >
+          <Exhibit
+            item={item}
+            position={[0, rule === "floating" ? 0.8 : 0, 0]}
+            kind={
+              rule === "floating"
+                ? "sculpture"
+                : item.category === "project"
+                  ? "screen"
+                  : "poster"
+            }
+          />
+        </group>
       )}
       <Exit dark={rule === "mirror" || rule === "floating"} />
     </group>
@@ -954,7 +956,7 @@ function ConfiguredGallery({ plan }: { plan: RoomPlan }) {
                 ? [0, 0, 0]
                 : [0, side === -1 ? Math.PI / 2 : -Math.PI / 2, 0]
             }
-            scale={single && !central ? [1.8, 1.05, 1] : [1, 1, 1]}
+            scale={single && !central ? [1.4, 1.4, 1] : [1, 1, 1]}
           >
             <Exhibit
               item={item}

@@ -73,6 +73,66 @@
     "color": "#1d252b"
   },
   {
+    "id": "anomaly-mirror",
+    "number": "—",
+    "title": "THE ECHO CHAMBER",
+    "subtitle": "A reflection is another way of remembering.",
+    "type": "anomaly",
+    "rule": "mirror",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-gravity",
+    "number": "—",
+    "title": "ANOTHER ORIENTATION",
+    "subtitle": "Move slowly. The architecture will follow.",
+    "type": "anomaly",
+    "rule": "gravity",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-floating",
+    "number": "—",
+    "title": "BETWEEN TWO PLACES",
+    "subtitle": "A path without a ground.",
+    "type": "anomaly",
+    "rule": "floating",
+    "color": "#d2e5ee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-compressing",
+    "number": "—",
+    "title": "THE DISTANCE WITHIN",
+    "subtitle": "The world narrows around a single thought.",
+    "type": "anomaly",
+    "rule": "compressing",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-impossible",
+    "number": "—",
+    "title": "MORE ROOM ON THE INSIDE",
+    "subtitle": "A small door. An unreasonable volume.",
+    "type": "anomaly",
+    "rule": "impossible",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-loop",
+    "number": "—",
+    "title": "ALMOST THE SAME PLACE",
+    "subtitle": "Return, and look again.",
+    "type": "anomaly",
+    "rule": "loop",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
     "id": "memory",
     "number": "—",
     "title": "THE QUIET ROOM",
