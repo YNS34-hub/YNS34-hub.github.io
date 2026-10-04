@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-04",
+  "application_source_commit": "28f5630ad722037908e0e50f0e338703295bfabe",
+  "scope": "Desktop visual direction; original touch/fallback behavior checked for regression.",
+  "renderer": "Chromium / SwiftShader. Hardware GPU FPS has not been measured.",
+  "lint": "PASS",
+  "unit_tests": {
+    "status": "PASS",
+    "count": 42
+  },
+  "typescript_and_build": "PASS",
+  "static_artifacts": {
+    "generatedRoutes": 49,
+    "indexedRoutes": 42,
+    "hiddenRoutes": 7,
+    "checkedAssets": 38,
+    "legacyRoutes": 4,
+    "fallback": "404.html equals application shell"
+  },
+  "production_browser": {
+    "status": "PASS",
+    "scenarios": [
+      "production files have static deep links, SEO text, local assets, fallback and preserved legacy pages",
+      "static project remains readable without JavaScript or WebGL",
+      "initial desktop architecture renders at medium quality before entering",
+      "2D index is independently accessible, searchable and focus links reload",
+      "local audio import, metadata edits, legal NetEase links and playback survive navigation",
+      "private images persist, full original is viewable, and image cinema enters 3D",
+      "all eight gallery rooms are reachable through the museum guide",
+      "desktop exploration, bookmarks and comfort settings survive reload",
+      "procedural and project direct links load, browser back restores the room",
+      "mobile tour and collection index work without horizontal overflow"
+    ],
+    "errors": [],
+    "external_requests": [],
+    "skipped_developer_diagnostic": [
+      "first-person controls move smoothly and corridor walls contain the visitor"
+    ]
+  },
+  "development_scene_inspection": {
+    "status": "PASS",
+    "checks": [
+      "Native explicit playback, album installation, Guide, Focus, 1920px index and 1440px Focus inspected.",
+      "Native WASD advances, corridor walls contain movement, five chunks remain resident, and the tapered room permits return."
+    ],
+    "movement": {
+      "start": [
+        0,
+        1.65,
+        14
+      ],
+      "moved": [
+        0,
+        1.65,
+        13.736330641898514
+      ],
+      "boundary": [
+        3.08,
+        1.65,
+        13.515439312619096
+      ],
+      "chunks": 5,
+      "narrow": [
+        2.758333333333333,
+        1.65,
+        -12
+      ]
+    },
+    "errors": [],
+    "external_requests": []
+  },
+  "native_audio_travel": {
+    "status": "PASS",
+    "checks": [
+      "Palace Study starts only after an explicit user click",
+      "Guide travel to projects preserves native Audio identity, track and advancing playback",
+      "Guide travel to research preserves native Audio identity, track and advancing playback"
+    ],
+    "observations": [
+      {
+        "room": "music",
+        "nativeAudioCount": 2,
+        "paused": false,
+        "ended": false,
+        "currentTime": 1.149866,
+        "duration": 36,
+        "readyState": 4
+      },
+      {
+        "room": "projects",
+        "nativeAudioCount": 2,
+        "sameNativeAudioElement": true,
+        "paused": false,
+        "ended": false,
+        "currentTime": 5.568329,
+        "duration": 36,
+        "readyState": 4
+      },
+      {
+        "room": "research",
+        "nativeAudioCount": 2,
+        "sameNativeAudioElement": true,
+        "paused": false,
+        "ended": false,
+        "currentTime": 9.287982,
+        "duration": 36,
+        "readyState": 4
+      }
+    ],
+    "events_during_travel": [],
+    "errors": []
+  },
+  "legacy_glass": {
+    "status": "PASS",
+    "native_import_modules": 8,
+    "desktop_triangles": 80000,
+    "mobile_triangles": 12500,
+    "closed_manifold": true,
+    "reduced_motion_and_missing_webgl_fallbacks": "PASS"
+  },
+  "curated_browser_captures": 29,
+  "private_audit_cover": "Actual renderer with visibly marked synthetic demonstration metadata; no manuscript, review, evidence artifact, real case or private source."
+}

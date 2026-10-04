@@ -38,7 +38,9 @@ if (process.env.PALACE_VERIFY_DIST === "1") {
     "build must generate independent room and exhibit pages",
   );
   const assets = new Set();
-  const hiddenRoutes = rooms.filter((room) => room.hidden).map((room) => `/${room.id}/`);
+  const hiddenRoutes = rooms
+    .filter((room) => room.hidden)
+    .map((room) => `/${room.id}/`);
   for (const route of [...routes, ...hiddenRoutes]) {
     const html = await readFile(path.join(dist, route, "index.html"), "utf8");
     assert.match(html, /id="static-collection"/);
@@ -112,7 +114,9 @@ if (process.env.PALACE_VERIFY_DIST === "1") {
     );
   }
   report.staticArtifacts = {
-    generatedRoutes: routes.length,
+    generatedRoutes: routes.length + hiddenRoutes.length,
+    indexedRoutes: routes.length,
+    hiddenRoutes: hiddenRoutes.length,
     checkedAssets: assets.size,
     legacyRoutes: 4,
     fallback: "404.html equals application shell",
@@ -121,7 +125,7 @@ if (process.env.PALACE_VERIFY_DIST === "1") {
     "production files have static deep links, SEO text, local assets, fallback and preserved legacy pages",
   );
   console.log(
-    `PASS production files: ${routes.length} static routes, ${assets.size} assets, 4 legacy routes and 404 fallback`,
+    `PASS production files: ${routes.length + hiddenRoutes.length} static routes (${hiddenRoutes.length} hidden), ${assets.size} assets, 4 legacy routes and 404 fallback`,
   );
 }
 if (process.env.PALACE_STATIC_ONLY === "1") {

@@ -1,5 +1,11 @@
 # Desktop visual inspection
 
+Final verification: lint, 42 unit tests, TypeScript/production build, 10 production
+browser scenarios, and three native audio-travel checks passed. The legacy glass
+import graph, manifold geometry, and reduced-motion/WebGL fallback checks also
+passed. Both project branches pass their GitHub CI. The machine-readable scope
+and observations are in [verification.json](visual/verification.json).
+
 These are actual Chromium captures of the running application, not concept renders.
 The baseline is `codex/the-memory-palace` at `7b2aef4`. The desktop inspection uses
 1600 × 1000, Medium quality, and device scale 1; Focus is also inspected at 1440 ×
@@ -141,3 +147,10 @@ regression checks the actual built route files and assets, local audio/image
 imports and IndexedDB restoration, legal NetEase links, direct Focus URLs,
 bookmarks, comfort settings, room travel, fullscreen viewing, cinema, and the
 existing touch/WebGL fallback behavior.
+
+The production build deliberately omits developer camera inspection. Its exact
+movement diagnostic is therefore skipped; the development visual run verifies
+native WASD, corridor containment, five resident chunks, and return movement
+inside the tapered room. Native audio inspection confirms the same two crossfade
+slots and the same playing Audio element across Listening → Projects → Research,
+with advancing playback time and no pause, end, abort, or empty events in travel.
