@@ -10,7 +10,7 @@ const output =
   process.env.PALACE_ARTIFACTS || path.resolve("qa-artifacts/art-direction");
 const rooms = (
   process.env.PALACE_ROOMS ||
-  "atrium,music,projects,research,wallpapers,experiments,archive,corridor"
+  "atrium,projects,research,music,wallpapers,imagined-worlds,archive,unfinished"
 ).split(",");
 const story = process.env.PALACE_STORY === "1";
 const moments = process.env.PALACE_MOMENTS === "1";
@@ -27,6 +27,7 @@ const report = {
 };
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
+  executablePath: process.env.PALACE_BROWSER || undefined,
   headless: true,
   args: [
     "--no-sandbox",

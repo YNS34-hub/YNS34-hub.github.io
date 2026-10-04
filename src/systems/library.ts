@@ -12,6 +12,11 @@ import {
 } from "./idb";
 import { imagePreview } from "./image-preview";
 import { usePalaceStore } from "./store";
+import {
+  readPersonal,
+  emptyPersonal,
+  type PersonalManifest,
+} from "../content/personal";
 
 export function parseNetEaseLink(value: string): {
   url: string;
@@ -68,6 +73,7 @@ export function parseNetEaseLink(value: string): {
 interface LibraryState {
   music: MusicTrack[];
   wallpapers: WallpaperItem[];
+  personal: PersonalManifest;
   ready: boolean;
   error: string | null;
   initialize: () => Promise<void>;
@@ -79,6 +85,7 @@ interface LibraryState {
   pairAudio: (id: string, file: File) => Promise<string | undefined>;
   removeMusic: (id: string) => Promise<void>;
   removeWallpaper: (id: string) => Promise<void>;
+  favoriteWallpaper: (id: string) => Promise<void>;
 }
 
 const records = new Map<string, LibraryRecord>();
@@ -155,6 +162,7 @@ async function persistRecord(record: LibraryRecord) {
 export const useLibraryStore = create<LibraryState>((set, get) => ({
   music: [...staticMusic],
   wallpapers: [...staticWallpapers],
+  personal: emptyPersonal,
   ready: false,
   error: null,
   initialize: async () => {
@@ -162,9 +170,16 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
     if (initializing) return initializing;
     initializing = (async () => {
       try {
-        const saved = (await readLibraryRecords()).sort(
-          (a, b) => (a.addedAt || 0) - (b.addedAt || 0),
-        );
+        const personal = await readPersonal().catch((error: unknown) => {
+          set({ error: errorMessage(error) });
+          return emptyPersonal;
+        });
+        const saved = (
+          await readLibraryRecords().catch((error: unknown) => {
+            set({ error: errorMessage(error) });
+            return [];
+          })
+        ).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
         saved.forEach((record) => records.set(record.id, record));
         const localMusic = saved
           .filter((record) => record.collection === "music")
@@ -172,17 +187,57 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         const localWallpapers = saved
           .filter((record) => record.collection === "wallpapers")
           .map(wallpaperFromRecord);
-        const snapshotIds = new Set(staticMusic.map((track) => track.id));
+        const initialMusic = [...personal.music, ...staticMusic];
+        const snapshotIds = new Set(initialMusic.map((track) => track.id));
         set({
+          personal: {
+            ...personal,
+            visuals: personal.visuals.map((item) => ({
+              ...item,
+              favorite:
+                localWallpapers.find((work) => work.id === item.id)?.favorite ??
+                item.favorite,
+            })),
+            projects: personal.projects.map((item) => ({
+              ...item,
+              favorite:
+                localWallpapers.find((work) => work.id === item.id)?.favorite ??
+                item.favorite,
+            })),
+            research: personal.research.map((item) => ({
+              ...item,
+              favorite:
+                localWallpapers.find((work) => work.id === item.id)?.favorite ??
+                item.favorite,
+            })),
+          },
           music: [
-            ...staticMusic.map(
+            ...initialMusic.map(
               (track) =>
                 localMusic.find((savedTrack) => savedTrack.id === track.id) ||
                 track,
             ),
             ...localMusic.filter((track) => !snapshotIds.has(track.id)),
           ],
-          wallpapers: [...staticWallpapers, ...localWallpapers],
+          wallpapers: [...personal.wallpapers, ...staticWallpapers]
+            .map((item) => {
+              const stored = localWallpapers.find(
+                (saved) => saved.id === item.id,
+              );
+              return stored ? { ...item, favorite: stored.favorite } : item;
+            })
+            .concat(
+              localWallpapers.filter(
+                (item) =>
+                  ![
+                    ...personal.wallpapers,
+                    ...personal.visuals,
+                    ...personal.projects,
+                    ...personal.research,
+                    ...staticWallpapers,
+                  ].some((base) => base.id === item.id),
+              ),
+            ),
           ready: true,
         });
       } catch (error) {
@@ -432,5 +487,40 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
     } catch (error) {
       set({ error: errorMessage(error) });
     }
+  },
+  favoriteWallpaper: async (id) => {
+    const item = [
+      ...get().wallpapers,
+      ...get().personal.visuals,
+      ...get().personal.projects,
+      ...get().personal.research,
+    ].find((work) => work.id === id);
+    if (!item) return;
+    const updated = { ...item, favorite: !item.favorite };
+    set((state) => ({
+      wallpapers: state.wallpapers.map((work) =>
+        work.id === id ? updated : work,
+      ),
+      personal: {
+        ...state.personal,
+        visuals: state.personal.visuals.map((work) =>
+          work.id === id ? updated : work,
+        ),
+        projects: state.personal.projects.map((work) =>
+          work.id === id ? updated : work,
+        ),
+        research: state.personal.research.map((work) =>
+          work.id === id ? updated : work,
+        ),
+      },
+    }));
+    if (usePalaceStore.getState().cinemaImage?.id === id)
+      usePalaceStore.getState().update({ cinemaImage: updated });
+    await persistRecord({
+      ...records.get(id),
+      id,
+      collection: "wallpapers",
+      data: { ...updated },
+    });
   },
 }));

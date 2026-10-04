@@ -10,7 +10,27 @@ export default function WallpaperPanel({
 }: {
   compact?: boolean;
 }) {
-  const images = useLibraryStore((state) => state.wallpapers);
+  const wallpapers = useLibraryStore((state) => state.wallpapers);
+  const visuals = useLibraryStore((state) => state.personal.visuals);
+  const roomId = usePalaceStore((state) => state.roomId);
+  const baseRoom = roomId.split("-page-")[0];
+  const visualRoom = [
+    "imagined-worlds",
+    "cosmic",
+    "glass-life",
+    "portraits",
+  ].includes(baseRoom);
+  const images = visualRoom
+    ? visuals.filter((item) =>
+        baseRoom === "glass-life"
+          ? item.category === "glass"
+          : baseRoom === "portraits"
+            ? item.category === "portrait"
+            : baseRoom === "cosmic"
+              ? item.category === "cosmic"
+              : true,
+      )
+    : wallpapers;
   const error = useLibraryStore((state) => state.error);
   const importRef = useRef<HTMLInputElement>(null);
   const fullscreenRef = useRef<HTMLDivElement>(null);
@@ -107,7 +127,11 @@ export default function WallpaperPanel({
           onClick={() => importRef.current?.click()}
         >
           <Upload size={14} />
-          {importing ? "READING ARCHIVE…" : "IMPORT IMAGES"}
+          {importing
+            ? "READING ARCHIVE…"
+            : visualRoom
+              ? "IMPORT INTO WALLPAPER VAULT"
+              : "IMPORT IMAGES"}
         </button>
         <input
           ref={importRef}

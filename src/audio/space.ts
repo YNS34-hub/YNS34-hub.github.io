@@ -4,12 +4,22 @@ import { useAudioStore, unlockAudioContext } from "./player";
 let context: AudioContext | undefined;
 let ambient: GainNode | undefined;
 let ui: GainNode | undefined;
+let roomFilter: BiquadFilterNode | undefined;
 let started = false;
 function updateLevels() {
   if (!context || !ambient || !ui) return;
   const settings = usePalaceStore.getState();
   const music = useAudioStore.getState().playing;
   const roomWeight = settings.roomId === "music" ? 0.55 : 1;
+  roomFilter?.frequency.setTargetAtTime(
+    settings.roomId === "music"
+      ? 160
+      : settings.roomId === "archive"
+        ? 1100
+        : 380,
+    context.currentTime,
+    1.2,
+  );
   ambient.gain.setTargetAtTime(
     settings.mute
       ? 0
@@ -49,6 +59,7 @@ function startAmbience() {
   source.buffer = buffer;
   source.loop = true;
   const filter = context.createBiquadFilter();
+  roomFilter = filter;
   filter.type = "lowpass";
   filter.frequency.value = 380;
   source.connect(filter);
@@ -119,8 +130,10 @@ export function initializeSpaceAudio() {
       state.roomId !== previous.roomId
     )
       updateLevels();
-    if (state.travelSequence !== previous.travelSequence)
-      tone(180, 0.48, 0.016, ui, 94);
+    if (state.travelSequence !== previous.travelSequence) {
+      if (state.roomId === "music") tone(55, 2.6, 0.025, ambient, 44);
+      else tone(180, 0.48, 0.016, ui, 94);
+    }
   });
   const unsubscribeMusic = useAudioStore.subscribe((state, previous) => {
     if (state.playing !== previous.playing) updateLevels();

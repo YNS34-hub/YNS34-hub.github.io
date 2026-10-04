@@ -20,6 +20,35 @@ export function roomBounds(roomId: string): [number, number, number, number] {
 export function roomFootprints(roomId: string): Footprint[] {
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
+  if (roomId === "music")
+    return [
+      { x: 0, z: -3, radius: 5.7 },
+      ...[-10.6, 10.6].map((x) => ({
+        x,
+        z: -5,
+        halfWidth: 0.35,
+        halfDepth: 9.3,
+      })),
+    ];
+  if (roomId === "projects")
+    return [{ x: -2.5, z: -8, halfWidth: 8.3, halfDepth: 1.4 }];
+  if (roomId === "research")
+    return [{ x: -3.4, z: -4, halfWidth: 3.8, halfDepth: 3.8 }];
+  if (roomId === "my-collection")
+    return [{ x: 0, z: -2, halfWidth: 4.8, halfDepth: 2 }];
+  if (
+    [
+      "archive",
+      "unfinished",
+      "imagined-worlds",
+      "cosmic",
+      "glass-life",
+      "portraits",
+    ].includes(roomId) ||
+    roomId.includes("-page-") ||
+    roomId.startsWith("wallpapers")
+  )
+    return [];
   if (plan.type === "listening")
     return [
       { x: 6.2, z: 4.6, halfWidth: 2.3, halfDepth: 0.85 },

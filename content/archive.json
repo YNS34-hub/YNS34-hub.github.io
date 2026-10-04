@@ -10,7 +10,12 @@
     "featured": true,
     "roomType": "archive",
     "roomRule": "memory",
-    "tags": ["Local-first", "AI assistant", "Human takeover", "WIP"],
+    "tags": [
+      "Local-first",
+      "AI assistant",
+      "Human takeover",
+      "WIP"
+    ],
     "status": "Private prototype · work in progress"
   },
   {
@@ -30,7 +35,11 @@
     "date": "2026-07-27",
     "featured": false,
     "roomType": "archive",
-    "tags": ["Fork", "External reference", "Communication"],
+    "tags": [
+      "Fork",
+      "External reference",
+      "Communication"
+    ],
     "status": "External fork · upstream authorship"
   },
   {
@@ -50,7 +59,11 @@
     "date": "2026-05-02",
     "featured": false,
     "roomType": "archive",
-    "tags": ["Fork", "External reference", "Design systems"],
+    "tags": [
+      "Fork",
+      "External reference",
+      "Design systems"
+    ],
     "status": "External fork · upstream authorship"
   },
   {
@@ -70,7 +83,11 @@
     "date": "2026-04-25",
     "featured": false,
     "roomType": "archive",
-    "tags": ["Fork", "External reference", "Image prompts"],
+    "tags": [
+      "Fork",
+      "External reference",
+      "Image prompts"
+    ],
     "status": "External fork · upstream authorship"
   }
 ]

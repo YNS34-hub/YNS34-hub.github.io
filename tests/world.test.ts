@@ -66,9 +66,9 @@ describe("accessible movement around architecture", () => {
     expect(roomBounds("anomaly-floating")).toEqual([-1.3, 1.3, -15.6, 15.6]);
   });
   it("keeps the eye out of furniture and preserves a usable door opening", () => {
-    const fromBench = new Vector3(6.2, 3, 4.6);
+    const fromBench = new Vector3(0, 3, -3);
     keepClear(fromBench, "music");
-    expect(Math.abs(fromBench.z - 4.6)).toBeCloseTo(0.85, 6);
+    expect(Math.hypot(fromBench.x, fromBench.z+3)).toBeCloseTo(5.7, 6);
     expect(fromBench.y).toBe(1.65);
     const opening = new Vector3(0, 1.65, 11);
     keepClear(opening, "anomaly-impossible");

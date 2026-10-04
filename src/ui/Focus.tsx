@@ -75,10 +75,10 @@ export default function Focus() {
           )}
           <div className="focus-actions">
             {item.github && (
-              <ExternalLink href={item.github}>GitHub</ExternalLink>
+              <ExternalLink href={item.github}>SOURCE</ExternalLink>
             )}
             {item.demo && (
-              <ExternalLink href={item.demo}>Live experience</ExternalLink>
+              <ExternalLink href={item.demo}>ENTER PROJECT</ExternalLink>
             )}
             {item.links?.map((link) => (
               <ExternalLink key={link.url} href={link.url}>

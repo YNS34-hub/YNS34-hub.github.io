@@ -64,7 +64,7 @@ export function resolvePalaceRoute(pathname: string, search = "") {
   }
   const index = new URLSearchParams(search).get("view") === "index";
   const procedural =
-    /^(?:(?:projects|research|experiments|archive|wallpapers)-page-\d{1,6}|anomaly-(?:mirror|gravity|floating|compressing|impossible|loop))$/.test(
+    /^(?:(?:projects|research|experiments|archive|wallpapers|imagined-worlds|cosmic|glass-life|portraits)-page-\d{1,6}|anomaly-(?:mirror|gravity|floating|compressing|impossible|loop))$/.test(
       path[0] || "",
     );
   const exhibit = allContent.some((item) => `exhibit-${item.id}` === path[0]);

@@ -10,14 +10,26 @@ import {
   Color,
   PCFSoftShadowMap,
   PMREMGenerator,
+  DirectionalLight,
+  HemisphereLight,
 } from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { usePalaceStore } from "../systems/store";
 import Atrium from "../rooms/Atrium";
 import GalleryRoom from "../rooms/Galleries";
 import Corridor from "../rooms/Corridor";
-import ListeningRoom from "../rooms/ListeningRoom";
-import { WallpaperCinema, WallpaperGallery } from "../rooms/Wallpapers";
+import { WallpaperCinema } from "../rooms/Wallpapers";
+import {
+  PersonalProjects,
+  PersonalResearch,
+  PersonalMusic,
+  PersonalWallpaper,
+  ImaginedWorlds,
+  PersonalArchive,
+  MyCollection,
+} from "../rooms/PersonalRooms";
+import { useLibraryStore } from "../systems/library";
+import { nearestImageAtmosphere } from "./imageAtmosphere";
 import Player from "./Player";
 import { setWalkTarget } from "./walkTarget";
 import { resolveRoomPlan } from "./roomPlan";
@@ -34,6 +46,43 @@ function Environment({
   const tier = usePalaceStore((s) => s.effectiveQuality);
   const plan = resolveRoomPlan(roomId);
   const lighting = roomLighting(plan, roomId);
+  const background = useRef(new Color(lighting.background));
+  const key = useRef<DirectionalLight>(null);
+  const sky = useRef<HemisphereLight>(null);
+  const targetColor = useRef(new Color());
+  const targetKey = useRef(new Color());
+  const targetSky = useRef(new Color());
+  const targetGround = useRef(new Color());
+  useFrame(({ camera }, dt) => {
+    const blend = 1 - Math.exp(-Math.min(dt, 1) / 0.8);
+    const imageTint = nearestImageAtmosphere(camera.position);
+    targetColor.current.set(lighting.background);
+    targetKey.current.set(lighting.key);
+    targetSky.current.set(lighting.sky);
+    targetGround.current.set(lighting.ground);
+    if (imageTint) {
+      targetColor.current.lerp(imageTint, 0.18);
+      targetKey.current.lerp(imageTint, 0.3);
+      targetSky.current.lerp(imageTint, 0.35);
+    }
+    background.current.lerp(targetColor.current, blend);
+    if (scene.fog) scene.fog.color.copy(background.current);
+    scene.environmentIntensity +=
+      (lighting.environment - scene.environmentIntensity) * blend;
+    if (key.current) {
+      key.current.color.lerp(targetKey.current, blend);
+      key.current.intensity +=
+        (lighting.keyIntensity * (imageTint ? 0.78 : 1) -
+          key.current.intensity) *
+        blend;
+    }
+    if (sky.current) {
+      sky.current.color.lerp(targetSky.current, blend);
+      sky.current.groundColor.lerp(targetGround.current, blend);
+      sky.current.intensity +=
+        (lighting.hemisphere - sky.current.intensity) * blend;
+    }
+  });
   const ready = useRef(onReady);
   useEffect(() => {
     ready.current = onReady;
@@ -57,13 +106,10 @@ function Environment({
       gl.domElement.removeEventListener("webglcontextlost", lost);
     };
   }, [gl, scene]);
-  useEffect(() => {
-    scene.environmentIntensity = lighting.environment;
-  }, [scene, lighting.environment]);
   const color = lighting.background;
   return (
     <>
-      <color attach="background" args={[color]} />
+      <primitive attach="background" object={background.current} />
       <fog
         attach="fog"
         args={[
@@ -72,13 +118,12 @@ function Environment({
           roomId === "corridor" ? 135 : lighting.dark ? 95 : 160,
         ]}
       />
-      <hemisphereLight
-        args={[lighting.sky, lighting.ground, lighting.hemisphere]}
-      />
+      <hemisphereLight ref={sky} args={["#b5cfde", "#22364a", 0.5]} />
       <directionalLight
+        ref={key}
         position={[12, 24, 4]}
-        color={lighting.key}
-        intensity={lighting.keyIntensity}
+        color="#d4e4f0"
+        intensity={1}
         castShadow={plan.type !== "listening"}
         shadow-mapSize={tier === "high" ? [2048, 2048] : [1024, 1024]}
         shadow-camera-left={-26}
@@ -146,6 +191,7 @@ function Scene({
 }) {
   const { camera, gl, scene } = useThree();
   const plan = resolveRoomPlan(roomId);
+  const baseRoom = roomId.split("-page-")[0];
   useEffect(() => {
     gl.transmissionResolutionScale =
       tier === "high" ? 0.8 : tier === "medium" ? 0.6 : 0.35;
@@ -186,12 +232,24 @@ function Scene({
           <Atrium />
         ) : roomId === "corridor" ? (
           <Corridor />
+        ) : baseRoom === "projects" ? (
+          <PersonalProjects />
+        ) : baseRoom === "research" ? (
+          <PersonalResearch />
+        ) : ["imagined-worlds", "cosmic", "glass-life", "portraits"].includes(
+            baseRoom,
+          ) ? (
+          <ImaginedWorlds roomId={roomId} />
+        ) : roomId === "archive" || roomId === "unfinished" ? (
+          <PersonalArchive unfinished={roomId === "unfinished"} />
+        ) : roomId === "my-collection" ? (
+          <MyCollection />
         ) : plan.type === "listening" ? (
-          <ListeningRoom />
+          <PersonalMusic />
         ) : roomId === "cinema" ? (
           <WallpaperCinema />
         ) : plan.type === "image-gallery" || roomId.startsWith("wallpapers") ? (
-          <WallpaperGallery roomId={roomId} />
+          <PersonalWallpaper />
         ) : (
           <GalleryRoom roomId={roomId} />
         )}
@@ -201,6 +259,9 @@ function Scene({
 }
 
 export default function World({ onReady }: { onReady?: () => void }) {
+  useEffect(() => {
+    void useLibraryStore.getState().initialize();
+  }, []);
   const roomId = usePalaceStore((s) => s.roomId);
   const quality = usePalaceStore((s) => s.quality);
   const effective = usePalaceStore((s) => s.effectiveQuality);

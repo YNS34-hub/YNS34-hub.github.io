@@ -1,5 +1,24 @@
 [
   {
+    "id": "reviewer-first-audit",
+    "title": "Reviewer-First Audit",
+    "subtitle": "Questions before conclusions.",
+    "description": "A private mathematical manuscript revision prototype built around explicit evidence, dependency tracking, semantic preservation and human sign-off. My role includes problem definition, workflow design, system architecture, AI-agent-assisted implementation and acceptance criteria. Validation is pending. The interactive five-step review lens is a conceptual workflow; it has no live model connection and makes no automatic mathematical conclusions. The displayed interface is produced by the actual offline dashboard renderer using explicitly synthetic metadata. No manuscript, private review, or real case is included.",
+    "category": "research",
+    "cover": "/media/projects/reviewer-first-audit.jpg",
+    "year": "2026",
+    "featured": true,
+    "roomType": "black-box",
+    "tags": [
+      "Python",
+      "Offline HTML",
+      "Evidence integrity",
+      "Human validation"
+    ],
+    "status": "PROTOTYPE / private / synthetic demonstration",
+    "coverCaption": "ACTUAL READ-ONLY INTERFACE / SYNTHETIC DEMONSTRATION DATA"
+  },
+  {
     "id": "nonlinear-elliptic-problems",
     "title": "Nonlinear Elliptic Problems",
     "subtitle": "Existence, growth and comparison.",
@@ -32,7 +51,12 @@
     "featured": true,
     "roomType": "installation",
     "roomRule": "floating",
-    "tags": ["Rearrangement", "Symmetrization", "Level sets", "Comparison"],
+    "tags": [
+      "Rearrangement",
+      "Symmetrization",
+      "Level sets",
+      "Comparison"
+    ],
     "status": "Mathematical method · visual study"
   },
   {
@@ -47,7 +71,11 @@
     "year": "Ongoing",
     "featured": false,
     "roomType": "white-cube",
-    "tags": ["Orlicz spaces", "Convex growth", "Nonlinear analysis"],
+    "tags": [
+      "Orlicz spaces",
+      "Convex growth",
+      "Nonlinear analysis"
+    ],
     "status": "Mathematical method · study notes"
   }
 ]

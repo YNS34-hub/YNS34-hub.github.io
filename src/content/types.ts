@@ -55,6 +55,9 @@ export interface MusicTrack {
   duration?: number;
 }
 export interface WallpaperItem {
+  favorite?: boolean;
+  width?: number;
+  height?: number;
   id: string;
   title: string;
   src: string;

@@ -13,31 +13,31 @@
     "title": "PROJECT GALLERY",
     "subtitle": "Ideas made tangible.",
     "type": "white-cube",
-    "color": "#e4e7e3"
+    "color": "#25374d"
   },
   {
     "id": "research",
     "number": "03",
-    "title": "RESEARCH HALL",
+    "title": "RESEARCH VAULT",
     "subtitle": "Mathematics as an exhibit.",
     "type": "white-cube",
-    "color": "#d8e5ed"
+    "color": "#162b3b"
   },
   {
     "id": "music",
     "number": "04",
-    "title": "LISTENING ROOM",
+    "title": "PERSONAL LISTENING ROOM",
     "subtitle": "A room that belongs to a song.",
     "type": "listening",
-    "color": "#493d32"
+    "color": "#10203f"
   },
   {
     "id": "wallpapers",
     "number": "05",
-    "title": "WALLPAPER ARCHIVE",
+    "title": "THE WALLPAPER VAULT",
     "subtitle": "Images held in space.",
     "type": "image-gallery",
-    "color": "#e8e5df"
+    "color": "#1c2b36"
   },
   {
     "id": "experiments",
@@ -50,10 +50,50 @@
   {
     "id": "archive",
     "number": "07",
-    "title": "UNFINISHED FUTURES",
-    "subtitle": "Some ideas are waiting for their time.",
+    "title": "THE ARCHIVE",
+    "subtitle": "Experiments, prototypes and references.",
     "type": "archive",
-    "color": "#c8cac8"
+    "color": "#35453c"
+  },
+  {
+    "id": "imagined-worlds",
+    "title": "AI VISUAL ARCHIVE",
+    "subtitle": "Imagined worlds I have kept.",
+    "type": "image-gallery",
+    "color": "#0b1530",
+    "number": "10"
+  },
+  {
+    "id": "glass-life",
+    "title": "GLASS LIFE ROOM",
+    "subtitle": "Transparency, organisms and light.",
+    "type": "image-gallery",
+    "color": "#25566e",
+    "number": "11"
+  },
+  {
+    "id": "portraits",
+    "title": "HUMAN / PORTRAIT ROOM",
+    "subtitle": "A warmer kind of presence.",
+    "type": "image-gallery",
+    "color": "#32252b",
+    "number": "12"
+  },
+  {
+    "id": "unfinished",
+    "title": "UNFINISHED WING",
+    "subtitle": "Things that are still becoming.",
+    "type": "archive",
+    "color": "#172333",
+    "number": "13"
+  },
+  {
+    "id": "my-collection",
+    "title": "MY COLLECTION",
+    "subtitle": "My desktop, memory and collection in space.",
+    "type": "installation",
+    "color": "#254456",
+    "number": "14"
   },
   {
     "id": "corridor",
@@ -141,5 +181,13 @@
     "rule": "memory",
     "color": "#d2e5ee",
     "hidden": true
+  },
+  {
+    "id": "cosmic",
+    "number": "10C",
+    "title": "COSMIC ROOM",
+    "subtitle": "A place for saved cosmic visual studies.",
+    "type": "image-gallery",
+    "color": "#070c21"
   }
 ]

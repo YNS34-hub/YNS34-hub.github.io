@@ -302,7 +302,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
           disabled={importing}
         >
           <Upload size={14} />
-          {importing ? "READING COLLECTION…" : "IMPORT MUSIC"}
+          {importing ? "READING COLLECTION…" : "IMPORT MUSIC / RECONNECT LIBRARY"}
         </button>
         <button
           type="button"

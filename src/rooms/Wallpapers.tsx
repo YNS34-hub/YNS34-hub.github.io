@@ -145,7 +145,7 @@ export function WallpaperCinema() {
     if (projection.current) {
       projection.current.scale.setScalar(0.28 + reveal * 0.72);
       projection.current.position.x = camera.position.x * -0.14;
-      projection.current.position.y = camera.position.y * -0.06;
+      projection.current.position.y = 0;
     }
     if (light.current) {
       light.current.color.lerp(tint, Math.min(delta * 0.5, 1));
@@ -159,9 +159,9 @@ export function WallpaperCinema() {
       <group ref={projection}>
         <Picture
           src={image?.displaySrc || image?.src}
-          width={49}
-          height={32}
-          position={[0, 7, -18]}
+          width={53}
+          height={33}
+          position={[0, 18, -18]}
         />
         <group position={[0, -0.065, -17.8]} scale={[1, -0.63, 1]}>
           <mesh position={[0, -4, 0.01]}>

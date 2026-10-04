@@ -106,11 +106,16 @@ afterEach(() => {
 describe("audio platform integration", () => {
   it("requires explicit Play, crossfades two native sources, and pauses both during a transition", async () => {
     const { useLibraryStore } = await import("../src/systems/library");
-    const { initializeAudio, useAudioStore } = await import(
-      "../src/audio/player"
-    );
+    const { initializeAudio, useAudioStore } =
+      await import("../src/audio/player");
     initializeAudio();
     await useLibraryStore.getState().initialize();
+    // Audio runtime uses a test-only source; the real listening shelf contains no recordings.
+    useLibraryStore.setState((state) => ({
+      music: state.music.map((track, index) =>
+        index === 0 ? { ...track, src: "/test-only.wav" } : track,
+      ),
+    }));
     expect(useAudioStore.getState().playing).toBe(false);
     expect(MockAudio.instances).toHaveLength(0);
     const first = useLibraryStore.getState().music[0];
@@ -152,11 +157,16 @@ describe("audio platform integration", () => {
 
   it("stops a deleted active local track before its blob source can be revoked", async () => {
     const { useLibraryStore } = await import("../src/systems/library");
-    const { initializeAudio, useAudioStore } = await import(
-      "../src/audio/player"
-    );
+    const { initializeAudio, useAudioStore } =
+      await import("../src/audio/player");
     initializeAudio();
     await useLibraryStore.getState().initialize();
+    // Audio runtime uses a test-only source; the real listening shelf contains no recordings.
+    useLibraryStore.setState((state) => ({
+      music: state.music.map((track, index) =>
+        index === 0 ? { ...track, src: "/test-only.wav" } : track,
+      ),
+    }));
     const snapshot = useLibraryStore.getState().music;
     const localTrack = {
       ...snapshot[0],
@@ -182,7 +192,7 @@ describe("audio platform integration", () => {
     localStorage.setItem(
       "memory-palace:player",
       JSON.stringify({
-        currentId: "palace-study-01",
+        currentId: "liangbo-0",
         progress: 12,
         repeat: "all",
         crossfade: 0,
@@ -190,11 +200,16 @@ describe("audio platform integration", () => {
     );
     const { useLibraryStore } = await import("../src/systems/library");
     const { usePalaceStore } = await import("../src/systems/store");
-    const { initializeAudio, useAudioStore } = await import(
-      "../src/audio/player"
-    );
+    const { initializeAudio, useAudioStore } =
+      await import("../src/audio/player");
     initializeAudio();
     await useLibraryStore.getState().initialize();
+    // Audio runtime uses a test-only source; the real listening shelf contains no recordings.
+    useLibraryStore.setState((state) => ({
+      music: state.music.map((track, index) =>
+        index === 0 ? { ...track, src: "/test-only.wav" } : track,
+      ),
+    }));
     expect(useAudioStore.getState().playing).toBe(false);
     await useAudioStore.getState().play();
     const active = MockAudio.instances.find((element) => !element.paused)!;

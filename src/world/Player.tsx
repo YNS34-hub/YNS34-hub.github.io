@@ -33,6 +33,9 @@ export default function Player({ roomId }: { roomId: string }) {
     } else if (roomId === "corridor") {
       camera.position.set(0, EYE, 14);
       camera.lookAt(0, 2.3, -40);
+    } else if (roomId === "cinema") {
+      camera.position.set(0, 18, 13.8);
+      camera.lookAt(0, 18, -18);
     } else {
       const plan = resolveRoomPlan(roomId);
       camera.position.set(
@@ -146,6 +149,8 @@ export default function Player({ roomId }: { roomId: string }) {
   useFrame(({ clock }, rawDelta) => {
     const delta = Math.min(rawDelta, 0.06);
     const state = usePalaceStore.getState();
+    // Cinema has a fixed, level viewing position; movement resumes on exit.
+    if (roomId === "cinema") return;
     if (clock.elapsedTime - proximityAt.current > 0.25) {
       proximityAt.current = clock.elapsedTime;
       let closest = Infinity,

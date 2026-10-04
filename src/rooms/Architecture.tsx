@@ -9,6 +9,7 @@ export function RoomShell({
   depth = 34,
   height = 9,
   open = false,
+  palette,
 }: {
   dark?: boolean;
   warm?: boolean;
@@ -16,10 +17,23 @@ export function RoomShell({
   depth?: number;
   height?: number;
   open?: boolean;
+  palette?: string;
 }) {
-  const concrete = dark ? museum.charcoal : warm ? "#d8d3c7" : museum.wall;
-  const ceiling = dark ? "#1d211f" : museum.ceiling;
-  const floor = dark ? "#454e4d" : warm ? "#b7b2a8" : museum.floor;
+  const colors: Record<string, [string, string, string]> = {
+    projects: ["#34435b", "#172740", "#253246"],
+    research: ["#202c39", "#131d2a", "#182a35"],
+    music: ["#10203f", "#090f24", "#101b30"],
+    wallpapers: ["#202c35", "#121b25", "#1c2730"],
+    archive: ["#3a4944", "#222b29", "#303b37"],
+    unfinished: ["#1b222b", "#10171f", "#222a32"],
+    collection: ["#253e4d", "#142835", "#20313b"],
+  };
+  const selected = palette ? colors[palette] : undefined;
+  const concrete =
+    selected?.[0] || (dark ? museum.charcoal : warm ? "#d8d3c7" : museum.wall);
+  const ceiling = selected?.[1] || (dark ? "#1d211f" : museum.ceiling);
+  const floor =
+    selected?.[2] || (dark ? "#454e4d" : warm ? "#b7b2a8" : museum.floor);
   return (
     <group>
       {!open && <Floor width={width} depth={depth} color={floor} />}

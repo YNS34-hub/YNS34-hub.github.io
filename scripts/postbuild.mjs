@@ -51,7 +51,13 @@ await writeFile(path.join(dist, "404.html"), home);
 await writeFile(path.join(dist, ".nojekyll"), "");
 const routeList = ["/"];
 let generatedRoutes = 1;
-const renderRoute = async (route, title, description, item, indexable = true) => {
+const renderRoute = async (
+  route,
+  title,
+  description,
+  item,
+  indexable = true,
+) => {
   const url = `${origin}/${route}/`;
   let html = home
     .replace(
@@ -111,7 +117,37 @@ const renderRoute = async (route, title, description, item, indexable = true) =>
 };
 for (const room of rooms.filter((room) => room.id !== "atrium")) {
   // Hidden rooms remain directly shareable without appearing in the public index.
-  await renderRoute(room.id, room.title, room.subtitle, undefined, !room.hidden);
+  await renderRoute(
+    room.id,
+    room.title,
+    room.subtitle,
+    undefined,
+    !room.hidden,
+  );
+}
+const personal = JSON.parse(
+  await readFile(path.join(dist, "personal-media/manifest.json"), "utf8"),
+);
+for (const [base, count] of [
+  ["wallpapers", personal.wallpapers.length],
+  ["imagined-worlds", personal.visuals.length],
+  ["glass-life", personal.visuals.filter((x) => x.category === "glass").length],
+  [
+    "portraits",
+    personal.visuals.filter((x) => x.category === "portrait").length,
+  ],
+  ["cosmic", personal.visuals.filter((x) => x.category === "cosmic").length],
+  ["projects", Math.max(0, personal.projects.length - 2) + 5],
+  ["research", Math.max(0, personal.research.length - 2) + 5],
+]) {
+  for (let page = 2; page <= Math.ceil(count / 5); page++)
+    await renderRoute(
+      `${base}-page-${page}`,
+      rooms.find((x) => x.id === base)?.title || "PERSONAL STUDIES",
+      "A growing personal collection.",
+      undefined,
+      false,
+    );
 }
 for (const [items, section] of [
   [projects, "projects"],
