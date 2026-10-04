@@ -38,7 +38,8 @@ if (process.env.PALACE_VERIFY_DIST === "1") {
     "build must generate independent room and exhibit pages",
   );
   const assets = new Set();
-  for (const route of routes) {
+  const hiddenRoutes = rooms.filter((room) => room.hidden).map((room) => `/${room.id}/`);
+  for (const route of [...routes, ...hiddenRoutes]) {
     const html = await readFile(path.join(dist, route, "index.html"), "utf8");
     assert.match(html, /id="static-collection"/);
     assert.match(html, /<meta property="og:title"/);

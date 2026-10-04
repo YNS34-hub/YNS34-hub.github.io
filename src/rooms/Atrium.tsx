@@ -2,7 +2,6 @@ import { Suspense, useEffect, useMemo, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
-  AdditiveBlending,
   BufferGeometry,
   CanvasTexture,
   Color,
@@ -27,7 +26,7 @@ function GlassGeometry() {
       : new BufferGeometry();
     result.computeBoundingSphere();
     result.center();
-    const scale = 2.35 / (result.boundingSphere?.radius || 1);
+    const scale = 2.6 / (result.boundingSphere?.radius || 1);
     result.scale(scale, scale, scale);
     result.computeVertexNormals();
     return result;
@@ -45,19 +44,17 @@ function GlassGeometry() {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color="#effcff"
+        color="#e2f4ff"
         metalness={0}
-        roughness={0.025}
+        roughness={0.035}
         transmission={1}
-        thickness={2.3}
-        ior={1.46}
-        attenuationColor="#93d3f5"
-        attenuationDistance={8}
-        clearcoat={0.3}
+        thickness={3.4}
+        ior={1.49}
+        attenuationColor="#84c9f2"
+        attenuationDistance={6.5}
+        clearcoat={0.16}
         clearcoatRoughness={0.035}
-        envMapIntensity={1}
-        transparent
-        depthWrite={false}
+        envMapIntensity={1.65}
       />
     </mesh>
   );
@@ -86,17 +83,15 @@ function LightGlassGeometry() {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color="#effcff"
-        roughness={0.025}
+        color="#e2f4ff"
+        roughness={0.035}
         transmission={1}
-        thickness={2.3}
-        ior={1.46}
-        attenuationColor="#93d3f5"
-        attenuationDistance={8}
-        clearcoat={0.3}
-        envMapIntensity={1}
-        transparent
-        depthWrite={false}
+        thickness={3.4}
+        ior={1.49}
+        attenuationColor="#84c9f2"
+        attenuationDistance={6.5}
+        clearcoat={0.16}
+        envMapIntensity={1.65}
       />
     </mesh>
   );
@@ -124,17 +119,6 @@ function Core() {
     return texture;
   }, []);
   useEffect(() => () => shadow.dispose(), [shadow]);
-  const particles = useMemo(() => {
-    const count = quality === "low" ? 20 : quality === "medium" ? 38 : 60;
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const t = (i / count) * Math.PI * 2;
-      positions[i * 3] = Math.cos(t) * (3.6 + Math.sin(i * 12.4) * 0.5);
-      positions[i * 3 + 1] = Math.sin(t * 2) * 1.3;
-      positions[i * 3 + 2] = Math.sin(t) * (3.6 + Math.sin(i * 12.4) * 0.5);
-    }
-    return positions;
-  }, [quality]);
   useFrame(({ camera, clock }, delta) => {
     if (sculpture.current && !reducedMotion) {
       sculpture.current.position.y =
@@ -143,7 +127,7 @@ function Core() {
     }
     if (light.current)
       light.current.intensity =
-        8 + (reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.4) * 1.5);
+        4.5 + (reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.4) * 0.5);
     camera.getWorldDirection(direction);
     towardsCore.set(0, 3.3, 0).sub(camera.position).normalize();
     const near =
@@ -161,7 +145,7 @@ function Core() {
       <mesh position={[0, 0.125, 0]} receiveShadow>
         <cylinderGeometry args={[3.36, 3.4, 0.24, 80]} />
         <meshStandardMaterial
-          color="#e3e7e3"
+          color="#d1d5ce"
           roughness={0.27}
           metalness={0.1}
         />
@@ -178,46 +162,12 @@ function Core() {
             <GlassGeometry />
           </Suspense>
         )}
-        <mesh rotation={[0.55, -0.2, 0.37]} renderOrder={3}>
-          <torusGeometry args={[1.24, 0.028, 8, 90]} />
-          <meshBasicMaterial
-            color="#74b9d5"
-            transparent
-            opacity={0.34}
-            depthWrite={false}
-          />
-        </mesh>
-        <mesh rotation={[1.24, 0.35, -0.45]} renderOrder={3}>
-          <torusGeometry args={[0.82, 0.014, 6, 70]} />
-          <meshBasicMaterial
-            color="#72c3e4"
-            transparent
-            opacity={0.42}
-            depthWrite={false}
-          />
-        </mesh>
-        <points>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              args={[particles, 3]}
-            />
-          </bufferGeometry>
-          <pointsMaterial
-            color="#a5cee7"
-            size={0.034}
-            transparent
-            opacity={0.52}
-            depthWrite={false}
-            blending={AdditiveBlending}
-          />
-        </points>
       </group>
       <pointLight
         ref={light}
         position={[0, 3.2, 0]}
         color="#b9e4ff"
-        intensity={8}
+        intensity={4.5}
         distance={10}
         decay={2}
       />
@@ -235,7 +185,7 @@ function Core() {
 function CorridorThreshold() {
   const panel = useRef<Group>(null);
   const reducedMotion = usePalaceStore((s) => s.reducedMotion);
-  const color = useMemo(() => new Color("#e8eeeb"), []);
+  const color = useMemo(() => new Color("#dedfd8"), []);
   useFrame(({ camera }, delta) => {
     if (!panel.current || reducedMotion) return;
     const reveal = Math.max(0, Math.min(1, (-camera.position.z - 7) / 10));
@@ -253,10 +203,10 @@ function CorridorThreshold() {
         <Block
           position={[6.4, 6.5, 0]}
           scale={[5.6, 13, 1.1]}
-          color="#e8eeeb"
+          color="#dedfd8"
         />
       </group>
-      <Block position={[0, 11.1, 0]} scale={[7.2, 3.8, 1.1]} color="#e8eeeb" />
+      <Block position={[0, 11.1, 0]} scale={[7.2, 3.8, 1.1]} color="#dedfd8" />
       <Block
         position={[0, 4.7, -0.6]}
         scale={[7.1, 9.4, 0.05]}
@@ -308,20 +258,20 @@ function CorridorThreshold() {
 export default function Atrium() {
   return (
     <group>
-      <Floor width={44} depth={54} color="#d9dedb" />
-      <Block position={[0, -0.23, 0]} scale={[48, 0.4, 58]} color="#d9dedb" />
+      <Floor width={44} depth={54} color="#c4c7c1" />
+      <Block position={[0, -0.23, 0]} scale={[48, 0.4, 58]} color="#c4c7c1" />
       {/* Deep structural volumes leave lit recesses, rather than a single cube. */}
       {[-1, 1].map((side) => (
         <group key={side}>
           <Block
             position={[side * 22, 6.5, 0]}
             scale={[1.1, 13, 54]}
-            color="#e5e8e4"
+            color="#e5e0d6"
           />
           <Block
             position={[side * 18.3, 12.65, 0]}
             scale={[6.5, 0.7, 54]}
-            color="#e4e7e3"
+            color="#cbcfc9"
             castShadow
           />
           <Block
@@ -340,7 +290,7 @@ export default function Atrium() {
               <Block
                 position={[side * 20.9, 6.35, z]}
                 scale={[1.2, 12.7, 0.42]}
-                color="#e0e5df"
+                color="#dedbd3"
                 castShadow
               />
             </group>
@@ -348,7 +298,7 @@ export default function Atrium() {
           <Block
             position={[side * 11.5, 10.9, -11]}
             scale={[0.5, 3.5, 26]}
-            color="#e5e9e3"
+            color="#d5d6cf"
           />
         </group>
       ))}
@@ -358,7 +308,7 @@ export default function Atrium() {
           <Block
             position={[0, 13.03, z]}
             scale={[31, 0.45, 4.4]}
-            color="#edf0e9"
+            color="#cfd2cc"
             castShadow
           />
           <Block
@@ -379,12 +329,12 @@ export default function Atrium() {
       <Block
         position={[-16, 6.5, -26.1]}
         scale={[10, 13, 0.8]}
-        color="#e7eae5"
+        color="#e6e1d8"
       />
       <Block
         position={[16, 6.5, -26.1]}
         scale={[10, 13, 0.8]}
-        color="#e7eae5"
+        color="#e6e1d8"
       />
       <Core />
       <CorridorThreshold />
@@ -450,20 +400,20 @@ export default function Atrium() {
         maxWidth={7}
         color="#59706b"
       />
-      {[-18, -12, -6, 0, 6, 12, 18].map((x) => (
+      {[-18, -9, 0, 9, 18].map((x) => (
         <Block
           key={x}
           position={[x, 0.012, 0]}
-          scale={[0.012, 0.015, 53]}
-          color="#bcc7c1"
+          scale={[0.007, 0.005, 53]}
+          color="#b7bfb8"
         />
       ))}
-      {[-21, -14, -7, 0, 7, 14, 21].map((z) => (
+      {[-18, -9, 0, 9, 18].map((z) => (
         <Block
           key={z}
           position={[0, 0.013, z]}
-          scale={[43, 0.015, 0.012]}
-          color="#bcc7c1"
+          scale={[43, 0.005, 0.007]}
+          color="#b7bfb8"
         />
       ))}
       <spotLight

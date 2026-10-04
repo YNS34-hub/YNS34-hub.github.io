@@ -21,6 +21,7 @@ import { WallpaperCinema, WallpaperGallery } from "../rooms/Wallpapers";
 import Player from "./Player";
 import { setWalkTarget } from "./walkTarget";
 import { resolveRoomPlan } from "./roomPlan";
+import { roomLighting } from "./artDirection";
 
 function Environment({
   roomId,
@@ -30,6 +31,9 @@ function Environment({
   onReady?: () => void;
 }) {
   const { gl, scene } = useThree();
+  const tier = usePalaceStore((s) => s.effectiveQuality);
+  const plan = resolveRoomPlan(roomId);
+  const lighting = roomLighting(plan, roomId);
   const ready = useRef(onReady);
   useEffect(() => {
     ready.current = onReady;
@@ -39,7 +43,6 @@ function Environment({
     const environment = new RoomEnvironment();
     const target = generator.fromScene(environment, 0.035);
     scene.environment = target.texture;
-    scene.environmentIntensity = 0.45;
     environment.dispose();
     generator.dispose();
     ready.current?.();
@@ -54,13 +57,10 @@ function Environment({
       gl.domElement.removeEventListener("webglcontextlost", lost);
     };
   }, [gl, scene]);
-  const plan = resolveRoomPlan(roomId);
-  const dark = plan.dark;
-  const color = dark
-    ? plan.type === "listening"
-      ? "#162024"
-      : "#10202a"
-    : "#dce6e4";
+  useEffect(() => {
+    scene.environmentIntensity = lighting.environment;
+  }, [scene, lighting.environment]);
+  const color = lighting.background;
   return (
     <>
       <color attach="background" args={[color]} />
@@ -69,22 +69,18 @@ function Environment({
         args={[
           color,
           roomId === "corridor" ? 32 : 38,
-          roomId === "corridor" ? 97 : dark ? 85 : 145,
+          roomId === "corridor" ? 135 : lighting.dark ? 95 : 160,
         ]}
       />
       <hemisphereLight
-        args={[
-          dark ? "#aac6d2" : "#effaff",
-          dark ? "#141817" : "#bfc4b6",
-          dark ? 0.3 : 0.72,
-        ]}
+        args={[lighting.sky, lighting.ground, lighting.hemisphere]}
       />
       <directionalLight
-        position={[14, 23, 13]}
-        color={dark ? "#dbe6dd" : "#fff6df"}
-        intensity={dark ? 0.38 : 2.2}
-        castShadow={!dark}
-        shadow-mapSize={[1024, 1024]}
+        position={[12, 24, 4]}
+        color={lighting.key}
+        intensity={lighting.keyIntensity}
+        castShadow={plan.type !== "listening"}
+        shadow-mapSize={tier === "high" ? [2048, 2048] : [1024, 1024]}
         shadow-camera-left={-26}
         shadow-camera-right={26}
         shadow-camera-top={27}
@@ -93,8 +89,9 @@ function Environment({
         shadow-camera-far={75}
         shadow-bias={-0.00035}
         shadow-normalBias={0.055}
+        shadow-radius={3}
       />
-      <ambientLight intensity={dark ? 0.07 : 0.07} />
+      <ambientLight intensity={0.025} />
     </>
   );
 }

@@ -54,6 +54,7 @@ export function resolveRoomPlan(id: string): RoomPlan {
       rule === "floating" ||
       rule === "memory" ||
       id.startsWith("experiments") ||
+      id.startsWith("archive") ||
       id === "cinema",
   };
 }

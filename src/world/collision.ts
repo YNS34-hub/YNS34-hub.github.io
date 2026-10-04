@@ -22,21 +22,15 @@ export function roomFootprints(roomId: string): Footprint[] {
   if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
   if (plan.type === "listening")
     return [
-      { x: 0, z: 2.4, radius: 1.55 },
-      { x: 0, z: -5.6, halfWidth: 2.05, halfDepth: 1.05 },
-      ...[-5.4, 5.4].map((x) => ({
+      { x: 6.2, z: 4.6, halfWidth: 2.3, halfDepth: 0.85 },
+      { x: 0, z: -3.8, halfWidth: 3.05, halfDepth: 1.6 },
+      ...[-6.8, 6.8].map((x) => ({
         x,
-        z: 2.8,
-        halfWidth: 2.28,
-        halfDepth: 1.32,
+        z: -10.6,
+        halfWidth: 1.15,
+        halfDepth: 1.0,
       })),
-      ...[-5.2, 5.2].map((x) => ({
-        x,
-        z: -9.6,
-        halfWidth: 0.83,
-        halfDepth: 0.73,
-      })),
-      { x: -10.2, z: -5, halfWidth: 0.9, halfDepth: 4.05 },
+      { x: -12.25, z: -3.5, halfWidth: 0.6, halfDepth: 3.5 },
     ];
   if (plan.rule === "impossible")
     return [
@@ -68,7 +62,15 @@ export function roomFootprints(roomId: string): Footprint[] {
     plan.type === "installation"
   ) {
     const footprints: Footprint[] = [
-      { x: 0, z: -3, radius: roomId.startsWith("experiments") ? 3.55 : 3.3 },
+      ...(roomId.startsWith("projects")
+        ? [{ x: 0, z: -4.8, halfWidth: 4.9, halfDepth: 1.2 }]
+        : [
+            {
+              x: 0,
+              z: -3,
+              radius: roomId.startsWith("experiments") ? 3.55 : 3.3,
+            },
+          ]),
     ];
     if (roomId.startsWith("research"))
       footprints.push(
@@ -119,6 +121,11 @@ export function keepClear(
   const [minX, maxX, minZ, maxZ] = roomBounds(roomId);
   position.x = MathUtils.clamp(position.x, minX, maxX);
   position.z = MathUtils.clamp(position.z, minZ, maxZ);
+  if (resolveRoomPlan(roomId).rule === "compressing") {
+    const progress = MathUtils.clamp((10 - position.z) / 24, 0, 1);
+    const halfWidth = 9.45 - progress * 7.3;
+    position.x = MathUtils.clamp(position.x, -halfWidth, halfWidth);
+  }
   position.y = 1.65;
 }
 
