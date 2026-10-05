@@ -1,41 +1,34 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { ArrowUpRight, Download, Expand, Upload, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Download, Expand, X } from "lucide-react";
 import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import type { WallpaperItem } from "../content/types";
 import "./collections.css";
+import MediaImport from "./MediaImport";
+import { worksForRoom, imageDestinations } from "../systems/mediaPlacement";
 
 export default function WallpaperPanel({
   compact = false,
+  galleryId,
 }: {
   compact?: boolean;
+  galleryId?: string;
 }) {
   const wallpapers = useLibraryStore((state) => state.wallpapers);
   const visuals = useLibraryStore((state) => state.personal.visuals);
   const roomId = usePalaceStore((state) => state.roomId);
-  const baseRoom = roomId.split("-page-")[0];
-  const visualRoom = [
-    "imagined-worlds",
-    "cosmic",
-    "glass-life",
-    "portraits",
-  ].includes(baseRoom);
-  const images = visualRoom
-    ? visuals.filter((item) =>
-        baseRoom === "glass-life"
-          ? item.category === "glass"
-          : baseRoom === "portraits"
-            ? item.category === "portrait"
-            : baseRoom === "cosmic"
-              ? item.category === "cosmic"
-              : true,
-      )
-    : wallpapers;
+  const baseRoom = (galleryId || roomId).split("-page-")[0];
+  const projects = useLibraryStore((s) => s.personal.projects),
+    research = useLibraryStore((s) => s.personal.research);
+  const images = worksForRoom(
+    [...wallpapers, ...visuals, ...projects, ...research],
+    baseRoom,
+  );
+  const removed = useLibraryStore((s) => s.removedImages);
+  const [editing, setEditing] = useState<string | null>(null);
   const error = useLibraryStore((state) => state.error);
-  const importRef = useRef<HTMLInputElement>(null);
   const fullscreenRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<WallpaperItem | null>(null);
-  const [importing, setImporting] = useState(false);
   useEffect(() => {
     void useLibraryStore.getState().initialize();
   }, []);
@@ -77,13 +70,6 @@ export default function WallpaperPanel({
       previous?.focus();
     };
   }, [selected]);
-  const importFiles = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    setImporting(true);
-    await useLibraryStore.getState().importWallpapers(files);
-    setImporting(false);
-    event.target.value = "";
-  };
   const showFullscreen = (item: WallpaperItem) => {
     setSelected(item);
     setTimeout(() => {
@@ -95,15 +81,7 @@ export default function WallpaperPanel({
     setSelected(null);
   };
   const cinema = (item: WallpaperItem) => {
-    const state = usePalaceStore.getState();
-    const mode =
-      state.mode === "index"
-        ? window.matchMedia("(pointer: coarse)").matches
-          ? "tour"
-          : "explore"
-        : state.mode;
-    state.update({ cinemaImage: item, mode, started: true });
-    usePalaceStore.getState().enterRoom("cinema");
+    usePalaceStore.getState().openCinema(item);
   };
   return (
     <section
@@ -119,30 +97,7 @@ export default function WallpaperPanel({
           {String(images.length).padStart(2, "0")} WORKS
         </span>
       </div>
-      <div className="collection-actions">
-        <button
-          className="text-button"
-          type="button"
-          disabled={importing}
-          onClick={() => importRef.current?.click()}
-        >
-          <Upload size={14} />
-          {importing
-            ? "READING ARCHIVE…"
-            : visualRoom
-              ? "IMPORT INTO WALLPAPER VAULT"
-              : "IMPORT IMAGES"}
-        </button>
-        <input
-          ref={importRef}
-          className="visually-hidden"
-          type="file"
-          multiple
-          accept=".jpg,.jpeg,.png,.webp,.avif"
-          aria-label="Import local wallpaper images"
-          onChange={(event) => void importFiles(event)}
-        />
-      </div>
+      <MediaImport roomHint={baseRoom} />
       {error && (
         <p role="status" className="collection-message">
           {error}
@@ -181,6 +136,12 @@ export default function WallpaperPanel({
               </div>
             </div>
             <div className="visual-actions">
+              <button
+                className="text-button"
+                onClick={() => setEditing(editing === item.id ? null : item.id)}
+              >
+                ARRANGE WORK
+              </button>
               <button
                 className="text-button"
                 type="button"
@@ -222,6 +183,95 @@ export default function WallpaperPanel({
                 </button>
               )}
             </div>
+            {editing === item.id && (
+              <form
+                className="work-placement"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const values = new FormData(e.currentTarget);
+                  const target = String(values.get("room"));
+                  const dest = imageDestinations.find((x) => x[0] === target)!;
+                  void useLibraryStore
+                    .getState()
+                    .updateImage(item.id, {
+                      title: String(values.get("title")),
+                      mediaKind: dest[2],
+                      category: String(values.get("category")),
+                      roomIds: [target],
+                      order: Number(values.get("order")),
+                      primary: values.get("primary") === "on",
+                    })
+                    .then(() => setEditing(null));
+                }}
+              >
+                <label>
+                  Title
+                  <input name="title" defaultValue={item.title} />
+                </label>
+                <label>
+                  Target gallery
+                  <select
+                    name="room"
+                    defaultValue={item.roomIds?.[0] || baseRoom}
+                  >
+                    {imageDestinations.map((x) => (
+                      <option key={x[0]} value={x[0]}>
+                        {x[1]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Category
+                  <select name="category" defaultValue={item.category}>
+                    {[
+                      "horizon",
+                      "visual",
+                      "cosmic",
+                      "glass",
+                      "portrait",
+                      "editorial",
+                      "project",
+                      "research",
+                    ].map((x) => (
+                      <option key={x} value={x}>
+                        {x}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Display order
+                  <input
+                    type="number"
+                    name="order"
+                    defaultValue={item.order || 0}
+                  />
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="primary"
+                    defaultChecked={item.primary}
+                  />
+                  Main work
+                </label>
+                <button className="text-button" type="submit">
+                  SAVE ARRANGEMENT
+                </button>
+                <button
+                  className="text-button"
+                  type="button"
+                  onClick={() =>
+                    void useLibraryStore
+                      .getState()
+                      .updateImage(item.id, { removed: true })
+                  }
+                >
+                  REMOVE FROM DISPLAY
+                </button>
+              </form>
+            )}
           </article>
         ))}
       </div>
@@ -229,6 +279,24 @@ export default function WallpaperPanel({
         <p className="collection-empty">
           Begin with an image you would like to live inside.
         </p>
+      )}
+      {!!removed.length && (
+        <details className="removed-works">
+          <summary>Removed works / restore</summary>
+          {removed.map((x) => (
+            <button
+              className="text-button"
+              key={x.id}
+              onClick={() =>
+                void useLibraryStore
+                  .getState()
+                  .updateImage(x.id, { removed: false })
+              }
+            >
+              RESTORE {x.title}
+            </button>
+          ))}
+        </details>
       )}
       <p className="collection-note privacy-note">
         Original aspect ratios. Private imports. A place for images to breathe.

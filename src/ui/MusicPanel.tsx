@@ -21,7 +21,9 @@ import {
   X,
 } from "lucide-react";
 import { useAudioStore } from "../audio/player";
+import { decodeLyrics, parseLyrics } from "../audio/lyrics.mjs";
 import { useLibraryStore } from "../systems/library";
+import MediaImport from "./MediaImport";
 import { usePalaceStore } from "../systems/store";
 import type { MusicTrack } from "../content/types";
 import { rooms } from "../content/catalog";
@@ -61,6 +63,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
   const volume = usePalaceStore((state) => state.musicVolume);
   const muted = usePalaceStore((state) => state.mute);
   const importRef = useRef<HTMLInputElement>(null);
+  const lyricsRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [showLink, setShowLink] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -130,6 +133,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
         roomIds: data.getAll("rooms").map(String),
         year: String(data.get("year")),
         url: String(data.get("url")) || undefined,
+        lyricsOffset: Math.max(-30, Math.min(30, Number(data.get("lyricsOffset")) || 0)),
       });
       setEditing(null);
       setFormError(null);
@@ -158,6 +162,22 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
     }
     event.target.value = "";
   };
+  const importLyrics = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const targetId = current?.id;
+    event.target.value = "";
+    if (!file || !targetId) return;
+    try {
+      if (!/\.(lrc|txt)$/i.test(file.name) || file.size > 2 * 1024 * 1024)
+        throw new Error("Choose a local LRC or TXT file under 2 MB.");
+      const lyrics = parseLyrics(decodeLyrics(new Uint8Array(await file.arrayBuffer())), "Local lyrics");
+      if (!lyrics) throw new Error("No readable lyrics in this file. Choose another file.");
+      await useLibraryStore.getState().updateTrack(targetId, { lyrics, lyricsOffset: 0 });
+      setFormError(null);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "Unable to read these lyrics.");
+    }
+  };
 
   return (
     <section
@@ -171,6 +191,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
         </div>
         <Disc3 size={26} strokeWidth={1} aria-hidden="true" />
       </div>
+      <MediaImport roomHint="music" />
       <div className="listening-console">
         <div className="record-sleeve">
           {current?.cover ? (
@@ -256,6 +277,15 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
             />
             <span>{timeLabel(player.duration)}</span>
           </div>
+          {current && (
+            <div className="record-lyrics-tools">
+              <span>{current.lyrics?.synced ? "Synchronized wall lyrics" : current.lyrics ? "Untimed lyrics · scroll to read" : "No local lyrics attached"}</span>
+              <button type="button" className="text-button" onClick={() => lyricsRef.current?.click()}>
+                {current.lyrics ? "REPLACE LYRICS" : "IMPORT LYRICS"} →
+              </button>
+              <input ref={lyricsRef} type="file" accept=".lrc,.txt" hidden aria-label="Import lyrics for current track" onChange={(event) => void importLyrics(event)} />
+            </div>
+          )}
         </div>
       </div>
       <div className="listening-options">
@@ -365,6 +395,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
         {tracks.map((track, index) => (
           <article
             key={track.id}
+            data-track-id={track.id}
             className={`record-row ${track.id === player.currentId ? "is-current" : ""}`}
             role="listitem"
           >
@@ -473,6 +504,11 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
               />
             </label>
           </div>
+          <label className="artwork-import">
+            LYRIC TIMING
+            <input name="lyricsOffset" type="number" min="-30" max="30" step="0.1" defaultValue={editing.lyricsOffset || 0} aria-label="Lyric timing offset" />
+            <small>Seconds. Positive values show the words earlier. Untimed lyrics remain manually scrollable.</small>
+          </label>
           <label className="artwork-import">
             ROOM SOUNDTRACK
             <select

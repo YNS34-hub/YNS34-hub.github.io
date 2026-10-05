@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 
@@ -9,19 +9,19 @@ const report = {
   base,
   checkedAt: new Date().toISOString(),
   scope:
-    "Explicit playback of Palace Study through Guide travel between three 3D rooms; real native Audio objects observed through CDP, with no application debug exports or injected global state.",
+    "Explicit playback of the repository's self-made Palace Study WAV, imported through local audio UI, through Guide travel between three 3D rooms; real native Audio objects observed through CDP, with no application debug exports or injected global state.",
   checks: [],
   observations: [],
   errors: [],
+  uploads: [],
 };
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
+  executablePath:
+    process.env.PALACE_BROWSER ||
+    "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
   headless: true,
-  args: [
-    "--no-sandbox",
-    "--use-angle=swiftshader",
-    "--enable-unsafe-swiftshader",
-  ],
+  args: ["--no-sandbox", "--use-angle=d3d11"],
 });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
@@ -39,6 +39,7 @@ await context.addInitScript(() => {
 const page = await context.newPage();
 page.setDefaultTimeout(60000);
 page.on("pageerror", (error) => report.errors.push(error.message));
+page.on("request", (request) => { if (request.method() === "POST") report.uploads.push(request.url()); });
 page.on("console", (message) => {
   if (message.type() === "error") report.errors.push(message.text());
 });
@@ -127,6 +128,11 @@ try {
   await page
     .getByRole("dialog", { name: "Listening collection", exact: true })
     .waitFor();
+  await page.getByLabel("Import local audio files").setInputFiles({
+    name: "Palace Study — No. 01.wav",
+    mimeType: "audio/wav",
+    buffer: await readFile("public/media/generated/palace-study.wav"),
+  });
   await page
     .locator(".record-row")
     .filter({ hasText: "Palace Study — No. 01" })
@@ -146,7 +152,7 @@ try {
   const active = await call(
     elements,
     `function () {
-    return this.find(element => !element.paused && element.currentSrc.endsWith('/media/generated/palace-study.wav'));
+    return this.find(element => !element.paused && element.currentSrc.startsWith('blob:'));
   }`,
     false,
   );
@@ -186,7 +192,7 @@ try {
     .waitFor({ state: "hidden" });
   for (const [room, title] of [
     ["projects", "PROJECT GALLERY"],
-    ["research", "RESEARCH HALL"],
+    ["research", "RESEARCH VAULT"],
   ]) {
     await guideTravel(room, title);
     const currentElements = await audioElements();
@@ -253,10 +259,40 @@ try {
     [],
     "travel must not emit pause, ended, emptied or abort",
   );
+  await guideTravel("music", "PERSONAL LISTENING ROOM");
+  await page.getByRole("button", { name: /OPEN COLLECTION/ }).click();
+  await page.getByLabel("Import lyrics for current track").setInputFiles({
+    name: "palace-study.lrc", mimeType: "text/plain",
+    buffer: Buffer.from("[00:00]A threshold of light\n[00:04]A note held in glass\n[00:08]停在这束光里"),
+  });
+  await page.getByText("Synchronized wall lyrics", { exact: true }).waitFor();
+  await page.getByRole("dialog").getByRole("button", { name: "Pause music", exact: true }).click();
+  const seek = page.getByLabel("Track progress", { exact: true });
+  await seek.press("Home");
+  await page.waitForFunction(() => document.querySelector(".lyric-wall")?.dataset.line === "0");
+  for (let i = 0; i < 50; i++) await seek.press("ArrowRight");
+  await page.waitForFunction(() => document.querySelector(".lyric-wall")?.dataset.line === "1");
+  assert.ok(Math.abs((await snapshot(active.objectId)).currentTime - 5) < 0.2);
+  await page.waitForTimeout(600);
+  assert.equal(await page.locator(".lyric-wall").getAttribute("data-line"), "1");
+  await page.locator(".collection-panel").evaluate(el => { el.scrollTop = 0; });
+  await page.screenshot({ path: path.join(output, "production-lyrics-panel.png") });
+  report.checks.push("Production local LRC binds to the native recording; real keyboard seeking and pause keep the wall synchronized");
+  await page.reload(); await page.locator(".world-ready").waitFor();
+  assert.equal(await page.evaluate(() => "__PALACE_DEBUG__" in window || "__PALACE_DEV__" in window), false);
+  await page.getByRole("button", { name: /OPEN COLLECTION/ }).click();
+  await page.getByText("Synchronized wall lyrics", { exact: true }).waitFor();
+  assert.equal(await page.getByRole("dialog").getByRole("button", { name: "Pause music", exact: true }).count(), 0);
+  await page.getByRole("dialog").getByRole("button", { name: "Play music", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Pause music", exact: true }).waitFor();
+  await page.evaluate(() => document.fonts.ready);
+  assert.ok(await page.evaluate(() => document.fonts.check('600 13px "Space Grotesk"')));
+  assert.deepEqual(report.uploads, []);
+  report.checks.push("Production audio blob and lyric metadata survive refresh; explicit Play resumes them, self-hosted typography loads and no upload occurs");
   assert.deepEqual(report.errors, [], "there must be no browser errors");
   report.exitCode = 0;
   console.log(
-    "PASS production audio travel regression; 3 checks, native Audio uninterrupted through Listening Room → Project Gallery → Research Hall",
+    "PASS production audio and lyric regression; 5 checks, native Audio preserved across rooms and local lyrics restored after refresh",
   );
 } catch (error) {
   report.failure = error.stack || String(error);

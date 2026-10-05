@@ -79,11 +79,15 @@ Research Vault 单独展示数学与 Reviewer-First Audit；后者只展示已�
 
 **IMPORT MUSIC / RECONNECT LIBRARY** 在本机读取音频标签、专辑、封面和时长。IndexedDB 保存 Blob 和 metadata，刷新后恢复；存储受限时显示明确提示。清除浏览器数据后通过 Reconnect 重新导入原文件。声音需用户手势启动，可独立调节音乐、环境与空间提示音。
 
+音乐室的墙面跟随当前歌曲显示标题、歌手和歌词。音频内嵌歌词与同名 `.lrc` 自动读取；在播放器 **IMPORT LYRICS** 可绑定本地 LRC / TXT，并在 Record Notes 调整时间偏移。带时间戳的歌词按原生播放器进度滚动，拖动进度立即定位；无时间戳的文字保留手动阅读，缺少歌词或纯音乐提示不伪造内容。歌词与音频都只留在本机。低频照明、中频鳍片、高频细节来自真实分析，暂停后回到静止。
+
+小型 UI 使用自托管 Space Grotesk；展品标题使用编辑字体，大幅入口标题保留 Palace Sans。馆标采用折叠门洞与玻璃核心轮廓，透明底、13 / 8 px 层级与固定字距；只随建筑背景改变字色。
+
 ## 探索与舒适度
 
 WASD / 方向键移动，鼠标拖动查看，Shift 加速，M 打开 Guide，ESC 关闭详情。触控使用 Tour；`/?view=index` 提供可读索引。设置包含画质、Reduce Motion、音量和灵敏度。每个主房间有独立 URL，收藏展翼也生成分享路径。自动质量调节、有限纹理分辨率与五个驻留长廊区段限制资源占用。
 
-房间背景、fog、ambient/key light 和图像主色通过逐帧缓动适应。玻璃生命体的光影、音乐室低频进入提示、壁纸降光、Cosmic 顶棚消失、Archive 干燥近声和 Unfinished UI 消隐构成克制的空间事件。Reduce Motion 保留作品与导航。
+房间背景、fog、ambient/key light 和图像主色通过逐帧缓动适应。玻璃生命体的光影、音乐室低频进入提示、壁纸降光、Cosmic 开放远景、Archive 干燥近声和 Unfinished UI 消隐构成克制的空间变化。Reduce Motion 保留作品与导航。
 
 ## 私人构建与公开发布
 
@@ -115,8 +119,27 @@ npm run build:public
 
 `npm test` 验证内容、路由、碰撞、音频与私人媒体扫描 / 公开排除。`scripts/verify-personal-world.mjs` 在 dev 服务器验证原生导览、每个房间的 WASD、影院键盘控制、收藏、图片和音频导入及刷新恢复。`npm run qa:visual` 截取八个主空间；环境变量 `PALACE_URL`、`PALACE_BROWSER`、`PALACE_ARTIFACTS` 控制地址、浏览器和输出位置。
 
-截图浏览器使用 SwiftShader，不代表独立显卡 FPS。构建生成静态作品页、SEO、sitemap 和 GitHub Pages 404 fallback。旧版本视觉记录保留在 docs，属于上一轮设计。
+旧的 `qa:visual` 记录使用 SwiftShader，不代表独立显卡 FPS。本轮 `qa:quality` 和 `qa:performance` 使用已安装 Edge，并记录实际 renderer；性能验收来自可见桌面浏览器。构建生成静态作品页、SEO、sitemap 和 GitHub Pages 404 fallback。旧版本视觉记录保留在 docs，属于上一轮设计。
 
-核心文件：`src/rooms/PersonalRooms.tsx`（私人世界）、`src/world/artDirection.ts`（房间照明）、`scripts/register-personal-media.mjs`（自动注册）、`src/systems/library.ts`（本地收藏）、`src/ui/CinemaControls.tsx`（影院）、`content/`（公开策展）。
+核心文件：`src/world/World.tsx`（当前渲染入口）、`src/rooms/`（独立建筑与展陈）、`src/world/artDirection.ts`（房间照明）、`scripts/register-personal-media.mjs`（自动注册）、`src/systems/library.ts`（本地收藏）、`src/ui/LyricsProjection.tsx`（空间歌词）、`src/ui/CinemaControls.tsx`（影院）、`content/`（公开策展）。
 
 This place continues to grow with me.
+
+
+## 空间与导入（quality-leap 分支）
+
+中庭使用低入口框景、闭合的双凹腔玻璃实体与收藏显影；聆听室由弧形声学构件、厚玻璃鳍片和静止聆听点组成；回廊保持五段常驻，同时改变横截面、侧向开口和光井。回廊 −003 的门在实际访问后开放更大的内部空间；这是有限访问状态与独立内室的转换，没有实现 portal 渲染。
+
+屏幕保持原始 sRGB；摄影印刷品接受受限的照明，保留肤色和暗部；投影仅用于短暂显影。玻璃使用同一闭合实体和 PMREM 环境，在中低画质保留轮廓。没有全馆实时镜面。
+
+Guide → **Arrange / import works** 可预览批量素材，确认目标房间、类别和主展品，再进入实际展位。图片可调整顺序、转移展厅、移除与恢复。资源引用共享稳定 ID，旧 IndexedDB v1 收藏仍保留。影院返回原房间、位置和朝向；二维入口也返回原索引分类。网站预览只在主动激活后装载一个 sandbox iframe，关闭后卸载；受限的网站保留截图与外部入口。
+
+```bash
+npm run qa:quality      # 同机位截图；PALACE_PHASE / PALACE_ARTIFACTS 控制输出
+npm run test:quality    # 本机开发预览：导入、返回、回廊和真实音频流程
+npm run qa:performance # 可见桌面浏览器；实际 renderer 写入报告
+```
+
+这些脚本默认连接 `http://127.0.0.1:5190`；先用 `npm run dev -- --port 5190 --strictPort` 启动。Windows 默认使用已安装 Edge；其他环境通过 `PALACE_BROWSER` 指定浏览器。`PALACE_TEST_TRACK` 可选本机已有合法歌曲；默认使用仓库自带 Palace Study，不下载音频。性能报告使用实际 GPU 名称与帧时间，截图的短时 headless 数据不作为目标硬件验收成绩。
+
+本轮同机位对比、实际测试、GTX 1650 采样及未测范围见 [空间重构验证记录](docs/quality-leap/README.md)。

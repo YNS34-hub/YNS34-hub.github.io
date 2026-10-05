@@ -1,0 +1,434 @@
+{
+  "baseline": "0424eb679a2c8ba9f1b6fbe052a323f6a3f097f3",
+  "branch": "codex/memory-palace-quality-leap",
+  "typecheck": "passed",
+  "lint": "passed",
+  "unit": {
+    "filesPassed": 10,
+    "testsPassed": 70
+  },
+  "publicBuild": {
+    "result": "passed",
+    "staticRoutes": 64,
+    "indexedRoutes": 50
+  },
+  "developmentFlows": {
+    "checks": [
+      "v1 IndexedDB records retain blob, favorite and ID after placement migration",
+      "all main rooms enter, return, load real works and retain WASD control",
+      "memory revelation uses a real collection image, stays in place and is interruptible",
+      "batch import targets Portraits, persists, renders its stable ID, and isolates failure",
+      "Cinema restores exact view from every source; ESC first closes metadata; Back returns",
+      "modal suspends WASD; project viewing retains the room; exactly one web preview mounts on demand",
+      "kept website references appear in My Collection and disappear when unkept",
+      "stateful corridor door changes after a real visit, with five bounded resident segments",
+      "observatory bridge rails and Unfinished exit match their physical walking boundaries",
+      "actual local audio drives measured frequency bands and settles after pause",
+      "local audio placement and room soundtrack metadata survive refresh",
+      "accessible index Cinema returns to index without discarding navigation"
+    ],
+    "skippedChecks": [],
+    "errors": []
+  },
+  "productionBrowser": {
+    "checks": [
+      "production files have static deep links, SEO text, local assets, fallback and preserved legacy pages",
+      "static project remains readable without JavaScript or WebGL",
+      "initial desktop architecture renders at medium quality before entering",
+      "2D index is independently accessible, searchable and focus links reload",
+      "local audio import, metadata edits, legal NetEase links and playback survive navigation",
+      "private images persist, full original is viewable, and image cinema enters 3D",
+      "all main gallery rooms are reachable through the museum guide",
+      "desktop exploration, bookmarks and comfort settings survive reload",
+      "procedural and project direct links load, browser back restores the room",
+      "mobile tour and collection index work without horizontal overflow"
+    ],
+    "skippedChecks": [
+      "first-person controls move smoothly and corridor walls contain the visitor"
+    ],
+    "errors": []
+  },
+  "nativeProductionAudio": {
+    "checks": [
+      "Palace Study starts only after an explicit user click",
+      "Guide travel to projects preserves native Audio identity, track and advancing playback",
+      "Guide travel to research preserves native Audio identity, track and advancing playback",
+      "Production local LRC binds to the native recording; real keyboard seeking and pause keep the wall synchronized",
+      "Production audio blob and lyric metadata survive refresh; explicit Play resumes them, self-hosted typography loads and no upload occurs"
+    ],
+    "errors": [],
+    "uploads": []
+  },
+  "finalProductionSmoke": {
+    "checks": [
+      "/museum/ reaches the current root entry; production debug exports are absent",
+      "M opens Guide and releases Pointer Lock; ESC closes only Guide",
+      "Native Pointer Lock enters through its real button; one ESC releases view without opening or closing another layer",
+      "Final Cosmic / Imagined Worlds bridge, Unfinished and Atrium load and return through production Guide at medium quality",
+      "Public private-media directory contains only an empty manifest; browser requested no private media files"
+    ],
+    "errors": []
+  },
+  "listeningIdentity": {
+    "browser": "148.0.3967.70",
+    "quality": "medium",
+    "dpr": 1,
+    "checks": [
+      {
+        "name": "floating identity uses the actual self-hosted font, fixed hierarchy, transparent backing and no hover transform",
+        "passed": true
+      },
+      {
+        "name": "all local CloudMusic records play through the existing native player without stacking players",
+        "passed": true
+      },
+      {
+        "name": "local timed lyrics attach to the selected audio and follow playback, forward seek, backward seek and pause",
+        "passed": true
+      },
+      {
+        "name": "the physical lyric surface hides from behind, tracks the camera and remains aligned at 1440p",
+        "passed": true
+      },
+      {
+        "name": "a rebuilt static resource follows the manifest while v1 favorite and metadata records survive",
+        "passed": true
+      },
+      {
+        "name": "lyric metadata and timing edits survive refresh without losing the audio blob",
+        "passed": true
+      },
+      {
+        "name": "invalid lyric imports preserve the previous lyrics and untimed text stays honest and scrollable",
+        "passed": true
+      },
+      {
+        "name": "long timed lyrics keep seven live lines, snap on a long seek, and obey reduced motion",
+        "passed": true
+      },
+      {
+        "name": "changing tracks clears the previous lyric identity and offers a real local LRC import entry",
+        "passed": true
+      }
+    ],
+    "skippedChecks": [],
+    "brand": [
+      {
+        "room": "atrium",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "font": "\"Space Grotesk\", \"Microsoft YaHei\", sans-serif",
+        "loaded": true,
+        "size": "13px",
+        "weight": "600",
+        "spacing": "0.78px",
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "0px",
+        "shadow": "none",
+        "transform": "none",
+        "color": "rgb(219, 234, 242)",
+        "subSize": "8px",
+        "subWeight": "500",
+        "subOpacity": "0.55",
+        "subGap": "7px",
+        "gap": "17px",
+        "width": 184.1875,
+        "height": 31.296875,
+        "subtitle": "JIE TIAN · LIVING ARCHIVE"
+      },
+      {
+        "room": "atrium-bright",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "color": "rgb(32, 56, 67)"
+      },
+      {
+        "room": "music",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "font": "\"Space Grotesk\", \"Microsoft YaHei\", sans-serif",
+        "loaded": true,
+        "size": "13px",
+        "weight": "600",
+        "spacing": "0.78px",
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "0px",
+        "shadow": "none",
+        "transform": "none",
+        "color": "rgb(219, 234, 242)",
+        "subSize": "8px",
+        "subWeight": "500",
+        "subOpacity": "0.55",
+        "subGap": "7px",
+        "gap": "17px",
+        "width": 184.1875,
+        "height": 31.296875,
+        "subtitle": "JIE TIAN · LIVING ARCHIVE"
+      },
+      {
+        "room": "archive",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "font": "\"Space Grotesk\", \"Microsoft YaHei\", sans-serif",
+        "loaded": true,
+        "size": "13px",
+        "weight": "600",
+        "spacing": "0.78px",
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "0px",
+        "shadow": "none",
+        "transform": "none",
+        "color": "rgb(219, 234, 242)",
+        "subSize": "8px",
+        "subWeight": "500",
+        "subOpacity": "0.55",
+        "subGap": "7px",
+        "gap": "17px",
+        "width": 184.1875,
+        "height": 31.296875,
+        "subtitle": "JIE TIAN · LIVING ARCHIVE"
+      },
+      {
+        "room": "atrium",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "font": "\"Space Grotesk\", \"Microsoft YaHei\", sans-serif",
+        "loaded": true,
+        "size": "13px",
+        "weight": "600",
+        "spacing": "0.78px",
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "0px",
+        "shadow": "none",
+        "transform": "none",
+        "color": "rgb(219, 234, 242)",
+        "subSize": "8px",
+        "subWeight": "500",
+        "subOpacity": "0.55",
+        "subGap": "7px",
+        "gap": "17px",
+        "width": 184.1875,
+        "height": 31.296875,
+        "subtitle": "JIE TIAN · LIVING ARCHIVE"
+      },
+      {
+        "room": "atrium-bright",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "color": "rgb(32, 56, 67)"
+      },
+      {
+        "room": "music",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "font": "\"Space Grotesk\", \"Microsoft YaHei\", sans-serif",
+        "loaded": true,
+        "size": "13px",
+        "weight": "600",
+        "spacing": "0.78px",
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "0px",
+        "shadow": "none",
+        "transform": "none",
+        "color": "rgb(219, 234, 242)",
+        "subSize": "8px",
+        "subWeight": "500",
+        "subOpacity": "0.55",
+        "subGap": "7px",
+        "gap": "17px",
+        "width": 184.1875,
+        "height": 31.296875,
+        "subtitle": "JIE TIAN · LIVING ARCHIVE"
+      },
+      {
+        "room": "archive",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "font": "\"Space Grotesk\", \"Microsoft YaHei\", sans-serif",
+        "loaded": true,
+        "size": "13px",
+        "weight": "600",
+        "spacing": "0.78px",
+        "background": "rgba(0, 0, 0, 0)",
+        "border": "0px",
+        "shadow": "none",
+        "transform": "none",
+        "color": "rgb(219, 234, 242)",
+        "subSize": "8px",
+        "subWeight": "500",
+        "subOpacity": "0.55",
+        "subGap": "7px",
+        "gap": "17px",
+        "width": 184.1875,
+        "height": 31.296875,
+        "subtitle": "JIE TIAN · LIVING ARCHIVE"
+      }
+    ],
+    "errors": [],
+    "uploads": []
+  },
+  "localCollection": {
+    "importedAudio": 38,
+    "formats": {
+      "mp3": 28,
+      "m4a": 8,
+      "flac": 2
+    },
+    "nativePlaybackPassed": 38,
+    "sourceSidecars": 4,
+    "usableSidecarLyrics": 0,
+    "metadataParserFallbacks": 3,
+    "privacy": "Recordings, local paths and private playlist titles excluded from this published report."
+  },
+  "identityBefore": {
+    "scope": "Prior public build before the identity and lyrics edits; actual initial spawn via Enter Palace",
+    "metrics": [
+      {
+        "room": "atrium",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "font": "\"Palace Sans\", Arial, sans-serif",
+        "size": "11px",
+        "background": "rgba(20, 43, 64, 0.72)",
+        "width": 219.15625,
+        "height": 49
+      },
+      {
+        "room": "music",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "font": "\"Palace Sans\", Arial, sans-serif",
+        "size": "11px",
+        "background": "rgba(20, 43, 64, 0.72)",
+        "width": 219.15625,
+        "height": 49
+      },
+      {
+        "room": "archive",
+        "resolution": [
+          1920,
+          1080
+        ],
+        "font": "\"Palace Sans\", Arial, sans-serif",
+        "size": "11px",
+        "background": "rgba(20, 43, 64, 0.72)",
+        "width": 219.15625,
+        "height": 49
+      },
+      {
+        "room": "atrium",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "font": "\"Palace Sans\", Arial, sans-serif",
+        "size": "11px",
+        "background": "rgba(20, 43, 64, 0.72)",
+        "width": 219.15625,
+        "height": 49
+      },
+      {
+        "room": "music",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "font": "\"Palace Sans\", Arial, sans-serif",
+        "size": "11px",
+        "background": "rgba(20, 43, 64, 0.72)",
+        "width": 219.15625,
+        "height": 49
+      },
+      {
+        "room": "archive",
+        "resolution": [
+          2560,
+          1440
+        ],
+        "font": "\"Palace Sans\", Arial, sans-serif",
+        "size": "11px",
+        "background": "rgba(20, 43, 64, 0.72)",
+        "width": 219.15625,
+        "height": 49
+      }
+    ]
+  },
+  "localRoomSoundtracks": {
+    "checks": [
+      {
+        "room": "music",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      },
+      {
+        "room": "cosmic",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      },
+      {
+        "room": "glass-life",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      },
+      {
+        "room": "research",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      },
+      {
+        "room": "portraits",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      },
+      {
+        "room": "archive",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      },
+      {
+        "room": "my-collection",
+        "passed": true,
+        "count": 2,
+        "playing": 1
+      }
+    ],
+    "errors": [],
+    "uploads": []
+  },
+  "finalVisualCapture": {
+    "phase": "identity-final",
+    "sha": "d23a236de21dc6cc6a9bb4739a93f16cca601ae4",
+    "browser": "148.0.3967.70",
+    "quality": "medium",
+    "dpr": 1,
+    "errors": [],
+    "capturedViews": 46,
+    "source": "Recorded HEAD with the working tree changes included by the subsequent commit; real screenshot capture, no generated artwork."
+  }
+}

@@ -2,7 +2,12 @@
 export async function imagePreview(
   blob: Blob,
   maxDimension = 1280,
-): Promise<{ preview?: Blob; color?: string }> {
+): Promise<{
+  preview?: Blob;
+  color?: string;
+  width?: number;
+  height?: number;
+}> {
   if (
     typeof createImageBitmap === "undefined" ||
     typeof document === "undefined"
@@ -63,7 +68,12 @@ export async function imagePreview(
     }
     canvas.width = 1;
     canvas.height = 1;
-    return { preview: preview || undefined, color };
+    return {
+      preview: preview || undefined,
+      color,
+      width: bitmap.width,
+      height: bitmap.height,
+    };
   } catch {
     return {};
   } finally {

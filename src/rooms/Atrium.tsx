@@ -1,493 +1,394 @@
-import { Suspense, useEffect, useMemo, useRef } from "react";
-import { useGLTF } from "@react-three/drei";
+import { Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Group, Vector3, MeshBasicMaterial } from "three";
 import {
-  BufferGeometry,
-  CanvasTexture,
-  Color,
-  Group,
-  Mesh,
-  SphereGeometry,
-  SRGBColorSpace,
-  Vector3,
-} from "three";
+  Block,
+  ContactShadow,
+  Door,
+  Floor,
+  Label,
+  Picture,
+  useImageTexture,
+} from "../world/primitives";
+import { GlassSculpture } from "../world/GlassSculpture";
 import { usePalaceStore } from "../systems/store";
-import { Block, ContactShadow, Door, Floor, Label } from "../world/primitives";
+import { useLibraryStore } from "../systems/library";
 import { projects } from "../content/catalog";
 import { VisualWall } from "./PersonalRooms";
-import { Picture } from "../world/primitives";
-import { useLibraryStore } from "../systems/library";
 
-function GlassGeometry() {
-  const gltf = useGLTF(`${import.meta.env.BASE_URL}assets/nonlinear-glass.glb`);
-  const geometry = useMemo(() => {
-    let original: BufferGeometry | null = null;
-    gltf.scene.traverse((object) => {
-      if (object instanceof Mesh && !original) original = object.geometry;
+function MemoryReveal() {
+  const library = useLibraryStore();
+  const viewed = usePalaceStore((s) => s.viewed);
+  const collected = [...library.wallpapers, ...library.personal.visuals].filter(
+    (x) => x.favorite,
+  );
+  const recent = projects.filter((x) => viewed.includes(x.id) && x.cover);
+  const src =
+    collected[0]?.displaySrc ||
+    collected[0]?.src ||
+    recent[0]?.cover ||
+    library.wallpapers[0]?.src;
+  const texture = useImageTexture(src);
+  const aspect = texture?.image
+    ? texture.image.width / texture.image.height
+    : 16 / 9;
+  const imageWidth = Math.min(5.6, 3.15 * aspect),
+    imageHeight = imageWidth / aspect;
+  const panels = useRef<Group>(null);
+  const age = useRef(0),
+    strength = useRef(0);
+  const active = usePalaceStore((s) => s.memoryReveal);
+  const reduced = usePalaceStore((s) => s.reducedMotion);
+  useFrame((_, dt) => {
+    if (active) {
+      age.current += Math.min(dt, 0.1);
+      if (age.current > 9)
+        usePalaceStore.getState().update({ memoryReveal: false });
+    } else age.current = 0;
+    strength.current +=
+      (Number(active) - strength.current) *
+      (reduced ? 1 : 1 - Math.exp(-dt * 2.4));
+    panels.current?.traverse((o) => {
+      if (
+        "material" in o &&
+        (o as import("three").Mesh).material instanceof MeshBasicMaterial
+      ) {
+        const m = (o as import("three").Mesh).material as MeshBasicMaterial;
+        m.opacity = strength.current * 0.88;
+      }
     });
-    const result = original
-      ? (original as BufferGeometry).clone()
-      : new BufferGeometry();
-    result.computeBoundingSphere();
-    result.center();
-    const scale = 2.6 / (result.boundingSphere?.radius || 1);
-    result.scale(scale, scale, scale);
-    result.computeVertexNormals();
-    return result;
-  }, [gltf]);
-  useEffect(
-    () => () => {
-      geometry.dispose();
-      gltf.scene.traverse((object) => {
-        if (object instanceof Mesh) object.geometry.dispose();
-      });
-      useGLTF.clear(`${import.meta.env.BASE_URL}assets/nonlinear-glass.glb`);
-    },
-    [geometry, gltf],
-  );
+  });
   return (
-    <mesh geometry={geometry}>
-      <meshPhysicalMaterial
-        color="#e2f4ff"
-        metalness={0}
-        roughness={0.035}
-        transmission={1}
-        thickness={3.4}
-        ior={1.49}
-        attenuationColor="#84c9f2"
-        attenuationDistance={6.5}
-        clearcoat={0.16}
-        clearcoatRoughness={0.035}
-        envMapIntensity={1.65}
-      />
-    </mesh>
+    <group ref={panels}>
+      {[-1, 1].map((side) => (
+        <mesh
+          key={side}
+          position={[side * 6.2, 4.4, -2.5]}
+          rotation={[0, -side * 0.2, 0]}
+        >
+          <planeGeometry args={[imageWidth, imageHeight]} />
+          <meshBasicMaterial
+            map={texture}
+            transparent
+            opacity={0}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.32, 1]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[imageWidth * 1.46, imageHeight * 1.46]} />
+        <meshBasicMaterial
+          map={texture}
+          transparent
+          opacity={0}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+    </group>
   );
 }
-
-function LightGlassGeometry() {
-  const geometry = useMemo(() => {
-    const sphere = new SphereGeometry(2.35, 32, 24);
-    const positions = sphere.attributes.position;
-    const point = new Vector3();
-    for (let i = 0; i < positions.count; i++) {
-      point.fromBufferAttribute(positions, i);
-      const theta = Math.atan2(point.z, point.x),
-        phi = Math.acos(Math.max(-1, Math.min(1, point.y / 2.35)));
-      point.multiplyScalar(
-        1 +
-          0.042 * Math.sin(theta * 3) * Math.sin(phi * 2) +
-          0.024 * Math.sin(theta * 5) * Math.sin(phi * 3),
-      );
-      positions.setXYZ(i, point.x, point.y, point.z);
-    }
-    sphere.computeVertexNormals();
-    return sphere;
-  }, []);
-  useEffect(() => () => geometry.dispose(), [geometry]);
-  return (
-    <mesh geometry={geometry}>
-      <meshPhysicalMaterial
-        color="#e2f4ff"
-        roughness={0.035}
-        transmission={1}
-        thickness={3.4}
-        ior={1.49}
-        attenuationColor="#84c9f2"
-        attenuationDistance={6.5}
-        clearcoat={0.16}
-        envMapIntensity={1.65}
-      />
-    </mesh>
-  );
-}
-
 function Core() {
-  const sculpture = useRef<Group>(null);
-  const light = useRef<import("three").PointLight>(null);
-  const reducedMotion = usePalaceStore((s) => s.reducedMotion);
-  const quality = usePalaceStore((s) => s.effectiveQuality);
-  const direction = useMemo(() => new Vector3(), []);
-  const towardsCore = useMemo(() => new Vector3(), []);
-  const shadow = useMemo(() => {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 128;
-    const context = canvas.getContext("2d")!;
-    const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
-    gradient.addColorStop(0, "rgba(20,50,66,0.21)");
-    gradient.addColorStop(0.5, "rgba(20,50,66,0.09)");
-    gradient.addColorStop(1, "rgba(20,50,66,0)");
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, 128, 128);
-    const texture = new CanvasTexture(canvas);
-    texture.colorSpace = SRGBColorSpace;
-    return texture;
-  }, []);
-  useEffect(() => () => shadow.dispose(), [shadow]);
-  useFrame(({ camera, clock }, delta) => {
-    if (sculpture.current && !reducedMotion) {
-      sculpture.current.position.y =
-        3.62 + Math.sin(clock.elapsedTime * 0.4) * 0.1;
-      sculpture.current.rotation.y += delta * 0.042;
-    }
-    if (light.current)
-      light.current.intensity =
-        4.5 + (reducedMotion ? 0 : Math.sin(clock.elapsedTime * 0.4) * 0.5);
+  const direction = useMemo(() => new Vector3(), []),
+    toward = useMemo(() => new Vector3(), []);
+  useFrame(({ camera }) => {
     camera.getWorldDirection(direction);
-    towardsCore.set(0, 3.3, 0).sub(camera.position).normalize();
+    toward.set(0, 3.6, 0).sub(camera.position).normalize();
     const near =
-      camera.position.x ** 2 + camera.position.z ** 2 < 85 &&
-      direction.dot(towardsCore) > 0.7;
+      camera.position.x ** 2 + camera.position.z ** 2 < 100 &&
+      direction.dot(toward) > 0.7;
     if (usePalaceStore.getState().coreNear !== near)
       usePalaceStore.getState().update({ coreNear: near });
   });
   return (
     <group>
-      <mesh position={[0, 0.055, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[5.2, 72]} />
-        <meshBasicMaterial map={shadow} transparent depthWrite={false} />
-      </mesh>
-      <mesh position={[0, 0.125, 0]} receiveShadow>
-        <cylinderGeometry args={[3.36, 3.4, 0.24, 80]} />
+      <ContactShadow width={9} depth={9} opacity={0.37} />
+      <mesh position={[0, 0.16, 0]} receiveShadow>
+        <cylinderGeometry args={[3.5, 3.56, 0.3, 80]} />
         <meshStandardMaterial
-          color="#d1d5ce"
-          roughness={0.27}
-          metalness={0.1}
+          color="#d8eaf0"
+          roughness={0.25}
+          metalness={0.12}
         />
       </mesh>
-      <mesh position={[0, 0.248, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[3.25, 3.28, 100]} />
-        <meshBasicMaterial color="#abc9ce" transparent opacity={0.65} />
+      <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[3.7, 3.74, 96]} />
+        <meshStandardMaterial color="#486a82" roughness={0.45} />
       </mesh>
-      <group ref={sculpture} position={[0, 3.62, 0]}>
-        {quality === "low" ? (
-          <LightGlassGeometry />
-        ) : (
-          <Suspense fallback={<LightGlassGeometry />}>
-            <GlassGeometry />
-          </Suspense>
-        )}
+      <group
+        position={[0, 3.7, 0]}
+        onClick={(e) => {
+          if (e.delta < 5 && usePalaceStore.getState().coreNear) {
+            e.stopPropagation();
+            usePalaceStore.getState().update({
+              memoryReveal: !usePalaceStore.getState().memoryReveal,
+            });
+          }
+        }}
+      >
+        <Suspense fallback={null}>
+          <GlassSculpture radius={2.7} />
+        </Suspense>
       </group>
-      <pointLight
-        ref={light}
-        position={[0, 3.2, 0]}
-        color="#b9e4ff"
-        intensity={4.5}
-        distance={10}
-        decay={2}
-      />
-      <Label
-        text="01   /   A LIVING ARCHIVE"
-        position={[0, 0.02, 6.1]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        size={0.16}
-        color="#647d81"
-      />
+      <MemoryReveal />
     </group>
   );
 }
-
-function CorridorThreshold() {
-  const panel = useRef<Group>(null);
-  const reducedMotion = usePalaceStore((s) => s.reducedMotion);
-  const color = useMemo(() => new Color("#dedfd8"), []);
-  useFrame(({ camera }, delta) => {
-    if (!panel.current || reducedMotion) return;
-    const reveal = Math.max(0, Math.min(1, (-camera.position.z - 7) / 10));
-    panel.current.position.x +=
-      (reveal * 3.3 - panel.current.position.x) * Math.min(delta * 1.5, 1);
-  });
+/** Compression → release → a luminous optical solid against a recessed blue archive. */
+export default function Atrium() {
+  const images = useLibraryStore((s) => s.wallpapers);
+  const hero = projects.find((x) => x.id === "void-echo");
   return (
-    <group position={[0, 0, -25.85]}>
+    <group>
+      <Floor width={42} depth={54} color="#bfced5" />
+      <Block position={[0, -0.22, 0]} scale={[42, 0.38, 54]} color="#b1c7d1" />
+      {[-1, 1].map((side) => (
+        <group key={side}>
+          <Block
+            position={[side * 7.3, 2.8, 21]}
+            scale={[7.4, 5.6, 12]}
+            color="#1d344c"
+            castShadow
+          />
+          <Block
+            position={[side * 3.57, 2.65, 17]}
+            scale={[0.07, 5.3, 1.8]}
+            color="#a8cfe5"
+            metalness={0.65}
+            roughness={0.2}
+          />
+          <Block
+            position={[side * 20.6, 7, 0]}
+            scale={[0.8, 14, 54]}
+            color="#e4eff2"
+          />
+          <Block
+            position={[side * 20.12, 0.18, 0]}
+            scale={[0.05, 0.12, 52]}
+            color="#38596a"
+          />
+          <Block
+            position={[side * 17.6, 13.7, -4]}
+            scale={[5.5, 0.7, 44]}
+            color="#cbdfe9"
+            castShadow
+          />
+          {[-19, -9, 1, 11].map((z) => (
+            <group key={z}>
+              <Block
+                position={[side * 19.8, 7, z]}
+                scale={[1.1, 14, 0.55]}
+                color="#d0e4eb"
+                castShadow
+              />
+              <ContactShadow
+                position={[side * 19.5, 0.01, z]}
+                width={4}
+                depth={3}
+                opacity={0.2}
+              />
+            </group>
+          ))}
+        </group>
+      ))}
       <Block
-        position={[-6.4, 6.5, 0]}
-        scale={[5.6, 13, 1.1]}
-        color={color.getStyle()}
+        position={[0, 5.5, 21]}
+        scale={[21.5, 0.6, 12]}
+        color="#233b54"
+        castShadow
       />
-      <group ref={panel}>
+      <Block
+        position={[0, 5.05, 15.2]}
+        scale={[7.1, 0.055, 0.32]}
+        color="#d7eefd"
+        emissive="#cae5f5"
+        emissiveIntensity={0.4}
+      />
+      <Block
+        position={[0, 7.3, -25.5]}
+        scale={[42, 14.6, 0.8]}
+        color="#2a4864"
+      />
+      <Block
+        position={[-9, 5.4, -24.92]}
+        scale={[8.2, 8.8, 0.26]}
+        color="#18334b"
+        roughness={0.5}
+      />
+      <Label
+        text={"THE MEMORY\nPALACE"}
+        position={[-9, 6.1, -24.7]}
+        size={0.7}
+        color="#dceffc"
+        maxWidth={8}
+      />
+      <Label
+        text="JIE TIAN / COLLECTED WORLDS"
+        position={[-9, 3.9, -24.7]}
+        size={0.16}
+        color="#acc9dd"
+      />
+      {[-1, 1].map((side) => (
         <Block
-          position={[6.4, 6.5, 0]}
-          scale={[5.6, 13, 1.1]}
-          color="#dedfd8"
+          key={side}
+          position={[side * 4.5, 5.3, -24.5]}
+          scale={[1, 10.6, 2.2]}
+          color="#bdd8e8"
+          castShadow
+        />
+      ))}
+      <Block
+        position={[0, 10.55, -24.5]}
+        scale={[10, 0.8, 2.2]}
+        color="#bdd8e8"
+      />
+      <group position={[0, 0, -25]}>
+        {Array.from({ length: 5 }, (_, i) => (
+          <group key={i} position={[0, 0, -2 - i * 3]}>
+            <Block
+              position={[-3.4, 3.9, 0]}
+              scale={[0.25, 7.8, 0.35]}
+              color="#557e9b"
+            />
+            <Block
+              position={[3.4, 3.9, 0]}
+              scale={[0.25, 7.8, 0.35]}
+              color="#557e9b"
+            />
+            <Block
+              position={[0, 7.8, 0]}
+              scale={[7, 0.25, 0.35]}
+              color="#c4e9f5"
+              emissive="#b6ddee"
+              emissiveIntensity={0.35}
+            />
+          </group>
+        ))}
+        <Door
+          id="corridor"
+          title="Infinite Corridor"
+          position={[0, 0, 0]}
+          dark
         />
       </group>
-      <Block position={[0, 11.1, 0]} scale={[7.2, 3.8, 1.1]} color="#dedfd8" />
-      <Block
-        position={[0, 4.7, -0.6]}
-        scale={[7.1, 9.4, 0.05]}
-        color="#c7d6d6"
-        emissive="#aabfc2"
-        emissiveIntensity={0.22}
-        onClick={(event) => {
-          if (event.delta < 5) {
-            event.stopPropagation();
-            usePalaceStore.getState().enterRoom("corridor");
-          }
-        }}
-      />
-      {Array.from({ length: 7 }, (_, i) => (
-        <group key={i} position={[0, 0, -1.4 - i * 2.3]}>
+      {[-17, -7, 3].map((z, i) => (
+        <group key={z}>
           <Block
-            position={[-3.1, 4.65, 0]}
-            scale={[0.16, 9.3, 0.22]}
-            color="#b6c6c7"
+            position={[i % 2 ? -2 : 2, 14, -8 + z]}
+            scale={[26, 0.55, 5]}
+            color="#b7d1df"
+            castShadow
           />
           <Block
-            position={[3.1, 4.65, 0]}
-            scale={[0.16, 9.3, 0.22]}
-            color="#b6c6c7"
-          />
-          <Block
-            position={[0, 9.3, 0]}
-            scale={[6.2, 0.13, 0.22]}
-            color="#b6c6c7"
+            position={[0, 14.7, z]}
+            scale={[29, 0.04, 4.4]}
+            color="#d8f2ff"
+            emissive="#e2f4ff"
+            emissiveIntensity={0.7}
           />
         </group>
       ))}
-      <Label
-        text="08     INFINITE CORRIDOR"
-        position={[0, 9.85, 0.57]}
-        size={0.24}
-        color="#385154"
-      />
-      <Label
-        text="THE ARCHIVE CONTINUES  →"
-        position={[0, 2.1, -0.56]}
-        size={0.18}
-        color="#5a767b"
-      />
-    </group>
-  );
-}
-
-export default function Atrium() {
-  const images = useLibraryStore((s) => s.wallpapers);
-  const hero = projects.find((p) => p.id === "void-echo");
-  return (
-    <group>
+      <Core />
       {hero && (
         <group
-          position={[-14, 5.2, -8]}
-          rotation={[0, 0.3, 0]}
+          position={[-12.2, 4.8, -8.5]}
+          rotation={[0, 0.28, 0]}
           onClick={(e) => {
             e.stopPropagation();
             usePalaceStore.getState().focusItem(hero);
           }}
         >
-          <Block scale={[11.6, 6.9, 0.16]} color="#152841" />
+          <Block scale={[9.8, 5.7, 0.35]} color="#11243a" />
           <Picture
             src={hero.cover}
-            width={11.3}
-            height={6.5}
-            position={[0, 0, 0.12]}
+            width={9.5}
+            height={5.35}
+            position={[0, 0, 0.2]}
           />
           <Label
-            text="VOID//ECHO / A WORLD I BUILT"
-            position={[0, -3.9, 0.13]}
-            color="#57798b"
-            size={0.18}
+            text="VOID//ECHO"
+            position={[-4.7, -3.1, 0.2]}
+            align="left"
+            size={0.22}
+            color="#315972"
           />
         </group>
       )}
       {images[0] && (
         <VisualWall
           item={images[0]}
-          position={[14.3, 5.1, -9]}
-          width={11.5}
-          height={7.3}
-          rotation={[0, -0.3, 0]}
+          position={[12.5, 4.6, -10]}
+          width={10.2}
+          height={5.74}
+          rotation={[0, -0.28, 0]}
+          atmosphere={false}
         />
       )}
+      <Block
+        position={[-20, 4.2, 3]}
+        scale={[0.12, 7.5, 7]}
+        color="#61472f"
+        emissive="#ac7447"
+        emissiveIntensity={0.1}
+      />
       <pointLight
-        position={[-19, 4, 1]}
-        color="#ffae60"
-        intensity={95}
+        position={[-17.5, 4.2, 3]}
+        color="#edc99d"
+        intensity={100}
         distance={16}
       />
-      <Block
-        position={[-21.1, 5.5, 1]}
-        scale={[0.1, 7.4, 6.6]}
-        color="#36241d"
-        emissive="#b67a46"
-        emissiveIntensity={0.3}
+      <spotLight
+        position={[-6, 12, 7]}
+        target-position={[0, 3, 0]}
+        intensity={180}
+        angle={0.47}
+        penumbra={0.8}
+        distance={28}
+        color="#ddf4ff"
       />
-      <Floor width={44} depth={54} color="#c4c7c1" />
-      <Block position={[0, -0.23, 0]} scale={[48, 0.4, 58]} color="#c4c7c1" />
-      {/* Deep structural volumes leave lit recesses, rather than a single cube. */}
-      {[-1, 1].map((side) => (
-        <group key={side}>
-          <Block
-            position={[side * 22, 6.5, 0]}
-            scale={[1.1, 13, 54]}
-            color="#e5e0d6"
-          />
-          <Block
-            position={[side * 18.3, 12.65, 0]}
-            scale={[6.5, 0.7, 54]}
-            color="#cbcfc9"
-            castShadow
-          />
-          <Block
-            position={[side * 21.38, 0.2, 0]}
-            scale={[0.07, 0.15, 53]}
-            color="#a5b4b1"
-          />
-          {[-20, -10, 0, 10, 20].map((z) => (
-            <group key={z}>
-              <ContactShadow
-                position={[side * 20.7, 0.017, z]}
-                width={5.5}
-                depth={4.8}
-                opacity={0.23}
-              />
-              <Block
-                position={[side * 20.9, 6.35, z]}
-                scale={[1.2, 12.7, 0.42]}
-                color="#dedbd3"
-                castShadow
-              />
-            </group>
-          ))}
-          <Block
-            position={[side * 11.5, 10.9, -11]}
-            scale={[0.5, 3.5, 26]}
-            color="#d5d6cf"
-          />
-        </group>
+      <pointLight
+        position={[7, 5, -3]}
+        intensity={35}
+        distance={14}
+        color="#c0e9ff"
+      />
+      {[
+        ["projects", "Project Gallery", -1, -12],
+        ["research", "Research Vault", 1, -12],
+        ["music", "Listening Room", -1, 3],
+        ["wallpapers", "Wallpaper Vault", 1, 3],
+        ["liquid-web", "Liquid Web", -1, 13],
+        ["archive", "Archive", 1, 13],
+      ].map(([id, title, side, z]) => (
+        <Door
+          key={id}
+          id={String(id)}
+          title={String(title)}
+          position={[Number(side) * 19.95, 0, Number(z)]}
+          rotation={[0, (-Number(side) * Math.PI) / 2, 0]}
+        />
       ))}
-      {/* A sequence of immense roof cuts, alternating daylight and mineral slabs. */}
-      {[-19, -7, 5, 17].map((z) => (
-        <group key={z}>
-          <Block
-            position={[0, 13.03, z]}
-            scale={[31, 0.45, 4.4]}
-            color="#cfd2cc"
-            castShadow
-          />
-          <Block
-            position={[0, 13.65, z + 4.55]}
-            scale={[30, 0.035, 4.4]}
-            color="#f4fbff"
-            emissive="#e7f4fb"
-            emissiveIntensity={0.6}
-          />
-          <Block
-            position={[0, 12.76, z - 2.1]}
-            scale={[31, 0.4, 0.12]}
-            color="#cad4cf"
-          />
-        </group>
-      ))}
-      {/* Monumental entry wall, pierced by the long central passage. */}
-      <Block
-        position={[-16, 6.5, -26.1]}
-        scale={[10, 13, 0.8]}
-        color="#e6e1d8"
-      />
-      <Block
-        position={[16, 6.5, -26.1]}
-        scale={[10, 13, 0.8]}
-        color="#e6e1d8"
-      />
-      <Core />
-      <CorridorThreshold />
-      <Door
-        id="projects"
-        title="Project Gallery"
-        number="02"
-        position={[-21.34, 0, -13]}
-        rotation={[0, Math.PI / 2, 0]}
-      />
-      <Door
-        id="research"
-        title="Research Hall"
-        number="03"
-        position={[21.34, 0, -13]}
-        rotation={[0, -Math.PI / 2, 0]}
-      />
-      <Door
-        id="music"
-        title="Listening Room"
-        number="04"
-        position={[-21.34, 0, 1]}
-        rotation={[0, Math.PI / 2, 0]}
-      />
-      <Door
-        id="wallpapers"
-        title="Wallpaper Archive"
-        number="05"
-        position={[21.34, 0, 1]}
-        rotation={[0, -Math.PI / 2, 0]}
-      />
-      <Door
-        id="liquid-web"
-        title="Liquid Web / Visual Lab"
-        number="06"
-        position={[-21.34, 0, 15]}
-        rotation={[0, Math.PI / 2, 0]}
-      />
-      <Door
-        id="archive"
-        title="Unfinished Futures"
-        number="07"
-        position={[21.34, 0, 15]}
-        rotation={[0, -Math.PI / 2, 0]}
-      />
-      <Label
-        text={"THE MEMORY\nPALACE"}
-        position={[-16.5, 5.2, -25.22]}
-        size={0.94}
-        maxWidth={8}
-        color="#405652"
-      />
-      <Label
-        text="JIE TIAN   /   MY PERSONAL WORLD"
-        position={[-16.5, 2.65, -25.19]}
-        size={0.16}
-        color="#6a807a"
-      />
-      <Label
-        text={"Things I made.\nWorlds I keep."}
-        position={[14.3, 4.2, -25.2]}
-        size={0.44}
-        maxWidth={7}
-        color="#59706b"
-      />
       <Door
         id="imagined-worlds"
         title="Imagined Worlds"
-        position={[16.2, 0, -24.8]}
+        position={[14.3, 0, -24.8]}
         dark
       />
       <Door
         id="my-collection"
         title="My Collection"
-        position={[-16.2, 0, -24.8]}
+        position={[-15.3, 0, -24.8]}
+        dark
       />
-      {[-18, -9, 0, 9, 18].map((x) => (
+      {[-10, 0, 10].map((x) => (
         <Block
           key={x}
-          position={[x, 0.012, 0]}
-          scale={[0.007, 0.005, 53]}
-          color="#b7bfb8"
+          position={[x, 0.01, -1]}
+          scale={[0.009, 0.005, 48]}
+          color="#8aa8bc"
         />
       ))}
-      {[-18, -9, 0, 9, 18].map((z) => (
-        <Block
-          key={z}
-          position={[0, 0.013, z]}
-          scale={[43, 0.005, 0.007]}
-          color="#b7bfb8"
-        />
-      ))}
-      <spotLight
-        position={[0, 11, 4]}
-        target-position={[0, 0, 0]}
-        intensity={100}
-        angle={0.52}
-        penumbra={1}
-        distance={28}
-        color="#e4f6ff"
-      />
     </group>
   );
 }

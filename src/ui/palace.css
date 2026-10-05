@@ -10,6 +10,12 @@
   font-weight: 600 800;
   font-display: swap;
 }
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/space-grotesk-variable.ttf") format("truetype");
+  font-weight: 300 700;
+  font-display: swap;
+}
 :root {
   font-family: "Palace Sans", Arial, sans-serif;
   color: #25313a;
@@ -22,11 +28,145 @@
   --blue: #668d9e;
   --ui-ink: #26333d;
   --ui-line: rgba(38, 52, 47, 0.25);
+  --type-ui: "Space Grotesk", "Microsoft YaHei", sans-serif;
+  --type-display: "Palace Sans", "Microsoft YaHei", sans-serif;
+  --type-editorial: Georgia, "Noto Serif SC", serif;
 }
 .palace-app {
   transition:
     color 2.4s ease,
     background-color 2.4s ease;
+}
+.room-loading {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  color: #bdd7e7;
+  background: #163044cc;
+  font-size: 12px;
+  z-index: 12;
+  pointer-events: none;
+}
+.palace-app.world-ready .world-reveal {
+  transition: opacity 0.85s ease;
+}
+.palace-app .world-reveal {
+  background: #91b9cf;
+  opacity: 0.12;
+  pointer-events: none;
+}
+.work-details {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-top: 20px;
+}
+.work-details summary {
+  cursor: pointer;
+  color: #385b70;
+}
+.live-work {
+  width: 100%;
+  height: 360px;
+  border: 0;
+  background: #091728;
+  margin-top: 12px;
+}
+.core-information {
+  max-width: min(360px, 90vw);
+  backdrop-filter: blur(8px);
+}
+.hud.is-welcome {
+  --ui-ink: #d6edf9;
+  color: #d6edf9;
+}
+.hud.is-welcome .welcome-caption h1,
+.hud.is-welcome .welcome-subtitle,
+.hud.is-welcome .welcome-caption .eyebrow {
+  color: #e5f4fc;
+}
+.media-import {
+  border-top: 1px solid #b7c9d4;
+  border-bottom: 1px solid #b7c9d4;
+  padding: 16px 0;
+  margin: 20px 0;
+  display: grid;
+  gap: 12px;
+  font-size: 12px;
+}
+.media-import > small {
+  color: #546e80;
+}
+.media-import label,
+.work-placement label {
+  display: grid;
+  gap: 6px;
+}
+.media-import select,
+.media-import input:not([type="checkbox"]),
+.work-placement input:not([type="checkbox"]),
+.work-placement select {
+  padding: 9px;
+  background: #eef4f6;
+  border: 1px solid #a9bfcf;
+  color: #243b4d;
+  min-width: 0;
+}
+.media-import .import-primary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.import-drafts {
+  max-height: 300px;
+  overflow: auto;
+  display: grid;
+  gap: 12px;
+}
+.import-drafts article {
+  display: grid;
+  grid-template-columns: 75px 1fr;
+  gap: 6px 14px;
+}
+.import-drafts img {
+  width: 75px;
+  height: 70px;
+  object-fit: contain;
+  grid-row: span 2;
+}
+.import-drafts small {
+  color: #526a7a;
+}
+.work-placement {
+  display: grid;
+  gap: 10px;
+  padding: 15px;
+  background: #dce8f0;
+  font-size: 12px;
+}
+.removed-works {
+  margin-top: 20px;
+  font-size: 12px;
+}
+.is-exploring .spatial-controls {
+  display: none;
+}
+.room-caption > p:not(.eyebrow) {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.room-caption:hover > p,
+.room-caption:focus-within > p {
+  opacity: 1;
+}
+@media (max-width: 800px) {
+  .focus-panel {
+    width: 96vw;
+  }
+  .dialog-backdrop:has(.focus-panel) {
+    padding: 12px;
+  }
 }
 .palace-app.dark-room {
   --ui-ink: #d0e1ef;
@@ -218,9 +358,9 @@ img {
 }
 .hud-header {
   position: absolute;
-  left: 38px;
-  right: 38px;
-  top: 30px;
+  left: 46px;
+  right: 46px;
+  top: 38px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -228,23 +368,35 @@ img {
 .wordmark {
   display: flex;
   align-items: center;
-  gap: 13px;
-  font-size: 11px;
-  letter-spacing: 0.13em;
+  gap: 17px;
+  font-family: var(--type-ui);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  color: #203843;
   padding: 0;
   text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  transition: color 0.2s ease;
 }
 .brand-symbol {
   font-size: 33px;
   line-height: 1;
   font-weight: 400;
-  color: #597883;
+  color: inherit;
+  opacity: 0.7;
 }
 .wordmark small {
   display: block;
   font-size: 8px;
-  letter-spacing: 0.2em;
-  opacity: 0.65;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.16em;
+  opacity: 0.55;
   margin-top: 7px;
 }
 .hud-header-actions {
@@ -463,26 +615,30 @@ img {
 .core-information {
   position: absolute;
   left: 50%;
-  top: 44%;
+  bottom: 64px;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 8px;
-  padding: 26px;
-  background: rgba(245, 247, 243, 0.92);
-  border: 1px solid rgba(165, 185, 187, 0.3);
+  gap: 4px;
+  padding: 10px 18px;
+  background: #e8f3f5dc;
+  color: #365b70;
+  border: 1px solid #afcdda;
   animation: rise 0.8s;
 }
 .core-information strong {
   font-weight: 400;
-  font-size: 31px;
+  font-size: 17px;
   letter-spacing: -0.03em;
 }
 .core-information > span:not(.eyebrow) {
   font-size: 10px;
   opacity: 0.65;
+}
+.core-information > svg {
+  display: none;
 }
 .tutorial {
   position: absolute;
@@ -551,9 +707,7 @@ img {
   --ui-ink: #d1dbe0;
   --ui-line: rgba(214, 227, 215, 0.25);
 }
-.dark-room .brand-symbol {
-  color: #bacad3;
-}
+.dark-room .brand-symbol { color: inherit; }
 .dark-room .welcome-subtitle {
   color: #b0bbc2;
 }
@@ -1532,12 +1686,12 @@ img {
     height: 29px;
   }
   .core-information {
-    padding: 20px;
-    top: 40%;
-    width: 230px;
+    padding: 10px 14px;
+    bottom: 74px;
+    width: 300px;
   }
   .core-information strong {
-    font-size: 27px;
+    font-size: 17px;
   }
   .near-caption {
     top: 52%;
@@ -2063,3 +2217,122 @@ html[data-motion="reduced"] *::before {
   color: var(--room-accent, #91bdd6);
   transition: color 2.4s ease;
 }
+
+/* Viewing keeps the architecture in the same frame. Override older centered-modal rules. */
+.palace-app .dialog-backdrop:has(.focus-panel) {
+  background: transparent;
+  backdrop-filter: none;
+  justify-content: flex-end;
+  padding: 42px;
+}
+.palace-app .focus-panel {
+  width: min(640px, 44vw);
+  max-height: 88vh;
+  padding: 44px 30px 28px;
+  background: #e8f0f4f2;
+  box-shadow: 0 12px 70px #06142466;
+}
+.palace-app .focus-panel .focus-body {
+  display: block;
+}
+.palace-app .focus-panel .focus-visual {
+  width: 100%;
+  padding: 0;
+  background: #12253b;
+  color: #c6dae9;
+}
+.palace-app .focus-visual .text-button {
+  color: #d2e7f4;
+  padding: 10px 12px;
+}
+.palace-app .focus-visual > small {
+  display: block;
+  padding: 8px 12px;
+}
+.palace-app .focus-panel .focus-cover {
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+}
+.palace-app .focus-panel .focus-copy {
+  padding: 20px 0 0;
+}
+@media (max-width: 800px) {
+  .palace-app .focus-panel {
+    width: 96vw;
+  }
+  .palace-app .dialog-backdrop:has(.focus-panel) {
+    padding: 12px;
+  }
+}
+
+/* The single menu has a light backing; the museum identity floats directly over the space. */
+.hud-header-actions {
+  color: #dcecf5;
+  background: rgba(8, 18, 25, 0.18);
+  backdrop-filter: blur(10px);
+  padding: 6px 10px;
+  border-radius: 0;
+}
+.hud-header-actions {
+  align-items: center;
+}
+.hud-header-actions .sound-button,
+.hud-header-actions .guide-button {
+  padding: 4px 0;
+}
+
+.hud, .eyebrow, .text-button, .guide-links, .index-sidebar,
+.music-panel, .music-collection, .wallpaper-panel, .media-import {
+  font-family: var(--type-ui);
+}
+.welcome-caption h1, .index-hero h1 {
+  font-family: var(--type-display);
+}
+.guide-intro h2, .focus-copy h2, .collection-heading h2 {
+  font-family: var(--type-editorial);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+.wordmark.identity-is-light {
+  color: #dbeaf2;
+}
+.wordmark:hover { color: #28414c; }
+.wordmark.identity-is-light:hover { color: #e1edf4; }
+.wordmark .brand-symbol svg { width: 23px; height: 30px; }
+@media (max-width: 700px) {
+  .wordmark { font-size: 11px; gap: 13px; }
+  .wordmark small { font-size: 7px; letter-spacing: .15em; }
+  .wordmark .brand-symbol svg { width: 20px; height: 26px; }
+}
+
+.lyrics-projection { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 3; visibility: hidden; }
+.lyrics-projection-camera { position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none; }
+.lyrics-projection-surface { position: absolute; top: 0; left: 0; pointer-events: none; }
+.lyric-wall {
+  width: 660px;
+  height: 395px;
+  padding: 20px 30px;
+  color: #dce8ed;
+  font-family: var(--type-ui);
+  pointer-events: auto;
+  backface-visibility: hidden;
+}
+.lyric-heading { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: .15em; color: #baa58a; }
+.lyric-current-track { margin-top: 10px; }
+.lyric-current-track p { font-size: 18px; line-height: 22px; margin: 0 0 3px; max-height: 44px; overflow: hidden; font-weight: 500; }
+.lyric-current-track span { display: block; font-size: 10px; line-height: 12px; opacity: .55; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lyric-viewport { height: 235px; overflow: hidden; margin-top: 16px; mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent); }
+.lyric-roll { position: relative; transition: transform .9s cubic-bezier(.2,.6,.25,1); }
+.lyric-line { position: absolute; width: 100%; height: 70px; margin: 0; display: flex; align-items: center; white-space: pre-line; font-size: 23px; line-height: 1.35; color: #99aebb; opacity: .35; font-weight: 400; transition: opacity .7s, color .7s; }
+.lyric-line.is-current { opacity: 1; color: #f2e5d2; }
+.lyric-wall[data-reduced="true"] .lyric-roll { transition: none; }
+.lyric-untimed { height: 235px; overflow-y: auto; margin-top: 16px; font-size: 22px; line-height: 1.7; scrollbar-width: thin; }
+.lyric-empty { height: 235px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.lyric-empty p { font-family: var(--type-editorial); font-size: 30px; margin: 0; }
+.lyric-empty small { font-size: 13px; opacity: .6; }
+.lyric-empty button { text-align: left; padding: 0; width: max-content; color: #c2ab8c; font-size: 11px; letter-spacing: .08em; }
+.lyric-footnote { opacity: .45; font-size: 10px; letter-spacing: .06em; margin-top: 8px; }
+.record-lyrics-tools { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 18px; margin-top: 14px; font-family: var(--type-ui); }
+.record-lyrics-tools > span { font-size: 11px; opacity: .65; }
+.record-lyrics-tools .text-button { font-size: 10px; padding: 4px 0; }

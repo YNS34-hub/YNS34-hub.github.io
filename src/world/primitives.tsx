@@ -8,7 +8,6 @@ import {
   Mesh,
   SRGBColorSpace,
   Texture,
-  TextureLoader,
   type EulerTuple,
   type Vector3Tuple,
   type WebGLProgramParametersWithUniforms,
@@ -20,6 +19,11 @@ import type { ContentItem } from "../content/types";
 import { usePalaceStore } from "../systems/store";
 import { setWalkTarget } from "./walkTarget";
 import { registerProximity } from "./proximity";
+import { acquireImage, prewarmImages } from "./textureCache";
+import { pictureFit } from "./pictureFit";
+import { PlaneGeometry } from "three";
+import { projects } from "../content/catalog";
+import { useLibraryStore } from "../systems/library";
 
 export interface BlockProps {
   position?: Vector3Tuple;
@@ -172,13 +176,15 @@ export function Label({
     const lines: string[] = [];
     text.split("\n").forEach((paragraph) => {
       let line = "";
-      paragraph.split(" ").forEach((word) => {
-        const next = line ? `${line} ${word}` : word;
-        if (line && context.measureText(next).width > limit) {
-          lines.push(line);
-          line = word;
-        } else line = next;
-      });
+      (paragraph.match(/[\u3400-\u9fff]|[^\s\u3400-\u9fff]+/g) || [""]).forEach(
+        (word) => {
+          const next = line ? `${line} ${word}` : word;
+          if (line && context.measureText(next).width > limit) {
+            lines.push(line);
+            line = word;
+          } else line = next;
+        },
+      );
       lines.push(line);
     });
     const contentWidth = Math.max(
@@ -242,53 +248,19 @@ export function Label({
   );
 }
 
-/** Textures belong to the mounted room, and are released when that room is left. */
+/** Reference-counted textures are shared across walls and the cinema. */
 export function useImageTexture(src?: string) {
   const [texture, setTexture] = useState<Texture | null>(null);
   const tier = usePalaceStore((s) => s.effectiveQuality);
   useEffect(() => {
     setTexture(null);
     if (!src) return;
-    let disposed = false;
-    let loaded: Texture | null = null;
-    const url = src.startsWith("/")
-      ? `${import.meta.env.BASE_URL}${src.slice(1)}`
-      : src;
-    new TextureLoader().load(
-      url,
-      (image) => {
-        if (disposed) {
-          image.dispose();
-          return;
-        }
-        loaded = image;
-        const budget = tier === "low" ? 768 : tier === "medium" ? 1280 : 2048;
-        const source = image.image as HTMLImageElement;
-        if (Math.max(source.width, source.height) > budget) {
-          const scale = budget / Math.max(source.width, source.height);
-          const resized = document.createElement("canvas");
-          resized.width = Math.max(1, Math.round(source.width * scale));
-          resized.height = Math.max(1, Math.round(source.height * scale));
-          const context = resized.getContext("2d");
-          if (context) {
-            context.drawImage(source, 0, 0, resized.width, resized.height);
-            image.image = resized;
-          }
-        }
-        image.colorSpace = SRGBColorSpace;
-        image.anisotropy = 2;
-        image.needsUpdate = true;
-        setTexture(image);
-      },
-      undefined,
-      () => {
-        if (!disposed) setTexture(null);
-      },
+    const budget = tier === "low" ? 1024 : tier === "medium" ? 1600 : 2560;
+    const resource = acquireImage(src, budget, () =>
+      setTexture(resource.get()),
     );
-    return () => {
-      disposed = true;
-      loaded?.dispose();
-    };
+    setTexture(resource.get());
+    return resource.release;
   }, [src, tier]);
   return texture;
 }
@@ -311,6 +283,17 @@ function galleryPrint(shader: WebGLProgramParametersWithUniforms) {
   );
 }
 
+function paperLighting(shader: WebGLProgramParametersWithUniforms) {
+  shader.fragmentShader = shader.fragmentShader.replace(
+    "#include <opaque_fragment>",
+    `// Bound print illumination while preserving photographic hue and shadow detail.
+    vec3 paperBase = diffuseColor.rgb;
+    vec3 paperLux = outgoingLight / max(paperBase, vec3(0.02));
+    float paperExposure = dot(paperLux, vec3(0.2126, 0.7152, 0.0722));
+    outgoingLight = paperBase * clamp(paperExposure, 0.62, 1.02);
+    #include <opaque_fragment>`,
+  );
+}
 export function Picture({
   src,
   width = 5,
@@ -320,6 +303,9 @@ export function Picture({
   color = "#8c9da0",
   fit = "contain",
   museumPrint = false,
+  medium = "screen",
+  focus = [0.5, 0.5],
+  luminance = 1,
   texture: providedTexture,
 }: {
   src?: string;
@@ -330,6 +316,9 @@ export function Picture({
   color?: string;
   fit?: "contain" | "cover";
   museumPrint?: boolean;
+  medium?: "screen" | "print" | "projection";
+  focus?: [number, number];
+  luminance?: number;
   texture?: Texture | null;
 }) {
   const loadedTexture = useImageTexture(
@@ -340,26 +329,47 @@ export function Picture({
   const aspect = texture?.image
     ? texture.image.width / texture.image.height
     : width / height;
-  const dimensions =
-    fit === "cover"
-      ? [width, height]
-      : aspect > width / height
-        ? [width, width / aspect]
-        : [height * aspect, height];
+  const dimensions = pictureFit(aspect, width, height, fit, focus);
+  const geometry = useMemo(() => {
+    const plane = new PlaneGeometry(dimensions.width, dimensions.height);
+    const uv = plane.attributes.uv;
+    const [x, y, right, top] = dimensions.uv;
+    for (let i = 0; i < uv.count; i++)
+      uv.setXY(i, x + uv.getX(i) * (right - x), y + uv.getY(i) * (top - y));
+    return plane;
+  }, [dimensions.width, dimensions.height, ...dimensions.uv]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
   return (
-    <mesh position={position} rotation={rotation}>
-      <planeGeometry args={[dimensions[0], dimensions[1]]} />
-      <meshBasicMaterial
-        key={texture?.uuid || "unloaded"}
-        map={texture}
-        color={texture ? "#ffffff" : color}
-        toneMapped={false}
-        side={DoubleSide}
-        onBeforeCompile={museumPrint ? galleryPrint : undefined}
-        customProgramCacheKey={() =>
-          museumPrint ? "museum-print-v1" : "picture-v1"
-        }
-      />
+    <mesh position={position} rotation={rotation} geometry={geometry}>
+      {medium === "print" ? (
+        <meshStandardMaterial
+          key={texture?.uuid || "unloaded-print"}
+          map={texture}
+          color={texture ? "#ffffff" : color}
+          roughness={0.9}
+          metalness={0}
+          toneMapped={false}
+          side={DoubleSide}
+          onBeforeCompile={paperLighting}
+          customProgramCacheKey={() => "photographic-paper-v1"}
+        />
+      ) : (
+        <meshBasicMaterial
+          key={texture?.uuid || "unloaded"}
+          map={texture}
+          color={
+            texture
+              ? new Color().setRGB(luminance, luminance, luminance)
+              : color
+          }
+          toneMapped={false}
+          side={DoubleSide}
+          onBeforeCompile={museumPrint ? galleryPrint : undefined}
+          customProgramCacheKey={() =>
+            museumPrint ? "museum-print-v1" : "picture-v1"
+          }
+        />
+      )}
     </mesh>
   );
 }
@@ -442,7 +452,19 @@ export function Door({
   const enter = (event: ThreeEvent<MouseEvent>) => {
     if (event.delta > 5) return;
     event.stopPropagation();
-    usePalaceStore.getState().enterRoom(id);
+    const library = useLibraryStore.getState();
+    const sources =
+      id === "projects"
+        ? projects.map((x) => x.cover || "")
+        : id === "wallpapers"
+          ? library.wallpapers.map((x) => x.displaySrc || x.src)
+          : library.personal.visuals.map((x) => x.displaySrc || x.src);
+    prewarmImages(
+      sources.filter(Boolean),
+      usePalaceStore.getState().effectiveQuality === "low" ? 1024 : 1600,
+    );
+    setWalkTarget(event.point.clone().setY(1.65));
+    usePalaceStore.getState().update({ pendingDoor: id });
   };
   return (
     <group position={position} rotation={rotation}>

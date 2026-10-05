@@ -28,6 +28,16 @@ export function roomLighting(plan: RoomPlan, roomId: string) {
       dark: boolean;
     }
   > = {
+    atrium: {
+      background: "#b7d9ec",
+      sky: "#e2f4ff",
+      ground: "#304965",
+      key: "#f1f8ff",
+      keyIntensity: 1.75,
+      environment: 0.65,
+      hemisphere: 0.68,
+      dark: false,
+    },
     corridor: {
       background: "#102131",
       sky: "#81b3d2",
@@ -95,7 +105,7 @@ export function roomLighting(plan: RoomPlan, roomId: string) {
       key: "#ebbd86",
       keyIntensity: 0.45,
       environment: 0.35,
-      hemisphere: 0.45,
+      hemisphere: 0.65,
       dark: true,
     },
     wallpapers: {

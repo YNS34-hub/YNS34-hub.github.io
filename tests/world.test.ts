@@ -14,6 +14,20 @@ import {
 } from "../src/world/collision";
 
 describe("content-driven architecture and bounded streaming", () => {
+  it("keeps the observatory deck edge closed and the viewing bridge continuous", () => {
+    for (const room of ["cosmic", "imagined-worlds", "cosmic-page-2"]) {
+      const center = new Vector3(0, 1.65, -23);
+      keepClear(center, room);
+      expect(center.z).toBe(-23);
+      const edge = new Vector3(9, 1.65, -16.7);
+      keepClear(edge, room);
+      expect(edge.z).toBe(-16.5);
+      const rail = new Vector3(3.8, 1.65, -23);
+      keepClear(rail, room);
+      expect(rail.x).toBeCloseTo(3.7);
+      expect(rail.z).toBe(-23);
+    }
+  });
   it("keeps five resident segments across negative addresses and long-distance exploration", () => {
     expect(residentChunks(14)).toEqual([-2, -1, 0, 1, 2]);
     expect(residentChunks(-0.1)).toEqual([-3, -2, -1, 0, 1]);
@@ -66,9 +80,9 @@ describe("accessible movement around architecture", () => {
     expect(roomBounds("anomaly-floating")).toEqual([-1.3, 1.3, -15.6, 15.6]);
   });
   it("keeps the eye out of furniture and preserves a usable door opening", () => {
-    const fromBench = new Vector3(0, 3, -3);
+    const fromBench = new Vector3(0, 3, -5);
     keepClear(fromBench, "music");
-    expect(Math.hypot(fromBench.x, fromBench.z+3)).toBeCloseTo(5.7, 6);
+    expect(Math.abs(fromBench.z + 5)).toBeCloseTo(1.95, 6);
     expect(fromBench.y).toBe(1.65);
     const opening = new Vector3(0, 1.65, 11);
     keepClear(opening, "anomaly-impossible");

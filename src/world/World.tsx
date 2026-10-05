@@ -20,21 +20,20 @@ import GalleryRoom from "../rooms/Galleries";
 import Corridor from "../rooms/Corridor";
 import { VisualLab } from "../rooms/VisualLab";
 import { WallpaperCinema } from "../rooms/Wallpapers";
-import {
-  PersonalProjects,
-  PersonalResearch,
-  PersonalMusic,
-  PersonalWallpaper,
-  ImaginedWorlds,
-  PersonalArchive,
-  MyCollection,
-} from "../rooms/PersonalRooms";
+import { PersonalProjects, PersonalResearch } from "../rooms/PersonalRooms";
 import { useLibraryStore } from "../systems/library";
 import { nearestImageAtmosphere } from "./imageAtmosphere";
 import Player from "./Player";
 import { setWalkTarget } from "./walkTarget";
 import { resolveRoomPlan } from "./roomPlan";
 import { roomLighting } from "./artDirection";
+import ListeningRoom from "../rooms/ListeningRoom";
+import { WallpaperVault, ImageRoom } from "../rooms/ImageRooms";
+import { ArchiveRoom, CollectionRoom } from "../rooms/ArchiveRooms";
+import { textureStatus } from "./textureCache";
+import { audioSignal } from "../audio/signal";
+import IdentityContrast from "./IdentityContrast";
+import { useProgress } from "@react-three/drei";
 
 function Environment({
   roomId,
@@ -44,6 +43,7 @@ function Environment({
   onReady?: () => void;
 }) {
   const { gl, scene } = useThree();
+  const { active: assetLoading } = useProgress();
   const tier = usePalaceStore((s) => s.effectiveQuality);
   const plan = resolveRoomPlan(roomId);
   const lighting = roomLighting(plan, roomId);
@@ -95,7 +95,6 @@ function Environment({
     scene.environment = target.texture;
     environment.dispose();
     generator.dispose();
-    ready.current?.();
     const lost = (event: Event) => {
       event.preventDefault();
       usePalaceStore.getState().update({ mode: "index" });
@@ -107,6 +106,26 @@ function Environment({
       gl.domElement.removeEventListener("webglcontextlost", lost);
     };
   }, [gl, scene]);
+  const readyAt = useRef(0),
+    sent = useRef("");
+  useEffect(() => {
+    readyAt.current = performance.now();
+    sent.current = "";
+  }, [roomId]);
+  useFrame(() => {
+    if (sent.current === roomId) return;
+    const status = textureStatus();
+    if (
+      useLibraryStore.getState().ready &&
+      !status.pending &&
+      !assetLoading &&
+      performance.now() - readyAt.current > 650 &&
+      sent.current !== roomId
+    ) {
+      sent.current = roomId;
+      ready.current?.();
+    }
+  });
   const color = lighting.background;
   return (
     <>
@@ -122,7 +141,13 @@ function Environment({
       <hemisphereLight ref={sky} args={["#b5cfde", "#22364a", 0.5]} />
       <directionalLight
         ref={key}
-        position={[12, 24, 4]}
+        position={
+          roomId === "music"
+            ? [-8, 13, 5]
+            : roomId === "atrium"
+              ? [-12, 24, 6]
+              : [10, 16, 5]
+        }
         color="#d4e4f0"
         intensity={1}
         castShadow={plan.type !== "listening"}
@@ -206,6 +231,8 @@ function Scene({
       scene,
       roomId,
       residentCorridorChunks: roomId === "corridor" ? 5 : 0,
+      textureStatus,
+      audioSignal,
     };
     return () => {
       delete debug.__PALACE_DEBUG__;
@@ -216,6 +243,7 @@ function Scene({
       <Environment roomId={roomId} onReady={onReady} />
       <Player roomId={roomId} />
       <PerformanceMonitor />
+      <IdentityContrast />
       <group
         key={roomId}
         onClick={(event) => {
@@ -242,17 +270,17 @@ function Scene({
         ) : ["imagined-worlds", "cosmic", "glass-life", "portraits"].includes(
             baseRoom,
           ) ? (
-          <ImaginedWorlds roomId={roomId} />
+          <ImageRoom roomId={roomId} />
         ) : roomId === "archive" || roomId === "unfinished" ? (
-          <PersonalArchive unfinished={roomId === "unfinished"} />
+          <ArchiveRoom unfinished={roomId === "unfinished"} />
         ) : roomId === "my-collection" ? (
-          <MyCollection />
+          <CollectionRoom />
         ) : plan.type === "listening" ? (
-          <PersonalMusic />
+          <ListeningRoom />
         ) : roomId === "cinema" ? (
           <WallpaperCinema />
         ) : plan.type === "image-gallery" || roomId.startsWith("wallpapers") ? (
-          <PersonalWallpaper />
+          <WallpaperVault />
         ) : (
           <GalleryRoom roomId={roomId} />
         )}
@@ -285,7 +313,7 @@ export default function World({ onReady }: { onReady?: () => void }) {
       className="world-canvas"
       dpr={dpr}
       shadows={renderTier !== "low"}
-      camera={{ fov: 60, near: 0.12, far: 200, position: [8.2, 1.65, 19.7] }}
+      camera={{ fov: 60, near: 0.12, far: 200, position: [0, 1.65, 23] }}
       events={(state) => {
         const normal = pointerEvents(state);
         return {

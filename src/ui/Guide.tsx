@@ -5,8 +5,16 @@ import { usePalaceStore } from "../systems/store";
 import { Dialog } from "./primitives";
 
 export default function Guide() {
-  const { roomId, enterRoom, setOverlay, recent, bookmarks, visits, update } =
-    usePalaceStore();
+  const {
+    roomId,
+    enterRoom,
+    setOverlay,
+    recent,
+    bookmarks,
+    visits,
+    update,
+    toggleBookmark,
+  } = usePalaceStore();
   const visibleRooms = rooms.filter((r) => !r.hidden && r.id !== "cinema");
   return (
     <Dialog
@@ -83,6 +91,24 @@ export default function Guide() {
           </button>
         ))}
         <div className="guide-links">
+          <button
+            aria-label={
+              bookmarks.includes(roomId) ? "Unbookmark room" : "Bookmark room"
+            }
+            aria-pressed={bookmarks.includes(roomId)}
+            onClick={() => toggleBookmark(roomId)}
+          >
+            {bookmarks.includes(roomId)
+              ? "Room kept in your trail"
+              : "Keep this room"}{" "}
+            <Bookmark size={15} />
+          </button>
+          <button onClick={() => setOverlay("collection")}>
+            Arrange / import works <ArrowRight size={15} />
+          </button>
+          <button onClick={() => setOverlay("settings")}>
+            Experience settings <ArrowRight size={15} />
+          </button>
           <button onClick={() => setOverlay("about")}>
             About Jie Tian <ArrowRight size={15} />
           </button>
@@ -108,12 +134,15 @@ export default function Guide() {
         {(recent.length > 0 || bookmarks.length > 0) && (
           <div className="recent-rooms">
             <span className="eyebrow">YOUR TRAIL</span>
-            {[...new Set([...bookmarks, ...recent])].slice(0, 4).map((id) => (
-              <button key={id} onClick={() => enterRoom(id)}>
-                {bookmarks.includes(id) && <Bookmark size={12} />}{" "}
-                {roomInfo(id).title}
-              </button>
-            ))}
+            {[...new Set([...bookmarks, ...recent])]
+              .filter((id) => visibleRooms.some((x) => x.id === id))
+              .slice(0, 4)
+              .map((id) => (
+                <button key={id} onClick={() => enterRoom(id)}>
+                  {bookmarks.includes(id) && <Bookmark size={12} />}{" "}
+                  {roomInfo(id).title}
+                </button>
+              ))}
           </div>
         )}
       </div>

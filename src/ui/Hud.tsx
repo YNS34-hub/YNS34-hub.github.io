@@ -18,6 +18,7 @@ import { usePalaceStore } from "../systems/store";
 import { useAudioStore } from "../audio/player";
 import { useLibraryStore } from "../systems/library";
 import { PalaceMark } from "./primitives";
+import { useIdentityTone } from "../systems/identityTone";
 export default function Hud({ ready }: { ready: boolean }) {
   const s = usePalaceStore();
   const audio = useAudioStore(
@@ -28,6 +29,7 @@ export default function Hud({ ready }: { ready: boolean }) {
     })),
   );
   const tracks = useLibraryStore((l) => l.music);
+  const lightIdentity = useIdentityTone((tone) => tone.light);
   const room = roomInfo(s.roomId);
   const plan = resolveRoomPlan(s.roomId);
   const track = tracks.find((t) => t.id === audio.currentId);
@@ -49,13 +51,13 @@ export default function Hud({ ready }: { ready: boolean }) {
     <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`}>
       <header className="hud-header">
         <button
-          className="wordmark"
+          className={`wordmark ${lightIdentity ? "identity-is-light" : ""}`}
           onClick={() => s.setOverlay("about")}
           aria-label="About The Memory Palace"
         >
           <PalaceMark />
           <span>
-            THE MEMORY PALACE<small>JIE TIAN / A LIVING ARCHIVE</small>
+            THE MEMORY PALACE<small>JIE TIAN · LIVING ARCHIVE</small>
           </span>
         </button>
         <div className="hud-header-actions">
@@ -211,11 +213,13 @@ export default function Hud({ ready }: { ready: boolean }) {
       {s.started && s.coreNear && !s.overlay && !s.focus && (
         <button
           className="core-information"
-          onClick={() => s.setOverlay("about")}
+          onClick={() => s.update({ memoryReveal: !s.memoryReveal })}
         >
-          <span className="eyebrow">THE KEEPER OF THIS PLACE</span>
-          <strong>Jie Tian</strong>
-          <span>Mathematics / AI / Creative coding</span>
+          <span className="eyebrow">MEMORY REVEAL / 记忆显影</span>
+          <strong>
+            {s.memoryReveal ? "Return to stillness" : "Reveal the collection"}
+          </strong>
+          <span>Saved works or selected collection · ESC to skip</span>
           <ArrowRight size={18} />
         </button>
       )}

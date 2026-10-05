@@ -13,20 +13,7 @@ export default function CinemaControls() {
     ...library.personal.research,
   ];
   const selected = image || images[0];
-  const exit = () =>
-    usePalaceStore
-      .getState()
-      .enterRoom(
-        library.personal.projects.some((x) => x.id === selected?.id)
-          ? selected?.category === "liquid-web"
-            ? "liquid-web"
-            : "projects"
-          : library.personal.research.some((x) => x.id === selected?.id)
-            ? "research"
-            : library.personal.visuals.some((x) => x.id === selected?.id)
-              ? "imagined-worlds"
-              : "wallpapers",
-      );
+  const exit = () => usePalaceStore.getState().exitCinema();
   const move = (direction: number) => {
     const index = images.findIndex((x) => x.id === selected?.id);
     if (images.length)
@@ -41,13 +28,18 @@ export default function CinemaControls() {
     const key = (event: KeyboardEvent) => {
       if ((event.target as HTMLElement)?.closest("input,textarea,select"))
         return;
+      const state = usePalaceStore.getState();
+      if (state.overlay || state.focus) return;
       if (["ArrowLeft", "ArrowRight", "Escape", "i", "I"].includes(event.key)) {
         event.preventDefault();
         event.stopImmediatePropagation();
       }
       if (event.key === "ArrowLeft") move(-1);
       if (event.key === "ArrowRight") move(1);
-      if (event.key === "Escape") exit();
+      if (event.key === "Escape") {
+        if (metadata) setMetadata(false);
+        else exit();
+      }
       if (event.key.toLowerCase() === "i") setMetadata((v) => !v);
     };
     window.addEventListener("keydown", key, true);
