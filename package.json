@@ -22,6 +22,7 @@
     "test:hero": "node scripts/check-hero.mjs",
     "qa:quality": "node scripts/capture-quality-leap.mjs",
     "test:quality": "node scripts/check-quality-leap.mjs",
+    "test:listening": "node scripts/check-listening-identity.mjs",
     "qa:performance": "node scripts/measure-quality-leap.mjs"
   },
   "devDependencies": {

@@ -19,6 +19,7 @@ import IndexView from "./ui/IndexView";
 import MusicPanel from "./ui/MusicPanel";
 import WallpaperPanel from "./ui/WallpaperPanel";
 import CinemaControls from "./ui/CinemaControls";
+import LyricsProjection from "./ui/LyricsProjection";
 import { Dialog } from "./ui/primitives";
 import { AudioSystem } from "./audio/AudioSystem";
 const World = lazy(() => import("./world/World"));
@@ -79,6 +80,7 @@ export default function App() {
         else if (s.overlay) s.setOverlay(null);
         else if (s.memoryReveal) s.update({ memoryReveal: false });
         else if (s.pendingDoor) s.update({ pendingDoor: null });
+        else if (document.pointerLockElement) document.exitPointerLock();
       }
     };
     window.addEventListener("keydown", keys);
@@ -156,6 +158,7 @@ export default function App() {
                 <World onReady={() => setReady(true)} />
               </Suspense>
             </WorldBoundary>
+            {s.roomId === "music" && <LyricsProjection />}
           </div>
           <div className="world-reveal" aria-hidden="true" />
           {!ready && (

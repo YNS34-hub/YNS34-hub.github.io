@@ -18,6 +18,35 @@ afterEach(async () => {
     await rm(root, { recursive: true, force: true });
 });
 describe("personal media registration", () => {
+  it("keeps stable audio IDs, registers real LRC, uses safe delivery paths and excludes music and lyrics from public builds", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "palace-audio-"));
+    fixtures.push(root);
+    const dir = path.join(root, "personal-media/music");
+    await mkdir(dir, { recursive: true });
+    const wav = Buffer.alloc(44 + 800);
+    wav.write("RIFF", 0); wav.writeUInt32LE(wav.length - 8, 4); wav.write("WAVEfmt ", 8);
+    wav.writeUInt32LE(16, 16); wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22);
+    wav.writeUInt32LE(8000, 24); wav.writeUInt32LE(16000, 28); wav.writeUInt16LE(2, 32);
+    wav.writeUInt16LE(16, 34); wav.write("data", 36); wav.writeUInt32LE(800, 40);
+    const file = "私人,本地&音频.wav";
+    await writeFile(path.join(dir, file), wav);
+    await writeFile(path.join(dir, file.replace(".wav", ".lrc")), "[00:00.01]A local test line\n[00:00.03]Another local test line");
+    const run = (args: string[] = []) => execute(process.execPath, ["scripts/register-personal-media.mjs", ...args], { env: { ...process.env, PALACE_MEDIA_ROOT: root } });
+    const manifestPath = path.join(root, "public/personal-media/manifest.json");
+    await run();
+    const track = JSON.parse(await readFile(manifestPath, "utf8")).music[0];
+    expect(track.id).toBe(`personal-music-${Buffer.from(file).toString("hex")}`);
+    expect(track.year).toBe("");
+    expect(track.src).toMatch(/^\/personal-media\/music\/audio\/[a-f0-9]{64}\.wav$/);
+    expect(track.lyrics).toMatchObject({ synced: true, source: "Local LRC", lines: [{ time: 0.01, text: "A local test line" }, { time: 0.03, text: "Another local test line" }] });
+    expect(await readFile(path.join(root, "public", track.src))).toEqual(wav);
+    await run();
+    expect(JSON.parse(await readFile(manifestPath, "utf8")).music[0].id).toBe(track.id);
+    await run(["--public"]);
+    expect(JSON.parse(await readFile(manifestPath, "utf8")).music).toEqual([]);
+    expect(await readdir(path.join(root, "public/personal-media"))).toEqual(["manifest.json"]);
+    expect(await readFile(path.join(dir, file))).toEqual(wav);
+  });
   it("copies a real website alongside its preview and rejects paths outside the collection", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "palace-site-"));
     fixtures.push(root);

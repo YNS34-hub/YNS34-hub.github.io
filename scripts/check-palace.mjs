@@ -85,8 +85,9 @@ if (process.env.PALACE_VERIFY_DIST === "1") {
       `${route} preserved document served`,
     );
   }
-  for (const name of await readdir(path.join(dist, "assets")))
-    assets.add(`/assets/${name}`);
+  for (const file of await readdir(path.join(dist, "assets"), { recursive: true, withFileTypes: true })) {
+    if (file.isFile()) assets.add("/" + path.relative(dist, path.join(file.parentPath, file.name)).split(path.sep).join("/"));
+  }
   for (const collection of [
     "projects",
     "research",

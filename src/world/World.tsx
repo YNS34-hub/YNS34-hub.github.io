@@ -32,6 +32,7 @@ import { WallpaperVault, ImageRoom } from "../rooms/ImageRooms";
 import { ArchiveRoom, CollectionRoom } from "../rooms/ArchiveRooms";
 import { textureStatus } from "./textureCache";
 import { audioSignal } from "../audio/signal";
+import IdentityContrast from "./IdentityContrast";
 import { useProgress } from "@react-three/drei";
 
 function Environment({
@@ -242,6 +243,7 @@ function Scene({
       <Environment roomId={roomId} onReady={onReady} />
       <Player roomId={roomId} />
       <PerformanceMonitor />
+      <IdentityContrast />
       <group
         key={roomId}
         onClick={(event) => {

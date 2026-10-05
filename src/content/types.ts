@@ -40,6 +40,8 @@ export interface ContentItem {
   date?: string;
 }
 export interface MusicTrack {
+  lyrics?: import("../audio/lyrics.mjs").TrackLyrics;
+  lyricsOffset?: number;
   roomIds?: string[];
   id: string;
   title: string;

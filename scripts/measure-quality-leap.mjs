@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 const out = path.resolve(
     process.env.PALACE_ARTIFACTS || "qa-artifacts/quality-leap",
   ),
@@ -41,6 +42,9 @@ await context.addInitScript(() =>
 const page = await context.newPage();
 page.setDefaultTimeout(60000);
 const report = {
+  checkedAt: new Date().toISOString(),
+  gitHead: execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
+  workingTreeModified: !!execFileSync("git", ["status", "--porcelain"]).toString().trim(),
   browser: browser.version(),
   headed: true,
   resolution: [1920, 1080],
@@ -186,6 +190,31 @@ try {
     await measure(room + " / still");
     if (["atrium", "music", "corridor"].includes(room))
       await measure(room + " / walking", 7, true);
+    if (room === "music" && process.env.PALACE_PERF_LYRICS === "1") {
+      await page.getByRole("button", { name: /OPEN COLLECTION/ }).click();
+      await page.getByLabel("Import local audio files").setInputFiles({
+        name: "Palace Study — performance.wav", mimeType: "audio/wav",
+        buffer: await readFile("public/media/generated/palace-study.wav"),
+      });
+      await page.locator(".record-row").filter({ hasText: "Palace Study — performance" }).locator(".record-title").click();
+      await page.getByRole("dialog").getByRole("button", { name: "Pause music", exact: true }).waitFor();
+      await page.getByLabel("Import lyrics for current track").setInputFiles({
+        name: "palace-study.lrc", mimeType: "text/plain",
+        buffer: Buffer.from(Array.from({ length: 7 }, (_, i) => `[00:${String(i * 4).padStart(2, "0")}.00]Original Palace Study line ${i + 1}`).join("\n")),
+      });
+      await page.getByText("Synchronized wall lyrics", { exact: true }).waitFor();
+      await page.keyboard.press("Escape");
+      await page.evaluate(() => {
+        const s = window.__PALACE_DEV__.state.getState(), c = window.__PALACE_DEBUG__.camera;
+        c.position.set(6, 1.65, -1.5); c.lookAt(6.8, 4.4, -10.3);
+        s.update({ travelSequence: s.travelSequence + 1, returnView: { roomId: "music", position: c.position.toArray(), quaternion: c.quaternion.toArray() } });
+        window.__PALACE_DEV__.audio.getState().seek(2);
+      });
+      await page.waitForFunction(() => window.__PALACE_DEBUG__.audioSignal.available && document.querySelector(".lyric-wall")?.dataset.playing === "true");
+      await measure("music / native playback, FFT and scrolling lyric wall", 8);
+      await page.screenshot({ path: path.join(out, "performance-lyrics.png") });
+      await page.locator(".now-playing-tag").getByRole("button", { name: "Pause music", exact: true }).click();
+    }
   }
   if (!process.env.PALACE_ROOMS) {
     await page.goto(base + "/corridor");

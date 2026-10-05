@@ -19,6 +19,9 @@ import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import { useAudioStore } from "../audio/player";
 import { audioSignal } from "../audio/signal";
+import LyricsWall from "./LyricsWall";
+
+const bands = ["bass", "mid", "treble"] as const;
 
 function AcousticWall() {
   const ribs = useRef<InstancedMesh>(null);
@@ -56,7 +59,7 @@ function Instrument() {
   const reduced = usePalaceStore((s) => s.reducedMotion);
   useFrame((_, dt) => {
     const decay = 1 - Math.exp(-Math.min(dt, 0.1) * 3);
-    for (const key of ["bass", "mid", "treble"] as const)
+    for (const key of bands)
       values.current[key] +=
         ((audioSignal.available && !reduced ? audioSignal[key] : 0) -
           values.current[key]) *
@@ -152,10 +155,24 @@ function Instrument() {
     </group>
   );
 }
+function RhythmDetails() {
+  const materials = useRef<(MeshStandardMaterial | null)[]>([]);
+  const reduced = usePalaceStore((s) => s.reducedMotion);
+  const values = useRef([0, 0, 0]);
+  useFrame((_, dt) => {
+    const response = 1 - Math.exp(-Math.min(dt, 0.1) * 2.5);
+    for (let i = 0; i < 3; i++) {
+      values.current[i] += ((audioSignal.available && !reduced ? audioSignal[bands[i]] : 0) - values.current[i]) * response;
+      const material = materials.current[i];
+      if (material) material.emissiveIntensity = 0.08 + values.current[i] * 0.2;
+    }
+  });
+  return <group name="rhythm-light-details">{[0, 1, 2].map(i => <mesh key={i} position={[-2.1 + i * 2.1, 8.3, -2.5 - i * 3]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[0.025, 4.5]} /><meshStandardMaterial ref={m => { materials.current[i] = m; }} color="#cdb89b" emissive="#c7ad84" emissiveIntensity={0.08} roughness={0.7} /></mesh>)}</group>;
+}
+
 export default function ListeningRoom() {
   const tracks = useLibraryStore((s) => s.music),
-    id = useAudioStore((s) => s.currentId),
-    playing = useAudioStore((s) => s.playing);
+    id = useAudioStore((s) => s.currentId);
   const track = tracks.find((x) => x.id === id);
   return (
     <group>
@@ -187,6 +204,8 @@ export default function ListeningRoom() {
         </group>
       ))}
       <Instrument />
+      <RhythmDetails />
+      <LyricsWall />
       {/* The listening datum is below eye height, separate from the sculpture's stage. */}
       <Block
         position={[-4, 0.32, 6.5]}
@@ -239,24 +258,6 @@ export default function ListeningRoom() {
           maxWidth={5}
         />
       </group>
-      <Label
-        text={track?.title || "A ROOM FOR LISTENING"}
-        position={[4.5, 7.5, -12.9]}
-        size={0.34}
-        color="#ead7bd"
-        maxWidth={8}
-      />
-      <Label
-        text={
-          track
-            ? `${track.artist} / ${track.album} / ${playing ? "PLAYING" : "PAUSED"}`
-            : "LISTENING PREFERENCES / LOCAL AUDIO"
-        }
-        position={[4.5, 6.85, -12.8]}
-        size={0.14}
-        color="#9badc6"
-        maxWidth={8}
-      />
       <spotLight
         position={[-4, 8, 3]}
         target-position={[0, 3, -5]}

@@ -198,6 +198,11 @@ export default function Player({ roomId }: { roomId: string }) {
     const state = usePalaceStore.getState();
     // Cinema has a fixed, level viewing position; movement resumes on exit.
     if (roomId === "cinema") return;
+    if (roomId === "music" && document.activeElement?.hasAttribute("data-reading")) {
+      keys.current.clear();
+      velocity.current.set(0, 0, 0);
+      return;
+    }
     if (clock.elapsedTime - proximityAt.current > 0.25) {
       proximityAt.current = clock.elapsedTime;
       let closest = Infinity,

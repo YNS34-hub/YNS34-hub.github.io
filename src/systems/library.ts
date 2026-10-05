@@ -11,6 +11,7 @@ import {
   type LibraryRecord,
 } from "./idb";
 import { imagePreview } from "./image-preview";
+import { embeddedLyrics } from "../audio/lyrics.mjs";
 import { usePalaceStore } from "./store";
 import {
   normalizeVisual,
@@ -253,11 +254,15 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
         const snapshotIds = new Set(initialMusic.map((track) => track.id));
         set({
           music: [
-            ...initialMusic.map(
-              (track) =>
-                localMusic.find((savedTrack) => savedTrack.id === track.id) ||
-                track,
-            ),
+            ...initialMusic.map((track) => {
+              const savedTrack = localMusic.find((item) => item.id === track.id);
+              return savedTrack ? {
+                ...track,
+                ...savedTrack,
+                // Static audio URLs follow the rebuilt manifest. Browser blobs keep their URL.
+                src: records.get(track.id)?.blob ? savedTrack.src : track.src,
+              } : track;
+            }),
             ...localMusic.filter((track) => !snapshotIds.has(track.id)),
           ],
           ready: true,
@@ -301,6 +306,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
           album: common.album || track.album,
           year: common.year ? String(common.year) : undefined,
           duration: metadata.format.duration,
+          lyrics: embeddedLyrics(common.lyrics),
         };
         const picture = common.picture?.[0];
         if (picture)

@@ -79,6 +79,10 @@ Research Vault 单独展示数学与 Reviewer-First Audit；后者只展示已�
 
 **IMPORT MUSIC / RECONNECT LIBRARY** 在本机读取音频标签、专辑、封面和时长。IndexedDB 保存 Blob 和 metadata，刷新后恢复；存储受限时显示明确提示。清除浏览器数据后通过 Reconnect 重新导入原文件。声音需用户手势启动，可独立调节音乐、环境与空间提示音。
 
+音乐室的墙面跟随当前歌曲显示标题、歌手和歌词。音频内嵌歌词与同名 `.lrc` 自动读取；在播放器 **IMPORT LYRICS** 可绑定本地 LRC / TXT，并在 Record Notes 调整时间偏移。带时间戳的歌词按原生播放器进度滚动，拖动进度立即定位；无时间戳的文字保留手动阅读，缺少歌词或纯音乐提示不伪造内容。歌词与音频都只留在本机。低频照明、中频鳍片、高频细节来自真实分析，暂停后回到静止。
+
+小型 UI 使用自托管 Space Grotesk；展品标题使用编辑字体，大幅入口标题保留 Palace Sans。馆标采用折叠门洞与玻璃核心轮廓，透明底、13 / 8 px 层级与固定字距；只随建筑背景改变字色。
+
 ## 探索与舒适度
 
 WASD / 方向键移动，鼠标拖动查看，Shift 加速，M 打开 Guide，ESC 关闭详情。触控使用 Tour；`/?view=index` 提供可读索引。设置包含画质、Reduce Motion、音量和灵敏度。每个主房间有独立 URL，收藏展翼也生成分享路径。自动质量调节、有限纹理分辨率与五个驻留长廊区段限制资源占用。
@@ -117,7 +121,7 @@ npm run build:public
 
 旧的 `qa:visual` 记录使用 SwiftShader，不代表独立显卡 FPS。本轮 `qa:quality` 和 `qa:performance` 使用已安装 Edge，并记录实际 renderer；性能验收来自可见桌面浏览器。构建生成静态作品页、SEO、sitemap 和 GitHub Pages 404 fallback。旧版本视觉记录保留在 docs，属于上一轮设计。
 
-核心文件：`src/rooms/PersonalRooms.tsx`（私人世界）、`src/world/artDirection.ts`（房间照明）、`scripts/register-personal-media.mjs`（自动注册）、`src/systems/library.ts`（本地收藏）、`src/ui/CinemaControls.tsx`（影院）、`content/`（公开策展）。
+核心文件：`src/world/World.tsx`（当前渲染入口）、`src/rooms/`（独立建筑与展陈）、`src/world/artDirection.ts`（房间照明）、`scripts/register-personal-media.mjs`（自动注册）、`src/systems/library.ts`（本地收藏）、`src/ui/LyricsProjection.tsx`（空间歌词）、`src/ui/CinemaControls.tsx`（影院）、`content/`（公开策展）。
 
 This place continues to grow with me.
 

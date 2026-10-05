@@ -3,23 +3,10 @@ import { useEffect, useRef, type ReactNode } from "react";
 export function PalaceMark() {
   return (
     <span className="brand-symbol" aria-hidden="true">
-      <svg viewBox="0 0 32 32" width="30" height="30" fill="none">
-        <circle
-          cx="16"
-          cy="16"
-          r="3.4"
-          stroke="currentColor"
-          strokeWidth="1.2"
-        />
-        {Array.from({ length: 8 }, (_, i) => (
-          <path
-            key={i}
-            d="M16 2.5V9.5"
-            stroke="currentColor"
-            strokeWidth="1.2"
-            transform={`rotate(${i * 45} 16 16)`}
-          />
-        ))}
+      <svg viewBox="0 0 24 32" width="23" height="30" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 29V5L17 2V26L3 29Z" />
+        <path d="M17 2L22 7V30L17 26M3 5L8 9V27.5" opacity=".55" />
+        <path d="M13 11C18 11 18.5 20.5 13.5 22C9 23.2 8.5 15.8 11.8 14.7C14 14 14.8 12.6 13 11Z" opacity=".78" />
       </svg>
     </span>
   );

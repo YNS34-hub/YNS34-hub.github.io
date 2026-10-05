@@ -2,6 +2,8 @@
 
 Drop images into `wallpapers/`, `chatgpt-images/`, `projects/` or `research/`, and audio into `music/`. Run `npm run build` (or restart `npm run dev`). New files are registered recursively without editing code. JPG/JPEG/PNG/WEBP/AVIF images and MP3/FLAC/WAV/M4A audio are supported. ChatGPT Library is not connected.
 
+For lyrics, place `song.lrc` beside `song.mp3`, `song.m4a`, `song.flac` or `song.wav` with exactly the same stem. Tagged lyrics are also read. The listening wall follows real timestamps, including LRC offsets, seeking and pauses. UTF-8, UTF-16 with BOM and GB18030 text are supported. Plain lyrics remain manually scrollable; missing-lyric / instrumental placeholders are ignored. Local LRC / TXT files up to 2 MB can also be attached through **IMPORT LYRICS** in the player, and timing adjusted in **Record Notes**. Browser attachments stay in IndexedDB; no lyric or music upload is made. Public builds exclude both private recordings and their lyrics.
+
 Optional `collection.json` in each folder can be an array of records with a `file` field, or an object keyed by relative filename. For one image, a single record is also accepted:
 
 ```json
