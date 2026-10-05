@@ -20,7 +20,8 @@ export interface RoomPlan {
 
 /** Content owns a room's architecture. IDs are stable; titles never act as addresses. */
 export function resolveRoomPlan(id: string): RoomPlan {
-  const definition = rooms.find((room) => room.id === id);
+  const baseId = id.split("-page-")[0];
+  const definition = rooms.find((room) => room.id === baseId);
   const item = id.startsWith("exhibit-")
     ? allContent.find((work) => `exhibit-${work.id}` === id)
     : undefined;
@@ -55,6 +56,20 @@ export function resolveRoomPlan(id: string): RoomPlan {
       rule === "memory" ||
       id.startsWith("experiments") ||
       id.startsWith("archive") ||
+      [
+        "projects",
+        "research",
+        "wallpapers",
+        "imagined-worlds",
+        "cosmic",
+        "glass-life",
+        "portraits",
+        "unfinished",
+        "my-collection",
+        "corridor",
+        "liquid-web",
+        "editorial",
+      ].includes(baseId) ||
       id === "cinema",
   };
 }

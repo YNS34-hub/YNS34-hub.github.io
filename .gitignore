@@ -12,3 +12,10 @@ qa-artifacts/
 
 # TypeScript build metadata
 *.tsbuildinfo
+
+# Private local collections; never upload Workshop previews or commercial audio.
+personal-media/*/**
+!personal-media/*/.gitkeep
+public/personal-media/
+local-inventory/
+personal-media/collection.json

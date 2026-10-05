@@ -8,7 +8,6 @@ import { promisify } from "node:util";
 import {
   allContent,
   rooms,
-  projects,
   research,
   archive,
   music,
@@ -29,7 +28,7 @@ describe("the local museum catalog", () => {
       expect(item.status.length).toBeGreaterThan(0);
     }
   });
-  it("ships a local playable study and original images without network dependencies", () => {
+  it("ships real project previews and a metadata-only listening shelf", () => {
     for (const asset of [
       ...music.flatMap((track) => [track.src, track.cover]),
       ...wallpapers.map((image) => image.src),
@@ -38,13 +37,20 @@ describe("the local museum catalog", () => {
       expect(asset).toMatch(/^\//);
       expect(existsSync(resolve(process.cwd(), `public${asset}`))).toBe(true);
     }
-    expect(music.some((track) => track.source === "static" && track.src)).toBe(
+    expect(music.every((track) => !track.src && track.artist === "梁博")).toBe(
       true,
     );
-    expect(wallpapers.length).toBeGreaterThanOrEqual(3);
+    expect(music.map((track) => track.title)).toEqual([
+      "男孩",
+      "出现又离开",
+      "日落大道",
+      "灵魂歌手",
+    ]);
+    expect(wallpapers).toEqual([]);
   });
   it("keeps private prototypes private and external authorship explicit", () => {
-    const audit = projects.find((item) => item.id === "reviewer-first-audit");
+    const audit = research.find((item) => item.id === "reviewer-first-audit");
+    expect(audit).toBeDefined();
     const echo = archive.find((item) => item.id === "echodate-ai");
     expect(audit?.github).toBeUndefined();
     expect(echo?.github).toBeUndefined();
@@ -96,6 +102,23 @@ describe("the local museum catalog", () => {
         resolve(output, "legacy/index.html"),
         "preserved-original",
       );
+      await mkdir(resolve(output, "personal-media"));
+      await writeFile(
+        resolve(output, "personal-media/manifest.json"),
+        JSON.stringify({
+          wallpapers: [],
+          visuals: [
+            { id: "glass-1", category: "glass" },
+            { id: "glass-2", category: "glass" },
+            { id: "glass-3", category: "glass" },
+            { id: "glass-4", category: "glass" },
+            { id: "glass-5", category: "glass" },
+            { id: "glass-6", category: "glass" },
+          ],
+          projects: [],
+          research: [],
+        }),
+      );
       await promisify(execFile)(process.execPath, ["scripts/postbuild.mjs"], {
         cwd: process.cwd(),
         env: { ...process.env, PALACE_OUTPUT_DIR: output },
@@ -125,6 +148,9 @@ describe("the local museum catalog", () => {
         "preserved-original",
       );
       expect(existsSync(resolve(output, "404.html"))).toBe(true);
+      expect(existsSync(resolve(output, "glass-life-page-2/index.html"))).toBe(
+        true,
+      );
       expect(await readFile(resolve(output, "sitemap.xml"), "utf8")).toContain(
         "/music/",
       );
@@ -138,9 +164,9 @@ describe("the local museum catalog", () => {
         );
         expect(hiddenPage).toContain(`https://yns34-hub.github.io/${room.id}/`);
         expect(hiddenPage).toContain('name="robots" content="noindex, follow"');
-        expect(await readFile(resolve(output, "sitemap.xml"), "utf8")).not.toContain(
-          `/${room.id}/`,
-        );
+        expect(
+          await readFile(resolve(output, "sitemap.xml"), "utf8"),
+        ).not.toContain(`/${room.id}/`);
       }
     } finally {
       await rm(output, { recursive: true, force: true });

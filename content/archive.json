@@ -10,7 +10,12 @@
     "featured": true,
     "roomType": "archive",
     "roomRule": "memory",
-    "tags": ["Local-first", "AI assistant", "Human takeover", "WIP"],
+    "tags": [
+      "Local-first",
+      "AI assistant",
+      "Human takeover",
+      "WIP"
+    ],
     "status": "Private prototype · work in progress"
   },
   {
@@ -30,8 +35,14 @@
     "date": "2026-07-27",
     "featured": false,
     "roomType": "archive",
-    "tags": ["Fork", "External reference", "Communication"],
-    "status": "External fork · upstream authorship"
+    "tags": [
+      "Fork",
+      "External reference",
+      "Communication"
+    ],
+    "status": "External fork · upstream authorship",
+    "cover": "/media/archives/buzz-reference.jpg",
+    "coverCaption": "Rendered repository README / REFERENCE / upstream authorship retained"
   },
   {
     "id": "design-systems-reference",
@@ -50,8 +61,14 @@
     "date": "2026-05-02",
     "featured": false,
     "roomType": "archive",
-    "tags": ["Fork", "External reference", "Design systems"],
-    "status": "External fork · upstream authorship"
+    "tags": [
+      "Fork",
+      "External reference",
+      "Design systems"
+    ],
+    "status": "External fork · upstream authorship",
+    "cover": "/media/archives/design-systems-reference.jpg",
+    "coverCaption": "Rendered repository README / REFERENCE / upstream authorship retained"
   },
   {
     "id": "image-prompts-reference",
@@ -70,7 +87,13 @@
     "date": "2026-04-25",
     "featured": false,
     "roomType": "archive",
-    "tags": ["Fork", "External reference", "Image prompts"],
-    "status": "External fork · upstream authorship"
+    "tags": [
+      "Fork",
+      "External reference",
+      "Image prompts"
+    ],
+    "status": "External fork · upstream authorship",
+    "cover": "/media/archives/image-prompts-reference.jpg",
+    "coverCaption": "Rendered repository README / REFERENCE / upstream authorship retained"
   }
 ]

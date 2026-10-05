@@ -40,6 +40,7 @@ export interface ContentItem {
   date?: string;
 }
 export interface MusicTrack {
+  roomIds?: string[];
   id: string;
   title: string;
   artist: string;
@@ -55,6 +56,11 @@ export interface MusicTrack {
   duration?: number;
 }
 export interface WallpaperItem {
+  projectUrl?: string;
+  github?: string;
+  favorite?: boolean;
+  width?: number;
+  height?: number;
   id: string;
   title: string;
   src: string;

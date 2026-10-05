@@ -23,6 +23,63 @@
   --ui-ink: #26333d;
   --ui-line: rgba(38, 52, 47, 0.25);
 }
+.palace-app {
+  transition:
+    color 2.4s ease,
+    background-color 2.4s ease;
+}
+.palace-app.dark-room {
+  --ui-ink: #d0e1ef;
+  --ui-line: rgba(158, 190, 213, 0.25);
+}
+.is-cinema .hud {
+  opacity: 0;
+  pointer-events: none;
+}
+.is-unfinished .hud-header,
+.is-unfinished .explore-controls {
+  opacity: 0.15;
+  transition: opacity 2s;
+}
+.is-unfinished .hud-header:hover,
+.is-unfinished .hud-header:focus-within {
+  opacity: 1;
+}
+.cinema-controls {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  color: #c7d9e8;
+  background: rgba(7, 15, 28, 0.65);
+  backdrop-filter: blur(10px);
+  z-index: 20;
+  font-size: 12px;
+  max-width: 96vw;
+}
+.cinema-controls button {
+  padding: 6px;
+  display: flex;
+}
+.cinema-controls span {
+  max-width: 32vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cinema-metadata {
+  position: absolute;
+  bottom: 68px;
+  left: 0;
+  width: 100%;
+  background: #111c2c;
+  padding: 24px;
+  line-height: 1.65;
+}
 * {
   box-sizing: border-box;
 }
@@ -1995,4 +2052,14 @@ html[data-motion="reduced"] *::before {
   .workflow-steps {
     gap: 12px;
   }
+}
+.dark-room .spatial-controls {
+  background: rgba(16, 29, 46, 0.72);
+  color: #b5ccdf;
+  border-color: rgba(145, 189, 214, 0.22);
+}
+.room-caption-number,
+.dark-room .room-caption-number {
+  color: var(--room-accent, #91bdd6);
+  transition: color 2.4s ease;
 }

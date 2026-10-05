@@ -24,6 +24,7 @@ import { useAudioStore } from "../audio/player";
 import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import type { MusicTrack } from "../content/types";
+import { rooms } from "../content/catalog";
 import "./collections.css";
 import { useShallow } from "zustand/react/shallow";
 
@@ -122,15 +123,14 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
     if (!editing) return;
     const data = new FormData(event.currentTarget);
     try {
-      await useLibraryStore
-        .getState()
-        .updateTrack(editing.id, {
-          title: String(data.get("title")),
-          artist: String(data.get("artist")),
-          album: String(data.get("album")),
-          year: String(data.get("year")),
-          url: String(data.get("url")) || undefined,
-        });
+      await useLibraryStore.getState().updateTrack(editing.id, {
+        title: String(data.get("title")),
+        artist: String(data.get("artist")),
+        album: String(data.get("album")),
+        roomIds: data.getAll("rooms").map(String),
+        year: String(data.get("year")),
+        url: String(data.get("url")) || undefined,
+      });
       setEditing(null);
       setFormError(null);
     } catch (error) {
@@ -269,12 +269,10 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
             value={muted ? 0 : volume}
             aria-label="Music volume"
             onChange={(event) =>
-              usePalaceStore
-                .getState()
-                .update({
-                  musicVolume: Number(event.target.value),
-                  mute: false,
-                })
+              usePalaceStore.getState().update({
+                musicVolume: Number(event.target.value),
+                mute: false,
+              })
             }
           />
         </label>
@@ -302,7 +300,9 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
           disabled={importing}
         >
           <Upload size={14} />
-          {importing ? "READING COLLECTION…" : "IMPORT MUSIC"}
+          {importing
+            ? "READING COLLECTION…"
+            : "IMPORT MUSIC / RECONNECT LIBRARY"}
         </button>
         <button
           type="button"
@@ -473,6 +473,27 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
               />
             </label>
           </div>
+          <label className="artwork-import">
+            ROOM SOUNDTRACK
+            <select
+              name="rooms"
+              multiple
+              defaultValue={editing.roomIds || []}
+              aria-label="Play in rooms"
+            >
+              {rooms
+                .filter((room) => !room.hidden && room.id !== "cinema")
+                .map((room) => (
+                  <option key={room.id} value={room.id}>
+                    {room.title}
+                  </option>
+                ))}
+            </select>
+            <small>
+              Select the spaces that belong to this song. Ctrl-click to select
+              several.
+            </small>
+          </label>
           <label className="artwork-import">
             LOCAL ALBUM ART
             {editing.cover && (

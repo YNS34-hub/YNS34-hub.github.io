@@ -19,7 +19,7 @@
       "Three.js",
       "Spatial web"
     ],
-    "status": "Active · public",
+    "status": "ORIGINAL / Active · public",
     "links": [
       {
         "label": "Original academic portfolio",
@@ -31,26 +31,6 @@
       }
     ],
     "coverCaption": "ACTUAL PROJECT INTERFACE / LOCAL BROWSER CAPTURE"
-  },
-  {
-    "id": "reviewer-first-audit",
-    "title": "Reviewer-First Audit",
-    "subtitle": "Questions before conclusions.",
-    "description": "A private mathematical manuscript revision prototype built around explicit evidence, dependency tracking, semantic preservation and human sign-off. My role includes problem definition, workflow design, system architecture, AI-agent-assisted implementation and acceptance criteria. Validation is pending. The interactive five-step review lens is a conceptual workflow; it has no live model connection and makes no automatic mathematical conclusions. The displayed interface is produced by the actual offline dashboard renderer using explicitly synthetic metadata. No manuscript, private review, or real case is included.",
-    "category": "project",
-    "cover": "/media/projects/reviewer-first-audit.jpg",
-    "year": "2026",
-    "featured": true,
-    "roomType": "white-cube",
-    "roomRule": "compressing",
-    "tags": [
-      "Python",
-      "Offline HTML",
-      "Evidence integrity",
-      "Human validation"
-    ],
-    "status": "Private prototype · validation pending",
-    "coverCaption": "ACTUAL READ-ONLY INTERFACE / SYNTHETIC DEMONSTRATION DATA"
   },
   {
     "id": "void-echo",
@@ -71,7 +51,7 @@
       "React Three Fiber",
       "GSAP"
     ],
-    "status": "Experimental · public",
+    "status": "ORIGINAL / Experimental · public",
     "coverCaption": "ACTUAL PROJECT INTERFACE / LOCAL BROWSER CAPTURE"
   },
   {
@@ -84,7 +64,7 @@
     "cover": "/media/projects/big-mouth-burger.jpg",
     "year": "2026",
     "date": "2026-05-06",
-    "featured": false,
+    "featured": true,
     "roomType": "installation",
     "tags": [
       "TypeScript",
@@ -92,7 +72,7 @@
       "Motion",
       "Interface design"
     ],
-    "status": "Concept · public",
+    "status": "ORIGINAL / Concept · public",
     "coverCaption": "ACTUAL PROJECT INTERFACE / LOCAL BROWSER CAPTURE"
   },
   {
@@ -106,7 +86,7 @@
     "cover": "/media/projects/giannis-editorial.jpg",
     "year": "2026",
     "date": "2026-06-11",
-    "featured": false,
+    "featured": true,
     "roomType": "white-cube",
     "tags": [
       "Editorial",
@@ -114,7 +94,7 @@
       "CSS",
       "Responsive"
     ],
-    "status": "Fan-made visual project · public",
+    "status": "ORIGINAL / Fan-made visual project · public",
     "coverCaption": "ACTUAL PROJECT INTERFACE / LOCAL BROWSER CAPTURE"
   },
   {
@@ -127,7 +107,7 @@
     "cover": "/media/projects/sci-fi-portfolio.jpg",
     "year": "2026",
     "date": "2026-09-05",
-    "featured": false,
+    "featured": true,
     "roomType": "black-box",
     "roomRule": "impossible",
     "tags": [
@@ -136,7 +116,7 @@
       "TypeScript",
       "Interactive art"
     ],
-    "status": "Experiment · public",
+    "status": "ORIGINAL / Experiment · public",
     "coverCaption": "ORIGINAL PROJECT PREVIEW / AFTERGLOW PROTOCOL"
   }
 ]

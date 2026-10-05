@@ -13,6 +13,10 @@ import {
 } from "three";
 import { usePalaceStore } from "../systems/store";
 import { Block, ContactShadow, Door, Floor, Label } from "../world/primitives";
+import { projects } from "../content/catalog";
+import { VisualWall } from "./PersonalRooms";
+import { Picture } from "../world/primitives";
+import { useLibraryStore } from "../systems/library";
 
 function GlassGeometry() {
   const gltf = useGLTF(`${import.meta.env.BASE_URL}assets/nonlinear-glass.glb`);
@@ -256,8 +260,56 @@ function CorridorThreshold() {
 }
 
 export default function Atrium() {
+  const images = useLibraryStore((s) => s.wallpapers);
+  const hero = projects.find((p) => p.id === "void-echo");
   return (
     <group>
+      {hero && (
+        <group
+          position={[-14, 5.2, -8]}
+          rotation={[0, 0.3, 0]}
+          onClick={(e) => {
+            e.stopPropagation();
+            usePalaceStore.getState().focusItem(hero);
+          }}
+        >
+          <Block scale={[11.6, 6.9, 0.16]} color="#152841" />
+          <Picture
+            src={hero.cover}
+            width={11.3}
+            height={6.5}
+            position={[0, 0, 0.12]}
+          />
+          <Label
+            text="VOID//ECHO / A WORLD I BUILT"
+            position={[0, -3.9, 0.13]}
+            color="#57798b"
+            size={0.18}
+          />
+        </group>
+      )}
+      {images[0] && (
+        <VisualWall
+          item={images[0]}
+          position={[14.3, 5.1, -9]}
+          width={11.5}
+          height={7.3}
+          rotation={[0, -0.3, 0]}
+        />
+      )}
+      <pointLight
+        position={[-19, 4, 1]}
+        color="#ffae60"
+        intensity={95}
+        distance={16}
+      />
+      <Block
+        position={[-21.1, 5.5, 1]}
+        scale={[0.1, 7.4, 6.6]}
+        color="#36241d"
+        emissive="#b67a46"
+        emissiveIntensity={0.3}
+      />
       <Floor width={44} depth={54} color="#c4c7c1" />
       <Block position={[0, -0.23, 0]} scale={[48, 0.4, 58]} color="#c4c7c1" />
       {/* Deep structural volumes leave lit recesses, rather than a single cube. */}
@@ -367,8 +419,8 @@ export default function Atrium() {
         rotation={[0, -Math.PI / 2, 0]}
       />
       <Door
-        id="experiments"
-        title="AI Playground"
+        id="liquid-web"
+        title="Liquid Web / Visual Lab"
         number="06"
         position={[-21.34, 0, 15]}
         rotation={[0, Math.PI / 2, 0]}
@@ -388,17 +440,28 @@ export default function Atrium() {
         color="#405652"
       />
       <Label
-        text="PROJECTS   /   RESEARCH   /   MUSIC"
+        text="JIE TIAN   /   MY PERSONAL WORLD"
         position={[-16.5, 2.65, -25.19]}
         size={0.16}
         color="#6a807a"
       />
       <Label
-        text={"A place for things\nthat are still becoming."}
+        text={"Things I made.\nWorlds I keep."}
         position={[14.3, 4.2, -25.2]}
         size={0.44}
         maxWidth={7}
         color="#59706b"
+      />
+      <Door
+        id="imagined-worlds"
+        title="Imagined Worlds"
+        position={[16.2, 0, -24.8]}
+        dark
+      />
+      <Door
+        id="my-collection"
+        title="My Collection"
+        position={[-16.2, 0, -24.8]}
       />
       {[-18, -9, 0, 9, 18].map((x) => (
         <Block

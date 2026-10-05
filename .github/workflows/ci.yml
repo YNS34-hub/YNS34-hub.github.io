@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, codex/the-memory-palace]
+    branches: [main, codex/the-memory-palace, codex/visual-art-direction]
   workflow_dispatch:
 
 permissions:
@@ -35,7 +35,7 @@ jobs:
         run: npm test
 
       - name: Build
-        run: npm run build
+        run: npm run build:public
 
       - name: Upload GitHub Pages artifact
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

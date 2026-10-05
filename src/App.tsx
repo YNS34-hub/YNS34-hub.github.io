@@ -16,6 +16,7 @@ import Focus from "./ui/Focus";
 import IndexView from "./ui/IndexView";
 import MusicPanel from "./ui/MusicPanel";
 import WallpaperPanel from "./ui/WallpaperPanel";
+import CinemaControls from "./ui/CinemaControls";
 import { Dialog } from "./ui/primitives";
 import { AudioSystem } from "./audio/AudioSystem";
 const World = lazy(() => import("./world/World"));
@@ -97,7 +98,17 @@ export default function App() {
   }, [s.focus, s.roomId, s.started, plan.title, plan.subtitle]);
   return (
     <div
-      className={`palace-app ${dark ? "dark-room" : ""} ${ready ? "world-ready" : ""}`}
+      className={`palace-app ${dark ? "dark-room" : ""} ${ready ? "world-ready" : ""} ${s.roomId === "cinema" ? "is-cinema" : ""} ${s.roomId === "unfinished" ? "is-unfinished" : ""}`}
+      style={
+        {
+          "--room-accent":
+            s.roomId === "music"
+              ? "#d3a677"
+              : s.roomId === "archive"
+                ? "#b9c2a6"
+                : "#91bdd6",
+        } as import("react").CSSProperties
+      }
     >
       <RouteSync />
       <AudioSystem />
@@ -129,6 +140,7 @@ export default function App() {
           </div>
           <div className="world-reveal" aria-hidden="true" />
           <Hud ready={ready} />
+          {s.roomId === "cinema" && <CinemaControls />}
         </>
       )}
       {s.overlay === "guide" && <Guide />}
