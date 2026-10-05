@@ -4,7 +4,7 @@
 
 A long-term personal lab for **nonlinear mathematics, AI-assisted scientific reasoning, and interactive research communication**.
 
-**Live:** https://yns34-hub.github.io/
+**Live:** https://yns34-hub.github.io/\n\n**Museum:** https://yns34-hub.github.io/museum/
 
 ---
 
