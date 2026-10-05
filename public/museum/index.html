@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>The Memory Palace — Jie Tian</title>
     <meta name="description" content="The latest public build of Jie Tian's Memory Palace." />
+    <meta name="robots" content="noindex" />
     <link rel="canonical" href="https://yns34-hub.github.io/" />
-    <meta http-equiv="refresh" content="0; url=/" />
-    <script>window.location.replace("/" + window.location.search + window.location.hash);</script>
+    <meta http-equiv="refresh" content="0; url=/?v=personal-world-20261005" />
+    <script>
+      const target = new URL("/", window.location.origin);
+      target.searchParams.set("v", "personal-world-20261005");
+      if (window.location.hash) target.hash = window.location.hash;
+      window.location.replace(target.toString());
+    </script>
   </head>
   <body>
-    <p>Opening <a href="/">The Memory Palace</a>…</p>
+    <p>Opening the latest <a href="/?v=personal-world-20261005">The Memory Palace</a>…</p>
   </body>
 </html>
