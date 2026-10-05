@@ -1,0 +1,81 @@
+[
+  {
+    "id": "reviewer-first-audit",
+    "title": "Reviewer-First Audit",
+    "subtitle": "Questions before conclusions.",
+    "description": "A private mathematical manuscript revision prototype built around explicit evidence, dependency tracking, semantic preservation and human sign-off. My role includes problem definition, workflow design, system architecture, AI-agent-assisted implementation and acceptance criteria. Validation is pending. The interactive five-step review lens is a conceptual workflow; it has no live model connection and makes no automatic mathematical conclusions. The displayed interface is produced by the actual offline dashboard renderer using explicitly synthetic metadata. No manuscript, private review, or real case is included.",
+    "category": "research",
+    "cover": "/media/projects/reviewer-first-audit.jpg",
+    "year": "2026",
+    "featured": true,
+    "roomType": "black-box",
+    "tags": [
+      "Python",
+      "Offline HTML",
+      "Evidence integrity",
+      "Human validation"
+    ],
+    "status": "PROTOTYPE / private / synthetic demonstration",
+    "coverCaption": "ACTUAL READ-ONLY INTERFACE / SYNTHETIC DEMONSTRATION DATA"
+  },
+  {
+    "id": "nonlinear-elliptic-problems",
+    "title": "Nonlinear Elliptic Problems",
+    "subtitle": "Existence, growth and comparison.",
+    "description": "My graduate research concerns nonlinear Dirichlet problems with general Orlicz-type growth and gradient-dependent lower-order terms. The current manuscript is in revision. The work includes proof development, verification, LaTeX preparation, literature review and reviewer-response revision. This exhibit summarizes an active research direction; it does not claim an accepted paper or a published theorem.",
+    "abstract": "Equilibrium models often respond nonlinearly to their inputs. The central question is how to establish existence and useful comparison estimates when the growth law is more general than a fixed power and the right-hand side depends on the gradient. Rearrangement, symmetrization and Orlicz-space analysis provide the methods explored here.",
+    "equation": "−div(a(x,u,∇u)) = H(x,u,∇u)",
+    "category": "research",
+    "cover": "/media/generated/level-sets.webp",
+    "year": "Ongoing",
+    "featured": true,
+    "roomType": "white-cube",
+    "tags": [
+      "Nonlinear PDE",
+      "Orlicz growth",
+      "Gradient terms",
+      "Dirichlet problems"
+    ],
+    "status": "Graduate manuscript · in revision"
+  },
+  {
+    "id": "rearrangement-and-symmetry",
+    "title": "Rearrangement & Symmetry",
+    "subtitle": "Transform the geometry. Preserve the information.",
+    "description": "A spatial study of rearrangement and symmetrization, two methods used in my research. A function's level sets can be reorganized into a symmetric model while preserving their distribution. The resulting geometry offers a way to reason about estimates and compare nonlinear solutions. The sculpture is an illustrative visualization, not a proof of a new result.",
+    "abstract": "How much can geometry change while the distribution of values stays fixed? This exhibit connects nested level sets to symmetric comparison problems and the role of rearrangement in nonlinear analysis.",
+    "equation": "|{x : u(x) > t}| = |{x : u*(x) > t}|",
+    "category": "research",
+    "cover": "/media/generated/level-sets.webp",
+    "year": "Ongoing",
+    "featured": true,
+    "roomType": "installation",
+    "roomRule": "floating",
+    "tags": [
+      "Rearrangement",
+      "Symmetrization",
+      "Level sets",
+      "Comparison"
+    ],
+    "status": "Mathematical method · visual study"
+  },
+  {
+    "id": "beyond-power-growth",
+    "title": "Beyond Power Growth",
+    "subtitle": "When one exponent is not enough.",
+    "description": "An introduction to the general growth laws behind Orlicz spaces. Rather than assuming every response follows one power, a convex growth function describes a wider range of behavior. This methodological exhibit accompanies the active nonlinear elliptic research direction and is not presented as a separately published paper.",
+    "abstract": "Orlicz-space analysis replaces a fixed power growth law with a more general convex function. The change broadens the models that can be studied and requires care with integrability, coercivity and comparison estimates.",
+    "equation": "∫Ω Φ(|∇u|) dx",
+    "category": "research",
+    "cover": "/media/generated/blue-hour.webp",
+    "year": "Ongoing",
+    "featured": false,
+    "roomType": "white-cube",
+    "tags": [
+      "Orlicz spaces",
+      "Convex growth",
+      "Nonlinear analysis"
+    ],
+    "status": "Mathematical method · study notes"
+  }
+]

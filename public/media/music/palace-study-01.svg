@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<rect width="1024" height="1024" fill="#dfddd0"/>
+<g fill="#34423c" font-family="Arial, sans-serif">
+<text x="70" y="94" font-size="16" letter-spacing="4">THE MEMORY PALACE / ORIGINAL SPATIAL STUDIES</text>
+<text x="65" y="226" font-size="82" letter-spacing="-3">Palace Study.</text>
+<text x="70" y="283" font-size="20" letter-spacing="3">NO. 01 — A ROOM FOR SOUND</text>
+</g>
+<path d="M70 335H954M70 923H954" fill="none" stroke="#869182" stroke-width="1"/>
+<g fill="none" stroke="#41514a" stroke-width="1.5">
+<circle cx="512" cy="630" r="229"/><circle cx="512" cy="630" r="203"/>
+<circle cx="512" cy="630" r="177"/><circle cx="512" cy="630" r="151"/>
+<circle cx="512" cy="630" r="125"/><circle cx="512" cy="630" r="99"/>
+<circle cx="512" cy="630" r="73"/><circle cx="512" cy="630" r="47"/>
+<path d="M283 630H741M512 401V859" stroke="#98a193"/>
+</g>
+<rect x="506" y="624" width="12" height="12" fill="#41514a"/>
+<text x="70" y="965" fill="#57675c" font-family="Arial, sans-serif" font-size="13" letter-spacing="3">LISTENING GALLERY / 2026</text>
+<text x="954" y="965" text-anchor="end" fill="#57675c" font-family="Arial, sans-serif" font-size="13" letter-spacing="3">36 SECONDS</text>
+</svg>

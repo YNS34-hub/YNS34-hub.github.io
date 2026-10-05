@@ -1,0 +1,209 @@
+[
+  {
+    "id": "atrium",
+    "number": "01",
+    "title": "THE ATRIUM",
+    "subtitle": "A place to begin. A place to return.",
+    "type": "installation",
+    "color": "#dbe7e9"
+  },
+  {
+    "id": "projects",
+    "number": "02",
+    "title": "PROJECT GALLERY",
+    "subtitle": "Ideas made tangible.",
+    "type": "white-cube",
+    "color": "#25374d"
+  },
+  {
+    "id": "research",
+    "number": "03",
+    "title": "RESEARCH VAULT",
+    "subtitle": "Mathematics as an exhibit.",
+    "type": "white-cube",
+    "color": "#162b3b"
+  },
+  {
+    "id": "music",
+    "number": "04",
+    "title": "PERSONAL LISTENING ROOM",
+    "subtitle": "A room that belongs to a song.",
+    "type": "listening",
+    "color": "#10203f"
+  },
+  {
+    "id": "wallpapers",
+    "number": "05",
+    "title": "THE WALLPAPER VAULT",
+    "subtitle": "Images held in space.",
+    "type": "image-gallery",
+    "color": "#1c2b36"
+  },
+  {
+    "id": "experiments",
+    "number": "06",
+    "title": "VISUAL LAB",
+    "subtitle": "Websites, motion and collected experiments.",
+    "type": "installation",
+    "color": "#244447"
+  },
+  {
+    "id": "archive",
+    "number": "07",
+    "title": "THE ARCHIVE",
+    "subtitle": "Experiments, prototypes and references.",
+    "type": "archive",
+    "color": "#35453c"
+  },
+  {
+    "id": "imagined-worlds",
+    "title": "VISUAL COLLECTION",
+    "subtitle": "Imagined worlds I have kept.",
+    "type": "image-gallery",
+    "color": "#0b1530",
+    "number": "10"
+  },
+  {
+    "id": "glass-life",
+    "title": "GLASS LIFE ROOM",
+    "subtitle": "Transparency, organisms and light.",
+    "type": "image-gallery",
+    "color": "#25566e",
+    "number": "11"
+  },
+  {
+    "id": "portraits",
+    "title": "HUMAN / PORTRAIT ROOM",
+    "subtitle": "A warmer kind of presence.",
+    "type": "image-gallery",
+    "color": "#32252b",
+    "number": "12"
+  },
+  {
+    "id": "unfinished",
+    "title": "UNFINISHED WING",
+    "subtitle": "Things that are still becoming.",
+    "type": "archive",
+    "color": "#172333",
+    "number": "13"
+  },
+  {
+    "id": "my-collection",
+    "title": "MY COLLECTION",
+    "subtitle": "My desktop, memory and collection in space.",
+    "type": "installation",
+    "color": "#254456",
+    "number": "14"
+  },
+  {
+    "id": "corridor",
+    "number": "08",
+    "title": "INFINITE CORRIDOR",
+    "subtitle": "A passage through the things I keep.",
+    "type": "anomaly",
+    "rule": "impossible",
+    "color": "#142537"
+  },
+  {
+    "id": "cinema",
+    "number": "09",
+    "title": "WALLPAPER CINEMA",
+    "subtitle": "An image becomes a place.",
+    "type": "black-box",
+    "color": "#1d252b"
+  },
+  {
+    "id": "anomaly-mirror",
+    "number": "—",
+    "title": "THE ECHO CHAMBER",
+    "subtitle": "A reflection is another way of remembering.",
+    "type": "anomaly",
+    "rule": "mirror",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-gravity",
+    "number": "—",
+    "title": "ANOTHER ORIENTATION",
+    "subtitle": "Move slowly. The architecture will follow.",
+    "type": "anomaly",
+    "rule": "gravity",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-floating",
+    "number": "—",
+    "title": "BETWEEN TWO PLACES",
+    "subtitle": "A path without a ground.",
+    "type": "anomaly",
+    "rule": "floating",
+    "color": "#d2e5ee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-compressing",
+    "number": "—",
+    "title": "THE DISTANCE WITHIN",
+    "subtitle": "The world narrows around a single thought.",
+    "type": "anomaly",
+    "rule": "compressing",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-impossible",
+    "number": "—",
+    "title": "MORE ROOM ON THE INSIDE",
+    "subtitle": "A small door. An unreasonable volume.",
+    "type": "anomaly",
+    "rule": "impossible",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "anomaly-loop",
+    "number": "—",
+    "title": "ALMOST THE SAME PLACE",
+    "subtitle": "Return, and look again.",
+    "type": "anomaly",
+    "rule": "loop",
+    "color": "#e6ecee",
+    "hidden": true
+  },
+  {
+    "id": "memory",
+    "number": "—",
+    "title": "THE QUIET ROOM",
+    "subtitle": "You have been here before.",
+    "type": "anomaly",
+    "rule": "memory",
+    "color": "#d2e5ee",
+    "hidden": true
+  },
+  {
+    "id": "cosmic",
+    "number": "10C",
+    "title": "COSMIC ROOM",
+    "subtitle": "A place for saved cosmic visual studies.",
+    "type": "image-gallery",
+    "color": "#070c21"
+  },
+  {
+    "id": "liquid-web",
+    "number": "15",
+    "title": "LIQUID WEB",
+    "subtitle": "My collected websites in space.",
+    "type": "installation",
+    "color": "#244447"
+  },
+  {
+    "id": "editorial",
+    "number": "16",
+    "title": "THE EDITORIAL STUDIO",
+    "subtitle": "Typography, people and warm visual references.",
+    "type": "image-gallery",
+    "color": "#57452e"
+  }
+]

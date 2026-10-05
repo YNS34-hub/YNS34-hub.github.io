@@ -1,0 +1,38 @@
+[
+  {
+    "id": "liangbo-0",
+    "title": "男孩",
+    "artist": "梁博",
+    "album": "Listening shelf",
+    "favorite": true,
+    "source": "static",
+    "year": "Preference"
+  },
+  {
+    "id": "liangbo-1",
+    "title": "出现又离开",
+    "artist": "梁博",
+    "album": "Listening shelf",
+    "favorite": true,
+    "source": "static",
+    "year": "Preference"
+  },
+  {
+    "id": "liangbo-2",
+    "title": "日落大道",
+    "artist": "梁博",
+    "album": "Listening shelf",
+    "favorite": true,
+    "source": "static",
+    "year": "Preference"
+  },
+  {
+    "id": "liangbo-3",
+    "title": "灵魂歌手",
+    "artist": "梁博",
+    "album": "Listening shelf",
+    "favorite": true,
+    "source": "static",
+    "year": "Preference"
+  }
+]
