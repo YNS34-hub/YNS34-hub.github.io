@@ -1,5 +1,10 @@
 # THE MEMORY PALACE
 
+> **Live Website:** https://yns34-hub.github.io/
+>
+> **Museum:** https://yns34-hub.github.io/museum/
+
+
 **Jie Tian's personal world — collected, not generated.**
 
 真实项目、留下来的画面、梁博的音乐偏好、非线性数学与未完成的想法进入同一个可探索的世界。入口保留 pearl / ice / glass；项目馆、研究馆、音乐室、壁纸库、Imagined Worlds、Archive 与 Unfinished Wing 使用各自的建筑、作品和照明。
