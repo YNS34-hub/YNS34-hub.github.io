@@ -1,366 +1,254 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import * as THREE from "three";
-import { usePalaceStore } from "../systems/store";
-import { Door, Label } from "../world/primitives";
-import { allContent, rooms } from "../content/catalog";
-import { useLibraryStore } from "../systems/library";
-import { VisualWall } from "./PersonalRooms";
+import { InstancedMesh, Object3D } from "three";
 import {
-  corridorSeed as seed,
+  corridorSeed,
+  residentChunks,
   CORRIDOR_SEGMENT_LENGTH as LENGTH,
 } from "../world/roomPlan";
-
-type Vector = [number, number, number];
-interface Part {
-  position: Vector;
-  scale: Vector;
-  rotation?: Vector;
-}
-
-const WING = 3.65;
-const DOORS = rooms.filter(
-  (room) => !room.hidden && !["atrium", "corridor", "cinema"].includes(room.id),
-);
-const WORK_DOORS = allContent.map((item, i) => ({
-  id: `exhibit-${item.id}`,
-  title: item.title.toUpperCase(),
-  number: String(i + 1).padStart(2, "0"),
-}));
-const ANOMALIES = [
-  { id: "anomaly-mirror", title: "MIRROR STUDY", number: "—" },
-  { id: "anomaly-gravity", title: "ANOTHER ORIENTATION", number: "—" },
-  { id: "anomaly-floating", title: "FLOATING COLLECTION", number: "—" },
-  { id: "anomaly-compressing", title: "SINGLE THOUGHT", number: "—" },
-  { id: "anomaly-impossible", title: "ROOM WITHIN A ROOM", number: "—" },
-  { id: "anomaly-loop", title: "AGAIN, WITH A DIFFERENCE", number: "—" },
-];
-
-const UNFOLD_DURATION = 4.8;
-function ease(value: number) {
-  const t = THREE.MathUtils.clamp(value, 0, 1);
-  return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-function writeInstances(
-  mesh: THREE.InstancedMesh,
-  parts: Part[],
-  object: THREE.Object3D,
-  elapsed: number,
-) {
-  parts.forEach((part, index) => {
-    const delay = THREE.MathUtils.clamp((14 - part.position[2]) / 25, 0, 3);
-    const unfolded = ease((elapsed - delay) / 1.75);
-    const height = 0.05 + unfolded * 0.95;
-    object.position.set(...part.position);
-    object.scale.set(part.scale[0], part.scale[1] * height, part.scale[2]);
-    if (part.scale[1] >= 1) {
-      // Vertical architecture rises from its footing; the walking plane never moves.
-      object.position.y = part.position[1] - (part.scale[1] * (1 - height)) / 2;
-    } else {
-      // Thin roof ribs quietly lift in the same ordered wave, opening the light well.
-      object.position.y = part.position[1] - (1 - unfolded) * 1.55;
-    }
-    object.rotation.set(...(part.rotation ?? [0, 0, 0]));
-    object.updateMatrix();
-    mesh.setMatrixAt(index, object.matrix);
-  });
-  mesh.instanceMatrix.needsUpdate = true;
-  mesh.computeBoundingSphere();
-}
-
-function Instances({
+import {
+  corridorProfile,
+  corridorClearWidth,
+  type Vector,
+} from "../world/spatialLayout";
+import { allContent, rooms } from "../content/catalog";
+import { usePalaceStore } from "../systems/store";
+import { useLibraryStore } from "../systems/library";
+import { Block, Door, Label, Floor } from "../world/primitives";
+import { VisualWall } from "./PersonalRooms";
+type Part = { position: Vector; scale: Vector };
+function Batch({
   parts,
   color,
-  roughness = 0.86,
-  opacity = 1,
-  emission = 0,
-  unfold = false,
-  fadeIn = false,
-  reducedMotion = false,
-  castShadow = false,
+  emissive = 0,
 }: {
   parts: Part[];
   color: string;
-  roughness?: number;
-  opacity?: number;
-  emission?: number;
-  unfold?: boolean;
-  fadeIn?: boolean;
-  reducedMotion?: boolean;
-  castShadow?: boolean;
+  emissive?: number;
 }) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  const elapsed = useRef(0);
-  const object = useMemo(() => new THREE.Object3D(), []);
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    if (reducedMotion) elapsed.current = UNFOLD_DURATION;
-    writeInstances(mesh, parts, object, unfold ? elapsed.current : Infinity);
-    if (fadeIn && mesh.material instanceof THREE.MeshStandardMaterial) {
-      mesh.material.opacity =
-        opacity * (0.14 + 0.86 * ease(elapsed.current / 3.8));
-    }
-  }, [parts, object, unfold, fadeIn, opacity, reducedMotion]);
-  useFrame((_state, delta) => {
-    const mesh = ref.current;
-    if (!mesh || (!unfold && !fadeIn) || elapsed.current >= UNFOLD_DURATION)
-      return;
-    elapsed.current = Math.min(UNFOLD_DURATION, elapsed.current + delta);
-    if (unfold) writeInstances(mesh, parts, object, elapsed.current);
-    if (fadeIn && mesh.material instanceof THREE.MeshStandardMaterial) {
-      mesh.material.opacity =
-        opacity * (0.14 + 0.86 * ease(elapsed.current / 3.8));
-    }
-  });
+  const ref = useRef<InstancedMesh>(null),
+    dummy = useMemo(() => new Object3D(), []);
+  useEffect(() => {
+    if (!ref.current) return;
+    parts.forEach((p, i) => {
+      dummy.position.set(...p.position);
+      dummy.scale.set(...p.scale);
+      dummy.updateMatrix();
+      ref.current!.setMatrixAt(i, dummy.matrix);
+    });
+    ref.current.instanceMatrix.needsUpdate = true;
+    ref.current.computeBoundingSphere();
+  }, [parts, dummy]);
   return (
     <instancedMesh
       ref={ref}
       args={[undefined, undefined, parts.length]}
       receiveShadow
-      castShadow={castShadow}
     >
       <boxGeometry />
       <meshStandardMaterial
         color={color}
-        roughness={roughness}
-        metalness={0}
-        transparent={opacity < 1}
-        opacity={opacity}
         emissive={color}
-        emissiveIntensity={emission}
-        depthWrite={opacity >= 1}
+        emissiveIntensity={emissive}
+        roughness={0.72}
       />
     </instancedMesh>
   );
 }
-
-/** Five 22 m segments stay resident, independent of total walking distance. */
+const destinations = rooms.filter(
+  (x) => !x.hidden && !["cinema", "corridor"].includes(x.id),
+);
+const anomalies = [
+  "mirror",
+  "gravity",
+  "floating",
+  "compressing",
+  "impossible",
+  "loop",
+];
+/** A deterministic sequence of throats, tall bays, lateral reveals and a stateful door. Only five addresses are mounted. */
 export default function Corridor() {
   const [center, setCenter] = useState(0);
-  const viewed = usePalaceStore((state) => state.viewed.length);
-  const reducedMotion = usePalaceStore((state) => state.reducedMotion);
-  const visuals = useLibraryStore((state) => state.personal.visuals);
-  const sites = useLibraryStore((state) => state.personal.projects);
-  const collection = [...visuals, ...sites];
-  const chunks = useMemo(
-    () => Array.from({ length: 5 }, (_, i) => center + i - 2),
-    [center],
-  );
-  const architecture = useMemo(() => {
-    const walls: Part[] = [];
-    const floor: Part[] = [];
-    const light: Part[] = [];
-    const trim: Part[] = [];
-    const portals: Part[] = [];
-    const ceiling: Part[] = [];
-    for (const chunk of chunks) {
-      const z = chunk * LENGTH;
-      const stage = Math.min(5, Math.max(0, -chunk));
-      const height = 9 + stage * 1.25;
-      floor.push({ position: [0, -0.15, z], scale: [8.7, 0.3, LENGTH] });
-      for (const side of [-1, 1]) {
-        const x = side * 4.15;
-        // Real openings in the structure, rather than screens attached to a wall.
-        for (const end of [-1, 1]) {
-          walls.push({
-            position: [x, height / 2, z + end * 6.2],
-            scale: [1, height, 9.6],
-          });
-          trim.push({
-            position: [side * 3.635, 0.16, z + end * 6.2],
-            scale: [0.035, 0.16, 9.6],
-          });
-        }
-        walls.push({
-          position: [x, (height + 4.5) / 2, z],
-          scale: [1, height - 4.5, 2.8],
-        });
-        // Rhythmic pilasters bring scale and depth to the repeated architecture.
-        for (const dz of [-10.8, -6.7, 6.7, 10.8]) {
-          walls.push({
-            position: [side * 3.61, height / 2, z + dz],
-            scale: [0.22, height, 0.38],
-          });
-        }
-        ceiling.push({
-          position: [side * 2.4, height + 0.04, z],
-          scale: [2.15, 0.22, LENGTH],
-        });
-        trim.push({
-          position: [side * 1.28, height + 0.1, z],
-          scale: [0.06, 0.12, LENGTH],
-        });
-      }
-      for (const dz of [-8.5, -3.8, 3.8, 8.5]) {
-        ceiling.push({
-          position: [0, height + 0.03, z + dz],
-          scale: [7.5, 0.22, 0.22],
-          rotation: [0, 0, stage > 2 ? (stage - 2) * 0.065 : 0],
-        });
-      }
-      // Long luminous roof cuts replace numerous costly dynamic lights.
-      light.push({
-        position: [stage > 1 ? 0.45 : 0, height + 0.35, z],
-        scale: [stage > 1 ? 0.8 : 2.48, 0.045, 21.7],
-      });
-      trim.push({ position: [0, 0.011, z], scale: [0.018, 0.016, 21.9] });
-      // The fixed path stays legible while the enclosing architecture ceases to agree.
-      // Stage 1: wrong proportions. Stage 2: displaced light. Stage 3: rotated datum.
-      // Stages 4–5: huge nested volumes occupy a passage that cannot contain them.
-      if (stage > 0) {
-        for (let i = 0; i < 4; i++) {
-          const turn = stage < 3 ? 0 : (stage - 2) * 0.16 + i * 0.07;
-          const radius = stage < 4 ? 3.35 : 4.8 + i * 0.5;
-          const anchor = new THREE.Vector3(
-            0,
-            stage < 4 ? height / 2 : height * 0.62,
-            z + 7.5 - i * 4.6,
-          );
-          for (const side of [-1, 1]) {
-            const p = new THREE.Vector3(side * radius, 0, 0)
-              .applyAxisAngle(new THREE.Vector3(0, 0, 1), turn)
-              .add(anchor);
-            portals.push({
-              position: p.toArray() as Vector,
-              scale: [0.1, stage < 4 ? height - 0.8 : 9.6 + i, 0.32],
-              rotation: [0, 0, turn],
+  const chunks = useMemo(() => residentChunks(center * LENGTH), [center]);
+  const library = useLibraryStore();
+  const visits = usePalaceStore((s) => s.visits);
+  const collection = [
+    ...library.personal.projects,
+    ...library.wallpapers,
+    ...library.personal.visuals,
+  ];
+  const parts = useMemo(() => {
+    const walls: Part[] = [],
+      roof: Part[] = [],
+      edges: Part[] = [],
+      glow: Part[] = [];
+    for (const c of chunks) {
+      const p = corridorProfile(c);
+      for (let j = 0; j < 11; j++) {
+        const z = c * LENGTH + j * 2 + 1,
+          half = corridorClearWidth(z);
+        for (const side of [-1, 1]) {
+          // A missing mid-wall opens a lit side-depth, rather than another painted plane.
+          if (j !== 5)
+            walls.push({
+              position: [side * (half + 0.35), p.height / 2, z],
+              scale: [0.7, p.height, 2.02],
             });
-            const q = new THREE.Vector3(
-              0,
-              side * (stage < 4 ? (height - 0.8) / 2 : (9.6 + i) / 2),
-              0,
-            )
-              .applyAxisAngle(new THREE.Vector3(0, 0, 1), turn)
-              .add(anchor);
-            portals.push({
-              position: q.toArray() as Vector,
-              scale: [radius * 2, 0.1, 0.32],
-              rotation: [0, 0, turn],
+          else {
+            walls.push({
+              position: [side * (half + 0.35), p.height - 1.15, z],
+              scale: [0.7, 2.3, 2],
             });
           }
+          edges.push({
+            position: [side * (half - 0.02), 0.16, z],
+            scale: [0.04, 0.12, 1.96],
+          });
         }
+        if (p.phase !== 2 && p.phase !== 5)
+          roof.push({
+            position: [p.wellX, p.height, z],
+            scale: [half * 2 - 1.2, 0.36, 2.02],
+          });
       }
+      const half = p.halfWidth;
+      for (const side of [-1, 1]) {
+        walls.push({
+          position: [side * (half + 3.3), 3.4, c * LENGTH + 11],
+          scale: [0.6, 6.8, 7.4],
+        });
+        for (const end of [-1, 1])
+          walls.push({
+            position: [side * (half + 1.5), 3.4, c * LENGTH + 11 + end * 3.8],
+            scale: [3.5, 6.8, 0.4],
+          });
+      }
+      // The light well actually moves across the section; tall bays have no low roof.
+      glow.push({
+        position: [p.wellX, p.height + 0.6, c * LENGTH + 11],
+        scale: [p.phase === 3 ? 1.2 : 2.4, 0.04, 17],
+      });
+      if (p.phase === 2 || p.phase === 5)
+        for (const z of [3, 11, 19])
+          roof.push({
+            position: [0, p.height, c * LENGTH + z],
+            scale: [half * 2 + 1, 0.5, 0.55],
+          });
     }
-    return { walls, floor, light, trim, portals, ceiling };
+    return { walls, roof, edges, glow };
   }, [chunks]);
-
   useFrame(({ camera }) => {
     const next = Math.floor(camera.position.z / LENGTH);
     if (next !== center) setCenter(next);
   });
-
   return (
     <group>
-      <Instances
-        parts={architecture.walls}
-        color="#203449"
-        castShadow
-        unfold
-        reducedMotion={reducedMotion}
-      />
-      <Instances parts={architecture.floor} color="#172735" roughness={0.25} />
-      <Instances
-        parts={architecture.ceiling}
-        color="#0c1b2b"
-        unfold
-        reducedMotion={reducedMotion}
-        castShadow
-      />
-      <Instances parts={architecture.light} color="#82b9d9" emission={0.55} />
-      <Instances
-        parts={architecture.trim}
-        color="#bd925f"
-        roughness={0.35}
-        emission={0.3}
-      />
-      <Instances
-        parts={architecture.portals}
-        color="#538396"
-        roughness={0.46}
-        unfold
-        reducedMotion={reducedMotion}
-        castShadow
-      />
-      {chunks.map((chunk) => {
-        const z = chunk * LENGTH;
-        const address = seed(chunk);
-        const left = DOORS[address % DOORS.length];
-        const right =
-          chunk <= -3 && chunk >= -8
-            ? ANOMALIES[-chunk - 3]
-            : WORK_DOORS.length
-              ? WORK_DOORS[(address + 3) % WORK_DOORS.length]
-              : DOORS[(address + 3) % DOORS.length];
-        const secret = chunk === -2 && viewed >= 3;
+      <Batch parts={parts.walls} color="#263e54" />
+      <Batch parts={parts.roof} color="#10263b" />
+      <Batch parts={parts.edges} color="#728c9b" />
+      <Batch parts={parts.glow} color="#b8ddec" emissive={0.46} />
+      {chunks.map((c) => {
+        const p = corridorProfile(c),
+          seed = corridorSeed(c),
+          z = c * LENGTH + 11;
+        const left = destinations[seed % destinations.length];
+        const work = allContent[(seed + 3) % allContent.length];
+        const anomaly =
+          c <= -3 && c >= -8 ? `anomaly-${anomalies[-c - 3]}` : null;
+        const remembered = c === -3 && (visits["anomaly-mirror"] || 0) > 0;
+        const rightId = remembered
+          ? "anomaly-impossible"
+          : anomaly || `exhibit-${work.id}`;
+        const chosen = collection.length
+          ? collection[(Math.abs(c) * 5 + seed) % collection.length]
+          : undefined;
         return (
-          <group key={chunk}>
-            {collection.length > 0 &&
-              [-1, 1].map((side, index) => {
-                const work =
-                  collection[(address + index * 7) % collection.length];
-                return (
-                  <VisualWall
-                    key={`${chunk}-${side}`}
-                    item={work}
-                    position={[side * 3.43, 4.2, z - 6.4]}
-                    width={7.6}
-                    height={4.8}
-                    rotation={[0, (-side * Math.PI) / 2, 0]}
-                  />
-                );
-              })}
-            <pointLight
-              position={[0, 4.5, z + 6.5]}
-              color={chunk % 2 ? "#deb278" : "#7cb4d0"}
-              intensity={18}
-              distance={18}
-            />
-            <Door
-              {...left}
-              position={[-WING, 0, z]}
-              rotation={[0, Math.PI / 2, 0]}
-              dark
-            />
-            <Door
-              id={secret ? "memory" : right.id}
-              title={secret ? "A ROOM REMEMBERS" : right.title}
-              number={secret ? "—" : right.number}
-              position={[WING, 0, z]}
-              rotation={[0, -Math.PI / 2, 0]}
-              dark
-            />
+          <group key={c}>
+            <group position={[0, 0, z]}>
+              <Floor
+                width={p.halfWidth * 2 + 6}
+                depth={22}
+                color={p.phase === 1 ? "#314152" : "#25394b"}
+              />
+            </group>
+            <group scale={[1, p.phase === 1 ? 0.8 : 1, 1]}>
+              <Door
+                id={left.id}
+                title={left.title}
+                position={[-p.halfWidth, 0, z]}
+                rotation={[0, Math.PI / 2, 0]}
+                dark
+              />
+              <Door
+                id={rightId}
+                title={
+                  remembered
+                    ? "ROOM WITHIN A ROOM"
+                    : anomaly
+                      ? anomaly.slice(8).toUpperCase() + " STUDY"
+                      : work.title
+                }
+                position={[p.halfWidth, 0, z]}
+                rotation={[0, -Math.PI / 2, 0]}
+                dark
+              />
+            </group>
+            {chosen && (
+              <VisualWall
+                item={chosen}
+                position={[p.nicheSide * (p.halfWidth - 0.15), 3.2, z - 6]}
+                rotation={[0, (-p.nicheSide * Math.PI) / 2, 0]}
+                width={p.phase === 1 ? 3.1 : 5.7}
+                height={p.phase === 1 ? 2.9 : 4.2}
+                atmosphere={false}
+                medium={p.phase === 1 ? "print" : "screen"}
+              />
+            )}
+            {/* A real stopping niche and an occluding wall give each work a viewing distance. */}
+            {p.phase === 2 && (
+              <Block
+                position={[-p.halfWidth + 1.1, 0.35, z - 6]}
+                scale={[0.8, 0.7, 3]}
+                color="#40566a"
+              />
+            )}
             <Label
-              text={`${chunk < 0 ? "−" : "+"}${String(Math.abs(chunk)).padStart(3, "0")} / ∞`}
-              position={[-2.5, 0.02, z + 4.5]}
+              text={`${c < 0 ? "−" : "+"}${String(Math.abs(c)).padStart(3, "0")} / ∞`}
+              position={[0, 0.025, z + 4]}
               rotation={[-Math.PI / 2, 0, 0]}
-              size={0.15}
-              color="#86aabd"
+              size={0.2}
+              color="#a8c9d8"
             />
-            {chunk === 0 && (
-              <>
-                <Label
-                  text="INFINITE CORRIDOR"
-                  position={[-3.46, 2.05, 7.4]}
-                  rotation={[0, Math.PI / 2, 0]}
-                  size={0.28}
-                  color="#d0dfdf"
-                  maxWidth={4.7}
-                />
-                <Label
-                  text="This place continues to grow with me."
-                  position={[3.46, 1.8, 6.4]}
-                  rotation={[0, -Math.PI / 2, 0]}
-                  size={0.15}
-                  color="#c1a885"
-                  maxWidth={4.7}
-                />
-              </>
+            {c === -3 && (
+              <Label
+                text={
+                  remembered
+                    ? "REVISITED / THE INNER ROOM IS NOW OPEN"
+                    : "A SMALL DOOR / A LARGER INTERIOR"
+                }
+                position={[p.halfWidth - 0.15, 5.65, z]}
+                rotation={[0, -Math.PI / 2, 0]}
+                size={0.15}
+                color="#d4c3a4"
+                maxWidth={6}
+              />
             )}
           </group>
         );
       })}
+      {/* Two lights follow the visible neighborhood, independent of collection size. */}
+      <pointLight
+        position={[2.3, 5, center * LENGTH + 5]}
+        intensity={72}
+        color="#c5dfee"
+        distance={28}
+      />
+      <pointLight
+        position={[-2, 6, center * LENGTH - 10]}
+        intensity={55}
+        color="#e6c8a0"
+        distance={30}
+      />
     </group>
   );
 }

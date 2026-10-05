@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useAudioStore } from "../audio/player";
 import { useLibraryStore } from "../systems/library";
+import MediaImport from "./MediaImport";
 import { usePalaceStore } from "../systems/store";
 import type { MusicTrack } from "../content/types";
 import { rooms } from "../content/catalog";
@@ -171,6 +172,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
         </div>
         <Disc3 size={26} strokeWidth={1} aria-hidden="true" />
       </div>
+      <MediaImport roomHint="music" />
       <div className="listening-console">
         <div className="record-sleeve">
           {current?.cover ? (

@@ -211,11 +211,13 @@ export default function Hud({ ready }: { ready: boolean }) {
       {s.started && s.coreNear && !s.overlay && !s.focus && (
         <button
           className="core-information"
-          onClick={() => s.setOverlay("about")}
+          onClick={() => s.update({ memoryReveal: !s.memoryReveal })}
         >
-          <span className="eyebrow">THE KEEPER OF THIS PLACE</span>
-          <strong>Jie Tian</strong>
-          <span>Mathematics / AI / Creative coding</span>
+          <span className="eyebrow">MEMORY REVEAL / 记忆显影</span>
+          <strong>
+            {s.memoryReveal ? "Return to stillness" : "Reveal the collection"}
+          </strong>
+          <span>Saved works or selected collection · ESC to skip</span>
           <ArrowRight size={18} />
         </button>
       )}

@@ -7,6 +7,8 @@ import {
   type ReactNode,
 } from "react";
 import { usePalaceStore } from "./systems/store";
+import { useLibraryStore } from "./systems/library";
+import { useAudioStore } from "./audio/player";
 import { resolveRoomPlan } from "./world/roomPlan";
 import Hud from "./ui/Hud";
 import Guide from "./ui/Guide";
@@ -49,6 +51,18 @@ function RouteSync() {
   return null;
 }
 export default function App() {
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const host = window as Window & { __PALACE_DEV__?: unknown };
+    host.__PALACE_DEV__ = {
+      state: usePalaceStore,
+      library: useLibraryStore,
+      audio: useAudioStore,
+    };
+    return () => {
+      delete host.__PALACE_DEV__;
+    };
+  }, []);
   const s = usePalaceStore();
   const [ready, setReady] = useState(false);
   const [contextError, setContextError] = useState(false);
@@ -60,8 +74,11 @@ export default function App() {
         s.setOverlay(s.overlay === "guide" ? null : "guide");
       }
       if (e.key === "Escape") {
+        if (e.defaultPrevented || s.roomId === "cinema") return;
         if (s.focus) s.focusItem(null);
-        else s.setOverlay(null);
+        else if (s.overlay) s.setOverlay(null);
+        else if (s.memoryReveal) s.update({ memoryReveal: false });
+        else if (s.pendingDoor) s.update({ pendingDoor: null });
       }
     };
     window.addEventListener("keydown", keys);
@@ -72,10 +89,12 @@ export default function App() {
       ? "reduced"
       : "full";
   }, [s.reducedMotion]);
+  useEffect(() => {
+    setReady(false);
+  }, [s.roomId]);
   const plan = resolveRoomPlan(s.roomId);
   const dark = plan.dark;
-  const visualCollection =
-    plan.type === "image-gallery" || s.roomId === "cinema";
+  const visualCollection = plan.type !== "listening";
   useEffect(() => {
     const title =
       s.focus?.title ||
@@ -139,6 +158,11 @@ export default function App() {
             </WorldBoundary>
           </div>
           <div className="world-reveal" aria-hidden="true" />
+          {!ready && (
+            <div className="room-loading" role="status">
+              Preparing visible works…
+            </div>
+          )}
           <Hud ready={ready} />
           {s.roomId === "cinema" && <CinemaControls />}
         </>

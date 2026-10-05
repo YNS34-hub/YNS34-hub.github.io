@@ -17,3 +17,8 @@ Personal media binaries, generated manifests/copies, and local inventories are i
 `npm run build:public` explicitly builds an empty private-media manifest, excluding every local personal file. Use it for public releases. `npm run build` includes local collections for personal use. Re-run `npm run media:register` or restart `npm run dev` after a public build to restore local previews.
 
 Browser imports are stored as Blobs and metadata in IndexedDB on this device, with no upload. They normally survive reloads. Storage errors show an explicit notice, and **Reconnect Library** allows reimport if browser data was cleared. Clearing site storage removes browser imports; original files remain untouched.
+
+
+Placement metadata also supports `roomIds` (for example `['portraits']` in JavaScript, `["portraits"]` in JSON), `primary: true`, and numeric `order`. Room IDs: `wallpapers`, `imagined-worlds`, `cosmic`, `glass-life`, `portraits`, `editorial`, `projects`, `research`. A room stores a reference to one resource; multi-room references do not copy the original file. Provenance belongs in `origin` and is never inferred as authorship.
+
+Inside the museum, open **Guide → Arrange / import works**. Drop a batch, inspect previews or tagged audio, choose the destination and category, then confirm. **See in the room** shows the actual placement. **Arrange work** edits title, target, category, order and the main work. Removing an image hides it from display and keeps its original browser blob available under **Removed works / restore**. Existing v1 IndexedDB records are normalized in place on read; the database is not cleared or replaced. Music's existing artwork editor remains the album-cover workflow.

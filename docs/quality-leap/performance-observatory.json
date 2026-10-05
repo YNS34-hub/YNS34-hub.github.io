@@ -1,0 +1,80 @@
+{
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "scope": "Visible installed Edge on the local GTX 1650; requestAnimationFrame wall timings, renderer.info and estimated uncompressed scene texture bytes. Not GPU timer-query timings.",
+  "samples": [
+    {
+      "label": "imagined-worlds / still",
+      "movement": false,
+      "frames": 718,
+      "elapsedMs": 5000.500000017881,
+      "fps": 143.58564143534298,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 14,
+      "peak": {
+        "calls": 79,
+        "triangles": 5458,
+        "textures": 28,
+        "lights": 5,
+        "textureMB": 53.908416748046854
+      },
+      "last": {
+        "room": "imagined-worlds",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 79,
+        "triangles": 5458,
+        "textures": 28,
+        "lights": 5,
+        "textureMB": 53.908416748046854,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 5,
+          "changed": 10
+        }
+      }
+    },
+    {
+      "label": "cosmic / still",
+      "movement": false,
+      "frames": 720,
+      "elapsedMs": 5000.199999988079,
+      "fps": 143.99424023073408,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999909,
+      "maxMs": 13.899999999999636,
+      "peak": {
+        "calls": 36,
+        "triangles": 3040,
+        "textures": 10,
+        "lights": 5,
+        "textureMB": 21.688425699869793
+      },
+      "last": {
+        "room": "cosmic",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 36,
+        "triangles": 3040,
+        "textures": 10,
+        "lights": 5,
+        "textureMB": 21.688425699869793,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 2,
+          "changed": 4
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "meetsMean45": true,
+  "meetsP95Frame22ms": true
+}

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { Group } from "three";
 import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import type { WallpaperItem } from "../content/types";
@@ -13,7 +12,7 @@ import {
   useImageTexture,
 } from "../world/primitives";
 import { RoomShell } from "./Architecture";
-import { sampledColor } from "./ListeningRoom";
+import { sampledColor } from "../world/imageColor";
 
 function FramedWork({ item, index }: { item: WallpaperItem; index: number }) {
   const side = index % 2 ? 1 : -1;
@@ -130,99 +129,60 @@ export function WallpaperGallery({ roomId }: { roomId: string }) {
 }
 
 export function WallpaperCinema() {
-  const images = useLibraryStore((s) => s.wallpapers);
-  const selected = usePalaceStore((s) => s.cinemaImage);
+  const images = useLibraryStore((s) => s.wallpapers),
+    selected = usePalaceStore((s) => s.cinemaImage);
   const image = selected || images[0];
-  const projection = useRef<Group>(null);
+  const texture = useImageTexture(image?.displaySrc || image?.src),
+    tint = useMemo(() => sampledColor(texture, "#95b5c3"), [texture]);
   const light = useRef<import("three").PointLight>(null);
-  const elapsed = useRef(0);
-  const texture = useImageTexture(image?.displaySrc || image?.src);
-  const tint = useMemo(() => sampledColor(texture, "#95b5c3"), [texture]);
-  const reducedMotion = usePalaceStore((s) => s.reducedMotion);
-  useFrame(({ camera }, delta) => {
-    elapsed.current += Math.min(delta, 0.05);
-    const reveal = reducedMotion ? 1 : 1 - Math.exp(-elapsed.current * 0.44);
-    if (projection.current) {
-      projection.current.scale.setScalar(0.28 + reveal * 0.72);
-      projection.current.position.x = camera.position.x * -0.14;
-      projection.current.position.y = 0;
-    }
-    if (light.current) {
-      light.current.color.lerp(tint, Math.min(delta * 0.5, 1));
-      light.current.intensity = 27 + reveal * 38;
-    }
+  useFrame((_, dt) => {
+    if (light.current) light.current.color.lerp(tint, 1 - Math.exp(-dt / 2.2));
   });
   return (
     <group>
-      <Floor width={48} depth={38} color="#172830" />
-      {/* The image grows past the architecture; only a quiet threshold remains. */}
-      <group ref={projection}>
-        <Picture
-          src={image?.displaySrc || image?.src}
-          width={53}
-          height={33}
-          position={[0, 18, -18]}
-        />
-        <group position={[0, -0.065, -17.8]} scale={[1, -0.63, 1]}>
-          <mesh position={[0, -4, 0.01]}>
-            <planeGeometry args={[49, 24]} />
-            <meshBasicMaterial
-              map={texture}
-              color="#8da6a9"
-              transparent
-              opacity={0.12}
-              depthWrite={false}
-              toneMapped={false}
-            />
-          </mesh>
-        </group>
-      </group>
+      <Floor width={42} depth={38} color="#14253a" />
+      <Block position={[0, 6.5, -16]} scale={[34, 13, 0.65]} color="#07172b" />
+      <Block
+        position={[0, 5.6, -14.2]}
+        scale={[27.6, 11.2, 0.3]}
+        color="#0b1a2c"
+        metalness={0.5}
+        roughness={0.3}
+      />
+      <Picture
+        texture={texture}
+        width={27}
+        height={10.8}
+        position={[0, 5.6, -13.98]}
+        medium="projection"
+      />
       {[-1, 1].map((side) => (
         <group key={side}>
           <Block
-            position={[side * 14.2, 5.4, 4]}
-            scale={[0.26, 10.8, 30]}
-            color="#24383d"
-            opacity={0.36}
+            position={[side * 15, 4.6, -2]}
+            scale={[1.2, 9.2, 27]}
+            color="#1b3247"
           />
           <Block
-            position={[side * 14.05, 0.04, 4]}
-            scale={[0.015, 0.026, 30]}
-            color="#9cbecb"
-            emissive="#7193a0"
-            emissiveIntensity={0.3}
+            position={[side * 10.8, 5.8, 10]}
+            scale={[2.8, 11.6, 1.1]}
+            color="#0e2339"
+          />
+          <Block
+            position={[side * 14.3, 0.04, -2]}
+            scale={[0.06, 0.03, 28]}
+            color="#8cbbc9"
+            emissive="#8cbbc9"
+            emissiveIntensity={0.2}
           />
         </group>
       ))}
+      <Block position={[0, 11.1, -6]} scale={[29, 0.5, 20]} color="#0c2035" />
       <pointLight
         ref={light}
-        position={[0, 7, -10]}
-        color="#95b5c3"
-        intensity={27}
-        distance={50}
-        decay={2}
-      />
-      <Label
-        text={image?.title.toUpperCase() || "WALLPAPER CINEMA"}
-        position={[0, 0.02, 7]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        size={0.23}
-        color="#9dbac2"
-      />
-      <Label
-        text="AN IMAGE BECOMES A PLACE."
-        position={[0, 0.02, 8]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        size={0.11}
-        color="#647f8a"
-      />
-      <Door
-        id="wallpapers"
-        title="The Visual Archive"
-        number="05"
-        position={[10.4, 0, 16]}
-        rotation={[0, Math.PI, 0]}
-        dark
+        position={[0, 4, -10]}
+        intensity={45}
+        distance={30}
       />
     </group>
   );

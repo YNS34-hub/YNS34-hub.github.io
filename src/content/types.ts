@@ -56,6 +56,11 @@ export interface MusicTrack {
   duration?: number;
 }
 export interface WallpaperItem {
+  mediaKind?: "wallpaper" | "visual" | "project" | "research";
+  roomIds?: string[];
+  order?: number;
+  primary?: boolean;
+  removed?: boolean;
   projectUrl?: string;
   github?: string;
   favorite?: boolean;

@@ -91,6 +91,8 @@ describe("personal media registration", () => {
             category: "glass",
             year: "2026",
             favorite: true,
+            primary: true,
+            roomIds: ["glass-life", "bad"],
           },
         ]),
     );
@@ -112,6 +114,8 @@ describe("personal media registration", () => {
       category: "glass",
       date: "2026",
       favorite: true,
+      primary: true,
+      roomIds: ["glass-life"],
       src: "/personal-media/chatgpt-images/%E7%8E%BB%E7%92%83/%E9%B2%B8.JPG",
     });
     expect(await readFile(path.join(dir, "鲸.JPG"))).toEqual(original);

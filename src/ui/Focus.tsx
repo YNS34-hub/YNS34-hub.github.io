@@ -5,9 +5,16 @@ import { Dialog, ExternalLink } from "./primitives";
 import { reviewWorkflow as steps } from "../content/catalog";
 
 export default function Focus() {
-  const { focus: item, focusItem, enterRoom } = usePalaceStore();
+  const {
+    focus: item,
+    focusItem,
+    enterRoom,
+    bookmarks,
+    toggleBookmark,
+  } = usePalaceStore();
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState(0);
+  const [live, setLive] = useState(false);
   if (!item) return null;
   const close = () => focusItem(null);
   return (
@@ -39,6 +46,29 @@ export default function Focus() {
                 preload="metadata"
               />
             )}
+            {item.demo && item.tags.includes("Website study") && (
+              <>
+                <button
+                  className="text-button"
+                  onClick={() => setLive((v) => !v)}
+                >
+                  {live ? "PAUSE PREVIEW" : "ACTIVATE THIS WEBSITE"}
+                </button>
+                {live && (
+                  <iframe
+                    className="live-work"
+                    title={`${item.title} interactive preview`}
+                    src={item.demo}
+                    sandbox="allow-scripts"
+                    referrerPolicy="no-referrer"
+                  />
+                )}
+                <small>
+                  One active work. If embedding is unavailable, use ENTER
+                  PROJECT.
+                </small>
+              </>
+            )}
           </figure>
         )}
         <div className="focus-copy">
@@ -46,20 +76,23 @@ export default function Focus() {
           <h2>{item.title}</h2>
           <p className="focus-subtitle">{item.subtitle}</p>
           {item.equation && <div className="equation">{item.equation}</div>}
-          <p className="focus-description">
-            {item.abstract || item.description}
-          </p>
-          {item.authors && (
-            <p className="authors">
-              {item.authors.join(" · ")}
-              {item.journal && ` / ${item.journal}`}
+          <details className="work-details">
+            <summary>About this work</summary>
+            <p className="focus-description">
+              {item.abstract || item.description}
             </p>
-          )}
-          <div className="tag-list">
-            {item.tags.map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
+            {item.authors && (
+              <p className="authors">
+                {item.authors.join(" · ")}
+                {item.journal && ` / ${item.journal}`}
+              </p>
+            )}
+            <div className="tag-list">
+              {item.tags.map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
+            </div>
+          </details>
           {item.date && (
             <p className="focus-date">
               CREATED / <time dateTime={item.date}>{item.date}</time>
@@ -74,6 +107,15 @@ export default function Focus() {
             />
           )}
           <div className="focus-actions">
+            <button
+              className="text-button"
+              aria-pressed={bookmarks.includes(item.id)}
+              onClick={() => toggleBookmark(item.id)}
+            >
+              {bookmarks.includes(item.id)
+                ? "KEPT IN MY COLLECTION"
+                : "KEEP THIS WORK"}
+            </button>
             {item.github && (
               <ExternalLink href={item.github}>SOURCE</ExternalLink>
             )}

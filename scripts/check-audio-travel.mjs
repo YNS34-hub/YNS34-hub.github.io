@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 
@@ -9,19 +9,18 @@ const report = {
   base,
   checkedAt: new Date().toISOString(),
   scope:
-    "Explicit playback of Palace Study through Guide travel between three 3D rooms; real native Audio objects observed through CDP, with no application debug exports or injected global state.",
+    "Explicit playback of the repository's self-made Palace Study WAV, imported through local audio UI, through Guide travel between three 3D rooms; real native Audio objects observed through CDP, with no application debug exports or injected global state.",
   checks: [],
   observations: [],
   errors: [],
 };
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
+  executablePath:
+    process.env.PALACE_BROWSER ||
+    "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
   headless: true,
-  args: [
-    "--no-sandbox",
-    "--use-angle=swiftshader",
-    "--enable-unsafe-swiftshader",
-  ],
+  args: ["--no-sandbox", "--use-angle=d3d11"],
 });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
@@ -127,6 +126,11 @@ try {
   await page
     .getByRole("dialog", { name: "Listening collection", exact: true })
     .waitFor();
+  await page.getByLabel("Import local audio files").setInputFiles({
+    name: "Palace Study — No. 01.wav",
+    mimeType: "audio/wav",
+    buffer: await readFile("public/media/generated/palace-study.wav"),
+  });
   await page
     .locator(".record-row")
     .filter({ hasText: "Palace Study — No. 01" })
@@ -146,7 +150,7 @@ try {
   const active = await call(
     elements,
     `function () {
-    return this.find(element => !element.paused && element.currentSrc.endsWith('/media/generated/palace-study.wav'));
+    return this.find(element => !element.paused && element.currentSrc.startsWith('blob:'));
   }`,
     false,
   );
@@ -186,7 +190,7 @@ try {
     .waitFor({ state: "hidden" });
   for (const [room, title] of [
     ["projects", "PROJECT GALLERY"],
-    ["research", "RESEARCH HALL"],
+    ["research", "RESEARCH VAULT"],
   ]) {
     await guideTravel(room, title);
     const currentElements = await audioElements();

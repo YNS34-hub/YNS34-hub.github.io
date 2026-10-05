@@ -1,0 +1,69 @@
+{
+  "baseline": "0424eb679a2c8ba9f1b6fbe052a323f6a3f097f3",
+  "branch": "codex/memory-palace-quality-leap",
+  "typecheck": "passed",
+  "lint": "passed",
+  "unit": {
+    "filesPassed": 9,
+    "testsPassed": 62
+  },
+  "publicBuild": {
+    "result": "passed",
+    "staticRoutes": 64,
+    "indexedRoutes": 50
+  },
+  "developmentFlows": {
+    "checks": [
+      "v1 IndexedDB records retain blob, favorite and ID after placement migration",
+      "all main rooms enter, return, load real works and retain WASD control",
+      "memory revelation uses a real collection image, stays in place and is interruptible",
+      "batch import targets Portraits, persists, renders its stable ID, and isolates failure",
+      "Cinema restores exact view from every source; ESC first closes metadata; Back returns",
+      "modal suspends WASD; project viewing retains the room; exactly one web preview mounts on demand",
+      "kept website references appear in My Collection and disappear when unkept",
+      "stateful corridor door changes after a real visit, with five bounded resident segments",
+      "observatory bridge rails and Unfinished exit match their physical walking boundaries",
+      "actual local audio drives measured frequency bands and settles after pause",
+      "local audio placement and room soundtrack metadata survive refresh",
+      "accessible index Cinema returns to index without discarding navigation"
+    ],
+    "skippedChecks": [],
+    "errors": []
+  },
+  "productionBrowser": {
+    "checks": [
+      "production files have static deep links, SEO text, local assets, fallback and preserved legacy pages",
+      "static project remains readable without JavaScript or WebGL",
+      "initial desktop architecture renders at medium quality before entering",
+      "2D index is independently accessible, searchable and focus links reload",
+      "local audio import, metadata edits, legal NetEase links and playback survive navigation",
+      "private images persist, full original is viewable, and image cinema enters 3D",
+      "all main gallery rooms are reachable through the museum guide",
+      "desktop exploration, bookmarks and comfort settings survive reload",
+      "procedural and project direct links load, browser back restores the room",
+      "mobile tour and collection index work without horizontal overflow"
+    ],
+    "skippedChecks": [
+      "first-person controls move smoothly and corridor walls contain the visitor"
+    ],
+    "errors": []
+  },
+  "nativeProductionAudio": {
+    "checks": [
+      "Palace Study starts only after an explicit user click",
+      "Guide travel to projects preserves native Audio identity, track and advancing playback",
+      "Guide travel to research preserves native Audio identity, track and advancing playback"
+    ],
+    "errors": []
+  },
+  "finalProductionSmoke": {
+    "checks": [
+      "/museum/ reaches the current root entry; production debug exports are absent",
+      "M opens Guide and releases Pointer Lock; ESC closes only Guide",
+      "Native Pointer Lock enters through its real button; one ESC releases view without opening or closing another layer",
+      "Final Cosmic / Imagined Worlds bridge, Unfinished and Atrium load and return through production Guide at medium quality",
+      "Public private-media directory contains only an empty manifest; browser requested no private media files"
+    ],
+    "errors": []
+  }
+}

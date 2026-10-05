@@ -1,5 +1,6 @@
 import { MathUtils, Vector3 } from "three";
 import { resolveRoomPlan } from "./roomPlan";
+import { corridorClearWidth, corridorProfile } from "./spatialLayout";
 
 export type Footprint =
   | { x: number; z: number; radius: number }
@@ -9,29 +10,47 @@ const CLEARANCE = 0.3;
 export function roomBounds(roomId: string): [number, number, number, number] {
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [-20.7, 20.7, -24.4, 25];
-  if (roomId === "corridor") return [-3.08, 3.08, -Infinity, Infinity];
+  if (roomId === "corridor") return [-6.1, 6.1, -Infinity, Infinity];
   if (plan.rule === "floating") return [-1.3, 1.3, -15.6, 15.6];
   if (plan.rule === "gravity") return [-8.5, 8.5, -15.6, 15.6];
   if (plan.rule === "impossible") return [-25.5, 25.5, -24.6, 24.6];
   if (roomId === "cinema") return [-12.4, 12.4, -14.8, 16];
+  if (roomId === "unfinished") return [-12.4, 12.4, -11.1, 11.5];
+  if (["cosmic", "imagined-worlds"].includes(roomId.split("-page-")[0]))
+    return [-12.4, 12.4, -25.6, 15.6];
   return [-12.4, 12.4, -15.6, 15.6];
 }
 
 export function roomFootprints(roomId: string): Footprint[] {
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
+  if (["cosmic", "imagined-worlds"].includes(roomId.split("-page-")[0]))
+    return [-1, 1].flatMap((side) => [
+      { x: side * 6.7, z: 1, halfWidth: 0.8, halfDepth: 0.9 },
+      { x: side * 8.4, z: -21.5, halfWidth: 4.7, halfDepth: 5 },
+    ]);
   if (roomId === "music")
     return [
-      { x: 0, z: -3, radius: 5.7 },
-      ...[-10.6, 10.6].map((x) => ({
-        x,
-        z: -5,
-        halfWidth: 0.35,
-        halfDepth: 9.3,
-      })),
+      { x: 0, z: -5, halfWidth: 4.1, halfDepth: 1.95 },
+      { x: -4, z: 6.5, halfWidth: 2.7, halfDepth: 0.95 },
     ];
   if (roomId === "projects")
-    return [{ x: -2.5, z: -8, halfWidth: 8.3, halfDepth: 1.4 }];
+    return [
+      { x: -2.5, z: -8, halfWidth: 8.3, halfDepth: 1.4 },
+      { x: 6.8, z: -10, halfWidth: 0.55, halfDepth: 4.8 },
+    ];
+  if (roomId === "glass-life")
+    return [
+      { x: 0, z: -3, halfWidth: 3, halfDepth: 3 },
+      ...[-8, 8].map((x) => ({ x, z: -8.3, halfWidth: 3.1, halfDepth: 0.75 })),
+    ];
+  if (roomId === "archive" || roomId === "unfinished")
+    return Array.from({ length: roomId === "archive" ? 3 : 5 }, (_, i) => ({
+      x: i % 2 ? 7.6 : -7.6,
+      z: 5 - Math.floor(i / 2) * 7,
+      halfWidth: 3.3,
+      halfDepth: 1.7,
+    }));
   if (roomId === "research")
     return [{ x: -3.4, z: -4, halfWidth: 3.8, halfDepth: 3.8 }];
   if (roomId === "my-collection")
@@ -156,6 +175,35 @@ export function keepClear(
   const [minX, maxX, minZ, maxZ] = roomBounds(roomId);
   position.x = MathUtils.clamp(position.x, minX, maxX);
   position.z = MathUtils.clamp(position.z, minZ, maxZ);
+  if (roomId === "corridor") {
+    const chunk = Math.floor(position.z / 22),
+      local = position.z - chunk * 22,
+      wallSample = chunk * 22 + Math.floor(local / 2) * 2 + 1;
+    const width =
+      Math.min(corridorClearWidth(position.z), corridorClearWidth(wallSample)) -
+      0.3;
+    position.x = MathUtils.clamp(position.x, -width, width);
+    const profile = corridorProfile(chunk),
+      benchX = -profile.halfWidth + 1.1,
+      benchZ = chunk * 22 + 5;
+    if (
+      profile.phase === 2 &&
+      Math.abs(position.x - benchX) < 0.7 &&
+      Math.abs(position.z - benchZ) < 1.8
+    )
+      position.x = benchX + 0.7;
+  }
+  if (roomId === "atrium" && position.z > 15)
+    position.x = MathUtils.clamp(position.x, -3.24, 3.24);
+  if (roomId === "music" && position.z < 7) {
+    const dx = position.x,
+      dz = position.z + 4,
+      r = Math.hypot(dx, dz);
+    if (r > 11.4) {
+      position.x = (dx / r) * 11.4;
+      position.z = (dz / r) * 11.4 - 4;
+    }
+  }
   if (resolveRoomPlan(roomId).rule === "compressing") {
     const progress = MathUtils.clamp((10 - position.z) / 24, 0, 1);
     const halfWidth = 9.45 - progress * 7.3;

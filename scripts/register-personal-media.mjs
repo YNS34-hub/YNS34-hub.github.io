@@ -158,6 +158,21 @@ for (const folder of folders) {
       }
       const item = {
         ...base,
+        primary: !!info.primary,
+        roomIds: Array.isArray(info.roomIds || info.rooms)
+          ? (info.roomIds || info.rooms).filter((x) =>
+              [
+                "wallpapers",
+                "imagined-worlds",
+                "cosmic",
+                "glass-life",
+                "portraits",
+                "editorial",
+                "projects",
+                "research",
+              ].includes(x),
+            )
+          : undefined,
         projectUrl,
         github:
           typeof info.github === "string" &&

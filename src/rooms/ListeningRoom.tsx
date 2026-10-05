@@ -1,544 +1,281 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Color, Group, InstancedMesh, Object3D, type Texture } from "three";
-import { useLibraryStore } from "../systems/library";
-import { useAudioStore } from "../audio/player";
-import { usePalaceStore } from "../systems/store";
+import {
+  Group,
+  InstancedMesh,
+  Object3D,
+  PointLight,
+  MeshStandardMaterial,
+} from "three";
 import {
   Block,
-  ContactShadow,
   Door,
   Floor,
   Label,
   Picture,
-  useImageTexture,
+  ContactShadow,
 } from "../world/primitives";
-import { useSurfaceTexture } from "../world/materials";
+import { useLibraryStore } from "../systems/library";
+import { usePalaceStore } from "../systems/store";
+import { useAudioStore } from "../audio/player";
+import { audioSignal } from "../audio/signal";
 
-export function sampledColor(texture: Texture | null, fallback = "#849aa7") {
-  const color = new Color(fallback);
-  if (!texture?.image) return color;
-  try {
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 8;
-    const context = canvas.getContext("2d")!;
-    context.drawImage(texture.image, 0, 0, 8, 8);
-    const pixels = context.getImageData(0, 0, 8, 8).data;
-    let r = 0,
-      g = 0,
-      b = 0;
-    for (let i = 0; i < pixels.length; i += 4) {
-      r += pixels[i];
-      g += pixels[i + 1];
-      b += pixels[i + 2];
-    }
-    color
-      .setRGB(r / 64 / 255, g / 64 / 255, b / 64 / 255)
-      .convertSRGBToLinear();
-    color.lerp(new Color("#c5d4d5"), 0.72);
-  } catch {
-    // A remote cover without CORS can still be shown; its lighting stays neutral.
-  }
-  return color;
-}
-
-/** Deep walnut fins are repeated in two draw calls, rather than individual furniture. */
-function AcousticFins({ wood }: { wood: Texture }) {
-  const sides = useRef<InstancedMesh>(null);
-  const back = useRef<InstancedMesh>(null);
+function AcousticWall() {
+  const ribs = useRef<InstancedMesh>(null);
+  const dummy = useMemo(() => new Object3D(), []);
   useEffect(() => {
-    const dummy = new Object3D();
-    for (let i = 0; i < 56; i++) {
-      dummy.position.set(i < 28 ? -13.25 : 13.25, 4.1, -14.4 + (i % 28) * 1.03);
-      dummy.scale.set(0.32, 7.5, 0.18);
+    if (!ribs.current) return;
+    for (let i = 0; i < 58; i++) {
+      const theta = -Math.PI * 0.88 + (i / 57) * Math.PI * 1.76;
+      dummy.position.set(Math.sin(theta) * 12, 4.4, -4 - Math.cos(theta) * 12);
+      dummy.rotation.set(0, theta, 0);
+      dummy.scale.set(0.28, 8.8, 0.68);
       dummy.updateMatrix();
-      sides.current?.setMatrixAt(i, dummy.matrix);
+      ribs.current.setMatrixAt(i, dummy.matrix);
     }
-    for (let i = 0; i < 50; i++) {
-      dummy.position.set(-13.25 + i * 0.54, 4.15, -15.52);
-      dummy.scale.set(0.075, 7.65, 0.22);
-      dummy.updateMatrix();
-      back.current?.setMatrixAt(i, dummy.matrix);
-    }
-    for (const mesh of [sides.current, back.current]) {
-      if (mesh) {
-        mesh.instanceMatrix.needsUpdate = true;
-        mesh.computeBoundingSphere();
-      }
-    }
-  }, []);
+    ribs.current.instanceMatrix.needsUpdate = true;
+    ribs.current.computeBoundingSphere();
+  }, [dummy]);
   return (
-    <>
-      <instancedMesh
-        ref={sides}
-        args={[undefined, undefined, 56]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry />
-        <meshStandardMaterial color="#8a7360" map={wood} roughness={0.72} />
-      </instancedMesh>
-      <instancedMesh
-        ref={back}
-        args={[undefined, undefined, 50]}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry />
-        <meshStandardMaterial color="#7c6654" map={wood} roughness={0.73} />
-      </instancedMesh>
-    </>
+    <instancedMesh
+      ref={ribs}
+      args={[undefined, undefined, 58]}
+      castShadow
+      receiveShadow
+    >
+      <boxGeometry />
+      <meshStandardMaterial color="#38445a" roughness={0.83} metalness={0.05} />
+    </instancedMesh>
   );
 }
-
-function IntegratedSpeaker({ side, wood }: { side: number; wood: Texture }) {
-  return (
-    <group position={[side * 6.8, 0, -10.6]}>
-      <ContactShadow width={3.4} depth={2.8} opacity={0.4} />
-      <Block
-        position={[0, 3.15, -0.18]}
-        scale={[1.62, 6.3, 0.96]}
-        color="#806b59"
-        map={wood}
-        roughness={0.68}
-        castShadow
-      />
-      <Block
-        position={[0, 3.12, 0.32]}
-        scale={[1.26, 5.55, 0.12]}
-        color="#292d2b"
-        roughness={0.91}
-      />
-      {[1.6, 2.6, 4.35].map((y, i) => (
-        <group key={y} position={[0, y, 0.397]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry
-              args={[i === 2 ? 0.18 : 0.43, i === 2 ? 0.18 : 0.43, 0.025, 48]}
-            />
-            <meshStandardMaterial color="#121716" roughness={0.85} />
-          </mesh>
-          <mesh>
-            <torusGeometry args={[i === 2 ? 0.187 : 0.438, 0.012, 6, 48]} />
-            <meshStandardMaterial
-              color="#60655e"
-              metalness={0.35}
-              roughness={0.55}
-            />
-          </mesh>
-        </group>
-      ))}
-      <Block
-        position={[0, 0.07, 0]}
-        scale={[1.84, 0.14, 1.3]}
-        color="#3d423d"
-        metalness={0.18}
-        roughness={0.6}
-      />
-      <Label
-        text={side < 0 ? "L / 01" : "R / 02"}
-        position={[0, 0.45, 0.4]}
-        size={0.075}
-        color="#89918b"
-      />
-    </group>
-  );
-}
-
-function ListeningInstallation({ wood }: { wood: Texture }) {
-  const vinyl = useRef<Group>(null);
+function Instrument() {
+  const fins = useRef<Group>(null);
+  const baseLight = useRef<PointLight>(null);
+  const rim = useRef<MeshStandardMaterial>(null);
+  const values = useRef({ bass: 0, mid: 0, treble: 0 });
   const reduced = usePalaceStore((s) => s.reducedMotion);
-  useFrame((_, delta) => {
-    if (vinyl.current && useAudioStore.getState().playing && !reduced)
-      vinyl.current.rotation.y += Math.min(delta, 0.05) * 0.58;
+  useFrame((_, dt) => {
+    const decay = 1 - Math.exp(-Math.min(dt, 0.1) * 3);
+    for (const key of ["bass", "mid", "treble"] as const)
+      values.current[key] +=
+        ((audioSignal.available && !reduced ? audioSignal[key] : 0) -
+          values.current[key]) *
+        decay;
+    if (fins.current)
+      fins.current.children.forEach((fin, i) => {
+        fin.rotation.z =
+          (i - 3) * 0.055 + values.current.mid * 0.055 * Math.sin(i * 0.9);
+        fin.position.y = values.current.mid * 0.025 * Math.cos(i);
+      });
+    if (baseLight.current)
+      baseLight.current.intensity = 48 + values.current.bass * 34;
+    if (rim.current)
+      rim.current.emissiveIntensity = 0.14 + values.current.treble * 0.65;
   });
   return (
     <group
-      position={[0, 0, -3.8]}
-      onClick={(event) => {
-        if (event.delta > 5) return;
-        event.stopPropagation();
-        usePalaceStore.getState().setOverlay("collection");
+      position={[0, 0, -5]}
+      onClick={(e) => {
+        if (e.delta < 5) {
+          e.stopPropagation();
+          usePalaceStore.getState().setOverlay("player");
+        }
       }}
     >
-      <ContactShadow width={8} depth={5.2} opacity={0.44} />
+      <ContactShadow width={8.6} depth={5.2} opacity={0.7} />
       <Block
-        position={[0, 0.42, 0]}
-        scale={[5.5, 0.74, 2.6]}
-        color="#bbb5a8"
-        roughness={0.46}
-        castShadow
+        position={[0, 0.24, 0]}
+        scale={[7.6, 0.48, 3.2]}
+        color="#1a2840"
+        roughness={0.27}
+        metalness={0.5}
       />
       <Block
-        position={[0, 0.055, 0]}
-        scale={[5.2, 0.11, 2.3]}
-        color="#222a26"
-        roughness={0.64}
+        position={[0, 0.49, 0]}
+        scale={[7.3, 0.035, 2.9]}
+        color="#708caa"
+        roughness={0.25}
+        metalness={0.6}
       />
-      <group position={[0, -0.28, 0]}>
-        <Block
-          position={[0, 1.12, 0]}
-          scale={[5.56, 0.12, 2.66]}
-          color="#c6c2b5"
-          roughness={0.27}
-          metalness={0.06}
-        />
-        <Block
-          position={[-0.2, 1.32, -0.05]}
-          scale={[3.85, 0.27, 1.94]}
-          color="#9b806b"
-          map={wood}
-          roughness={0.46}
-          castShadow
-        />
-        <Block
-          position={[-0.2, 1.47, -0.05]}
-          scale={[3.77, 0.035, 1.87]}
-          color="#505952"
-          roughness={0.4}
-          metalness={0.62}
-        />
-        <group ref={vinyl} position={[-0.66, 1.52, -0.05]}>
-          <mesh>
-            <cylinderGeometry args={[0.83, 0.83, 0.055, 80]} />
-            <meshStandardMaterial
-              color="#a7afa7"
-              metalness={0.78}
-              roughness={0.3}
-            />
-          </mesh>
-          <mesh position={[0, 0.033, 0]}>
-            <cylinderGeometry args={[0.79, 0.79, 0.012, 80]} />
-            <meshStandardMaterial
-              color="#171d1b"
-              roughness={0.29}
-              metalness={0.18}
-            />
-          </mesh>
-          {[0.3, 0.41, 0.52, 0.63, 0.74].map((radius) => (
-            <mesh
-              key={radius}
-              rotation={[-Math.PI / 2, 0, 0]}
-              position={[0, 0.042, 0]}
+      <group ref={fins} name="audio-fins">
+        {Array.from({ length: 7 }, (_, i) => {
+          const h = 4.4 + Math.cos((i - 3) * 0.55) * 1.6;
+          return (
+            <group
+              key={i}
+              position={[(i - 3) * 0.82, 0, Math.abs(i - 3) * 0.17]}
+              rotation={[0, (i - 3) * 0.08, (i - 3) * 0.055]}
             >
-              <torusGeometry args={[radius, 0.0025, 3, 64]} />
-              <meshStandardMaterial
-                color="#41483f"
-                roughness={0.34}
-                metalness={0.1}
+              <Block
+                position={[0, h / 2 + 0.58, 0]}
+                scale={[0.08, h, 0.42]}
+                color="#748eaa"
+                metalness={0.7}
+                roughness={0.24}
               />
-            </mesh>
-          ))}
-          <mesh position={[0, 0.044, 0]}>
-            <cylinderGeometry args={[0.19, 0.19, 0.008, 40]} />
-            <meshStandardMaterial color="#d7dacb" roughness={0.65} />
-          </mesh>
-          <mesh position={[0, 0.08, 0]}>
-            <cylinderGeometry args={[0.025, 0.025, 0.09, 12]} />
-            <meshStandardMaterial
-              color="#bcc1b6"
-              metalness={0.85}
-              roughness={0.22}
-            />
-          </mesh>
-        </group>
-        <mesh position={[1.02, 1.57, -0.56]}>
-          <cylinderGeometry args={[0.12, 0.12, 0.18, 24]} />
-          <meshStandardMaterial
-            color="#a4afa5"
-            metalness={0.7}
-            roughness={0.36}
-          />
-        </mesh>
-        <Block
-          position={[0.87, 1.69, -0.16]}
-          rotation={[0, -0.45, 0]}
-          scale={[0.055, 0.04, 0.91]}
-          color="#c1c8be"
-          metalness={0.82}
-          roughness={0.28}
-        />
-        <Block
-          position={[0.66, 1.655, 0.28]}
-          scale={[0.13, 0.07, 0.22]}
-          color="#242c28"
-          roughness={0.6}
-        />
+              <mesh position={[0.12, h / 2 + 0.58, 0]}>
+                <boxGeometry args={[0.28, h, 1.04]} />
+                <meshPhysicalMaterial
+                  color="#c4e6fa"
+                  roughness={0.08}
+                  metalness={0}
+                  transmission={0.92}
+                  thickness={0.7}
+                  ior={1.46}
+                  attenuationColor="#64a6e4"
+                  attenuationDistance={7}
+                  envMapIntensity={1.5}
+                />
+              </mesh>
+              <mesh position={[0.275, h / 2 + 0.58, 0.48]}>
+                <boxGeometry args={[0.014, h, 0.024]} />
+                <meshStandardMaterial
+                  ref={i === 3 ? rim : undefined}
+                  color="#e5c6a0"
+                  emissive="#d9b47d"
+                  emissiveIntensity={0.18}
+                  roughness={0.22}
+                  metalness={0.4}
+                />
+              </mesh>
+            </group>
+          );
+        })}
       </group>
-      <Label
-        text="04 / THE LISTENING TABLE"
-        position={[-0.65, 0.58, 1.31]}
-        size={0.11}
-        color="#424c45"
-        maxWidth={4}
-      />
-      <Label
-        text="OPEN COLLECTION  ↗"
-        position={[-0.88, 0.32, 1.315]}
-        size={0.095}
-        color="#606a60"
-        maxWidth={4}
+      <pointLight
+        ref={baseLight}
+        position={[0, 1, 2.6]}
+        intensity={48}
+        distance={15}
+        color="#598ed6"
       />
     </group>
   );
 }
-
 export default function ListeningRoom() {
-  const tracks = useLibraryStore((s) => s.music);
-  const currentId = useAudioStore((s) => s.currentId);
-  const playing = useAudioStore((s) => s.playing);
-  const track = tracks.find((item) => item.id === currentId) || tracks[0];
-  const artwork = useRef<Group>(null);
-  const light = useRef<import("three").PointLight>(null);
-  const texture = useImageTexture(track?.displayCover || track?.cover);
-  const artworkHeight = texture?.image
-    ? Math.min(6.18, (6.18 * texture.image.height) / texture.image.width)
-    : 6.18;
-  const tint = useMemo(() => sampledColor(texture, "#d5c6ac"), [texture]);
-  const reduced = usePalaceStore((s) => s.reducedMotion);
-  const wood = useSurfaceTexture("walnut");
-  const quality = usePalaceStore((s) => s.effectiveQuality);
-  useEffect(() => {
-    void useLibraryStore.getState().initialize();
-  }, []);
-  useFrame((_, delta) => {
-    const easing = Math.min(delta * (reduced ? 12 : 0.65), 1);
-    if (artwork.current)
-      artwork.current.position.y +=
-        ((playing ? 0.45 : 0) - artwork.current.position.y) * easing;
-    if (light.current) {
-      light.current.color.lerp(tint, Math.min(delta * 0.3, 1));
-      light.current.intensity +=
-        ((playing ? 38 : 24) +
-          useAudioStore.getState().energy * 2 -
-          light.current.intensity) *
-        easing;
-    }
-  });
+  const tracks = useLibraryStore((s) => s.music),
+    id = useAudioStore((s) => s.currentId),
+    playing = useAudioStore((s) => s.playing);
+  const track = tracks.find((x) => x.id === id);
   return (
     <group>
-      <Floor width={28} depth={34} color="#97988d" />
+      <Floor width={28} depth={34} color="#17233b" />
+      <AcousticWall />
       <Block
-        position={[0, 4.5, -16.2]}
-        scale={[28.7, 9, 0.9]}
-        color="#514b40"
-        map={wood}
-        roughness={0.85}
+        position={[0, 9.5, -5]}
+        scale={[26, 0.65, 24]}
+        color="#0c172d"
+        castShadow
       />
+      {/* Suspended amber canopy, open along its center. It has a weight and a front edge. */}
       {[-1, 1].map((side) => (
         <group key={side}>
           <Block
-            position={[side * 14, 4.5, 0]}
-            scale={[0.8, 9, 34]}
-            color="#3c3e36"
-            roughness={0.91}
+            position={[side * 5.2, 8.5, -5]}
+            scale={[5.8, 0.36, 22]}
+            color="#524534"
+            metalness={0.28}
+            roughness={0.55}
           />
           <Block
-            position={[side * 13.48, 4.1, 0]}
-            scale={[0.15, 7.8, 30]}
-            color="#554a3c"
-            map={wood}
-            roughness={0.78}
-          />
-          <Block
-            position={[side * 13.51, 0.12, 0]}
-            scale={[0.09, 0.1, 33]}
-            color="#161c18"
-          />
-          <Block
-            position={[side * 12.9, 8.12, 0]}
-            scale={[1.3, 0.18, 32]}
-            color="#1b211c"
-            roughness={0.88}
-          />
-          <Block
-            position={[side * 12.3, 8.22, 0]}
-            scale={[0.045, 0.035, 30]}
-            color="#e6d6b7"
-            emissive="#ffe1ae"
+            position={[side * 2.25, 8.31, -5]}
+            scale={[0.1, 0.06, 20.8]}
+            color="#e0be91"
+            emissive="#dfb981"
             emissiveIntensity={0.65}
           />
-          <IntegratedSpeaker side={side} wood={wood} />
-          <pointLight
-            position={[side * 9, 5.2, -12.3]}
-            color="#ffdfb8"
-            intensity={70}
-            distance={16}
-            decay={2}
-          />
         </group>
       ))}
-      <AcousticFins wood={wood} />
-      <Block position={[0, 9, 0]} scale={[28, 0.4, 34]} color="#222921" />
-      {[-8, -4, 0, 4, 8].map((x) => (
-        <group key={x}>
-          <Block
-            position={[x, 8.47, 0]}
-            scale={[2.8, 0.28, 30]}
-            color="#383d32"
-            roughness={0.97}
-            castShadow
+      <Instrument />
+      {/* The listening datum is below eye height, separate from the sculpture's stage. */}
+      <Block
+        position={[-4, 0.32, 6.5]}
+        scale={[4.8, 0.64, 1.25]}
+        color="#233349"
+        roughness={0.7}
+      />
+      <ContactShadow
+        position={[-4, 0.02, 6.5]}
+        width={6}
+        depth={2.6}
+        opacity={0.35}
+      />
+      <group position={[-7.9, 3.3, -8]} rotation={[0, 0.36, 0]}>
+        {track?.cover ? (
+          <Picture
+            src={track.displayCover || track.cover}
+            width={3.8}
+            height={3.8}
+            medium="print"
           />
-          <Block
-            position={[x, 8.31, -3.2]}
-            scale={[0.035, 0.035, 15]}
-            color="#e7ddcb"
-            emissive="#f6e0bb"
-            emissiveIntensity={0.45}
-          />
-        </group>
-      ))}
-      <Label
-        text="A ROOM FOR LISTENING"
-        position={[-9.8, 6.62, -15.39]}
-        size={0.24}
-        color="#d5d4c6"
-        maxWidth={5}
-      />
-      <Label
-        text="04 / SOUND COLLECTION"
-        position={[-9.8, 6.06, -15.38]}
-        size={0.1}
-        color="#959b8b"
-      />
-      <Label
-        text={playing ? "NOW PLAYING" : "SELECTED RECORD"}
-        position={[0, 7.5, -9.66]}
-        size={0.105}
-        color="#bdc4b8"
-      />
-      <group ref={artwork}>
-        <ContactShadow
-          position={[0, 0.025, -9.5]}
-          width={8.2}
-          depth={3.5}
-          opacity={0.24}
-        />
-        <Block
-          position={[0, 4.13, -9.76]}
-          scale={[6.3, artworkHeight + 0.12, 0.08]}
-          color="#353e32"
-          roughness={0.72}
-        />
-        <Picture
-          src={track?.displayCover || track?.cover}
-          width={6.18}
-          height={6.18}
-          position={[0, 4.13, -9.697]}
-          color="#7b8d85"
+        ) : (
+          <>
+            <Block scale={[3.8, 3.8, 0.12]} color="#283951" />
+            <Label
+              text={track ? "LOCAL AUDIO\nNO ARTWORK" : "梁博\nLISTENING SHELF"}
+              position={[0, 0.3, 0.08]}
+              size={0.27}
+              color="#d4deed"
+              maxWidth={3}
+            />
+            <Label
+              text={
+                track
+                  ? "YOUR BROWSER LIBRARY"
+                  : "男孩\n出现又离开\n日落大道\n灵魂歌手"
+              }
+              position={[0, -0.8, 0.08]}
+              size={0.13}
+              color="#c4ae90"
+              maxWidth={3}
+            />
+          </>
+        )}
+        <Label
+          text={track?.artist || "梁博 / LISTENING PREFERENCE"}
+          position={[0, -2.35, 0.1]}
+          size={0.2}
+          color="#d8ba91"
+          maxWidth={5}
         />
       </group>
       <Label
-        text={track?.title || "YOUR COLLECTION STARTS HERE"}
-        position={[0, 4.13 - artworkHeight / 2 - 0.5, -9.65]}
-        size={0.21}
-        color="#d4dace"
-        maxWidth={7}
+        text={track?.title || "A ROOM FOR LISTENING"}
+        position={[4.5, 7.5, -12.9]}
+        size={0.34}
+        color="#ead7bd"
+        maxWidth={8}
       />
       <Label
         text={
           track
-            ? `${track.artist}   /   ${track.album}`
-            : "Import a record. Make this space yours."
+            ? `${track.artist} / ${track.album} / ${playing ? "PLAYING" : "PAUSED"}`
+            : "LISTENING PREFERENCES / LOCAL AUDIO"
         }
-        position={[0, 4.13 - artworkHeight / 2 - 0.94, -9.64]}
-        size={0.115}
-        color="#9fa99b"
+        position={[4.5, 6.85, -12.8]}
+        size={0.14}
+        color="#9badc6"
         maxWidth={8}
       />
-      <ListeningInstallation wood={wood} />
-      {/* One monolithic listening bench; space is the luxury here. */}
-      <ContactShadow
-        position={[6.2, 0.018, 4.6]}
-        width={5.1}
-        depth={2.4}
-        opacity={0.38}
-      />
-      <Block
-        position={[6.2, 0.55, 4.6]}
-        scale={[4, 0.2, 1.05]}
-        color="#b0ae9e"
-        roughness={0.86}
-        castShadow
-      />
-      {[4.7, 7.7].map((x) => (
-        <Block
-          key={x}
-          position={[x, 0.26, 4.6]}
-          scale={[0.15, 0.45, 0.76]}
-          color="#454c42"
-          roughness={0.47}
-          metalness={0.5}
-        />
-      ))}
-      <group position={[-12.25, 0, -3.5]} rotation={[0, Math.PI / 2, 0]}>
-        <Block
-          position={[0, 1.17, -0.13]}
-          scale={[6.4, 0.12, 0.75]}
-          color="#83745b"
-          map={wood}
-          roughness={0.58}
-        />
-        <Label
-          text="THE RECORD ARCHIVE"
-          position={[0, 3.25, 0]}
-          size={0.14}
-          color="#bdc4b4"
-        />
-        {tracks.slice(0, 5).map((item, i) => (
-          <group
-            key={item.id}
-            position={[-2.6 + i * 1.3, 1.95, 0]}
-            onClick={(event) => {
-              if (event.delta < 5) {
-                event.stopPropagation();
-                void useAudioStore.getState().play(item.id);
-              }
-            }}
-          >
-            <Block scale={[1.12, 1.12, 0.055]} color="#202c25" />
-            <Picture
-              src={item.displayCover || item.cover}
-              width={1.08}
-              height={1.08}
-              position={[0, 0, 0.035]}
-            />
-          </group>
-        ))}
-      </group>
-      <pointLight
-        ref={light}
-        position={[0, 5.5, -8]}
-        intensity={24}
-        color="#d5c6ac"
-        distance={18}
-        decay={2}
-      />
       <spotLight
-        position={[-1.5, 7.9, 0]}
-        target-position={[0, 0.8, -3.8]}
-        color="#ffe2b6"
-        intensity={320}
-        angle={0.58}
-        penumbra={1}
-        distance={22}
-        castShadow={quality !== "low"}
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0002}
-        shadow-normalBias={0.03}
-        shadow-radius={3}
+        position={[-4, 8, 3]}
+        target-position={[0, 3, -5]}
+        color="#d7e7fa"
+        intensity={220}
+        angle={0.5}
+        penumbra={0.7}
+        distance={26}
       />
       <pointLight
-        position={[0, 5, 9]}
-        color="#efe4cb"
-        intensity={80}
+        position={[7, 5, -9]}
+        intensity={85}
         distance={22}
-        decay={2}
+        color="#e9be83"
       />
       <Door
         id="atrium"
         title="The Atrium"
-        number="01"
-        position={[9.1, 0, 15.5]}
+        position={[7.5, 0, 12.8]}
         rotation={[0, Math.PI, 0]}
         dark
       />
