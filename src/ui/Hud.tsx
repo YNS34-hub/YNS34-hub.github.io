@@ -19,6 +19,7 @@ import { useAudioStore } from "../audio/player";
 import { useLibraryStore } from "../systems/library";
 import { PalaceMark } from "./primitives";
 import { useIdentityTone } from "../systems/identityTone";
+import { useMotionCue } from "../motion/useMotionCue";
 export default function Hud({ ready }: { ready: boolean }) {
   const s = usePalaceStore();
   const audio = useAudioStore(
@@ -33,6 +34,13 @@ export default function Hud({ ready }: { ready: boolean }) {
   const room = roomInfo(s.roomId);
   const plan = resolveRoomPlan(s.roomId);
   const track = tracks.find((t) => t.id === audio.currentId);
+  const identityCue = useMotionCue<HTMLButtonElement>("museum-identity", "identity");
+  const welcomeEnabled = ready && !s.started;
+  const eyebrowCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled);
+  const heroCue = useMotionCue<HTMLHeadingElement>("welcome", "hero", welcomeEnabled, 60);
+  const subtitleCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled, 160);
+  const entryCue = useMotionCue<HTMLDivElement>("welcome", "copy", welcomeEnabled, 240);
+  const memoryCue = useMotionCue<HTMLElement>(String(s.memoryReveal), "copy", s.coreNear && !s.overlay && !s.focus);
   const [tutorial, setTutorial] = useState(false);
   useEffect(() => {
     if (!s.started || s.tutorialDone) return;
@@ -51,6 +59,7 @@ export default function Hud({ ready }: { ready: boolean }) {
     <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`}>
       <header className="hud-header">
         <button
+          ref={identityCue}
           className={`wordmark ${lightIdentity ? "identity-is-light" : ""}`}
           onClick={() => s.setOverlay("about")}
           aria-label="About The Memory Palace"
@@ -81,20 +90,20 @@ export default function Hud({ ready }: { ready: boolean }) {
       </header>
       {!s.started && (
         <div className="welcome-caption">
-          <p className="eyebrow">
+          <p className="eyebrow" ref={eyebrowCue}>
             <span className="status-dot" /> A DIGITAL MUSEUM BY JIE TIAN
           </p>
-          <h1>
+          <h1 ref={heroCue}>
             THE MEMORY
             <br />
             <span>PALACE</span>
             <sup>∞</sup>
           </h1>
-          <p className="welcome-subtitle">
+          <p className="welcome-subtitle" ref={subtitleCue}>
             An infinite gallery of projects, research,
             <br className="desktop-break" /> music, images and experiments.
           </p>
-          <div className="welcome-actions">
+          <div className="welcome-actions" ref={entryCue}>
             <button
               className="enter-button"
               disabled={!ready}
@@ -216,7 +225,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           onClick={() => s.update({ memoryReveal: !s.memoryReveal })}
         >
           <span className="eyebrow">MEMORY REVEAL / 记忆显影</span>
-          <strong>
+          <strong ref={memoryCue}>
             {s.memoryReveal ? "Return to stillness" : "Reveal the collection"}
           </strong>
           <span>Saved works or selected collection · ESC to skip</span>

@@ -11,3 +11,17 @@
   --motion-ease-settle: cubic-bezier(.22, .68, .2, 1);
   --motion-ease-exit: cubic-bezier(.4, 0, 1, 1);
 }
+
+/* 馆标仅变色；入口、焦点和按下反馈不改变组件的占位。 */
+.wordmark { transition: color var(--motion-feedback) var(--motion-ease-settle); }
+.enter-button {
+  transition: background-color var(--motion-feedback) var(--motion-ease-settle), transform var(--motion-feedback) var(--motion-ease-settle);
+}
+.enter-button:hover { transform: translateX(1px); }
+.spatial-controls button, .guide-button, .icon-button, .playback-controls button {
+  transition: color var(--motion-feedback) var(--motion-ease-settle), opacity var(--motion-feedback) var(--motion-ease-settle);
+}
+.spatial-controls button:active, .guide-button:active, .icon-button:active { opacity: .72; }
+.bookmarked svg { transition: fill var(--motion-feedback) var(--motion-ease-settle); }
+html[data-motion="reduced"] .enter-button:hover { transform: none; }
+@media (prefers-reduced-motion: reduce) { .enter-button:hover { transform: none; } }
