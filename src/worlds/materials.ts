@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { CanvasTexture, RepeatWrapping, SRGBColorSpace, NoColorSpace } from "three";
 
 // 原创纹理在场景内生成与释放，没有外部品牌、下载素材或私人文件。
-export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "waves" | "land" | "leaves") {
+export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "waves" | "land" | "leaves" | "brick") {
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
     canvas.width = kind === "court" ? 1536 : 512;
@@ -12,6 +12,14 @@ export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "wa
     const random = () => { seed = Math.imul(seed, 1664525) + 1013904223 | 0; return (seed >>> 0) / 4294967296; };
     ctx.fillStyle = kind === "ball" ? "#b96a31" : kind === "court" ? "#323b42" : kind === "mural" ? "#21433e" : "#a99b83";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (kind === "brick") {
+      ctx.fillStyle = "#898b87"; ctx.fillRect(0, 0, 512, 512);
+      for (let row = 0; row < 32; row++) for (let column = -1; column < 12; column++) {
+        const tone = 202 + Math.floor(random() * 32);
+        ctx.fillStyle = `rgb(${tone},${tone},${tone - 3})`;
+        ctx.fillRect(column * 48 + row % 2 * 24 + 1, row * 16 + 1, 46, 14);
+      }
+    }
     if (kind === "court") {
       ctx.save(); ctx.translate(768, 1024); ctx.scale(64, 2048 / 36);
       ctx.fillStyle = "#365e6f"; ctx.fillRect(-7.5, -14, 15, 28);
@@ -85,6 +93,7 @@ export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "wa
     }
     const tex = new CanvasTexture(canvas); tex.colorSpace = kind === "waves" ? NoColorSpace : SRGBColorSpace; tex.anisotropy = kind === "court" ? 4 : 2;
     if (kind === "grain" || kind === "waves" || kind === "land") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(kind === "waves" ? 30 : kind === "land" ? 10 : 12, kind === "waves" ? 30 : kind === "land" ? 10 : 12); }
+    if (kind === "brick") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(2, 3); }
     return tex;
   }, [kind]);
   useEffect(() => () => texture.dispose(), [texture]);

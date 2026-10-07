@@ -57,16 +57,20 @@ function Hoop({ side }: { side: number }) {
 function Fence() {
   const geometry = useMemo(() => {
     const p: Vector3[] = [];
+    // 在矩形内裁切真实小菱形围网；四米高的整面交叉线不能表现铁丝网的尺度。
+    const weave = (side: number, lower: number, upper: number, end: boolean) => {
+      for (const slope of [-1, 1]) for (let start = lower - 4.2; start <= upper + 4.2; start += .24) {
+        const y0 = Math.max(.1, .1 + (slope === 1 ? lower - start : start - upper));
+        const y1 = Math.min(4.25, .1 + (slope === 1 ? upper - start : start - lower));
+        if (y0 >= y1) continue;
+        const a = start + slope * (y0 - .1), b = start + slope * (y1 - .1);
+        p.push(end ? new Vector3(a, y0, side * 18) : new Vector3(side * 12, y0, a), end ? new Vector3(b, y1, side * 18) : new Vector3(side * 12, y1, b));
+      }
+    };
     for (const side of [-1, 1]) {
-      for (let z = -18; z <= 18; z += .55) {
-        p.push(new Vector3(side * 12, .1, z), new Vector3(side * 12, 4.25, z + 1.4));
-        p.push(new Vector3(side * 12, .1, z + 1.4), new Vector3(side * 12, 4.25, z));
-      }
-      for (let x = -12; x <= 12; x += .55) {
-        if (side === 1 && Math.abs(x) < 2.3) continue;
-        p.push(new Vector3(x, .1, side * 18), new Vector3(x + 1.4, 4.25, side * 18));
-        p.push(new Vector3(x + 1.4, .1, side * 18), new Vector3(x, 4.25, side * 18));
-      }
+      weave(side, -18, 18, false);
+      if (side === 1) { weave(side, -12, -2.3, true); weave(side, 2.3, 12, true); }
+      else weave(side, -12, 12, true);
     }
     return new BufferGeometry().setFromPoints(p);
   }, []);
@@ -93,10 +97,10 @@ function UrbanContext() {
       windows.push({ position: [14.98, y, z], scale: [.035, 1.4, 1], color: z % 3 === 0 ? "#465654" : "#b29b77" });
     return { buildings, windows };
   }, []);
-  const mural = useWorldTexture("mural");
+  const mural = useWorldTexture("mural"), brick = useWorldTexture("brick");
   return <>
-    <Instances items={city.buildings} geometry={geo} color="#6c756e" shadows />
-    <Instances items={city.windows} geometry={geo} color="#bda678" />
+    <Instances items={city.buildings} geometry={geo} color="#6c756e" shadows map={brick} bumpMap={brick} />
+    <Instances items={city.windows} geometry={geo} color="#bda678" roughness={.28} metalness={.38} />
     <Block position={[-16, 2.6, -1]} scale={[2.5, 5.2, 30]} color="#77766d" roughness={.88} castShadow />
     <mesh position={[-14.71, 2.8, -2]} rotation={[0, Math.PI / 2, 0]}><planeGeometry args={[15, 4.5]} /><meshStandardMaterial map={mural} roughness={.9} /></mesh>
     <Block position={[18, 3.5, 6]} scale={[6, 7, 23]} color="#76695c" />
