@@ -83,19 +83,21 @@ function MountainRidges() {
     <mesh geometry={geometry} position={[35, -12, 45]} scale={[1, .62, .8]}><meshStandardMaterial color="#6f8276" roughness={1} /></mesh>
   </>;
 }
-function Lake() {
+function LowLake() {
   const material = useRef<MeshPhysicalMaterial>(null);
-  const quality = usePalaceStore(s => s.effectiveQuality);
   useFrame((_, dt) => {
     if (!material.current?.normalMap) return;
     material.current.normalMap.offset.x += Math.min(dt, .06) * .013;
     material.current.normalMap.offset.y += Math.min(dt, .06) * .006;
   });
   const waves = useWorldTexture("waves");
-  if (quality !== "low") return <LakeReflection />;
   return <mesh position={[lakeX, .23, lakeZ]} rotation={[-Math.PI / 2, 0, 0]} scale={[39, 53, 1]} name="sky-reflecting-lake">
     <circleGeometry args={[1, 80]} /><meshPhysicalMaterial ref={material} color="#274c50" roughness={.2} metalness={.06} envMapIntensity={.8} clearcoat={1} clearcoatRoughness={.12} ior={1.33} normalMap={waves} normalScale={[.14, .14]} />
   </mesh>;
+}
+function Lake() {
+  const quality = usePalaceStore(s => s.effectiveQuality);
+  return quality !== "low" ? <LakeReflection /> : <LowLake />;
 }
 function Viewpoints() {
   const geo = useMemo(() => new BoxGeometry(1, 1, 1), []);

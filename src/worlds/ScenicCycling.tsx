@@ -45,7 +45,7 @@ function Rider() {
     publish();
     const command = (event: Event) => {
       const s = usePalaceStore.getState();
-      if (s.overlay || s.focus || s.mode === "index") return;
+      if (s.overlay || s.focus || s.mode === "index" || useActivity.getState().warming) return;
       const action = (event as CustomEvent<RideCommand>).detail;
       sound.unlock();
       if (action === "start") { ride.resume(); state.current.cruise = true; useActivity.setState({ photo: false }); acknowledge("Ride at your own pace"); }
@@ -72,7 +72,7 @@ function Rider() {
       const s = usePalaceStore.getState();
       const ridingKey = ["KeyW", "KeyS", "ArrowUp", "ArrowDown"].includes(event.code);
       // 原 Player 先阻止方向键滚动，但骑行仍需读取相同真实输入；不改它的控制器或事件顺序。
-      if (event.repeat || (event.defaultPrevented && !ridingKey) || s.overlay || s.focus || s.mode === "index" ||
+      if (event.repeat || (event.defaultPrevented && !ridingKey) || s.overlay || s.focus || s.mode === "index" || useActivity.getState().warming ||
         (event.target instanceof HTMLElement && event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
       if (event.code === "KeyP") { event.preventDefault(); command(new CustomEvent("palace:ride", { detail: "photo" })); return; }
       if (useActivity.getState().photo) return;
@@ -101,7 +101,7 @@ function Rider() {
   }, [ride, sound, camera, gl, scene]);
   useFrame((_, rawDelta) => {
     const s = usePalaceStore.getState(), local = state.current;
-    if (!s.started || s.overlay || s.focus || s.mode === "index" || document.hidden) return;
+    if (!s.started || s.overlay || s.focus || s.mode === "index" || document.hidden || useActivity.getState().warming) return;
     const dt = Math.min(rawDelta, .06), before = ride.distance, wasAtViewpoint = ride.atViewpoint;
     const keys = local.keys;
     ride.step(dt, { pedal: keys.has("KeyW") || keys.has("ArrowUp"), slow: keys.has("KeyS") || keys.has("ArrowDown"), brake: keys.has("Space") || keys.has("brake"), cruise: local.cruise, blocked: useActivity.getState().photo });

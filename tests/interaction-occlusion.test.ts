@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BoxGeometry, Group, InstancedMesh, Mesh, MeshBasicMaterial } from "three";
-import { isVisibleMesh } from "../src/interaction/occlusion";
+import { isVisibleMesh, isVisibleObject } from "../src/interaction/occlusion";
 
 describe("actual gaze occlusion", () => {
   it("includes instanced architecture and excludes every hidden ancestor", () => {
@@ -11,7 +11,9 @@ describe("actual gaze occlusion", () => {
     expect(isVisibleMesh(blocker)).toBe(true);
     expect(isVisibleMesh(work)).toBe(true);
     expect(isVisibleMesh(inner)).toBe(false);
+    expect(isVisibleObject(inner)).toBe(true);
     root.visible = false;
+    expect(isVisibleObject(inner)).toBe(false);
     expect(isVisibleMesh(blocker)).toBe(false);
     expect(isVisibleMesh(work)).toBe(false);
     root.visible = true; work.visible = false;

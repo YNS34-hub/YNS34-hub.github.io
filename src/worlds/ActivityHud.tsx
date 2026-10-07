@@ -16,7 +16,7 @@ export default function ActivityHud() {
     if (root) root.dataset.activityWorld = room;
     return () => { if (root) { delete root.dataset.activityPhoto; delete root.dataset.activityWorld; } };
   }, [room, a.photo]);
-  if (!blocked && room === "cycling") {
+  if (!blocked && !a.warming && room === "cycling") {
     if (a.photo) return <aside className="ride-photo-controls" aria-label="Cycling photo view">
       <button onClick={() => rideCommand("save-photo")}>Save this view</button>
       <button onClick={() => useActivity.setState({ photo: false })}>Exit photo view · ESC</button>
@@ -37,7 +37,7 @@ export default function ActivityHud() {
       <small>W accelerate · S slow · Space brake · drag / lock to look around · P photo view. Low motion uses a steady camera.</small>
     </aside>;
   }
-  if (blocked || room !== "basketball") return null;
+  if (blocked || a.warming || room !== "basketball") return null;
   return <aside className="activity-hud court-hud" aria-label="Basketball practice controls">
     <div className="practice-score"><span>PRACTICE / AFTER HOURS</span><strong>{a.made}<small> / {a.shots}</small></strong><span>MADE / ATTEMPTED{a.streak > 1 ? " · STREAK " + a.streak : ""}</span></div>
     <p className="shot-result" ref={result} role="status">{a.result || "Find your spot."}</p>

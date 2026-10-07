@@ -22,7 +22,7 @@ function PracticeBall() {
   const publish = () => useActivity.setState({ ...simulation.stats, mode: simulation.mode, dribbling: state.current.dribble, charge: state.current.charge });
   const enabled = () => {
     const s = usePalaceStore.getState();
-    return s.started && !s.overlay && !s.focus && !s.pendingDoor && s.mode !== "index" && !document.hidden;
+    return s.started && !s.overlay && !s.focus && !s.pendingDoor && s.mode !== "index" && !document.hidden && !useActivity.getState().warming;
   };
   const distance = () => Math.hypot(camera.position.x - simulation.position.x, camera.position.z - simulation.position.z);
   const pickup = () => {

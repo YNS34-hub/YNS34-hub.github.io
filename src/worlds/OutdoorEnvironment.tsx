@@ -53,7 +53,7 @@ function Outdoor({ roomId, onReady }: { roomId: string; onReady?: () => void }) 
       sunlight.current.target.position.copy(camera.position); sunlight.current.target.updateMatrixWorld();
     }
     const name = roomId === "basketball" ? "basketball-practice-world" : roomId === "cycling" ? "golden-forest-cycling-world" : "worlds-threshold-wing";
-    if (!sent.current && scene.getObjectByName(name) && useLibraryStore.getState().ready && !active && !textureStatus().pending && performance.now() - readyAt.current > 650) { sent.current = true; onReady?.(); }
+    if (!sent.current && scene.getObjectByName(name) && scene.getObjectByName("prepared-world:" + roomId)?.userData.prepared && useLibraryStore.getState().ready && !active && !textureStatus().pending && performance.now() - readyAt.current > 650) { sent.current = true; onReady?.(); }
   });
   return <>
     <color attach="background" args={["#b7a38e"]} />

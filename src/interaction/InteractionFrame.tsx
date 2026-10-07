@@ -4,7 +4,7 @@ import { Raycaster, Vector3, type Object3D } from "three";
 import { usePalaceStore } from "../systems/store";
 import { attentionSample, advanceDwell, type Dwell } from "./attention";
 import { activateFocused, interactives, publishFocus, readInteraction } from "./registry";
-import { isVisibleMesh } from "./occlusion";
+import { isVisibleMesh, isVisibleObject } from "./occlusion";
 
 export default function InteractionFrame() {
   const { camera, scene } = useThree();
@@ -34,6 +34,7 @@ export default function InteractionFrame() {
     camera.getWorldDirection(direction);
     let candidate = "", closest = Infinity;
     for (const [id, target] of interactives) {
+      if (!isVisibleObject(target.object)) { target.state.proximity = 0; target.state.focused = false; continue; }
       target.object.getWorldPosition(position);
       delta.subVectors(position, camera.position);
       const distance = delta.length(), sample = attentionSample(distance, delta.normalize().dot(direction), target.radius);

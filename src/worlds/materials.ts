@@ -1,9 +1,18 @@
 import { useEffect, useMemo } from "react";
 import { CanvasTexture, RepeatWrapping, SRGBColorSpace, NoColorSpace } from "three";
 
-// 原创纹理在场景内生成与释放，没有外部品牌、下载素材或私人文件。
-export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "waves" | "land" | "leaves" | "brick") {
-  const texture = useMemo(() => {
+export type WorldTextureKind = "court" | "ball" | "mural" | "grain" | "waves" | "land" | "leaves" | "brick";
+// 仅缓存这八种固定原创 CPU 画布，最多约 19 MiB；GPU 纹理仍由各挂载实例独立释放。
+const sources = new Map<WorldTextureKind, HTMLCanvasElement>();
+function textureFromCanvas(kind: WorldTextureKind, canvas: HTMLCanvasElement) {
+  const tex = new CanvasTexture(canvas); tex.colorSpace = kind === "waves" ? NoColorSpace : SRGBColorSpace; tex.anisotropy = kind === "court" ? 4 : 2;
+  if (kind === "grain" || kind === "waves" || kind === "land") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(kind === "waves" ? 30 : kind === "land" ? 10 : 12, kind === "waves" ? 30 : kind === "land" ? 10 : 12); }
+  if (kind === "brick") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(2, 3); }
+  return tex;
+}
+export function createWorldTexture(kind: WorldTextureKind) {
+    const cached = sources.get(kind);
+    if (cached) return textureFromCanvas(kind, cached);
     const canvas = document.createElement("canvas");
     canvas.width = kind === "court" ? 1536 : 512;
     canvas.height = kind === "court" ? 2048 : 512;
@@ -91,11 +100,11 @@ export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "wa
         ctx.strokeStyle = "#817d6780"; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(0, 16); ctx.stroke(); ctx.restore();
       }
     }
-    const tex = new CanvasTexture(canvas); tex.colorSpace = kind === "waves" ? NoColorSpace : SRGBColorSpace; tex.anisotropy = kind === "court" ? 4 : 2;
-    if (kind === "grain" || kind === "waves" || kind === "land") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(kind === "waves" ? 30 : kind === "land" ? 10 : 12, kind === "waves" ? 30 : kind === "land" ? 10 : 12); }
-    if (kind === "brick") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(2, 3); }
-    return tex;
-  }, [kind]);
+    sources.set(kind, canvas);
+    return textureFromCanvas(kind, canvas);
+}
+export function useWorldTexture(kind: WorldTextureKind) {
+  const texture = useMemo(() => createWorldTexture(kind), [kind]);
   useEffect(() => () => texture.dispose(), [texture]);
   return texture;
 }

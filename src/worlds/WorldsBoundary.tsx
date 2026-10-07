@@ -2,6 +2,7 @@ import { lazy, Suspense, type ReactNode } from "react";
 import { Block, Floor, Label } from "../world/primitives";
 import { WorldPortal } from "./WorldPortal";
 import { loadCourt, loadRide } from "./preload";
+import WorldWarmup from "./WorldWarmup";
 
 const Basketball = lazy(loadCourt);
 const Cycling = lazy(loadRide);
@@ -30,8 +31,8 @@ export function MuseumWorldsEntry({ roomId }: { roomId: string }) {
   return roomId === "atrium" ? <WorldPortal id="worlds" title="Worlds beyond the archive" position={[19.55, 3.1, 7.2]} rotation={[0, -Math.PI / 2, 0]} museum /> : null;
 }
 export default function WorldsBoundary({ roomId, children }: { roomId: string; children: ReactNode }) {
-  if (roomId === "worlds") return <WorldsWing />;
-  if (roomId === "basketball") return <Suspense fallback={null}><Basketball /></Suspense>;
-  if (roomId === "cycling") return <Suspense fallback={null}><Cycling /></Suspense>;
+  if (roomId === "worlds") return <WorldWarmup key={roomId} roomId={roomId}><WorldsWing /></WorldWarmup>;
+  if (roomId === "basketball") return <Suspense fallback={null}><WorldWarmup key={roomId} roomId={roomId}><Basketball /></WorldWarmup></Suspense>;
+  if (roomId === "cycling") return <Suspense fallback={null}><WorldWarmup key={roomId} roomId={roomId}><Cycling /></WorldWarmup></Suspense>;
   return children;
 }
