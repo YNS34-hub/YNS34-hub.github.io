@@ -13,6 +13,7 @@ import {
 } from "../world/primitives";
 import { RoomShell } from "./Architecture";
 import { sampledColor } from "../world/imageColor";
+import ProjectionReveal from "../motion/ProjectionReveal";
 
 function FramedWork({ item, index }: { item: WallpaperItem; index: number }) {
   const side = index % 2 ? 1 : -1;
@@ -149,13 +150,15 @@ export function WallpaperCinema() {
         metalness={0.5}
         roughness={0.3}
       />
-      <Picture
-        texture={texture}
-        width={27}
-        height={10.8}
-        position={[0, 5.6, -13.98]}
-        medium="projection"
-      />
+      <ProjectionReveal resourceKey={texture?.uuid || "loading"} ready={!!texture}>
+        <Picture
+          texture={texture}
+          width={27}
+          height={10.8}
+          position={[0, 5.6, -13.98]}
+          medium="projection"
+        />
+      </ProjectionReveal>
       {[-1, 1].map((side) => (
         <group key={side}>
           <Block

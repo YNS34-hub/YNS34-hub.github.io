@@ -12,7 +12,8 @@ const out = path.resolve(process.env.PALACE_ARTIFACTS || "qa-artifacts/motion-la
 const publicMedia = { wallpapers: [], visuals: [], music: [], projects: [], research: [] };
 const report = {
   phase, reference: "63805572054147816699f5ab5b8e513e7447c530", url: base,
-  gitHead: execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
+  gitHead: baseline ? "63805572054147816699f5ab5b8e513e7447c530" : execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
+  runnerHead: execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
   workingTreeModified: !!execFileSync("git", ["status", "--porcelain"]).toString().trim(),
   quality: "medium", dpr: 1, content: "Identical public catalog and original browser-local Palace Study fixtures. No private recordings or manifests.",
   checks: [], views: [], cues: [], errors: [], uploads: [],
@@ -30,10 +31,20 @@ try {
   for (const width of process.env.PALACE_SIZE === "1920" ? [1920] : [1920, 2560]) {
     const context = await browser.newContext({ viewport: { width, height: width === 1920 ? 1080 : 1440 }, deviceScaleFactor: 1 });
     await context.route("**/personal-media/manifest.json", route => route.fulfill({ json: publicMedia }));
-    await context.addInitScript(() => localStorage.setItem("memory-palace:v3", JSON.stringify({
-      state: { quality: "medium", tutorialDone: true, reducedMotion: false, roomSoundtracks: false, mute: false }, version: 0,
-    })));
+    await context.addInitScript(() => {
+      localStorage.setItem("memory-palace:v3", JSON.stringify({
+        state: { quality: "medium", tutorialDone: true, reducedMotion: false, roomSoundtracks: false, mute: false }, version: 0,
+      }));
+      // 只暂停实际创建的欢迎动画来采样精确时间；不创建、替换或伪造动画。
+      const animate = Element.prototype.animate;
+      Element.prototype.animate = function(...args) {
+        const result = animate.apply(this, args);
+        if (this.matches(".welcome-caption h1")) result.pause();
+        return result;
+      };
+    });
     const page = await context.newPage();
+    await page.bringToFront();
     page.setDefaultTimeout(45000);
     page.on("pageerror", e => report.errors.push(e.message));
     page.on("request", request => { if (request.method() === "POST") report.uploads.push(request.url()); });
@@ -110,7 +121,7 @@ try {
       assert.ok(Math.abs(paused.progress - await page.evaluate(() => window.__PALACE_DEV__.audio.getState().progress)) < 0.01);
       assert.equal(await page.locator(".lyric-wall").getAttribute("data-line"), paused.line);
       report.checks.push({ name: "Original native audio, lyric timing, seven-line limit and pause", width });
-      if (stage >= 3 && !baseline) {
+      if (stage >= 3) {
         await page.evaluate(() => window.__PALACE_DEV__.library.getState().updateTrack(window.__PALACE_DEV__.audio.getState().currentId, { title: "Motion Study — new title" }));
         await shot("now-playing-rest");
       }

@@ -30,7 +30,8 @@ export function useMotionCue<T extends HTMLElement>(key: string | number | null,
     if (!node?.animate || !enabled || quiet || document.visibilityState === "hidden") return;
     const preset = cues[cue];
     const animation = node.animate(preset.frames, {
-      duration: preset.duration, delay, easing: motionEase.enter, fill: "none",
+      // 延迟期间保持起始帧，避免先显示后淡入；结束后不保留行内样式。
+      duration: preset.duration, delay, easing: motionEase.enter, fill: "backwards",
     });
     animation.id = "palace:" + cue;
     const visibility = () => { if (document.visibilityState === "hidden") animation.cancel(); };

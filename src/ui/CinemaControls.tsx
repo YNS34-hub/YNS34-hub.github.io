@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Heart, Info, X } from "lucide-react";
 import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
+import { useMotionCue } from "../motion/useMotionCue";
 export default function CinemaControls() {
   const library = useLibraryStore();
   const image = usePalaceStore((s) => s.cinemaImage);
@@ -13,6 +14,9 @@ export default function CinemaControls() {
     ...library.personal.research,
   ];
   const selected = image || images[0];
+  const controlsCue = useMotionCue<HTMLElement>("cinema-controls", "identity");
+  const titleCue = useMotionCue<HTMLSpanElement>(selected?.id || "empty", "copy");
+  const metadataCue = useMotionCue<HTMLDivElement>(String(metadata), "identity", metadata);
   const exit = () => usePalaceStore.getState().exitCinema();
   const move = (direction: number) => {
     const index = images.findIndex((x) => x.id === selected?.id);
@@ -46,11 +50,11 @@ export default function CinemaControls() {
     return () => window.removeEventListener("keydown", key, true);
   });
   return (
-    <aside className="cinema-controls" aria-label="Wallpaper cinema controls">
+    <aside className="cinema-controls" ref={controlsCue} aria-label="Wallpaper cinema controls">
       <button aria-label="Previous image" onClick={() => move(-1)}>
         <ChevronLeft size={20} />
       </button>
-      <span>{selected?.title || "Wallpaper Cinema"}</span>
+      <span ref={titleCue}>{selected?.title || "Wallpaper Cinema"}</span>
       <button aria-label="Next image" onClick={() => move(1)}>
         <ChevronRight size={20} />
       </button>
@@ -71,7 +75,7 @@ export default function CinemaControls() {
         <X size={20} />
       </button>
       {metadata && (
-        <div className="cinema-metadata">
+        <div className="cinema-metadata" ref={metadataCue}>
           <strong>{selected?.title}</strong>
           <p>
             {selected?.date} / {selected?.category}

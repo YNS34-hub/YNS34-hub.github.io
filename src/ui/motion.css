@@ -59,3 +59,8 @@ html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
 .lyric-wall[data-reduced="true"] .lyric-line-content { transition: none; }
 /* 减少动态只取消文本微移，滚动轴的即时定位由原 inline transform 保留。 */
 .lyric-wall[data-reduced="true"] .lyric-line-content { transform: none; }
+
+.cinema-controls button {
+  transition: opacity var(--motion-feedback) var(--motion-ease-settle), color var(--motion-feedback) var(--motion-ease-settle);
+}
+.cinema-controls button:active { opacity: .64; }
