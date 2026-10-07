@@ -36,4 +36,20 @@ describe("bounded scene effects on the existing audio context", () => {
     expect(bed.gain.setTargetAtTime.mock.lastCall?.[0]).toBeCloseTo(before * .3);
     effects.dispose();
   });
+  it("ties road friction to real speed and lake ambience to proximity without inventing motion", () => {
+    const effects = sceneAudio("cycling"); effects.unlock(); effects.update(0, 0);
+    const automated = fixture.nodes.filter(node => node.gain.setTargetAtTime.mock.calls.length);
+    expect(automated).toHaveLength(4);
+    const [, , tires, water] = automated;
+    expect(tires.gain.setTargetAtTime.mock.lastCall?.[0]).toBe(0);
+    expect(water.gain.setTargetAtTime.mock.lastCall?.[0]).toBe(0);
+    fixture.context.currentTime = .2; effects.update(9, 1);
+    expect(tires.gain.setTargetAtTime.mock.lastCall?.[0]).toBeCloseTo(.16);
+    expect(water.gain.setTargetAtTime.mock.lastCall?.[0]).toBeCloseTo(.065);
+    fixture.context.currentTime = .4; fixture.audio.playing = true; effects.update(0, 1);
+    expect(tires.gain.setTargetAtTime.mock.lastCall?.[0]).toBe(0);
+    expect(water.gain.setTargetAtTime.mock.lastCall?.[0]).toBeCloseTo(.065 * .3);
+    effects.dispose();
+    expect(tires.disconnect).toHaveBeenCalledTimes(1); expect(water.disconnect).toHaveBeenCalledTimes(1);
+  });
 });

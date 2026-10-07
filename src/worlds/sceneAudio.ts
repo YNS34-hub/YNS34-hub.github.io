@@ -10,7 +10,7 @@ export function useSceneAudio(kind: "court" | "cycling") {
   }, [kind]);
   return useMemo(() => ({
     unlock: () => ref.current?.unlock(),
-    update: (speed = 0) => ref.current?.update(speed),
+    update: (speed = 0, nearWater = 0) => ref.current?.update(speed, nearWater),
     sound: (name: Parameters<ReturnType<typeof sceneAudio>["sound"]>[0]) => ref.current?.sound(name),
     dispose: () => ref.current?.dispose(),
   }), []);
@@ -19,9 +19,10 @@ export function useSceneAudio(kind: "court" | "cycling") {
 // 音效连接现有播放器提供的 AudioContext；没有第二个播放器、曲库或音量持久化。
 export function sceneAudio(kind: "court" | "cycling") {
   let context: AudioContext | undefined, bus: GainNode | undefined, bed: GainNode | undefined;
+  let tires: GainNode | undefined, water: GainNode | undefined;
   let ambient: AudioBufferSourceNode | undefined, noise: AudioBuffer | undefined;
   const voices = new Set<AudioScheduledSourceNode>();
-  let disposed = false, updatedAt = -1, lastLevel = -1, lastBed = -1;
+  let disposed = false, updatedAt = -1, lastLevel = -1, lastBed = -1, lastTires = -1, lastWater = -1;
   const unlock = () => {
     if (disposed) return;
     context = unlockAudioContext();
@@ -35,9 +36,18 @@ export function sceneAudio(kind: "court" | "cycling") {
     ambient = context.createBufferSource(); ambient.buffer = noise; ambient.loop = true;
     const filter = context.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = kind === "court" ? 240 : 750;
     ambient.connect(filter); filter.connect(bed); ambient.start();
-    ambient.onended = () => { ambient?.disconnect(); filter.disconnect(); };
+    const filters = [filter];
+    if (kind === "cycling") {
+      // 同一个原创噪声源分出道路摩擦与湖岸声；真实速度和位置决定音量，静止时轮胎层归零。
+      const roadFilter = context.createBiquadFilter(); roadFilter.type = "bandpass"; roadFilter.frequency.value = 580; roadFilter.Q.value = .7;
+      tires = context.createGain(); tires.gain.value = 0; ambient.connect(roadFilter); roadFilter.connect(tires); tires.connect(bus);
+      const waterFilter = context.createBiquadFilter(); waterFilter.type = "bandpass"; waterFilter.frequency.value = 1900; waterFilter.Q.value = .4;
+      water = context.createGain(); water.gain.value = 0; ambient.connect(waterFilter); waterFilter.connect(water); water.connect(bus);
+      filters.push(roadFilter, waterFilter);
+    }
+    ambient.onended = () => { ambient?.disconnect(); filters.forEach(node => node.disconnect()); };
   };
-  const update = (speed = 0) => {
+  const update = (speed = 0, nearWater = 0) => {
     if (!context || !bus || !bed || disposed || context.currentTime - updatedAt < .1) return;
     updatedAt = context.currentTime;
     const s = usePalaceStore.getState();
@@ -46,6 +56,10 @@ export function sceneAudio(kind: "court" | "cycling") {
     const duck = useAudioStore.getState().playing ? 0.3 : 1;
     const bedLevel = (kind === "court" ? 0.045 : 0.045 + Math.min(12, speed) * 0.02) * duck;
     if (Math.abs(bedLevel - lastBed) > .002) { bed.gain.setTargetAtTime(bedLevel, context.currentTime, 0.4); lastBed = bedLevel; }
+    const tireLevel = Math.pow(Math.max(0, Math.min(1, speed / 9)), 1.5) * .16 * duck;
+    const waterLevel = Math.max(0, Math.min(1, nearWater)) * .065 * duck;
+    if (tires && Math.abs(tireLevel - lastTires) > .001) { tires.gain.setTargetAtTime(tireLevel, context.currentTime, .3); lastTires = tireLevel; }
+    if (water && Math.abs(waterLevel - lastWater) > .001) { water.gain.setTargetAtTime(waterLevel, context.currentTime, .6); lastWater = waterLevel; }
   };
   const sound = (name: "bounce" | "rim" | "backboard" | "made" | "step" | "bird") => {
     if (!context || !bus || context.state !== "running" || disposed || voices.size >= 8 || usePalaceStore.getState().mute) return;
@@ -76,6 +90,6 @@ export function sceneAudio(kind: "court" | "cycling") {
   return { unlock, update, sound, dispose: () => {
     if (disposed) return;
     disposed = true; ambient?.stop(); voices.forEach(voice => { try { voice.stop(); } catch { /* 已结束节点无需再次停止。 */ } });
-    bus?.disconnect(); bed?.disconnect(); voices.clear();
+    bus?.disconnect(); bed?.disconnect(); tires?.disconnect(); water?.disconnect(); voices.clear();
   } };
 }

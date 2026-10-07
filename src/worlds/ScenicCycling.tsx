@@ -9,6 +9,7 @@ import { RidePhysics, cyclingView, route, routeLength, routePhase, shortestHeadi
 import { useSceneAudio } from "./sceneAudio";
 import { useActivity, type RideCommand } from "./activity";
 import { Block, Label } from "../world/primitives";
+import { lakeRadius } from "./cyclingGeometry";
 
 function Bicycle() {
   const root = useRef<Group>(null), wheel = useRef<Group>(null);
@@ -116,7 +117,7 @@ function Rider() {
     camera.position.set(point.x, point.y + 1.52 + (quiet ? 0 : Math.sin(local.traveled * 2.3) * .012 * Math.min(1, ride.speed / 5)), point.z);
     const phase = routePhase(t);
     if (phase !== local.phase) { local.phase = phase; useActivity.setState({ scenic: phase }); }
-    sound.update(ride.speed); local.birdAt += dt;
+    sound.update(ride.speed, Math.max(0, 1 - (lakeRadius(point.x, point.z) - 1) / .8)); local.birdAt += dt;
     if (local.birdAt > 12 && ride.speed < 7) { local.birdAt = 0; sound.sound("bird"); }
     local.publish += dt;
     if (local.publish > .12) {

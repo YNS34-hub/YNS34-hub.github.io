@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { BackSide, PMREMGenerator, Scene, Mesh, SphereGeometry, ShaderMaterial, DirectionalLight } from "three";
 import { usePalaceStore } from "../systems/store";
 import { isWorldScene } from "./worldConfig";
-import { useProgress } from "@react-three/drei";
+import { useProgress, useGLTF } from "@react-three/drei";
 import { textureStatus } from "../world/textureCache";
 import { useLibraryStore } from "../systems/library";
 
@@ -30,6 +30,10 @@ function Outdoor({ roomId, onReady }: { roomId: string; onReady?: () => void }) 
   const { gl, scene, camera } = useThree(), sent = useRef(false), sunlight = useRef<DirectionalLight>(null);
   const quality = usePalaceStore(s => s.effectiveQuality);
   const { active } = useProgress(), readyAt = useRef(performance.now());
+  useEffect(() => {
+    // 从新世界返回中庭前在提交阶段预热原资产，避免首次 useGLTF 在渲染中通知已挂载的进度观察者。
+    useGLTF.preload("/assets/memory-glass.glb");
+  }, []);
   useEffect(() => {
     const far = camera.far; camera.far = roomId === "cycling" ? 650 : 200; camera.updateProjectionMatrix();
     return () => { camera.far = far; camera.updateProjectionMatrix(); };
