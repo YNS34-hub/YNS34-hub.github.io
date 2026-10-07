@@ -21,7 +21,7 @@ export function sceneAudio(kind: "court" | "cycling") {
   let context: AudioContext | undefined, bus: GainNode | undefined, bed: GainNode | undefined;
   let ambient: AudioBufferSourceNode | undefined, noise: AudioBuffer | undefined;
   const voices = new Set<AudioScheduledSourceNode>();
-  let disposed = false;
+  let disposed = false, updatedAt = -1, lastLevel = -1, lastBed = -1;
   const unlock = () => {
     if (disposed) return;
     context = unlockAudioContext();
@@ -38,11 +38,14 @@ export function sceneAudio(kind: "court" | "cycling") {
     ambient.onended = () => { ambient?.disconnect(); filter.disconnect(); };
   };
   const update = (speed = 0) => {
-    if (!context || !bus || !bed) return;
+    if (!context || !bus || !bed || disposed || context.currentTime - updatedAt < .1) return;
+    updatedAt = context.currentTime;
     const s = usePalaceStore.getState();
-    bus.gain.setTargetAtTime(s.mute ? 0 : s.ambientVolume, context.currentTime, 0.15);
+    const level = s.mute ? 0 : s.ambientVolume;
+    if (level !== lastLevel) { bus.gain.setTargetAtTime(level, context.currentTime, 0.15); lastLevel = level; }
     const duck = useAudioStore.getState().playing ? 0.3 : 1;
-    bed.gain.setTargetAtTime((kind === "court" ? 0.045 : 0.045 + Math.min(12, speed) * 0.02) * duck, context.currentTime, 0.4);
+    const bedLevel = (kind === "court" ? 0.045 : 0.045 + Math.min(12, speed) * 0.02) * duck;
+    if (Math.abs(bedLevel - lastBed) > .002) { bed.gain.setTargetAtTime(bedLevel, context.currentTime, 0.4); lastBed = bedLevel; }
   };
   const sound = (name: "bounce" | "rim" | "backboard" | "made" | "step" | "bird") => {
     if (!context || !bus || context.state !== "running" || disposed || voices.size >= 8 || usePalaceStore.getState().mute) return;
@@ -71,6 +74,7 @@ export function sceneAudio(kind: "court" | "cycling") {
     source.onended = () => { source.disconnect(); filter?.disconnect(); envelope.disconnect(); voices.delete(source); };
   };
   return { unlock, update, sound, dispose: () => {
+    if (disposed) return;
     disposed = true; ambient?.stop(); voices.forEach(voice => { try { voice.stop(); } catch { /* 已结束节点无需再次停止。 */ } });
     bus?.disconnect(); bed?.disconnect(); voices.clear();
   } };

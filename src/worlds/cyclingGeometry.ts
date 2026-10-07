@@ -15,7 +15,7 @@ export function groundHeight(x: number, z: number) {
     if (d < nearest) { nearest = d; height = p.y - .16; }
   }
   // 路肩完整削平后再回到山坡，避免粗地形的插值面穿过连续路面。
-  const blend = Math.max(0, Math.min(1, (11 - Math.sqrt(nearest)) / 5));
+  const blend = Math.max(0, Math.min(1, (12.5 - Math.sqrt(nearest)) / 5));
   return base * (1 - blend) + height * blend;
 }
 export function roadRibbon(width: number, offset = 0, lifted = 0) {

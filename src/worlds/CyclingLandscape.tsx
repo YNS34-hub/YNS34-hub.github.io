@@ -114,11 +114,12 @@ function Viewpoints() {
     <Instances geometry={geo} items={posts} color="#82765a" />
     {stopDistances.map((distance, i) => {
       const t = distance / routeLength, p = route.getPointAt(t), tangent = route.getTangentAt(t), normal = new Vector3(-tangent.z, 0, tangent.x).normalize();
-      return <group key={i} position={[p.x + normal.x * 6, p.y, p.z + normal.z * 6]} rotation={[0, Math.atan2(normal.x, normal.z), 0]}>
+      const benchX = i === 0 ? 2 : -2;
+      return <group key={i} position={[p.x + normal.x * 4.8, p.y, p.z + normal.z * 4.8]} rotation={[0, Math.atan2(normal.x, normal.z), 0]}>
         <Block position={[0, -.18, 0]} scale={[7.5, .3, 4.6]} color="#9a9276" roughness={.85} />
-        <Block position={[0, .5, 1]} scale={[3.8, .16, .68]} color="#897456" castShadow />
-        <Block position={[0, .94, 1.3]} scale={[3.8, .5, .1]} color="#938065" />
-        {[-1.6, 1.6].map(x => <Block key={x} position={[x, .18, 1]} scale={[.1, .55, .56]} color="#5b6654" />)}
+        <Block position={[benchX, .5, 1]} scale={[2.7, .16, .68]} color="#897456" castShadow />
+        <Block position={[benchX, .94, 1.3]} scale={[2.7, .5, .1]} color="#938065" />
+        {[-1.1, 1.1].map(x => <Block key={x} position={[benchX + x, .18, 1]} scale={[.1, .55, .56]} color="#5b6654" />)}
         <Block position={[-2.8, .7, -1.7]} scale={[.08, 1.4, .08]} color="#586457" />
         <Label text={["LAKE OPENING", "VALLEY GLOW", "THE OVERLOOK"][i]} position={[-2.8, 1.5, -1.65]} size={.18} color="#e0d5b9" maxWidth={3} />
       </group>;

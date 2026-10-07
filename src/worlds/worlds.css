@@ -1,4 +1,4 @@
-.activity-hud { position:fixed; top:130px; right:48px; z-index:14; color:#f3ecdd; width:235px; font-family:"Space Grotesk",sans-serif; text-shadow:0 1px 10px #18292b66; pointer-events:auto; }
+.activity-hud { position:fixed; top:130px; right:48px; z-index:14; color:#f3ecdd; width:235px; padding:14px 0 14px 18px; background:linear-gradient(90deg,#0b1c2266,#0b1c2226); font-family:"Space Grotesk",sans-serif; text-shadow:0 1px 5px #18292b99; pointer-events:auto; }
 .practice-score { display:flex; flex-direction:column; gap:8px; }
 .practice-score > span { font-size:9px; letter-spacing:.13em; opacity:.72; }
 .practice-score strong { font-size:42px; font-weight:500; line-height:1; font-variant-numeric:tabular-nums; }

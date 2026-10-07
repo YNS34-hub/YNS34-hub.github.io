@@ -22,7 +22,12 @@ function Hoop({ side }: { side: number }) {
   }, []);
   useEffect(() => () => geometry.dispose(), [geometry]);
   useFrame((_, dt) => {
-    if (courtResponse.hoop !== side) return;
+    if (courtResponse.hoop !== side) {
+      if (rim.current) rim.current.rotation.z = 0;
+      if (net.current) { net.current.scale.y = 1; net.current.rotation.y = 0; }
+      if (board.current) board.current.emissiveIntensity = 0;
+      return;
+    }
     if (rim.current) rim.current.rotation.z = quiet ? 0 : Math.sin(courtResponse.rim * 13) * courtResponse.rim * .025;
     if (net.current) { net.current.scale.y = quiet ? 1 : 1 + courtResponse.net * .22; net.current.rotation.y = quiet ? 0 : courtResponse.net * .11; }
     if (board.current) board.current.emissiveIntensity = courtResponse.board * .18;
@@ -84,6 +89,8 @@ function UrbanContext() {
       for (let y = 2.6; y < height - 1; y += 2.3) for (const dx of [-1.8, 0, 1.8])
         windows.push({ position: [x + dx, y, z + 4.02], scale: [.68, 1.1, .03], color: (i + Math.round(y)) % 4 === 0 ? "#c9ab78" : "#354b51" });
     }
+    for (const y of [2.3, 4.7]) for (let z = -3; z <= 15; z += 3)
+      windows.push({ position: [14.98, y, z], scale: [.035, 1.4, 1], color: z % 3 === 0 ? "#465654" : "#b29b77" });
     return { buildings, windows };
   }, []);
   const mural = useWorldTexture("mural");
@@ -111,7 +118,7 @@ function UrbanContext() {
 export default function CourtArchitecture() {
   const texture = useWorldTexture("court"), grain = useWorldTexture("grain");
   return <group name="original-after-hours-court">
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.025, 0]} receiveShadow><planeGeometry args={[24, 36]} /><meshStandardMaterial map={texture} roughness={.68} metalness={.035} /></mesh>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[24, 36]} /><meshStandardMaterial map={texture} roughness={.68} metalness={.035} /></mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -.04, 0]} receiveShadow><planeGeometry args={[160, 160]} /><meshStandardMaterial color="#69685e" map={grain} roughness={.9} /></mesh>
     <Fence /><UrbanContext /><Hoop side={-1} /><Hoop side={1} />
     <Label text="AFTER HOURS / PRACTICE COURT" position={[-6.6, 2.1, -18.5]} size={.32} color="#ddd2bc" align="left" />

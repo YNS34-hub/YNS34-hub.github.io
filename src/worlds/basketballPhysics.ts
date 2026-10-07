@@ -55,7 +55,7 @@ export class BallPhysics {
       for (const hoop of HOOPS) {
         const boardZ = Math.sign(hoop.z) * 12.72;
         const boardSide = Math.sign(hoop.z);
-        if (Math.abs(p.x) < 0.9 + BALL_RADIUS && p.y > 2.8 && p.y < 4.18 &&
+        if (Math.abs(p.x) < 0.9 + BALL_RADIUS && p.y > 3.075 - BALL_RADIUS && p.y < 4.125 + BALL_RADIUS &&
           (oldZ - boardZ) * boardSide < -BALL_RADIUS && (p.z - boardZ) * boardSide >= -BALL_RADIUS) {
           p.z = boardZ - boardSide * (BALL_RADIUS + 0.003); v.z = -v.z * 0.68;
           if (this.elapsed - this.contactAt.backboard > 0.12) { events.push("backboard"); this.contactAt.backboard = this.elapsed; }

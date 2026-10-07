@@ -4,6 +4,7 @@ import { Raycaster, Vector3, type Object3D } from "three";
 import { usePalaceStore } from "../systems/store";
 import { attentionSample, advanceDwell, type Dwell } from "./attention";
 import { activateFocused, interactives, publishFocus, readInteraction } from "./registry";
+import { isVisibleMesh } from "./occlusion";
 
 export default function InteractionFrame() {
   const { camera, scene } = useThree();
@@ -45,7 +46,7 @@ export default function InteractionFrame() {
       target.object.getWorldPosition(position);
       ray.set(camera.position, delta.subVectors(position, camera.position).normalize());
       ray.far = closest + 0.4;
-      const hit = ray.intersectObjects(scene.children, true).find(hit => hit.object.visible && hit.object.type === "Mesh");
+      const hit = ray.intersectObjects(scene.children, true).find(hit => isVisibleMesh(hit.object));
       // 使用世界坐标与实际遮挡；不会隔着墙激活另一侧的收藏。
       let ancestor: Object3D | null = hit?.object || null;
       while (ancestor && ancestor !== target.object) ancestor = ancestor.parent;

@@ -69,14 +69,17 @@ function Rider() {
     };
     const down = (event: KeyboardEvent) => {
       const s = usePalaceStore.getState();
-      if (event.repeat || event.defaultPrevented || useActivity.getState().photo || s.overlay || s.focus || s.mode === "index" ||
+      const ridingKey = ["KeyW", "KeyS", "ArrowUp", "ArrowDown"].includes(event.code);
+      // 原 Player 先阻止方向键滚动，但骑行仍需读取相同真实输入；不改它的控制器或事件顺序。
+      if (event.repeat || (event.defaultPrevented && !ridingKey) || s.overlay || s.focus || s.mode === "index" ||
         (event.target instanceof HTMLElement && event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
+      if (event.code === "KeyP") { event.preventDefault(); command(new CustomEvent("palace:ride", { detail: "photo" })); return; }
+      if (useActivity.getState().photo) return;
       if (["KeyW", "KeyS", "Space", "ArrowUp", "ArrowDown"].includes(event.code)) {
         if (event.code === "Space" && !document.pointerLockElement && event.target instanceof HTMLElement && event.target.closest("button,a")) return;
         event.preventDefault(); state.current.keys.add(event.code); sound.unlock();
         if (event.code === "KeyW" || event.code === "ArrowUp") { ride.resume(); state.current.cruise = true; }
       }
-      if (event.code === "KeyP") command(new CustomEvent("palace:ride", { detail: "photo" }));
     };
     const up = (event: KeyboardEvent) => state.current.keys.delete(event.code);
     const halt = () => { state.current.keys.clear(); state.current.cruise = false; ride.speed = 0; saveRideDistance(ride.distance); publish(); };

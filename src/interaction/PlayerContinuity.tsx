@@ -50,6 +50,7 @@ export default function PlayerContinuity() {
       if (state.overlay === "player" && previous.overlay !== "player" && initiated && source) {
         let retries = 0;
         const find = () => {
+          if (!initiated || usePalaceStore.getState().overlay !== "player") return;
           const to = document.querySelector(".record-sleeve")?.getBoundingClientRect();
           if (to) morph(source!, to);
           else if (++retries < 12) frame = requestAnimationFrame(find);
@@ -64,9 +65,10 @@ export default function PlayerContinuity() {
       }
       if (state.roomId !== previous.roomId) { initiated = false; cancel(); }
     });
+    const audioChanges = useAudioStore.subscribe((state, previous) => { if (state.currentId !== previous.currentId) { initiated = false; cancel(); } });
     const hidden = () => { if (document.hidden) cancel(); };
     document.addEventListener("visibilitychange", hidden);
-    return () => { cancel(); unsubscribe(); document.removeEventListener("click", click, true); document.removeEventListener("visibilitychange", hidden); };
+    return () => { cancel(); unsubscribe(); audioChanges(); document.removeEventListener("click", click, true); document.removeEventListener("visibilitychange", hidden); };
   }, [quiet]);
   return null;
 }
