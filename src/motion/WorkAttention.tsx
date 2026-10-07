@@ -4,10 +4,11 @@ import { BufferGeometry, LineSegments, LineBasicMaterial, Vector3 } from "three"
 import { usePalaceStore } from "../systems/store";
 import { useQuietMotion } from "./useMotionCue";
 import { settleMotion } from "./tokens";
+import type { Attention } from "../interaction/registry";
 
 // 附在原作品边缘的四个短角标：只响应实际指向，不移动作品、不拦截点击，静止时不绘制。
-export default function WorkAttention({ width, height, hovered, warm = false }: {
-  width: number; height: number; hovered: RefObject<boolean>; warm?: boolean;
+export default function WorkAttention({ width, height, hovered, warm = false, attention }: {
+  width: number; height: number; hovered: RefObject<boolean>; warm?: boolean; attention?: RefObject<Attention>;
 }) {
   const edge = useRef<LineSegments<BufferGeometry, LineBasicMaterial>>(null);
   const strength = useRef(0);
@@ -26,7 +27,10 @@ export default function WorkAttention({ width, height, hovered, warm = false }: 
   useFrame((_, dt) => {
     if (!edge.current) return;
     const state = usePalaceStore.getState();
-    const target = Number(hovered.current && !state.overlay && !state.focus && !state.pendingDoor);
+    const input = attention?.current;
+    const target = !state.overlay && !state.focus && !state.pendingDoor
+      ? hovered.current || input?.focused ? 1 : (input?.proximity || 0) * 0.36
+      : 0;
     strength.current = quiet ? target : settleMotion(strength.current, target, dt, 0.14, 0.2);
     edge.current.visible = strength.current > 0.001;
     edge.current.material.opacity = strength.current * 0.42;

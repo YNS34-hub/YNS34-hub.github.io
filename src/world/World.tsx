@@ -34,6 +34,9 @@ import { textureStatus } from "./textureCache";
 import { audioSignal } from "../audio/signal";
 import IdentityContrast from "./IdentityContrast";
 import { useProgress } from "@react-three/drei";
+// 交互扩展开始 world-import
+import InteractionFrame from "../interaction/InteractionFrame";
+// 交互扩展结束
 
 function Environment({
   roomId,
@@ -244,6 +247,9 @@ function Scene({
       <Player roomId={roomId} />
       <PerformanceMonitor />
       <IdentityContrast />
+      {/* 交互扩展开始 world-interaction */}
+      <InteractionFrame />
+      {/* 交互扩展结束 */}
       <group
         key={roomId}
         onClick={(event) => {
