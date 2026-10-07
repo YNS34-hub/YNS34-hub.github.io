@@ -24,6 +24,7 @@ import { Dialog } from "./ui/primitives";
 import { AudioSystem } from "./audio/AudioSystem";
 // 交互扩展开始 app-import
 import InteractionHud from "./interaction/InteractionHud";
+import ActivityHud from "./worlds/ActivityHud";
 // 交互扩展结束
 const World = lazy(() => import("./world/World"));
 class WorldBoundary extends Component<
@@ -138,6 +139,7 @@ export default function App() {
       <AudioSystem />
       {/* 交互扩展开始 app-hud */}
       <InteractionHud />
+      <ActivityHud />
       {/* 交互扩展结束 */}
       {s.mode === "index" ? (
         <IndexView />

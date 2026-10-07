@@ -1,0 +1,14 @@
+.activity-hud { position:fixed; top:130px; right:48px; z-index:14; color:#f3ecdd; width:235px; font-family:"Space Grotesk",sans-serif; text-shadow:0 1px 10px #18292b66; pointer-events:auto; }
+.practice-score { display:flex; flex-direction:column; gap:8px; }
+.practice-score > span { font-size:9px; letter-spacing:.13em; opacity:.72; }
+.practice-score strong { font-size:42px; font-weight:500; line-height:1; font-variant-numeric:tabular-nums; }
+.practice-score strong small { font-size:20px; opacity:.55; }
+.shot-result { font-size:12px; min-height:16px; margin:20px 0 12px; letter-spacing:.04em; }
+.activity-actions { display:flex; flex-wrap:wrap; gap:8px 13px; }
+.activity-actions button { font:500 10px "Space Grotesk",sans-serif; color:inherit; padding:6px 0; background:transparent; border:0; border-bottom:1px solid #e9d8b44d; text-shadow:inherit; }
+.activity-actions button:hover,.activity-actions button:focus-visible { border-color:#fff0ce; }
+.activity-hud > small { display:block; margin-top:18px; font-size:10px; line-height:1.65; opacity:.65; max-width:225px; }
+.release-meter { position:relative; width:205px; height:3px; background:#132b3255; margin:12px 0 18px; }
+.release-zone { position:absolute; left:58%; width:12%; height:8px; top:-2px; background:#c5e3bf88; }
+.release-meter i { position:absolute; inset:0 auto 0 0; background:#f7e4b6; }
+@media(max-width:700px) { .activity-hud { top:120px; right:20px; width:190px; } .practice-score strong { font-size:30px; } .activity-hud > small { font-size:9px; } }

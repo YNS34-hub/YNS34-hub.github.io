@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { Raycaster, Vector3, type Object3D } from "three";
 import { usePalaceStore } from "../systems/store";
 import { attentionSample, advanceDwell, type Dwell } from "./attention";
-import { activateFocused, interactives, publishFocus } from "./registry";
+import { activateFocused, interactives, publishFocus, readInteraction } from "./registry";
 
 export default function InteractionFrame() {
   const { camera, scene } = useThree();
@@ -13,9 +13,9 @@ export default function InteractionFrame() {
     const key = (event: KeyboardEvent) => {
       const state = usePalaceStore.getState();
       if (event.repeat || event.defaultPrevented || !state.started || state.overlay || state.focus || state.mode === "index" || state.pendingDoor ||
-        (event.target instanceof HTMLElement && (event.target.closest('input,textarea,select,[contenteditable="true"],[data-reading]') ||
-          (!document.pointerLockElement && event.target.closest("button,a"))))) return;
+        (event.target instanceof HTMLElement && event.target.closest('input,textarea,select,[contenteditable="true"],[data-reading]'))) return;
       if (event.code === "KeyE" || event.code === "KeyF") {
+        if (!readInteraction().id || (event.code === "KeyF" && !readInteraction().secondary)) return;
         event.preventDefault();
         activateFocused(event.code === "KeyF");
       }

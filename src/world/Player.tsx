@@ -10,6 +10,9 @@ import { roomViews } from "./visitView";
 import { useLibraryStore } from "../systems/library";
 import { imageLayout } from "./spatialLayout";
 import { worksForRoom } from "../systems/mediaPlacement";
+// 交互扩展开始 player-import
+import { setWorldView } from "../worlds/worldConfig";
+// 交互扩展结束
 
 const EYE = 1.65;
 const worldPosition = new Vector3();
@@ -81,6 +84,9 @@ export default function Player({ roomId }: { roomId: string }) {
         -8,
       );
     }
+    // 交互扩展开始 player-world-view
+    setWorldView(camera, roomId);
+    // 交互扩展结束
     angle.current.setFromQuaternion(camera.quaternion, "YXZ");
     velocity.current.set(0, 0, 0);
     keys.current.clear();

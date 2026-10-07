@@ -50,7 +50,9 @@ const digest = (source: string) => createHash("sha256").update(source.replace(/\
 // 这保留原有摘要检查，不能通过重新记录新摘要掩盖对旧播放器、建筑或导航的改写。
 const additions: Record<string, string[]> = {
   "src/App.tsx": ["app-import", "app-hud"],
-  "src/world/World.tsx": ["world-import", "world-interaction"],
+  "src/world/World.tsx": ["world-import", "world-interaction", "world-environment-open", "world-environment-close", "world-boundary-open", "world-boundary-close"],
+  "src/world/Player.tsx": ["player-import", "player-world-view"],
+  "src/world/collision.ts": ["collision-import", "collision-world-bounds", "collision-world-footprints"],
 };
 function withoutAdditions(file: string, source: string) {
   const seen: string[] = [];

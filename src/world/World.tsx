@@ -37,6 +37,8 @@ import { useProgress } from "@react-three/drei";
 // 交互扩展开始 world-import
 import InteractionFrame from "../interaction/InteractionFrame";
 import ListeningAttention from "../interaction/ListeningAttention";
+import WorldsBoundary, { MuseumWorldsEntry } from "../worlds/WorldsBoundary";
+import WorldsEnvironment from "../worlds/OutdoorEnvironment";
 // 交互扩展结束
 
 function Environment({
@@ -244,13 +246,20 @@ function Scene({
   }, [camera, gl, roomId, scene]);
   return (
     <>
+      {/* 交互扩展开始 world-environment-open */}
+      <WorldsEnvironment roomId={roomId} onReady={onReady}>
+      {/* 交互扩展结束 */}
       <Environment roomId={roomId} onReady={onReady} />
+      {/* 交互扩展开始 world-environment-close */}
+      </WorldsEnvironment>
+      {/* 交互扩展结束 */}
       <Player roomId={roomId} />
       <PerformanceMonitor />
       <IdentityContrast />
       {/* 交互扩展开始 world-interaction */}
       <InteractionFrame />
       <ListeningAttention key={roomId} roomId={roomId} />
+      <MuseumWorldsEntry key={"worlds-entry:" + roomId} roomId={roomId} />
       {/* 交互扩展结束 */}
       <group
         key={roomId}
@@ -265,6 +274,9 @@ function Scene({
           }
         }}
       >
+        {/* 交互扩展开始 world-boundary-open */}
+        <WorldsBoundary roomId={roomId}>
+        {/* 交互扩展结束 */}
         {roomId === "atrium" ? (
           <Atrium />
         ) : roomId === "corridor" ? (
@@ -292,6 +304,9 @@ function Scene({
         ) : (
           <GalleryRoom roomId={roomId} />
         )}
+        {/* 交互扩展开始 world-boundary-close */}
+        </WorldsBoundary>
+        {/* 交互扩展结束 */}
       </group>
     </>
   );
