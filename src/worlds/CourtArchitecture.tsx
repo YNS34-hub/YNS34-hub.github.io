@@ -109,6 +109,7 @@ function UrbanContext() {
       <Block position={[0, .5, 0]} scale={[3.7, .12, .6]} color="#876748" roughness={.8} castShadow />
       <Block position={[0, .97, -.24]} rotation={[-.15, 0, 0]} scale={[3.7, .55, .1]} color="#937953" />
       {[-1.4, 1.4].map(x => <Block key={x} position={[x, .22, 0]} scale={[.09, .45, .55]} color="#354940" metalness={.55} />)}
+      {[-1.4, 1.4].map(x => <Block key={"back:" + x} position={[x, .63, -.28]} scale={[.075, .96, .075]} color="#354940" metalness={.55} />)}
     </group>))}
     {[-1, 1].map(side => <group key={side} position={[side * 10.6, 0, -8]}>
       <Block position={[0, 4.4, 0]} scale={[.09, 8.8, .09]} color="#41534b" metalness={.7} />
