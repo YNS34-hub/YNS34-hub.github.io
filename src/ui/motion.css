@@ -1,0 +1,78 @@
+/* 仅增量动效：不覆盖基线布局、字体、材质、颜色和静止构图。 */
+:root {
+  --motion-feedback: 120ms;
+  --motion-copy: 260ms;
+  --motion-enter: 360ms;
+  --motion-exit: 180ms;
+  --motion-hero: 600ms;
+  --motion-lyric: 640ms;
+  --motion-threshold: 420ms;
+  --motion-ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --motion-ease-settle: cubic-bezier(.22, .68, .2, 1);
+  --motion-ease-exit: cubic-bezier(.4, 0, 1, 1);
+}
+
+/* 馆标仅变色；入口、焦点和按下反馈不改变组件的占位。 */
+.wordmark { transition: color var(--motion-feedback) var(--motion-ease-settle); }
+.enter-button {
+  transition: background-color var(--motion-feedback) var(--motion-ease-settle), transform var(--motion-feedback) var(--motion-ease-settle);
+}
+.enter-button:hover { transform: translateX(1px); }
+.spatial-controls button, .guide-button, .icon-button, .playback-controls button {
+  transition: color var(--motion-feedback) var(--motion-ease-settle), opacity var(--motion-feedback) var(--motion-ease-settle);
+}
+.spatial-controls button:active, .guide-button:active, .icon-button:active { opacity: .72; }
+.bookmarked svg { transition: fill var(--motion-feedback) var(--motion-ease-settle); }
+html[data-motion="reduced"] .enter-button:hover { transform: none; }
+@media (prefers-reduced-motion: reduce) { .enter-button:hover { transform: none; } }
+
+/* 歌曲身份 cue 读取原播放器；唱片暂停时保留朝向，不回弹，也不添加伪造频谱。 */
+.palace-app .record-disc {
+  animation: turn-record 24s linear infinite;
+  animation-play-state: paused;
+}
+.palace-app .record-disc.is-playing { animation-play-state: running; }
+html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
+@media (prefers-reduced-motion: reduce) { .palace-app .record-disc { animation: none; } }
+
+/* 保留原歌词滚动轴，只调整相邻行的层次；不使用模糊滤镜或改变歌词计时。 */
+.lyric-roll { transition: transform var(--motion-lyric) var(--motion-ease-settle); }
+.lyric-line { transition: opacity var(--motion-copy) var(--motion-ease-settle), color var(--motion-copy) var(--motion-ease-settle); }
+.lyric-line[data-distance="1"] { opacity: .46; }
+.lyric-line[data-distance="2"] { opacity: .25; }
+.lyric-line[data-distance="3"] { opacity: .14; }
+.lyric-line.is-current { opacity: 1; }
+.lyric-line-content {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  transform: translateX(2px);
+  transition: transform var(--motion-copy) var(--motion-ease-settle);
+}
+.lyric-line.is-current .lyric-line-content,
+.lyric-wall[data-playing="false"] .lyric-line-content { transform: none; }
+.lyric-viewport[data-snap="true"] .lyric-roll,
+.lyric-viewport[data-snap="true"] .lyric-line,
+.lyric-viewport[data-snap="true"] .lyric-line-content { transition: none; }
+.lyric-wall[data-reduced="true"] .lyric-roll,
+.lyric-wall[data-reduced="true"] .lyric-line,
+.lyric-wall[data-reduced="true"] .lyric-line-content { transition: none; }
+/* 减少动态只取消文本微移，滚动轴的即时定位由原 inline transform 保留。 */
+.lyric-wall[data-reduced="true"] .lyric-line-content { transform: none; }
+
+.cinema-controls button {
+  transition: opacity var(--motion-feedback) var(--motion-ease-settle), color var(--motion-feedback) var(--motion-ease-settle);
+}
+.cinema-controls button:active { opacity: .64; }
+
+/* 门槛仍由原导航与真实 ready 决定；只缩短已有薄幕的时间，不遮挡或延迟控制。 */
+.palace-app .world-reveal { transition: opacity var(--motion-exit) var(--motion-ease-exit); }
+.palace-app.world-ready .world-reveal { transition: opacity var(--motion-threshold) var(--motion-ease-settle); }
+.near-caption, .core-information, .tutorial { animation: motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
+.guide-panel { animation: motion-panel-in var(--motion-enter) var(--motion-ease-enter); }
+@keyframes motion-hint-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes motion-panel-in { from { opacity: .82; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .palace-app .world-reveal, .palace-app.world-ready .world-reveal { transition: none; }
+  .near-caption, .core-information, .tutorial, .guide-panel { animation: none; }
+}
