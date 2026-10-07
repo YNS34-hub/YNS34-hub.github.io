@@ -108,9 +108,11 @@ async function pose(position, target) {
 }
 async function travel(room) {
   await page.locator(".guide-button").click();
+  const definition = roomList.find((x) => x.id === room);
+  // 新目的地的副标题可能包含旧房间名；以原生按钮的编号与标题前缀定位，不削弱返回检查。
+  const escaped = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   await page
-    .locator(".room-link")
-    .filter({ hasText: roomList.find((x) => x.id === room).title })
+    .getByRole("button", { name: new RegExp("^" + escaped(definition.number) + "\\s+" + escaped(definition.title)) })
     .click();
   await page.waitForFunction(
     (id) => window.__PALACE_DEBUG__?.roomId === id,

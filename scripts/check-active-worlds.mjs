@@ -16,6 +16,7 @@ try {
     await context.addInitScript(() => localStorage.setItem("memory-palace:v3", JSON.stringify({ state: { quality: "medium", tutorialDone: true, roomSoundtracks: false }, version: 0 })));
     const page = await context.newPage(); page.setDefaultTimeout(45000);
     page.on("pageerror", error => report.errors.push(error.message));
+    page.on("console", message => { if (message.type() === "error") report.errors.push(message.text()); });
     page.on("request", request => { if (request.method() === "POST") report.uploads.push(request.url()); });
     const ready = () => page.waitForFunction(() => document.querySelector(".world-ready") && window.__PALACE_DEBUG__ && window.__PALACE_DEV__?.library.getState().ready);
     const goto = async id => { await page.goto(base + "/" + id); await ready(); };

@@ -62,6 +62,7 @@ const ready = () =>
       document.querySelector(".world-ready") && window.__PALACE_DEBUG__?.camera,
   );
 async function measure(label, seconds = 5, move = false) {
+  await page.bringToFront();
   const pending = page.evaluate(
     async ({ seconds }) => {
       const start = performance.now(),

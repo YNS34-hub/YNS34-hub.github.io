@@ -125,8 +125,9 @@ try {
     await pose([6, 1.65, -1.5], [6.8, 4.4, -10.3]);
     await page.evaluate(() => window.__PALACE_DEV__.audio.getState().seek(13));
     await page.waitForFunction(() => document.querySelector(".lyric-wall")?.dataset.line === "3");
-    await page.waitForTimeout(1000); await shot("lyrics-playing");
     assert.equal(await page.locator(".lyric-line.is-current").innerText(), "停在这束光里");
+    // 先在真实播放时钟的当前窗口验值，截图耗时不应把录音推进到下一句后再验前一句。
+    await page.waitForTimeout(1000); await shot("lyrics-playing");
     const active = await page.locator(".lyric-line.is-current").evaluate(el => el.getBoundingClientRect());
     assert.ok(active.width > 80 && active.height > 10);
     await page.locator(".now-playing-tag").getByRole("button", { name: "Pause music", exact: true }).click();

@@ -16,6 +16,7 @@ try {
     await context.addInitScript(() => localStorage.setItem("memory-palace:v3", JSON.stringify({ state: { quality: "medium", tutorialDone: true, roomSoundtracks: false }, version: 0 })));
     const page = await context.newPage(); page.setDefaultTimeout(45000);
     page.on("pageerror", error => report.errors.push(error.message)); page.on("request", request => { if (request.method() === "POST") report.uploads.push(request.url()); });
+    page.on("console", message => { if (message.type() === "error") report.errors.push(message.text()); });
     const ready = () => page.waitForFunction(() => document.querySelector(".world-ready") && window.__PALACE_DEBUG__ && window.__PALACE_DEV__?.library.getState().ready);
     const speed = () => page.locator(".ride-speed strong").textContent().then(Number);
     const position = () => page.evaluate(() => window.__PALACE_DEBUG__.camera.position.toArray());
@@ -32,9 +33,8 @@ try {
     await page.goto(base + "/cycling"); await ready(); await shot("forest-entry");
     assert.equal(await speed(), 0);
     const first = await position();
-    await page.getByRole("button", { name: "Start / resume ride", exact: true }).click();
     await page.keyboard.down("w"); await page.waitForTimeout(6500); await page.keyboard.up("w");
-    assert.ok(await speed() > 17); assert.ok(Math.hypot(...(await position()).map((v, i) => v - first[i])) > 15);
+    assert.ok(await speed() > 28, "W must pedal faster than the 20 km/h easy cruise, without a Start button"); assert.ok(Math.hypot(...(await position()).map((v, i) => v - first[i])) > 15);
     await shot("forest-moving");
     await page.getByRole("button", { name: "Brake · Space", exact: true }).click();
     await page.waitForFunction(() => Number(document.querySelector(".ride-speed strong")?.textContent) === 0);
@@ -52,6 +52,8 @@ try {
     await shot("lake-photo");
     const download = page.waitForEvent("download"); await page.getByRole("button", { name: "Save this view", exact: true }).click(); await (await download).saveAs(path.join(out, "lake-scene-export-" + width + ".png"));
     await page.keyboard.press("Escape"); await page.getByRole("button", { name: "Photo view · P", exact: true }).waitFor();
+    await page.keyboard.press("p"); await page.getByRole("button", { name: "Save this view", exact: true }).waitFor();
+    await page.keyboard.press("p"); await page.getByRole("button", { name: "Photo view · P", exact: true }).waitFor();
     await page.reload(); await ready(); assert.equal(await speed(), 0);
     const restored = await position(); restored.forEach((v, i) => assert.ok(Math.abs(v - lake[i]) < .01));
     report.checks.push({ width, name: "Actual lake viewpoint stop, look-around, photo controls, local PNG export, one-level Escape and refresh progression" });
@@ -70,6 +72,13 @@ try {
     await page.getByRole("button", { name: "Back to Worlds", exact: true }).click(); await ready();
     assert.equal(await page.evaluate(() => window.__PALACE_DEV__.state.getState().roomId), "worlds");
     assert.equal(await page.evaluate(() => window.__PALACE_DEBUG__.camera.far), 200);
+    await page.locator(".guide-button").click();
+    await page.getByRole("button", { name: /^W2\s+SCENIC CYCLING ROUTE/ }).click(); await ready();
+    const arrived = await position();
+    await page.keyboard.down("w"); await page.waitForTimeout(1000); await page.keyboard.up("w");
+    assert.ok(Math.hypot(...(await position()).map((v, i) => v - arrived[i])) > .3, "Guide arrival must retain direct pedal input after the original Player listener");
+    await page.getByRole("button", { name: "Brake · Space", exact: true }).click();
+    await page.waitForFunction(() => Number(document.querySelector(".ride-speed strong")?.textContent) === 0);
     report.checks.push({ width, name: "Actual valley / overlook progression, reduced-motion ride and original navigation return" });
     await context.close();
   }
