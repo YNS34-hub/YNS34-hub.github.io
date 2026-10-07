@@ -1,0 +1,72 @@
+{
+  "source": "feb26c8eda883b41b212ad8a2a001e291eba7ef8",
+  "workingTreeModified": false,
+  "at": "2026-10-07T20:03:01.837Z",
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "scope": "Visible installed Edge on the local GTX 1650; requestAnimationFrame wall timings, renderer.info and estimated uncompressed scene texture bytes. Not GPU timer-query timings.",
+  "content": "Identical public catalog; original browser-local Palace Study audio and LRC fixture. Private content excluded.",
+  "controller": {
+    "Name": "NVIDIA GeForce GTX 1650",
+    "DriverVersion": "32.0.15.9186"
+  },
+  "samples": [
+    {
+      "label": "atrium / still",
+      "frames": 310,
+      "elapsedMs": 5001.800000001491,
+      "fps": 61.9776880322899,
+      "medianMs": 13.900000000000546,
+      "p95Ms": 20.900000000000546,
+      "maxMs": 55.600000000000364,
+      "peak": {
+        "calls": 254,
+        "triangles": 62086,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 37.50843811035155
+      },
+      "last": {
+        "room": "atrium",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 254,
+        "triangles": 62086,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 37.50843811035155
+      }
+    },
+    {
+      "label": "atrium / walking",
+      "frames": 499,
+      "elapsedMs": 7000.900000001489,
+      "fps": 71.27655015782169,
+      "medianMs": 13.899999999999636,
+      "p95Ms": 20.799999999999272,
+      "maxMs": 55.599999999998545,
+      "peak": {
+        "calls": 254,
+        "triangles": 62086,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 37.50843811035155
+      },
+      "last": {
+        "room": "atrium",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 168,
+        "triangles": 54918,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 37.50843811035155
+      }
+    }
+  ],
+  "errors": []
+}
