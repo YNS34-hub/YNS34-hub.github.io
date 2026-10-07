@@ -3,6 +3,7 @@ import { Check, Copy, ArrowRight } from "lucide-react";
 import { usePalaceStore } from "../systems/store";
 import { Dialog, ExternalLink } from "./primitives";
 import { reviewWorkflow as steps } from "../content/catalog";
+import { useMotionCue } from "../motion/useMotionCue";
 
 export default function Focus() {
   const {
@@ -15,11 +16,14 @@ export default function Focus() {
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState(0);
   const [live, setLive] = useState(false);
+  const headCue = useMotionCue<HTMLDivElement>(item?.id || "empty", "copy");
+  const titleCue = useMotionCue<HTMLHeadingElement>(item?.id || "empty", "copy", !!item, 60);
+  const captionCue = useMotionCue<HTMLElement>(item?.id || "empty", "copy", !!item, 120);
   if (!item) return null;
   const close = () => focusItem(null);
   return (
     <Dialog label={item.title} className="focus-panel" onClose={close}>
-      <div className="focus-head">
+      <div className="focus-head" ref={headCue}>
         <p className="eyebrow">
           COLLECTION / {item.category.toUpperCase()} / {item.year}
         </p>
@@ -34,7 +38,7 @@ export default function Focus() {
               alt={item.coverCaption || item.title}
               loading="lazy"
             />
-            <figcaption>
+            <figcaption ref={captionCue}>
               <span>{item.coverCaption || "FROM THE COLLECTION"}</span>
               <span>{item.year}</span>
             </figcaption>
@@ -73,7 +77,7 @@ export default function Focus() {
         )}
         <div className="focus-copy">
           <p className="focus-catalogue-number">A WORK IN THE MEMORY PALACE</p>
-          <h2>{item.title}</h2>
+          <h2 ref={titleCue}>{item.title}</h2>
           <p className="focus-subtitle">{item.subtitle}</p>
           {item.equation && <div className="equation">{item.equation}</div>}
           <details className="work-details">

@@ -19,6 +19,7 @@ import {
 import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import { worksForRoom } from "../systems/mediaPlacement";
+import WorkAttention from "../motion/WorkAttention";
 
 function Heading({
   title,
@@ -77,11 +78,14 @@ export function ProjectScreen({
   tint?: string;
   medium?: "screen" | "print" | "projection";
 }) {
+  const hovered = useRef(false);
   return (
     <group
       name={`project:${item.id}`}
       position={position}
       rotation={rotation}
+      onPointerOver={() => { hovered.current = true; }}
+      onPointerOut={() => { hovered.current = false; }}
       onClick={(e) => {
         if (e.delta < 5) {
           e.stopPropagation();
@@ -102,6 +106,7 @@ export function ProjectScreen({
         height={height}
         position={[0, 0, 0.12]}
       />
+      <WorkAttention width={width} height={height} hovered={hovered} warm={medium === "print"} />
       <Block
         position={[0, -height / 2 - 0.1, 0]}
         scale={[width, 0.035, 0.22]}
@@ -407,6 +412,7 @@ export function VisualWall({
   const texture = useImageTexture(item.displaySrc || item.src);
   const atmosphereId = useId();
   const frame = useRef<Group>(null);
+  const hovered = useRef(false);
   const tint = useRef(new Color(item.color || "#679ac3"));
   useEffect(() => {
     if (frame.current && atmosphere && medium !== "print") {
@@ -457,6 +463,8 @@ export function VisualWall({
       userData={{ resourceId: item.id, medium }}
       position={position}
       rotation={rotation}
+      onPointerOver={() => { hovered.current = true; }}
+      onPointerOut={() => { hovered.current = false; }}
       onClick={(e) => {
         if (e.delta < 5) {
           e.stopPropagation();
@@ -476,6 +484,7 @@ export function VisualWall({
         height={actualHeight}
         position={[0, 0, 0.135]}
       />
+      <WorkAttention width={actualWidth} height={actualHeight} hovered={hovered} warm={medium === "print"} />
       <Label
         text={item.title.toUpperCase()}
         align="left"
