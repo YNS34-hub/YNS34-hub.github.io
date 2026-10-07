@@ -25,3 +25,12 @@
 .bookmarked svg { transition: fill var(--motion-feedback) var(--motion-ease-settle); }
 html[data-motion="reduced"] .enter-button:hover { transform: none; }
 @media (prefers-reduced-motion: reduce) { .enter-button:hover { transform: none; } }
+
+/* 歌曲身份 cue 读取原播放器；唱片暂停时保留朝向，不回弹，也不添加伪造频谱。 */
+.palace-app .record-disc {
+  animation: turn-record 24s linear infinite;
+  animation-play-state: paused;
+}
+.palace-app .record-disc.is-playing { animation-play-state: running; }
+html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
+@media (prefers-reduced-motion: reduce) { .palace-app .record-disc { animation: none; } }

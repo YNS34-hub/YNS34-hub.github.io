@@ -41,6 +41,8 @@ export default function Hud({ ready }: { ready: boolean }) {
   const subtitleCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled, 160);
   const entryCue = useMotionCue<HTMLDivElement>("welcome", "copy", welcomeEnabled, 240);
   const memoryCue = useMotionCue<HTMLElement>(String(s.memoryReveal), "copy", s.coreNear && !s.overlay && !s.focus);
+  const trackCue = useMotionCue<HTMLSpanElement>(`${audio.currentId}:${track?.title}`, "copy", !!track && s.started);
+  const playbackCue = useMotionCue<HTMLButtonElement>(String(audio.playing), "identity", !!track && s.started);
   const [tutorial, setTutorial] = useState(false);
   useEffect(() => {
     if (!s.started || s.tutorialDone) return;
@@ -251,7 +253,7 @@ export default function Hud({ ready }: { ready: boolean }) {
         </div>
       )}
       {track && s.started && (
-        <div className="now-playing-tag">
+        <div className="now-playing-tag" data-playing={audio.playing}>
           <button
             className="now-playing-open"
             onClick={() => s.setOverlay("player")}
@@ -259,7 +261,7 @@ export default function Hud({ ready }: { ready: boolean }) {
             {track.cover && (
               <img src={track.displayCover || track.cover} alt="" />
             )}
-            <span>
+            <span ref={trackCue}>
               <small>
                 {audio.playing ? "NOW PLAYING" : "ON THE TURNTABLE"}
               </small>
@@ -267,6 +269,7 @@ export default function Hud({ ready }: { ready: boolean }) {
             </span>
           </button>
           <button
+            ref={playbackCue}
             className="now-playing-action"
             onClick={() => audio.toggle()}
             aria-label={audio.playing ? "Pause music" : "Play music"}

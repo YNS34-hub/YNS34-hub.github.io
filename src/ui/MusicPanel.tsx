@@ -29,6 +29,7 @@ import type { MusicTrack } from "../content/types";
 import { rooms } from "../content/catalog";
 import "./collections.css";
 import { useShallow } from "zustand/react/shallow";
+import { useMotionCue } from "../motion/useMotionCue";
 
 const timeLabel = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
@@ -69,6 +70,8 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
   const [formError, setFormError] = useState<string | null>(null);
   const [editing, setEditing] = useState<MusicTrack | null>(null);
   const current = tracks.find((track) => track.id === player.currentId);
+  const titleCue = useMotionCue<HTMLHeadingElement>(`${current?.id}:${current?.title}`, "copy");
+  const sleeveCue = useMotionCue<HTMLDivElement>(current?.cover || current?.id || "empty", "identity");
   useEffect(() => {
     void useLibraryStore.getState().initialize();
   }, []);
@@ -192,8 +195,8 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
         <Disc3 size={26} strokeWidth={1} aria-hidden="true" />
       </div>
       <MediaImport roomHint="music" />
-      <div className="listening-console">
-        <div className="record-sleeve">
+      <div className="listening-console" data-playing={player.playing}>
+        <div className="record-sleeve" ref={sleeveCue}>
           {current?.cover ? (
             <img
               src={current.displayCover || current.cover}
@@ -211,7 +214,7 @@ export default function MusicPanel({ compact = false }: MusicPanelProps) {
           <p className="eyebrow">
             {player.playing ? "NOW PLAYING" : "READY WHEN YOU ARE"}
           </p>
-          <h3>{current?.title || "Your private soundtrack"}</h3>
+          <h3 ref={titleCue}>{current?.title || "Your private soundtrack"}</h3>
           <p>
             {current
               ? `${current.artist}${current.album ? ` · ${current.album}` : ""}`

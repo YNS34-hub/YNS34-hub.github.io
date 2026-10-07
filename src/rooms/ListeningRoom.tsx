@@ -20,8 +20,12 @@ import { usePalaceStore } from "../systems/store";
 import { useAudioStore } from "../audio/player";
 import { audioSignal } from "../audio/signal";
 import LyricsWall from "./LyricsWall";
+import { measuredEnergy, settleMotion } from "../motion/tokens";
+import { useQuietMotion } from "../motion/useMotionCue";
 
 const bands = ["bass", "mid", "treble"] as const;
+// 三个现有频段采用不同包络：低频较慢，中频跟随，高频快速归位；幅度和构件保持不变。
+const responses = { bass: [0.24, 0.55], mid: [0.16, 0.42], treble: [0.08, 0.24] } as const;
 
 function AcousticWall() {
   const ribs = useRef<InstancedMesh>(null);
@@ -56,14 +60,13 @@ function Instrument() {
   const baseLight = useRef<PointLight>(null);
   const rim = useRef<MeshStandardMaterial>(null);
   const values = useRef({ bass: 0, mid: 0, treble: 0 });
-  const reduced = usePalaceStore((s) => s.reducedMotion);
+  const reduced = useQuietMotion();
   useFrame((_, dt) => {
-    const decay = 1 - Math.exp(-Math.min(dt, 0.1) * 3);
-    for (const key of bands)
-      values.current[key] +=
-        ((audioSignal.available && !reduced ? audioSignal[key] : 0) -
-          values.current[key]) *
-        decay;
+    for (const key of bands) {
+      const target = audioSignal.available && !reduced ? measuredEnergy(audioSignal[key]) : 0;
+      values.current[key] = settleMotion(values.current[key], target, dt, ...responses[key]);
+      if (!target && values.current[key] < 0.0001) values.current[key] = 0;
+    }
     if (fins.current)
       fins.current.children.forEach((fin, i) => {
         fin.rotation.z =
@@ -157,12 +160,13 @@ function Instrument() {
 }
 function RhythmDetails() {
   const materials = useRef<(MeshStandardMaterial | null)[]>([]);
-  const reduced = usePalaceStore((s) => s.reducedMotion);
+  const reduced = useQuietMotion();
   const values = useRef([0, 0, 0]);
   useFrame((_, dt) => {
-    const response = 1 - Math.exp(-Math.min(dt, 0.1) * 2.5);
     for (let i = 0; i < 3; i++) {
-      values.current[i] += ((audioSignal.available && !reduced ? audioSignal[bands[i]] : 0) - values.current[i]) * response;
+      const target = audioSignal.available && !reduced ? measuredEnergy(audioSignal[bands[i]]) : 0;
+      values.current[i] = settleMotion(values.current[i], target, dt, 0.24, 0.4);
+      if (!target && values.current[i] < 0.0001) values.current[i] = 0;
       const material = materials.current[i];
       if (material) material.emissiveIntensity = 0.08 + values.current[i] * 0.2;
     }
