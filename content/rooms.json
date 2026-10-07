@@ -221,5 +221,13 @@
     "number": "W1",
     "color": "#ad7952",
     "type": "white-cube"
+  },
+  {
+    "subtitle": "Golden forest, open water, a slower kind of journey.",
+    "type": "white-cube",
+    "number": "W2",
+    "title": "SCENIC CYCLING ROUTE",
+    "color": "#7e9b76",
+    "id": "cycling"
   }
 ]

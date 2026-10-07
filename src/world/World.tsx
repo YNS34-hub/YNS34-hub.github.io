@@ -258,7 +258,7 @@ function Scene({
       <IdentityContrast />
       {/* 交互扩展开始 world-interaction */}
       <InteractionFrame />
-      <ListeningAttention key={roomId} roomId={roomId} />
+      <ListeningAttention key={"listening-attention:" + roomId} roomId={roomId} />
       <MuseumWorldsEntry key={"worlds-entry:" + roomId} roomId={roomId} />
       {/* 交互扩展结束 */}
       <group

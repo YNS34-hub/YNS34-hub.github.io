@@ -12,6 +12,7 @@ import { imageLayout } from "./spatialLayout";
 import { worksForRoom } from "../systems/mediaPlacement";
 // 交互扩展开始 player-import
 import { setWorldView } from "../worlds/worldConfig";
+import { applyCyclingLook } from "../worlds/cyclingRoute";
 // 交互扩展结束
 
 const EYE = 1.65;
@@ -233,6 +234,9 @@ export default function Player({ roomId }: { roomId: string }) {
       return;
     }
     camera.quaternion.setFromEuler(angle.current);
+    // 交互扩展开始 player-cycle-locomotion
+    if (roomId === "cycling") { applyCyclingLook(camera, angle.current); return; }
+    // 交互扩展结束
     const input = keys.current;
     const x =
       (input.has("KeyD") || input.has("ArrowRight") ? 1 : 0) -

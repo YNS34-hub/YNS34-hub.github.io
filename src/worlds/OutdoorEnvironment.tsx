@@ -1,8 +1,11 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { BackSide, PMREMGenerator, Scene, Mesh, SphereGeometry, ShaderMaterial } from "three";
+import { BackSide, PMREMGenerator, Scene, Mesh, SphereGeometry, ShaderMaterial, DirectionalLight } from "three";
 import { usePalaceStore } from "../systems/store";
 import { isWorldScene } from "./worldConfig";
+import { useProgress } from "@react-three/drei";
+import { textureStatus } from "../world/textureCache";
+import { useLibraryStore } from "../systems/library";
 
 const vertex = "varying vec3 direction; void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}";
 const fragment = `
@@ -24,8 +27,13 @@ void main(){
 }`;
 
 function Outdoor({ roomId, onReady }: { roomId: string; onReady?: () => void }) {
-  const { gl, scene } = useThree(), sent = useRef(false);
+  const { gl, scene, camera } = useThree(), sent = useRef(false), sunlight = useRef<DirectionalLight>(null);
   const quality = usePalaceStore(s => s.effectiveQuality);
+  const { active } = useProgress(), readyAt = useRef(performance.now());
+  useEffect(() => {
+    const far = camera.far; camera.far = roomId === "cycling" ? 650 : 200; camera.updateProjectionMatrix();
+    return () => { camera.far = far; camera.updateProjectionMatrix(); };
+  }, [camera, roomId]);
   useEffect(() => {
     const envScene = new Scene();
     const geo = new SphereGeometry(10, 32, 16), mat = new ShaderMaterial({ vertexShader: vertex, fragmentShader: fragment, side: BackSide });
@@ -36,15 +44,19 @@ function Outdoor({ roomId, onReady }: { roomId: string; onReady?: () => void }) 
     return () => { target.dispose(); scene.environment = null; };
   }, [gl, scene, roomId]);
   useFrame(() => {
+    if (roomId === "cycling" && sunlight.current) {
+      sunlight.current.position.set(camera.position.x - 30, camera.position.y + 18, camera.position.z - 18);
+      sunlight.current.target.position.copy(camera.position); sunlight.current.target.updateMatrixWorld();
+    }
     const name = roomId === "basketball" ? "basketball-practice-world" : roomId === "cycling" ? "golden-forest-cycling-world" : "worlds-threshold-wing";
-    if (!sent.current && scene.getObjectByName(name)) { sent.current = true; onReady?.(); }
+    if (!sent.current && scene.getObjectByName(name) && useLibraryStore.getState().ready && !active && !textureStatus().pending && performance.now() - readyAt.current > 650) { sent.current = true; onReady?.(); }
   });
   return <>
     <color attach="background" args={["#b7a38e"]} />
-    <fog attach="fog" args={["#b7a38e", 65, 190]} />
-    <mesh name="original-golden-sky" raycast={() => {}}><sphereGeometry args={[180, 32, 16]} /><shaderMaterial vertexShader={vertex} fragmentShader={fragment} side={BackSide} depthWrite={false} /></mesh>
+    <fog attach="fog" args={["#b7a38e", roomId === "cycling" ? 140 : 65, roomId === "cycling" ? 460 : 190]} />
+    <mesh name="original-golden-sky" raycast={() => {}}><sphereGeometry args={[roomId === "cycling" ? 550 : 180, 32, 16]} /><shaderMaterial vertexShader={vertex} fragmentShader={fragment} side={BackSide} depthWrite={false} /></mesh>
     <hemisphereLight args={["#adc6d4", "#534435", .7]} />
-    <directionalLight position={[-30, 18, -18]} color="#ffd394" intensity={2.1} castShadow={quality !== "low"}
+    <directionalLight ref={sunlight} position={[-30, 18, -18]} color="#ffd394" intensity={2.1} castShadow={quality !== "low"}
       shadow-mapSize={quality === "high" ? [2048, 2048] : [1024, 1024]} shadow-camera-left={-30} shadow-camera-right={30} shadow-camera-top={30} shadow-camera-bottom={-30} shadow-camera-far={100} shadow-normalBias={.06} shadow-bias={-.0002} />
   </>;
 }

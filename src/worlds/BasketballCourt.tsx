@@ -22,7 +22,7 @@ function PracticeBall() {
   const publish = () => useActivity.setState({ ...simulation.stats, mode: simulation.mode, dribbling: state.current.dribble, charge: state.current.charge });
   const enabled = () => {
     const s = usePalaceStore.getState();
-    return s.started && !s.overlay && !s.focus && s.mode !== "index" && !document.hidden;
+    return s.started && !s.overlay && !s.focus && !s.pendingDoor && s.mode !== "index" && !document.hidden;
   };
   const distance = () => Math.hypot(camera.position.x - simulation.position.x, camera.position.z - simulation.position.z);
   const pickup = () => {
@@ -50,6 +50,7 @@ function PracticeBall() {
       if (action === "pickup" || action === "dribble") pickup();
       if (action === "charge" && simulation.mode === "held") { state.current.charging = true; state.current.charge = 0; }
       if (action === "release") release();
+      if (action === "cancel") { state.current.charging = false; state.current.charge = 0; publish(); }
       if (action === "recall") {
         camera.getWorldDirection(scratch.current.forward); scratch.current.forward.y = 0; scratch.current.forward.normalize();
         simulation.recall({ x: camera.position.x + scratch.current.forward.x * 1.3, y: BALL_RADIUS, z: camera.position.z + scratch.current.forward.z * 1.3 });

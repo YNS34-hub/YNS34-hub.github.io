@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
-import { Color, InstancedMesh, Object3D, type BufferGeometry } from "three";
+import { Color, InstancedMesh, Object3D, DoubleSide, FrontSide, type Texture, type BufferGeometry } from "three";
 
 export interface Instance {
   position: [number, number, number]; scale: [number, number, number];
   rotation?: [number, number, number]; color?: string;
 }
-export default function Instances({ items, geometry, color = "#586154", shadows = false, roughness = 0.8 }: {
-  items: Instance[]; geometry: BufferGeometry; color?: string; shadows?: boolean; roughness?: number;
+export default function Instances({ items, geometry, color = "#586154", shadows = false, roughness = 0.8, map, cutout = false }: {
+  items: Instance[]; geometry: BufferGeometry; color?: string; shadows?: boolean; roughness?: number; map?: Texture; cutout?: boolean;
 }) {
   const ref = useRef<InstancedMesh>(null);
   useLayoutEffect(() => {
@@ -21,6 +21,6 @@ export default function Instances({ items, geometry, color = "#586154", shadows 
     ref.current!.computeBoundingSphere();
   }, [items]);
   return <instancedMesh ref={ref} args={[geometry, undefined, items.length]} castShadow={shadows} receiveShadow={shadows}>
-    <meshStandardMaterial color={items.some(i => i.color) ? "#ffffff" : color} roughness={roughness} />
+    <meshStandardMaterial color={items.some(i => i.color) ? "#ffffff" : color} roughness={roughness} map={map} alphaTest={cutout ? .42 : 0} side={cutout ? DoubleSide : FrontSide} />
   </instancedMesh>;
 }

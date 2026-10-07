@@ -1,5 +1,6 @@
 import type { Camera } from "three";
 import type { Footprint } from "../world/collision";
+import { route, routeLength, readRideDistance, cyclingView } from "./cyclingRoute";
 
 export const isWorldScene = (id: string) => id === "worlds" || id === "basketball" || id === "cycling";
 export function worldBounds(id: string): [number, number, number, number] | undefined {
@@ -16,4 +17,10 @@ export function worldFootprints(id: string): Footprint[] | undefined {
 export function setWorldView(camera: Camera, roomId: string) {
   if (roomId === "basketball") { camera.position.set(2, 1.65, 9); camera.lookAt(0, 2.4, -12.1); }
   if (roomId === "worlds") { camera.position.set(0, 1.65, 12.5); camera.lookAt(0, 3.2, -10); }
+  if (roomId === "cycling") {
+    const t = readRideDistance() / routeLength, p = route.getPointAt(t), tangent = route.getTangentAt(t);
+    camera.position.set(p.x, p.y + 1.52, p.z); camera.lookAt(p.x + tangent.x * 5, p.y + 1.3, p.z + tangent.z * 5);
+    cyclingView.baseYaw = cyclingView.yaw = Math.atan2(-tangent.x, -tangent.z);
+    cyclingView.distance = t * routeLength; cyclingView.speed = 0;
+  }
 }

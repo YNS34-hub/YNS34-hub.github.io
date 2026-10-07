@@ -4,10 +4,12 @@ import { create } from "zustand";
 export const useActivity = create<{
   mode: "ground" | "held" | "flight"; dribbling: boolean; charge: number;
   shots: number; made: number; streak: number; result: string; assist: boolean;
-  speed: number; distance: number; riding: boolean; scenic: string; stopped: boolean;
+  speed: number; distance: number; riding: boolean; scenic: string; stopped: boolean; photo: boolean;
 }>(() => ({
   mode: "ground", dribbling: false, charge: 0, shots: 0, made: 0, streak: 0, result: "", assist: true,
-  speed: 0, distance: 0, riding: false, scenic: "FOREST ENTRY", stopped: true,
+  speed: 0, distance: 0, riding: false, scenic: "FOREST ENTRY", stopped: true, photo: false,
 }));
-export type CourtCommand = "pickup" | "dribble" | "charge" | "release" | "recall";
+export type CourtCommand = "pickup" | "dribble" | "charge" | "release" | "cancel" | "recall";
 export function courtCommand(command: CourtCommand) { window.dispatchEvent(new CustomEvent("palace:court", { detail: command })); }
+export type RideCommand = "start" | "brake" | "viewpoint" | "restart" | "photo" | "save-photo";
+export function rideCommand(command: RideCommand) { window.dispatchEvent(new CustomEvent("palace:ride", { detail: command })); }

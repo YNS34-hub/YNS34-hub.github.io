@@ -51,7 +51,7 @@ const digest = (source: string) => createHash("sha256").update(source.replace(/\
 const additions: Record<string, string[]> = {
   "src/App.tsx": ["app-import", "app-hud"],
   "src/world/World.tsx": ["world-import", "world-interaction", "world-environment-open", "world-environment-close", "world-boundary-open", "world-boundary-close"],
-  "src/world/Player.tsx": ["player-import", "player-world-view"],
+  "src/world/Player.tsx": ["player-import", "player-world-view", "player-cycle-locomotion"],
   "src/world/collision.ts": ["collision-import", "collision-world-bounds", "collision-world-footprints"],
 };
 function withoutAdditions(file: string, source: string) {

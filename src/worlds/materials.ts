@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from "three";
+import { CanvasTexture, RepeatWrapping, SRGBColorSpace, NoColorSpace } from "three";
 
 // 原创纹理在场景内生成与释放，没有外部品牌、下载素材或私人文件。
-export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain") {
+export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain" | "waves" | "land" | "leaves") {
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
     canvas.width = kind === "court" ? 1536 : 512;
@@ -52,8 +52,39 @@ export function useWorldTexture(kind: "court" | "ball" | "mural" | "grain") {
       ctx.beginPath(); ctx.moveTo(0, 256); ctx.lineTo(512, 256); ctx.stroke();
       for (const x of [128, 384]) { ctx.beginPath(); ctx.ellipse(x, 256, 76, 252, 0, 0, Math.PI * 2); ctx.stroke(); }
     }
-    const tex = new CanvasTexture(canvas); tex.colorSpace = SRGBColorSpace; tex.anisotropy = kind === "court" ? 4 : 2;
-    if (kind === "grain") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(12, 12); }
+    if (kind === "waves") {
+      const pixels = ctx.createImageData(512, 512);
+      for (let y = 0; y < 512; y++) for (let x = 0; x < 512; x++) {
+        const i = (y * 512 + x) * 4;
+        pixels.data[i] = 128 + Math.sin(x * .11 + Math.cos(y * .12)) * 16;
+        pixels.data[i + 1] = 128 + Math.cos(y * .14 + Math.sin(x * .08)) * 14;
+        pixels.data[i + 2] = 250; pixels.data[i + 3] = 255;
+      }
+      ctx.putImageData(pixels, 0, 0);
+    }
+    if (kind === "land") {
+      ctx.fillStyle = "#b9bba9"; ctx.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 30000; i++) {
+        ctx.strokeStyle = random() > .5 ? "#757f5d66" : "#e6ddbd88";
+        const x = random() * 512, y = random() * 512;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + random() * 2 - 1, y - 1 - random() * 3); ctx.stroke();
+      }
+    }
+    if (kind === "leaves") {
+      // 带空隙的原创枝叶纹理：硬 alpha 裁切形成细叶轮廓，无透明叠层排序。
+      ctx.clearRect(0, 0, 512, 512);
+      for (let i = 0; i < 150; i++) {
+        const a = random() * Math.PI * 2, r = Math.sqrt(random()) * 200;
+        const x = 256 + Math.cos(a) * r, y = 256 + Math.sin(a) * r;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a + .7);
+        const tone = 125 + Math.floor(random() * 120);
+        ctx.fillStyle = `rgb(${tone},${tone},${tone - 9})`;
+        ctx.beginPath(); ctx.ellipse(0, 0, 7 + random() * 8, 16 + random() * 9, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#817d6780"; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(0, -16); ctx.lineTo(0, 16); ctx.stroke(); ctx.restore();
+      }
+    }
+    const tex = new CanvasTexture(canvas); tex.colorSpace = kind === "waves" ? NoColorSpace : SRGBColorSpace; tex.anisotropy = kind === "court" ? 4 : 2;
+    if (kind === "grain" || kind === "waves" || kind === "land") { tex.wrapS = tex.wrapT = RepeatWrapping; tex.repeat.set(kind === "waves" ? 30 : kind === "land" ? 10 : 12, kind === "waves" ? 30 : kind === "land" ? 10 : 12); }
     return tex;
   }, [kind]);
   useEffect(() => () => texture.dispose(), [texture]);
