@@ -35,8 +35,17 @@ export function useMotionCue<T extends HTMLElement>(key: string | number | null,
     });
     animation.id = "palace:" + cue;
     const visibility = () => { if (document.visibilityState === "hidden") animation.cancel(); };
+    const settled = () => document.removeEventListener("visibilitychange", visibility);
     document.addEventListener("visibilitychange", visibility);
-    return () => { animation.cancel(); document.removeEventListener("visibilitychange", visibility); };
+    // 一次性 cue 归位后立即卸下监听；取消、快速切换与组件卸载也共享同一清理路径。
+    animation.addEventListener("finish", settled, { once: true });
+    animation.addEventListener("cancel", settled, { once: true });
+    return () => {
+      animation.removeEventListener("finish", settled);
+      animation.removeEventListener("cancel", settled);
+      animation.cancel();
+      settled();
+    };
   }, [key, cue, enabled, delay, quiet]);
   return ref;
 }

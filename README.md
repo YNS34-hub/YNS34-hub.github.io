@@ -143,3 +143,5 @@ npm run qa:performance # 可见桌面浏览器；实际 renderer 写入报告
 这些脚本默认连接 `http://127.0.0.1:5190`；先用 `npm run dev -- --port 5190 --strictPort` 启动。Windows 默认使用已安装 Edge；其他环境通过 `PALACE_BROWSER` 指定浏览器。`PALACE_TEST_TRACK` 可选本机已有合法歌曲；默认使用仓库自带 Palace Study，不下载音频。性能报告使用实际 GPU 名称与帧时间，截图的短时 headless 数据不作为目标硬件验收成绩。
 
 本轮同机位对比、实际测试、GTX 1650 采样及未测范围见 [空间重构验证记录](docs/quality-leap/README.md)。
+
+从固定 `6380557` 派生的增量动效分支，只调整原组件的时间、真实音频响应与交互反馈。八阶段提交、同机位对比、回归测试和 GTX 1650 前后采样见 [动效验证记录](docs/motion-layer/README.md)。

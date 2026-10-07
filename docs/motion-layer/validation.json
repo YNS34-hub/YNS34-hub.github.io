@@ -1,0 +1,804 @@
+{
+  "baseline": "63805572054147816699f5ab5b8e513e7447c530",
+  "branch": "codex/memory-palace-motion-layer",
+  "checkedAt": "2026-10-07T08:03:13.530Z",
+  "sourceShaAtStartOfPhase8": "6f7783acd052e4becb801d6efe1218eb0f55a467",
+  "testedWorkingTree": true,
+  "testedSourceDigest": "da6508e2a86ed100d98e3d35e788428d18850e390758bfd3f0b434c2d8c0f8bc",
+  "baselineSourceDigest": "821f95af181469913d75ec7a1092d650ca28bbc0753b37043aa30c021c426dff",
+  "sourceDigestMethod": "SHA256 of src relative paths and UTF-8 content, sorted by English filename order; CRLF normalized to LF. Captures the tested phase 8 source before the evidence commit.",
+  "typecheck": "passed",
+  "lint": "passed",
+  "unit": {
+    "filesPassed": 12,
+    "testsPassed": 78,
+    "baselineTestsPreserved": 70
+  },
+  "publicBuild": {
+    "result": "passed",
+    "shareableRoutes": 64,
+    "indexedRoutes": 50,
+    "privateMedia": "Only empty manifest; no private media files."
+  },
+  "phases": [
+    {
+      "phase": "1",
+      "passed": true,
+      "checks": 2,
+      "realFrames": 6,
+      "errors": []
+    },
+    {
+      "phase": "2",
+      "passed": true,
+      "checks": 2,
+      "realFrames": 12,
+      "errors": []
+    },
+    {
+      "phase": "3",
+      "passed": true,
+      "checks": 4,
+      "realFrames": 20,
+      "errors": []
+    },
+    {
+      "phase": "4",
+      "passed": true,
+      "checks": 4,
+      "realFrames": 20,
+      "errors": []
+    },
+    {
+      "phase": "5",
+      "passed": true,
+      "checks": 6,
+      "realFrames": 28,
+      "errors": []
+    },
+    {
+      "phase": "6",
+      "passed": true,
+      "checks": 8,
+      "realFrames": 34,
+      "errors": []
+    },
+    {
+      "phase": "7",
+      "passed": true,
+      "checks": 10,
+      "realFrames": 40,
+      "errors": []
+    },
+    {
+      "phase": "8",
+      "passed": true,
+      "checks": 10,
+      "realFrames": 40,
+      "errors": []
+    }
+  ],
+  "development": {
+    "checks": [
+      "v1 IndexedDB records retain blob, favorite and ID after placement migration",
+      "all main rooms enter, return, load real works and retain WASD control",
+      "memory revelation uses a real collection image, stays in place and is interruptible",
+      "batch import targets Portraits, persists, renders its stable ID, and isolates failure",
+      "Cinema restores exact view from every source; ESC first closes metadata; Back returns",
+      "modal suspends WASD; project viewing retains the room; exactly one web preview mounts on demand",
+      "kept website references appear in My Collection and disappear when unkept",
+      "stateful corridor door changes after a real visit, with five bounded resident segments",
+      "observatory bridge rails and Unfinished exit match their physical walking boundaries",
+      "actual local audio drives measured frequency bands and settles after pause",
+      "local audio placement and room soundtrack metadata survive refresh",
+      "accessible index Cinema returns to index without discarding navigation"
+    ],
+    "skippedChecks": [],
+    "errors": []
+  },
+  "listening": {
+    "checks": [
+      {
+        "name": "floating identity uses the actual self-hosted font, fixed hierarchy, transparent backing and no hover transform",
+        "passed": true
+      },
+      {
+        "name": "all local CloudMusic records play through the existing native player without stacking players",
+        "passed": true
+      },
+      {
+        "name": "local timed lyrics attach to the selected audio and follow playback, forward seek, backward seek and pause",
+        "passed": true
+      },
+      {
+        "name": "the physical lyric surface hides from behind, tracks the camera and remains aligned at 1440p",
+        "passed": true
+      },
+      {
+        "name": "a rebuilt static resource follows the manifest while v1 favorite and metadata records survive",
+        "passed": true
+      },
+      {
+        "name": "lyric metadata and timing edits survive refresh without losing the audio blob",
+        "passed": true
+      },
+      {
+        "name": "invalid lyric imports preserve the previous lyrics and untimed text stays honest and scrollable",
+        "passed": true
+      },
+      {
+        "name": "long timed lyrics keep seven live lines, snap on a long seek, and obey reduced motion",
+        "passed": true
+      },
+      {
+        "name": "changing tracks clears the previous lyric identity and offers a real local LRC import entry",
+        "passed": true
+      }
+    ],
+    "skippedChecks": [],
+    "cloudMusicRecordsTested": 38,
+    "errors": [],
+    "uploads": []
+  },
+  "productionBrowser": {
+    "checks": [
+      "production files have static deep links, SEO text, local assets, fallback and preserved legacy pages",
+      "static project remains readable without JavaScript or WebGL",
+      "initial desktop architecture renders at medium quality before entering",
+      "2D index is independently accessible, searchable and focus links reload",
+      "local audio import, metadata edits, legal NetEase links and playback survive navigation",
+      "private images persist, full original is viewable, and image cinema enters 3D",
+      "all main gallery rooms are reachable through the museum guide",
+      "desktop exploration, bookmarks and comfort settings survive reload",
+      "procedural and project direct links load, browser back restores the room",
+      "mobile tour and collection index work without horizontal overflow"
+    ],
+    "skippedChecks": [
+      "first-person controls move smoothly and corridor walls contain the visitor"
+    ],
+    "errors": [],
+    "staticArtifacts": {
+      "generatedRoutes": 57,
+      "indexedRoutes": 50,
+      "hiddenRoutes": 7,
+      "checkedAssets": 42,
+      "legacyRoutes": 4,
+      "fallback": "404.html equals application shell"
+    },
+    "movementDiagnostics": "Production build: private developer camera diagnostics omitted. Exact movement/collision and resident-chunk assertions are covered by development browser QA and unit tests."
+  },
+  "productionAudio": {
+    "checks": [
+      "Palace Study starts only after an explicit user click",
+      "Guide travel to projects preserves native Audio identity, track and advancing playback",
+      "Guide travel to research preserves native Audio identity, track and advancing playback",
+      "Production local LRC binds to the native recording; real keyboard seeking and pause keep the wall synchronized",
+      "Production audio blob and lyric metadata survive refresh; explicit Play resumes them, self-hosted typography loads and no upload occurs"
+    ],
+    "errors": [],
+    "uploads": []
+  },
+  "productionSmoke": {
+    "checks": [
+      "/museum/ reaches the current root entry; production debug exports are absent",
+      "M opens Guide and releases Pointer Lock; ESC closes only Guide",
+      "Native Pointer Lock enters through its real button; one ESC releases view without opening or closing another layer",
+      "Final Cosmic / Imagined Worlds bridge, Unfinished and Atrium load and return through production Guide at medium quality",
+      "Public private-media directory contains only an empty manifest; browser requested no private media files"
+    ],
+    "errors": [],
+    "privateRequests": []
+  },
+  "accessibility": {
+    "checks": [
+      {
+        "name": "rapid native cues cancel superseded instances and finish without retained inline styles",
+        "passed": true
+      },
+      {
+        "name": "live OS reduced motion cancels existing cues and keeps genuine audio and lyric time",
+        "passed": true
+      },
+      {
+        "name": "application reduced setting cancels in-flight identity cues without owning playback",
+        "passed": true
+      },
+      {
+        "name": "paused disc retains orientation and resumes from the same native animation",
+        "passed": true
+      },
+      {
+        "name": "rapid Cinema navigation settles the original material and preserves exact return view",
+        "passed": true
+      },
+      {
+        "name": "keyboard focus and single Escape work immediately while guide animation is active",
+        "passed": true
+      }
+    ],
+    "errors": [],
+    "uploads": [],
+    "video": "native-motion.webm"
+  },
+  "visual": {
+    "beforeSource": "63805572054147816699f5ab5b8e513e7447c530",
+    "afterSource": "6f7783acd052e4becb801d6efe1218eb0f55a467",
+    "beforeFrames": 38,
+    "afterFrames": 38,
+    "viewports": [
+      [
+        1920,
+        1080
+      ],
+      [
+        2560,
+        1440
+      ]
+    ],
+    "quality": "medium",
+    "dpr": 1,
+    "phase8Frames": 40,
+    "actualReview": "All 8 architecture boards and all phase resting boards inspected; resting structure and image ratios preserved. Seven-line opacity hierarchy intentionally refined."
+  },
+  "performance": {
+    "before": [
+      {
+        "label": "atrium / still",
+        "fps": 80.63872255489022,
+        "p95Ms": 20.69999999999891,
+        "maxMs": 41.69999999999982,
+        "peak": {
+          "calls": 250,
+          "triangles": 61654,
+          "textures": 38,
+          "lights": 6,
+          "textureMB": 34.91287231445313
+        }
+      },
+      {
+        "label": "atrium / walking",
+        "fps": 94.56602479826087,
+        "p95Ms": 14.100000000000364,
+        "maxMs": 48.600000000000364,
+        "peak": {
+          "calls": 250,
+          "triangles": 61654,
+          "textures": 38,
+          "lights": 6,
+          "textureMB": 34.91287231445313
+        }
+      },
+      {
+        "label": "music / still",
+        "fps": 143.18854491708942,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 14,
+        "peak": {
+          "calls": 72,
+          "triangles": 5558,
+          "textures": 8,
+          "lights": 6,
+          "textureMB": 6.788096110026042
+        }
+      },
+      {
+        "label": "music / walking",
+        "fps": 142.3838222275424,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.899999999999636,
+        "peak": {
+          "calls": 72,
+          "triangles": 5558,
+          "textures": 8,
+          "lights": 6,
+          "textureMB": 6.788096110026042
+        }
+      },
+      {
+        "label": "music / native playback, FFT and scrolling lyric wall",
+        "fps": 142.80359820111224,
+        "p95Ms": 7.100000000002183,
+        "maxMs": 14,
+        "peak": {
+          "calls": 52,
+          "triangles": 4610,
+          "textures": 5,
+          "lights": 6,
+          "textureMB": 4.662033081054688
+        }
+      },
+      {
+        "label": "corridor / still",
+        "fps": 139.87131838675074,
+        "p95Ms": 7.5,
+        "maxMs": 41.80000000000018,
+        "peak": {
+          "calls": 80,
+          "triangles": 7920,
+          "textures": 32,
+          "lights": 5,
+          "textureMB": 54.19374593098958
+        }
+      },
+      {
+        "label": "corridor / walking",
+        "fps": 136.78484229787549,
+        "p95Ms": 7.200000000000728,
+        "maxMs": 90.20000000000073,
+        "peak": {
+          "calls": 85,
+          "triangles": 7930,
+          "textures": 53,
+          "lights": 5,
+          "textureMB": 63.206207275390604
+        }
+      },
+      {
+        "label": "projects / still",
+        "fps": 143.7482506304585,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.899999999999636,
+        "peak": {
+          "calls": 39,
+          "triangles": 2516,
+          "textures": 18,
+          "lights": 5,
+          "textureMB": 61.58045450846353
+        }
+      },
+      {
+        "label": "research / still",
+        "fps": 143.82453406946397,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.899999999999636,
+        "peak": {
+          "calls": 67,
+          "triangles": 46612,
+          "textures": 15,
+          "lights": 4,
+          "textureMB": 25.01621500651042
+        }
+      },
+      {
+        "label": "wallpapers / still",
+        "fps": 143.11127101231358,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 20,
+        "peak": {
+          "calls": 33,
+          "triangles": 2398,
+          "textures": 13,
+          "lights": 5,
+          "textureMB": 42.45479329427083
+        }
+      },
+      {
+        "label": "imagined-worlds / still",
+        "fps": 141.9716056781874,
+        "p95Ms": 7.199999999999818,
+        "maxMs": 27.800000000000182,
+        "peak": {
+          "calls": 79,
+          "triangles": 5458,
+          "textures": 28,
+          "lights": 5,
+          "textureMB": 53.908416748046854
+        }
+      },
+      {
+        "label": "cosmic / still",
+        "fps": 143.5425829661291,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.899999999999636,
+        "peak": {
+          "calls": 36,
+          "triangles": 3040,
+          "textures": 10,
+          "lights": 5,
+          "textureMB": 21.688425699869793
+        }
+      },
+      {
+        "label": "glass-life / still",
+        "fps": 143.4880792978056,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.899999999999636,
+        "peak": {
+          "calls": 31,
+          "triangles": 42392,
+          "textures": 9,
+          "lights": 5,
+          "textureMB": 13.072377522786459
+        }
+      },
+      {
+        "label": "portraits / still",
+        "fps": 143.7108992428121,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.800000000000182,
+        "peak": {
+          "calls": 35,
+          "triangles": 2402,
+          "textures": 15,
+          "lights": 5,
+          "textureMB": 27.12966918945313
+        }
+      },
+      {
+        "label": "editorial / still",
+        "fps": 140.45954045853682,
+        "p95Ms": 7.200000000000728,
+        "maxMs": 27.799999999999272,
+        "peak": {
+          "calls": 52,
+          "triangles": 3708,
+          "textures": 20,
+          "lights": 4,
+          "textureMB": 35.27071126302082
+        }
+      },
+      {
+        "label": "liquid-web / still",
+        "fps": 143.79712405649033,
+        "p95Ms": 7.099999999999909,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 55,
+          "triangles": 3820,
+          "textures": 21,
+          "lights": 4,
+          "textureMB": 63.664459228515625
+        }
+      },
+      {
+        "label": "archive / still",
+        "fps": 143.72813593271897,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.800000000000182,
+        "peak": {
+          "calls": 58,
+          "triangles": 3932,
+          "textures": 23,
+          "lights": 5,
+          "textureMB": 46.68606567382812
+        }
+      },
+      {
+        "label": "unfinished / still",
+        "fps": 143.69079499546086,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 14,
+        "peak": {
+          "calls": 39,
+          "triangles": 2728,
+          "textures": 15,
+          "lights": 5,
+          "textureMB": 29.228983561197925
+        }
+      },
+      {
+        "label": "my-collection / still",
+        "fps": 143.58564143517182,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 33,
+          "triangles": 2080,
+          "textures": 16,
+          "lights": 4,
+          "textureMB": 37.89510091145833
+        }
+      },
+      {
+        "label": "room switches / mixed gallery and five corridor chunks",
+        "fps": 80.21590823883912,
+        "p95Ms": 20.800000000000182,
+        "maxMs": 451.3000000000011,
+        "peak": {
+          "calls": 250,
+          "triangles": 61654,
+          "textures": 80,
+          "lights": 6,
+          "textureMB": 61.58045450846353
+        }
+      },
+      {
+        "label": "corridor streaming / bounded cache",
+        "fps": 139.30895426606,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 90.30000000000109,
+        "peak": {
+          "calls": 85,
+          "triangles": 7930,
+          "textures": 70,
+          "lights": 5,
+          "textureMB": 63.206207275390604
+        }
+      }
+    ],
+    "after": [
+      {
+        "label": "atrium / still",
+        "fps": 85.3948763080323,
+        "p95Ms": 14.100000000000364,
+        "maxMs": 34.69999999999982,
+        "peak": {
+          "calls": 250,
+          "triangles": 61654,
+          "textures": 38,
+          "lights": 6,
+          "textureMB": 34.91287231445313
+        }
+      },
+      {
+        "label": "atrium / walking",
+        "fps": 98.47717185030356,
+        "p95Ms": 14.099999999998545,
+        "maxMs": 41.600000000000364,
+        "peak": {
+          "calls": 250,
+          "triangles": 61654,
+          "textures": 38,
+          "lights": 6,
+          "textureMB": 34.91287231445313
+        }
+      },
+      {
+        "label": "music / still",
+        "fps": 142.92853573179332,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 14,
+        "peak": {
+          "calls": 72,
+          "triangles": 5558,
+          "textures": 8,
+          "lights": 6,
+          "textureMB": 6.788096110026042
+        }
+      },
+      {
+        "label": "music / walking",
+        "fps": 140.26767986949218,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 55.600000000000364,
+        "peak": {
+          "calls": 72,
+          "triangles": 5558,
+          "textures": 8,
+          "lights": 6,
+          "textureMB": 6.788096110026042
+        }
+      },
+      {
+        "label": "music / native playback, FFT and scrolling lyric wall",
+        "fps": 143.37812859048444,
+        "p95Ms": 7.100000000002183,
+        "maxMs": 14,
+        "peak": {
+          "calls": 52,
+          "triangles": 4610,
+          "textures": 5,
+          "lights": 6,
+          "textureMB": 4.662033081054688
+        }
+      },
+      {
+        "label": "corridor / still",
+        "fps": 141.38020677105203,
+        "p95Ms": 7.199999999999818,
+        "maxMs": 41.599999999999454,
+        "peak": {
+          "calls": 80,
+          "triangles": 7920,
+          "textures": 32,
+          "lights": 5,
+          "textureMB": 54.19374593098958
+        }
+      },
+      {
+        "label": "corridor / walking",
+        "fps": 135.5210921653056,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 90.29999999999927,
+        "peak": {
+          "calls": 85,
+          "triangles": 7930,
+          "textures": 53,
+          "lights": 5,
+          "textureMB": 63.206207275390604
+        }
+      },
+      {
+        "label": "projects / still",
+        "fps": 143.78849692093198,
+        "p95Ms": 7.099999999999909,
+        "maxMs": 13.799999999999272,
+        "peak": {
+          "calls": 39,
+          "triangles": 2516,
+          "textures": 18,
+          "lights": 5,
+          "textureMB": 61.58045450846353
+        }
+      },
+      {
+        "label": "research / still",
+        "fps": 143.76549628089256,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 14.099999999999454,
+        "peak": {
+          "calls": 67,
+          "triangles": 46612,
+          "textures": 15,
+          "lights": 4,
+          "textureMB": 25.01621500651042
+        }
+      },
+      {
+        "label": "wallpapers / still",
+        "fps": 143.64486354873725,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.800000000000182,
+        "peak": {
+          "calls": 33,
+          "triangles": 2398,
+          "textures": 13,
+          "lights": 5,
+          "textureMB": 42.45479329427083
+        }
+      },
+      {
+        "label": "imagined-worlds / still",
+        "fps": 141.7744805931552,
+        "p95Ms": 7.199999999999818,
+        "maxMs": 27.699999999999818,
+        "peak": {
+          "calls": 79,
+          "triangles": 5458,
+          "textures": 28,
+          "lights": 5,
+          "textureMB": 53.908416748046854
+        }
+      },
+      {
+        "label": "cosmic / still",
+        "fps": 143.6649549426964,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 36,
+          "triangles": 3040,
+          "textures": 10,
+          "lights": 5,
+          "textureMB": 21.688425699869793
+        }
+      },
+      {
+        "label": "glass-life / still",
+        "fps": 143.27391895029896,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 31,
+          "triangles": 42392,
+          "textures": 9,
+          "lights": 5,
+          "textureMB": 13.072377522786459
+        }
+      },
+      {
+        "label": "portraits / still",
+        "fps": 143.77124575050712,
+        "p95Ms": 7.099999999999909,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 35,
+          "triangles": 2402,
+          "textures": 15,
+          "lights": 5,
+          "textureMB": 27.12966918945313
+        }
+      },
+      {
+        "label": "editorial / still",
+        "fps": 143.56554426937532,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 20.900000000000546,
+        "peak": {
+          "calls": 52,
+          "triangles": 3708,
+          "textures": 20,
+          "lights": 4,
+          "textureMB": 35.27071126302082
+        }
+      },
+      {
+        "label": "liquid-web / still",
+        "fps": 143.59138451761365,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 14,
+        "peak": {
+          "calls": 55,
+          "triangles": 3820,
+          "textures": 21,
+          "lights": 4,
+          "textureMB": 63.664459228515625
+        }
+      },
+      {
+        "label": "archive / still",
+        "fps": 142.35444657641673,
+        "p95Ms": 7.399999999999636,
+        "maxMs": 27.800000000000182,
+        "peak": {
+          "calls": 58,
+          "triangles": 3932,
+          "textures": 23,
+          "lights": 5,
+          "textureMB": 46.68606567382812
+        }
+      },
+      {
+        "label": "unfinished / still",
+        "fps": 143.70515459728054,
+        "p95Ms": 7.099999999999909,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 39,
+          "triangles": 2728,
+          "textures": 15,
+          "lights": 5,
+          "textureMB": 29.228983561197925
+        }
+      },
+      {
+        "label": "my-collection / still",
+        "fps": 143.81017057552606,
+        "p95Ms": 7.099999999999909,
+        "maxMs": 13.900000000000546,
+        "peak": {
+          "calls": 33,
+          "triangles": 2080,
+          "textures": 16,
+          "lights": 4,
+          "textureMB": 37.89510091145833
+        }
+      },
+      {
+        "label": "room switches / mixed gallery and five corridor chunks",
+        "fps": 95.40394614013555,
+        "p95Ms": 13.900000000001455,
+        "maxMs": 458.2000000000007,
+        "peak": {
+          "calls": 250,
+          "triangles": 61654,
+          "textures": 80,
+          "lights": 6,
+          "textureMB": 61.58045450846353
+        }
+      },
+      {
+        "label": "corridor streaming / bounded cache",
+        "fps": 138.81251145633908,
+        "p95Ms": 7.100000000002183,
+        "maxMs": 111.09999999999854,
+        "peak": {
+          "calls": 85,
+          "triangles": 7930,
+          "textures": 70,
+          "lights": 5,
+          "textureMB": 63.206207275390604
+        }
+      }
+    ],
+    "environment": "Visible installed Edge 148.0.3967.70 / GTX 1650 / D3D11 / 1920x1080 DPR1 medium, isolated sequential samples. Private manifests intercepted; identical public catalog and original fixture.",
+    "notMeasured": [
+      "GPU timer query",
+      "30-minute stress",
+      "Visible 2560x1440 / DPR2 performance",
+      "Physical mobile devices"
+    ]
+  },
+  "deployed": false,
+  "merged": false
+}
