@@ -18,6 +18,15 @@ export function groundHeight(x: number, z: number) {
   const blend = Math.max(0, Math.min(1, (12.5 - Math.sqrt(nearest)) / 5));
   return base * (1 - blend) + height * blend;
 }
+export function terrainSurfaceHeight(x: number, z: number) {
+  // 和 Terrain 的 140×140 三角网格使用相同插值；附着构件不能直接取未插值的解析高度。
+  const gx = (x + 160) / 430 * 140, gz = (z + 170) / 380 * 140;
+  if (gx < 0 || gz < 0 || gx > 140 || gz > 140) return groundHeight(x, z);
+  const ix = Math.min(139, Math.floor(gx)), iz = Math.min(139, Math.floor(gz)), u = gx - ix, v = gz - iz;
+  const at = (dx: number, dz: number) => groundHeight((ix + dx) / 140 * 430 - 160, (iz + dz) / 140 * 380 - 170);
+  return u + v <= 1 ? at(0, 0) * (1 - u - v) + at(1, 0) * u + at(0, 1) * v
+    : at(1, 1) * (u + v - 1) + at(1, 0) * (1 - v) + at(0, 1) * (1 - u);
+}
 export function roadRibbon(width: number, offset = 0, lifted = 0) {
   const positions: number[] = [], uv: number[] = [], indices: number[] = [];
   const normal = new Vector3();

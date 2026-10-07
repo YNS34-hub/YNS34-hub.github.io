@@ -1,8 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { RidePhysics, route, routePhase, stopDistances, shortestHeading } from "../src/worlds/cyclingRoute";
-import { roadRibbon, groundHeight } from "../src/worlds/cyclingGeometry";
+import { roadRibbon, groundHeight, terrainSurfaceHeight } from "../src/worlds/cyclingGeometry";
+import { BufferGeometry, Float32BufferAttribute, Mesh, MeshBasicMaterial, Raycaster, Vector3 } from "three";
 
 describe("comfortable route-following cycling", () => {
+  it("attaches structures to the rendered triangular terrain instead of the unmeshed height field", () => {
+    for (const [ix, iz] of [[50, 62], [75, 95], [90, 92]]) {
+      const vertices = [[ix, iz], [ix + 1, iz], [ix, iz + 1], [ix + 1, iz + 1]].flatMap(([x, z]) => {
+        const wx = x / 140 * 430 - 160, wz = z / 140 * 380 - 170; return [wx, groundHeight(wx, wz), wz];
+      });
+      const geo = new BufferGeometry(); geo.setAttribute("position", new Float32BufferAttribute(vertices, 3)); geo.setIndex([0, 2, 1, 1, 2, 3]);
+      const material = new MeshBasicMaterial(), mesh = new Mesh(geo, material); mesh.updateMatrixWorld();
+      for (const [u, v] of [[.2, .4], [.85, .65]]) {
+        const x = (ix + u) / 140 * 430 - 160, z = (iz + v) / 140 * 380 - 170;
+        const hit = new Raycaster(new Vector3(x, 100, z), new Vector3(0, -1, 0)).intersectObject(mesh)[0];
+        expect(hit).toBeDefined(); expect(Math.abs(terrainSurfaceHeight(x, z) - hit.point.y)).toBeLessThan(.002);
+      }
+      geo.dispose(); material.dispose();
+    }
+  });
   it("keeps the continuous road front-facing and terrain below the rider's route", () => {
     const road = roadRibbon(4.7);
     const normals = road.getAttribute("normal");

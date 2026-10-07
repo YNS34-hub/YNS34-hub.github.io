@@ -7,7 +7,7 @@ import Instances, { type Instance } from "./Instances";
 import { useWorldTexture } from "./materials";
 import { usePalaceStore } from "../systems/store";
 import LakeReflection from "./LakeReflection";
-import { groundHeight, lakeRadius, roadRibbon } from "./cyclingGeometry";
+import { groundHeight, lakeRadius, roadRibbon, terrainSurfaceHeight } from "./cyclingGeometry";
 
 const lakeX = 53, lakeZ = -13;
 function Terrain() {
@@ -115,10 +115,22 @@ function Viewpoints() {
   return <>
     <Instances geometry={geo} items={posts} color="#82765a" />
     {stopDistances.map((distance, i) => {
-      const t = distance / routeLength, p = route.getPointAt(t), tangent = route.getTangentAt(t), normal = new Vector3(-tangent.z, 0, tangent.x).normalize();
-      const benchX = i === 0 ? 2 : -2;
-      return <group key={i} position={[p.x + normal.x * 4.8, p.y, p.z + normal.z * 4.8]} rotation={[0, Math.atan2(normal.x, normal.z), 0]}>
-        <Block position={[0, -.18, 0]} scale={[7.5, .3, 4.6]} color="#9a9276" roughness={.85} />
+      const stop = distance / routeLength, grade = route.getTangentAt(stop).y;
+      // 把休憩构件退到下坡侧，保留实际停靠点的湖景视廊；不移动骑行停止位置。
+      const t = (stop + (grade > 0 ? -1 : 1) * 12 / routeLength + 1) % 1;
+      const p = route.getPointAt(t), tangent = route.getTangentAt(t), normal = new Vector3(-tangent.z, 0, tangent.x).normalize();
+      const benchX = i === 0 ? 1.3 : -1.3;
+      // 观景台选朝湖一侧，避开上坡高地遮挡；路线与骑行停靠坐标保持原样。
+      const side = (lakeX - p.x) * normal.x + (lakeZ - p.z) * normal.z >= 0 ? 1 : -1;
+      const cx = p.x + normal.x * 4.6 * side, cz = p.z + normal.z * 4.6 * side, yaw = Math.atan2(normal.x * side, normal.z * side);
+      const levels: number[] = [];
+      for (let z = -2; z <= 2; z++) for (let x = -2; x <= 2; x++) {
+        const dx = x * 1.5, dz = z * .9;
+        levels.push(terrainSurfaceHeight(cx + dx * Math.cos(yaw) + dz * Math.sin(yaw), cz - dx * Math.sin(yaw) + dz * Math.cos(yaw)));
+      }
+      const elevation = Math.max(p.y, ...levels) + .06, depth = Math.max(.3, elevation - Math.min(...levels) + .12);
+      return <group key={i} position={[cx, elevation, cz]} rotation={[0, yaw, 0]}>
+        <Block position={[0, -depth / 2, 0]} scale={[6, depth, 3.6]} color="#a1a294" roughness={.85} />
         <Block position={[benchX, .5, 1]} scale={[2.7, .16, .68]} color="#897456" castShadow />
         <Block position={[benchX, .94, 1.3]} scale={[2.7, .5, .1]} color="#938065" />
         {[-1.1, 1.1].map(x => <Block key={x} position={[benchX + x, .18, 1]} scale={[.1, .55, .56]} color="#5b6654" />)}
