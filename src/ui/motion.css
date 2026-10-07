@@ -64,3 +64,15 @@ html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
   transition: opacity var(--motion-feedback) var(--motion-ease-settle), color var(--motion-feedback) var(--motion-ease-settle);
 }
 .cinema-controls button:active { opacity: .64; }
+
+/* 门槛仍由原导航与真实 ready 决定；只缩短已有薄幕的时间，不遮挡或延迟控制。 */
+.palace-app .world-reveal { transition: opacity var(--motion-exit) var(--motion-ease-exit); }
+.palace-app.world-ready .world-reveal { transition: opacity var(--motion-threshold) var(--motion-ease-settle); }
+.near-caption, .core-information, .tutorial { animation: motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
+.guide-panel { animation: motion-panel-in var(--motion-enter) var(--motion-ease-enter); }
+@keyframes motion-hint-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes motion-panel-in { from { opacity: .82; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .palace-app .world-reveal, .palace-app.world-ready .world-reveal { transition: none; }
+  .near-caption, .core-information, .tutorial, .guide-panel { animation: none; }
+}

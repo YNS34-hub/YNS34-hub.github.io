@@ -43,6 +43,7 @@ export default function Hud({ ready }: { ready: boolean }) {
   const memoryCue = useMotionCue<HTMLElement>(String(s.memoryReveal), "copy", s.coreNear && !s.overlay && !s.focus);
   const trackCue = useMotionCue<HTMLSpanElement>(`${audio.currentId}:${track?.title}`, "copy", !!track && s.started);
   const playbackCue = useMotionCue<HTMLButtonElement>(String(audio.playing), "identity", !!track && s.started);
+  const roomCue = useMotionCue<HTMLDivElement>(s.roomId, "threshold", s.started && ready && s.roomId !== "cinema");
   const [tutorial, setTutorial] = useState(false);
   useEffect(() => {
     if (!s.started || s.tutorialDone) return;
@@ -130,7 +131,7 @@ export default function Hud({ ready }: { ready: boolean }) {
       )}
       {s.started && (
         <>
-          <div className="room-caption">
+          <div className="room-caption" ref={roomCue}>
             <p className="eyebrow">
               <span className="room-caption-number">{room?.number || "∞"}</span>{" "}
               {room?.title || "A SECRET MEMORY"}
