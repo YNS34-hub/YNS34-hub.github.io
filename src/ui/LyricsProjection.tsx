@@ -6,6 +6,7 @@ import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import { lyricProjection } from "../systems/spatialLyrics";
 import type { TrackLyrics } from "../audio/lyrics.mjs";
+import { useMotionCue, useQuietMotion } from "../motion/useMotionCue";
 
 const LyricDocument = memo(function LyricDocument({ lyrics, index }: { lyrics: TrackLyrics; index: number }) {
   const previous = useRef({ lyrics, index });
@@ -22,9 +23,10 @@ const LyricDocument = memo(function LyricDocument({ lyrics, index }: { lyrics: T
   }}>{lyrics.lines.map((line, i) => <p key={i}>{line.text}</p>)}</div>;
   const first = Math.max(0, index - 3);
   return (
-    <div className="lyric-viewport" aria-live="off">
+    <div className="lyric-viewport" aria-live="off" data-snap={snap}>
       <div className="lyric-roll" style={{ transform: `translateY(${82.5 - Math.max(0, index) * 70}px)`, transition: snap ? "none" : undefined }}>
-        {lyrics.lines.slice(first, Math.max(4, index + 4)).map((line, i) => <p key={first + i} style={{ top: (first + i) * 70 }} className={`lyric-line ${first + i === index ? "is-current" : ""}`}>{line.text}</p>)}
+        {/* 文本包装只负责层次，不更改现有索引、70 px 步长和七行窗口；跳转仍直接定位。 */}
+        {lyrics.lines.slice(first, Math.max(4, index + 4)).map((line, i) => <p key={first + i} style={{ top: (first + i) * 70 }} data-distance={Math.min(3, Math.abs(first + i - index))} className={`lyric-line ${first + i === index ? "is-current" : ""}`}><span className="lyric-line-content">{line.text}</span></p>)}
       </div>
     </div>
   );
@@ -35,9 +37,10 @@ export default function LyricsProjection() {
   const root = useRef<HTMLDivElement>(null), camera = useRef<HTMLDivElement>(null), surface = useRef<HTMLDivElement>(null);
   const tracks = useLibraryStore((s) => s.music);
   const { currentId, progress, playing } = useAudioStore(useShallow((s) => ({ currentId: s.currentId, progress: s.progress, playing: s.playing })));
-  const reduced = usePalaceStore((s) => s.reducedMotion);
+  const reduced = useQuietMotion();
   const track = tracks.find(t => t.id === currentId), lyrics = track?.lyrics;
   const index = lyricIndex(lyrics, progress, track?.lyricsOffset || 0);
+  const trackCue = useMotionCue<HTMLDivElement>(currentId, "copy", !!track);
   useEffect(() => {
     const element = root.current;
     lyricProjection.root = element; lyricProjection.camera = camera.current; lyricProjection.surface = surface.current;
@@ -49,7 +52,7 @@ export default function LyricsProjection() {
         <div className="lyrics-projection-surface" ref={surface}>
           <div className="lyric-wall" data-track={track?.id || ""} data-line={index} data-playing={playing} data-reduced={reduced} aria-label="Listening room lyric wall">
             <div className="lyric-heading"><span>WORDS / {lyrics?.synced ? "SYNCHRONIZED" : lyrics ? "UNTIMED" : "LOCAL COLLECTION"}</span><span>{playing ? "PLAYING" : "STILL"}</span></div>
-            {track && <div className="lyric-current-track"><p>{track.title}</p><span>{track.artist}{track.album ? ` · ${track.album}` : ""}</span></div>}
+            {track && <div className="lyric-current-track" ref={trackCue}><p>{track.title}</p><span>{track.artist}{track.album ? ` · ${track.album}` : ""}</span></div>}
             {lyrics ? (
               <LyricDocument lyrics={lyrics} index={index} />
             ) : (

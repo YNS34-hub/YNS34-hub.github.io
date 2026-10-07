@@ -34,3 +34,28 @@ html[data-motion="reduced"] .enter-button:hover { transform: none; }
 .palace-app .record-disc.is-playing { animation-play-state: running; }
 html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
 @media (prefers-reduced-motion: reduce) { .palace-app .record-disc { animation: none; } }
+
+/* 保留原歌词滚动轴，只调整相邻行的层次；不使用模糊滤镜或改变歌词计时。 */
+.lyric-roll { transition: transform var(--motion-lyric) var(--motion-ease-settle); }
+.lyric-line { transition: opacity var(--motion-copy) var(--motion-ease-settle), color var(--motion-copy) var(--motion-ease-settle); }
+.lyric-line[data-distance="1"] { opacity: .46; }
+.lyric-line[data-distance="2"] { opacity: .25; }
+.lyric-line[data-distance="3"] { opacity: .14; }
+.lyric-line.is-current { opacity: 1; }
+.lyric-line-content {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  transform: translateX(2px);
+  transition: transform var(--motion-copy) var(--motion-ease-settle);
+}
+.lyric-line.is-current .lyric-line-content,
+.lyric-wall[data-playing="false"] .lyric-line-content { transform: none; }
+.lyric-viewport[data-snap="true"] .lyric-roll,
+.lyric-viewport[data-snap="true"] .lyric-line,
+.lyric-viewport[data-snap="true"] .lyric-line-content { transition: none; }
+.lyric-wall[data-reduced="true"] .lyric-roll,
+.lyric-wall[data-reduced="true"] .lyric-line,
+.lyric-wall[data-reduced="true"] .lyric-line-content { transition: none; }
+/* 减少动态只取消文本微移，滚动轴的即时定位由原 inline transform 保留。 */
+.lyric-wall[data-reduced="true"] .lyric-line-content { transform: none; }
