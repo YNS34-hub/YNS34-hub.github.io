@@ -1,0 +1,13 @@
+/* 仅增量动效：不覆盖基线布局、字体、材质、颜色和静止构图。 */
+:root {
+  --motion-feedback: 120ms;
+  --motion-copy: 260ms;
+  --motion-enter: 360ms;
+  --motion-exit: 180ms;
+  --motion-hero: 600ms;
+  --motion-lyric: 640ms;
+  --motion-threshold: 420ms;
+  --motion-ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --motion-ease-settle: cubic-bezier(.22, .68, .2, 1);
+  --motion-ease-exit: cubic-bezier(.4, 0, 1, 1);
+}
