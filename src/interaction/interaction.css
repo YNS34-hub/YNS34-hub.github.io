@@ -5,4 +5,12 @@
 .interaction-hint kbd { font:inherit; opacity:.5; margin-right:6px; }
 .interaction-response { position:fixed; top:97px; left:50%; transform:translateX(-50%); z-index:45; background:rgba(8,18,25,.45); padding:8px 15px; color:#e8f4ed; font:500 11px "Space Grotesk",sans-serif; letter-spacing:.06em; pointer-events:none; }
 .palace-app:has(.interaction-hint) .near-caption { display:none; }
+.player-art-transfer { position:fixed; pointer-events:none; z-index:90; transform-origin:top left; overflow:hidden; }
+.player-art-transfer img { width:100%; height:100%; object-fit:cover; }
+.now-playing-action:active { opacity:.6; }
+.lyric-wall[data-attended="true"] .lyric-heading { opacity:.9; }
+.lyric-wall[data-attended="true"] .lyric-line[data-distance="1"] { opacity:.55; }
+.lyric-wall[data-attended="true"] .lyric-footnote { opacity:.7; }
+.lyric-current-track { position:relative; }
+.lyric-wall[data-attended="true"] .lyric-current-track::after { content:""; position:absolute; left:0; bottom:-6px; width:48px; height:1px; background:#d7bd98; opacity:calc(.28 + var(--listener-energy, 0) * .4); }
 @media(max-width:700px) { .interaction-hint { bottom:165px; gap:12px; flex-wrap:wrap; justify-content:center; } .interaction-hint > span { width:100%; text-align:center; } }

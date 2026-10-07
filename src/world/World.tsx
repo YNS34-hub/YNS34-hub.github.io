@@ -36,6 +36,7 @@ import IdentityContrast from "./IdentityContrast";
 import { useProgress } from "@react-three/drei";
 // 交互扩展开始 world-import
 import InteractionFrame from "../interaction/InteractionFrame";
+import ListeningAttention from "../interaction/ListeningAttention";
 // 交互扩展结束
 
 function Environment({
@@ -249,6 +250,7 @@ function Scene({
       <IdentityContrast />
       {/* 交互扩展开始 world-interaction */}
       <InteractionFrame />
+      <ListeningAttention key={roomId} roomId={roomId} />
       {/* 交互扩展结束 */}
       <group
         key={roomId}

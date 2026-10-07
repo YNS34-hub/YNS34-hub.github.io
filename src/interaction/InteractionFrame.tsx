@@ -13,7 +13,8 @@ export default function InteractionFrame() {
     const key = (event: KeyboardEvent) => {
       const state = usePalaceStore.getState();
       if (event.repeat || event.defaultPrevented || !state.started || state.overlay || state.focus || state.mode === "index" || state.pendingDoor ||
-        (event.target instanceof HTMLElement && event.target.closest('input,textarea,select,button,a,[contenteditable="true"],[data-reading]'))) return;
+        (event.target instanceof HTMLElement && (event.target.closest('input,textarea,select,[contenteditable="true"],[data-reading]') ||
+          (!document.pointerLockElement && event.target.closest("button,a"))))) return;
       if (event.code === "KeyE" || event.code === "KeyF") {
         event.preventDefault();
         activateFocused(event.code === "KeyF");
