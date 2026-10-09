@@ -202,7 +202,9 @@ async function travel(id) {
   // 新区域的说明会引用旧房间名；以真实编号和标题定位同一入口。
   const escaped = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   await page.getByRole("button", { name: new RegExp("^" + escaped(room.number) + "\\s+" + escaped(room.title)) }).click();
-  await page.locator(".room-caption").filter({ hasText: room.title }).waitFor();
+  // 骑行使用更轻的地面入口标题；保留真实可见标题的断言，不能等待其已隐藏的旧 HUD 副本。
+  if(id==="cycling")await page.locator(".road-entry-copy h2").filter({hasText:room.title}).waitFor();
+  else await page.locator(".room-caption").filter({ hasText: room.title }).waitFor();
   await page.waitForTimeout(450);
 }
 async function slider(locator, value) {
