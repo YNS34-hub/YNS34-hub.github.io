@@ -36,15 +36,17 @@ try {
     await page.getByRole("button", { name: "E · Dribble", exact: true }).click();
     await page.getByRole("button", { name: "E · Hold ball", exact: true }).waitFor();
     await travel("W2"); await ready("cycling");
+    assert.equal(await page.locator(".road-status").getAttribute("data-mounted"),"false");
+    await page.keyboard.down("w");await page.waitForFunction(()=>!document.querySelector(".road-mount")?.disabled);await page.keyboard.up("w");
+    await page.keyboard.press("e");await page.waitForFunction(()=>document.querySelector(".road-status")?.dataset.mounted==="true"&&document.querySelector(".road-status")?.dataset.state!=="mounting");
     const before = await page.evaluate(() => window.__PALACE_DEBUG__.camera.position.toArray());
-    await page.keyboard.down("w"); await page.waitForTimeout(1200); await page.keyboard.up("w");
+    await page.keyboard.down("w"); await page.waitForTimeout(2500); await page.keyboard.up("w");
     const after = await page.evaluate(() => window.__PALACE_DEBUG__.camera.position.toArray());
     assert.ok(Math.hypot(...after.map((v, i) => v - before[i])) > .6, "Native pedal input survives a direct court-to-route replacement");
-    await page.getByRole("button", { name: "Brake · Space", exact: true }).click();
-    await page.waitForFunction(() => Number(document.querySelector(".ride-speed strong")?.textContent) === 0);
-    const lake = await page.evaluate(() => window.__PALACE_DEBUG__.scene.getObjectByName("sky-reflecting-lake")?.type || null);
-    if (quality === "low") assert.equal(lake, "Mesh"); else assert.equal(lake, "Reflector");
-    await page.getByRole("button", { name: "Back to Worlds", exact: true }).click(); await ready("worlds");
+    await page.keyboard.down("s");await page.waitForFunction(()=>Number(document.querySelector(".road-status")?.dataset.speed)===0);await page.keyboard.up("s");
+    const lake = await page.evaluate(() => window.__PALACE_DEBUG__.scene.getObjectByName("long-way-home-lake")?.type || null);
+    assert.equal(lake,"Mesh");
+    await page.getByRole("button", { name: "Ride options", exact: true }).click();await page.getByRole("button", { name: "Return to the Palace", exact: true }).click(); await ready("worlds");
     await sample(quality + " / recovered original world limits"); assert.equal(report.samples.at(-1).far, 200);
     report.checks.push(quality + " preparation preserves native pickup/dribble, direct Guide transfer, real pedalling, brake and camera return");
   }

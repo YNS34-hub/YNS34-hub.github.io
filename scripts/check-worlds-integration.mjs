@@ -69,7 +69,11 @@ try {
     for (const room of ["basketball", "cycling", "music"]) {
       await page.evaluate(room => window.__PALACE_DEV__.state.getState().enterRoom(room), room); await ready();
       if (room === "basketball") await page.getByRole("button", { name: "R · Recall ball", exact: true }).click();
-      if (room === "cycling") { await page.getByRole("button", { name: "Start / resume ride", exact: true }).click(); await page.waitForTimeout(700); await page.getByRole("button", { name: "Brake · Space", exact: true }).click(); }
+      if (room === "cycling") {
+        await page.keyboard.down("w");await page.waitForFunction(()=>!document.querySelector(".road-mount")?.disabled);await page.keyboard.up("w");
+        await page.keyboard.press("e");await page.waitForFunction(()=>document.querySelector(".road-status")?.dataset.mounted==="true"&&document.querySelector(".road-status")?.dataset.state!=="mounting");
+        await page.keyboard.down("w");await page.waitForTimeout(1000);await page.keyboard.up("w");await page.keyboard.down("s");await page.waitForFunction(()=>Number(document.querySelector(".road-status")?.dataset.speed)===0);await page.keyboard.up("s");
+      }
       assert.equal(await page.evaluate(() => window.__PALACE_DEV__.audio.getState().currentId), track);
       assert.equal(await page.evaluate(() => window.__PALACE_DEV__.audio.getState().playing), true);
     }
