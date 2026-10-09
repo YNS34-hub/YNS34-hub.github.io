@@ -21,6 +21,8 @@ Local evidence lives outside Git under `outputs/living-world`. Tests use public 
 
 No Round Three performance or visual acceptance result is claimed until measured and reviewed.
 
+Latest checkpoint: `c9c42a8` implements Phase 3 and is pushed. The final inactive-action CSS adjustment was rechecked with all 4 native journeys passing in `phase-3-final`; no page errors. TypeScript, lint and public production build passed. Public generated personal manifest has all five empty lists and no private assets; the local catalog was restored to 4 wallpapers / 22 visuals / 40 audio / 8 local projects / 0 research. This is an intermediate checkpoint, not full Round Three acceptance.
+
 ## Resume checkpoint / 2026-10-09
 
 The 5-hour account window reached 98% used. User explicitly requested automatic continuation after reset; heartbeat `memory-palace` targets this same chat at 19:56:11 Asia/Shanghai, after reported 19:54:11 reset. Do not treat scheduling as completion. Do not duplicate the automation. Continue using the user's requested GPT-6 Astra / high setting.
