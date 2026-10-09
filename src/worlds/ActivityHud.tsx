@@ -4,12 +4,14 @@ import { usePalaceStore } from "../systems/store";
 import { useMotionCue } from "../motion/useMotionCue";
 import "./worlds.css";
 import RoadHud, { rememberRoadReturn } from "./road/Hud";
+import {roadTravel} from "./road/state";
 
 export default function ActivityHud() {
   const room = usePalaceStore(s => s.roomId), blocked = usePalaceStore(s => !!s.overlay || !!s.focus || s.mode === "index" || !s.started);
   const a = useActivity();
   const result = useMotionCue<HTMLParagraphElement>(a.result, "copy", room === "basketball" && !blocked);
   useEffect(() => usePalaceStore.subscribe((state, previous) => {
+    if(state.roomId!==previous.roomId)roadTravel(previous.roomId,state.roomId);
     if (state.roomId === "cycling" && previous.roomId !== "cycling") rememberRoadReturn(previous.roomId);
   }), []);
   useEffect(() => {

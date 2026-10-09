@@ -7,7 +7,7 @@ import { useRoadRide,roadCommand } from "./state";
 import "./road.css";
 
 let returnRoom="worlds";
-export function rememberRoadReturn(previous:string){if(previous!=="cycling"&&previous!=="cinema")returnRoom=previous;}
+export function rememberRoadReturn(previous:string){if(previous!=="cycling"&&previous!=="cinema")returnRoom=previous==="basketball"?"worlds":previous;}
 function returnToPalace(){
   const view=roomViews.get(returnRoom);usePalaceStore.getState().enterRoom(returnRoom);
   if(view)usePalaceStore.getState().update({returnView:view});

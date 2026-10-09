@@ -54,12 +54,12 @@ export function createRoadAudio(){
     }
     debug.activeVoices=voices.size;
   };
-  return{unlock,shift,update,debug,dispose:()=>{
+  return{unlock,shift,update,debug,monitor:()=>import.meta.env.DEV?bus:undefined,dispose:()=>{
     if(disposed)return;disposed=true;source?.stop();hub?.stop();for(const voice of voices){try{voice.stop();}catch{/* 已结束的短音效无需重复停止。 */}}voices.clear();nodes.forEach(node=>node.disconnect());
   }};
 }
 export function useRoadAudio(){
   const audio=useRef<ReturnType<typeof createRoadAudio>|null>(null);
   useEffect(()=>{const instance=createRoadAudio();audio.current=instance;return()=>{instance.dispose();if(audio.current===instance)audio.current=null;};},[]);
-  return useMemo(()=>({unlock:()=>audio.current?.unlock(),shift:()=>audio.current?.shift(),update:(input:RoadSoundInput)=>audio.current?.update(input),debug:()=>audio.current?.debug}),[]);
+  return useMemo(()=>({unlock:()=>audio.current?.unlock(),shift:()=>audio.current?.shift(),update:(input:RoadSoundInput)=>audio.current?.update(input),debug:()=>audio.current?.debug,monitor:()=>audio.current?.monitor()}),[]);
 }

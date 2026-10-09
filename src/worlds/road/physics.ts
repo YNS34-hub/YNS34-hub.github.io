@@ -22,7 +22,7 @@ export class RoadPhysics {
     let brake=!!input.brake, pedal=!!input.pedal;
     const remaining=this.stopAt===null?Infinity:Math.max(0,this.stopAt-this.distance);
     if(remaining<this.speed*this.speed/4+2)brake=true;
-    if(this.ended||this.atStop){if(pedal&&!this.ended){this.atStop=false;}else pedal=false;}
+    if(this.ended||this.atStop){pedal=false;brake=true;}
     this.braking+=(Number(brake)-this.braking)*(1-Math.exp(-dt*4.5));
     const ratio=48/sprockets[this.gear-1],wheelCadence=this.speed/wheelCircumference*60/ratio;
     // 起步的低踏频仍能施加踏板扭矩；不能用零轮速推断访问者没有做功。
@@ -48,7 +48,7 @@ export class RoadPhysics {
     this.lean+=(Math.atan(this.speed*this.speed*(curvature+this.steering/1.01)/9.81)*.42-this.lean)*(1-Math.exp(-dt*5));
     this.lean=Math.max(-.15,Math.min(.15,this.lean));
     this.distance=Math.min(roadLength,this.distance+this.speed*Math.cos(this.heading)*dt);
-    if((remaining<.16&&this.speed<.7)||this.distance>=roadLength){this.speed=0;this.stopAt=null;this.atStop=true;this.ended=this.distance>=roadLength;}
+    if((remaining<4&&this.speed<.1)||this.distance>=roadLength){this.speed=0;this.stopAt=null;this.atStop=true;this.ended=this.distance>=roadLength;}
     this.cadence+=(pedal&&!brake?Math.min(108,Math.max(72,wheelCadence))-this.cadence:-this.cadence)*(1-Math.exp(-dt*3));
     this.state=this.atStop?"scenic-stop":this.speed===0?"stopped":brake?"braking":pedal&&this.grade>.025?"climbing":!pedal&&this.grade<-.02?"descending":Math.abs(this.steering)>.008?"cornering":!pedal?"coasting":this.speed<2.8?"starting":acceleration>.15?"accelerating":"cruising";
     this.lastSafe=this.distance;

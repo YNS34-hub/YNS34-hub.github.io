@@ -32,4 +32,10 @@ describe("authored road ride",()=>{
     b.lastSafe=123;b.distance=NaN;b.step(.016,{});expect(b.recovered).toBe(true);expect(b.distance).toBeCloseTo(123);expect(b.speed).toBe(0);
     const before=b.distance;b.step(.06,{blocked:true,pedal:true});expect(b.distance).toBe(before);
   });
+  it("settles inside the viewpoint approach without teleporting or stalling before arrival",()=>{
+    const b=new RoadPhysics();b.distance=500;b.speed=8;b.stopAt=540;let jump=0;
+    for(let i=0;i<18*90;i++){const before=b.distance;b.step(1/90,{pedal:true},0);jump=Math.max(jump,b.distance-before);}
+    expect(b.atStop).toBe(true);expect(b.speed).toBe(0);expect(b.distance).toBeGreaterThan(536);expect(b.distance).toBeLessThan(540);expect(jump).toBeLessThan(.1);
+    b.step(.016,{pedal:true},0);expect(b.atStop).toBe(true);b.atStop=false;advance(b,2,{pedal:true});expect(b.speed).toBeGreaterThan(0);
+  });
 });
