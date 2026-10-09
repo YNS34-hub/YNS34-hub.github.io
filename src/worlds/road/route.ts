@@ -4,9 +4,9 @@ import { CatmullRomCurve3, Vector3, BufferGeometry, Float32BufferAttribute } fro
 const knots = [
   [0,18,0],[8,18,-80],[-10,20,-180],[35,22,-290],[0,24,-385],[65,22,-495],
   [160,19,-560],[275,20,-585],[405,24,-780],[520,31,-805],[575,37,-850],
-  [640,43,-950],[755,51,-1050],[810,60,-1150],[825,63,-1210],[910,65,-1245],
-  [1040,65,-1190],[1130,59,-1115],[1145,50,-1005],[1230,43,-935],[1320,34,-865],
-  [1330,25,-745],[1275,17,-645],[1150,15,-580],[1010,15,-450],[885,16,-350],
+  [640,43,-950],[755,51,-1050],[810,60,-1150],[880,63,-1180],[990,65,-1100],
+  [1070,65,-990],[1060,65,-875],[980,63,-805],[1100,54,-735],[1230,44,-700],[1320,37,-645],
+  [1330,31,-555],[1275,23,-495],[1150,18,-580],[1010,15,-450],[885,16,-350],
   [750,18,-310],[680,19,-255],[555,20,-220],[415,19,-235],[295,18,-140],
   [180,18,-110],[100,18,30],[50,18,140],[0,18,240],
 ] as const;
@@ -17,11 +17,11 @@ export const sectorLength = 160;
 export const sectorCount = Math.ceil(roadLength / sectorLength);
 export const lake = { x: 520, z: -452, rx: 244, rz: 180, y: 12.08 };
 export function lakeDistance(x: number, z: number) { return Math.hypot((x-lake.x)/lake.rx,(z-lake.z)/lake.rz); }
-export const roadStops = [.23,.425,.88].map((t,i) => ({ distance: t*roadLength, title: ["LAKE EDGE","HIGH MEADOW","LAST LIGHT"][i] }));
+export const roadStops = [.23,.475,.89].map((t,i) => ({ distance: t*roadLength, title: ["LAKE EDGE","HIGH MEADOW","LAST LIGHT"][i] }));
 export const roadChapters = [
   [0,"TRAILHEAD"],[.025,"CEDAR SHADE"],[.075,"FIRST LIGHT"],[.12,"FOREST ROLLERS"],
-  [.19,"LAKE REVEAL"],[.23,"SHORE ROAD"],[.265,"THE CLIMB"],[.395,"CREST"],
-  [.425,"HIGH MEADOW"],[.45,"GOLDEN VALLEY"],[.475,"THE DESCENT"],[.655,"WATERLINE"],[.82,"LAST LIGHT"],
+  [.185,"LAKE REVEAL"],[.23,"SHORE ROAD"],[.27,"THE CLIMB"],[.46,"CREST"],
+  [.475,"HIGH MEADOW"],[.50,"GOLDEN VALLEY"],[.535,"THE DESCENT"],[.70,"WATERLINE"],[.83,"LAST LIGHT"],
 ] as const;
 export function roadChapter(distance: number) { const t=distance/roadLength; return [...roadChapters].reverse().find(p=>t>=p[0])?.[1] ?? "TRAILHEAD"; }
 export function roadSample(distance: number, point: Vector3, tangent: Vector3) {
@@ -68,10 +68,10 @@ export function activeRoadSectors(distance:number) {
 export function roadForestDensity(t:number) {
   if(t<.17) return .92;
   if(t<.30) return .43;
-  if(t<.395) return .85;
-  if(t<.44) return .85*(1-smooth(.395,.44,t));
-  if(t<.54) return .04;
-  if(t<.70) return .25;
+  if(t<.385) return .85;
+  if(t<.445) return .85*(1-smooth(.385,.445,t));
+  if(t<.59) return .035;
+  if(t<.73) return .25;
   if(t<.83) return .32;
   return .65;
 }
