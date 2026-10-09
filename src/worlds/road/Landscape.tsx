@@ -1,6 +1,6 @@
-import { useMemo,useEffect,useRef,useState } from "react";
+import { useMemo,useEffect,useLayoutEffect,useRef,useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry,Float32BufferAttribute,Vector3,CylinderGeometry,PlaneGeometry,BoxGeometry,DodecahedronGeometry,MeshStandardMaterial,CanvasTexture,SRGBColorSpace,Group,Mesh,Texture } from "three";
+import { BufferGeometry,Float32BufferAttribute,Vector3,CylinderGeometry,PlaneGeometry,BoxGeometry,DodecahedronGeometry,MeshStandardMaterial,CanvasTexture,SRGBColorSpace,Group,Mesh,InstancedMesh,Texture } from "three";
 import Instances,{type Instance} from "../Instances";
 import { Block,Label } from "../../world/primitives";
 import { roadLength,sectorLength,sectorCount,roadSample,roadRibbon,terrainHeight,roadForestDensity,activeRoadSectors,lake,lakeDistance,roadStops,closestRoad } from "./route";
@@ -193,12 +193,15 @@ function RoadStops(){
   })}</>;
 }
 export default function RoadLandscape(){
+  const scenery=useRef<Group>(null);
   const maps=useRoadTextures();
   const pineShape=usePineShape(),wood=useMemo(()=>{const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(pineShape.position,3));g.setAttribute("normal",new Float32BufferAttribute(pineShape.normal,3));g.setAttribute("uv",new Float32BufferAttribute(pineShape.uv,2));g.setIndex(pineShape.index);return g;},[pineShape]);
   useEffect(()=>()=>wood.dispose(),[wood]);
   const leaves=useWorldTexture("leaves");
   const [sectors,setSectors]=useState(()=>activeRoadSectors(roadView.distance)),last=useRef(-1),tick=useRef(0);
+  // 草木与远山没有交互入口，跳过几十万个实例的导航射线测试；近处路面和自行车仍正常拾取。
+  useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
 }
