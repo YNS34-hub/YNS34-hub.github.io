@@ -27,7 +27,7 @@ describe("authored road ride",()=>{
     advance(fast,20,{pedal:true,steer:1});expect(Math.abs(fast.offset)).toBeLessThanOrEqual(2.24);expect(Math.abs(fast.lean)).toBeLessThanOrEqual(.15);
   });
   it("bounds sectors and recovers only invalid states without background-tab jumps",()=>{
-    for(let d=0;d<roadLength;d+=100)expect(activeRoadSectors(d).length).toBe(6);
+    for(let d=0;d<roadLength;d+=100){expect(activeRoadSectors(d).length).toBeLessThanOrEqual(6);expect(activeRoadSectors(d)).toContain(Math.floor(d/160));}
     const b=new RoadPhysics();b.speed=10;const d=b.distance;b.step(99,{});expect(b.distance-d).toBeLessThan(.7);
     b.lastSafe=123;b.distance=NaN;b.step(.016,{});expect(b.recovered).toBe(true);expect(b.distance).toBeCloseTo(123);expect(b.speed).toBe(0);
     const before=b.distance;b.step(.06,{blocked:true,pedal:true});expect(b.distance).toBe(before);

@@ -1,6 +1,6 @@
 import { CatmullRomCurve3, Vector3, BufferGeometry, Float32BufferAttribute } from "three";
 
-// 这是同一片湖谷内的固定环路。坐标为米，海拔起伏服务真实爬坡，不用章节传送拼接风景。
+// 这是同一片湖谷内的固定公路。坐标为米，海拔起伏服务真实爬坡，不用章节传送拼接风景。
 const knots = [
   [0,18,0],[8,18,-80],[-10,20,-180],[35,22,-290],[0,24,-385],[65,22,-495],
   [160,19,-560],[275,20,-585],[405,24,-780],[520,31,-805],[575,37,-850],
@@ -8,20 +8,20 @@ const knots = [
   [1040,65,-1190],[1130,59,-1115],[1145,50,-1005],[1230,43,-935],[1320,34,-865],
   [1330,25,-745],[1275,17,-645],[1150,15,-580],[1010,15,-450],[885,16,-350],
   [750,18,-310],[680,19,-255],[555,20,-220],[415,19,-235],[295,18,-140],
-  [180,18,-110],[65,18,-40],
+  [180,18,-110],[100,18,30],[50,18,140],[0,18,240],
 ] as const;
-export const roadRoute = new CatmullRomCurve3(knots.map(p => new Vector3(...p)), true, "centripetal");
+export const roadRoute = new CatmullRomCurve3(knots.map(p => new Vector3(p[0]*.8,18+(p[1]-18)*.8,p[2]*.8)), false, "centripetal");
 roadRoute.arcLengthDivisions = 5000;
 export const roadLength = roadRoute.getLength();
 export const sectorLength = 160;
 export const sectorCount = Math.ceil(roadLength / sectorLength);
-export const lake = { x: 650, z: -565, rx: 305, rz: 225, y: 10.6 };
+export const lake = { x: 520, z: -452, rx: 244, rz: 180, y: 12.08 };
 export function lakeDistance(x: number, z: number) { return Math.hypot((x-lake.x)/lake.rx,(z-lake.z)/lake.rz); }
-export const roadStops = [.23,.47,.81].map((t,i) => ({ distance: t*roadLength, title: ["LAKE EDGE","HIGH MEADOW","LAST LIGHT"][i] }));
+export const roadStops = [.23,.425,.88].map((t,i) => ({ distance: t*roadLength, title: ["LAKE EDGE","HIGH MEADOW","LAST LIGHT"][i] }));
 export const roadChapters = [
   [0,"TRAILHEAD"],[.025,"CEDAR SHADE"],[.075,"FIRST LIGHT"],[.12,"FOREST ROLLERS"],
-  [.19,"LAKE REVEAL"],[.245,"SHORE ROAD"],[.30,"THE CLIMB"],[.415,"CREST"],
-  [.46,"HIGH MEADOW"],[.51,"GOLDEN VALLEY"],[.555,"THE DESCENT"],[.715,"WATERLINE"],[.82,"LAST LIGHT"],
+  [.19,"LAKE REVEAL"],[.23,"SHORE ROAD"],[.265,"THE CLIMB"],[.395,"CREST"],
+  [.425,"HIGH MEADOW"],[.45,"GOLDEN VALLEY"],[.475,"THE DESCENT"],[.655,"WATERLINE"],[.82,"LAST LIGHT"],
 ] as const;
 export function roadChapter(distance: number) { const t=distance/roadLength; return [...roadChapters].reverse().find(p=>t>=p[0])?.[1] ?? "TRAILHEAD"; }
 export function roadSample(distance: number, point: Vector3, tangent: Vector3) {
@@ -45,7 +45,7 @@ const smooth=(a:number,b:number,v:number)=> {const t=Math.max(0,Math.min(1,(v-a)
 export function terrainHeight(x:number,z:number) {
   const radius=lakeDistance(x,z);
   const hills=16 + 8*Math.sin(x*.005)*Math.cos(z*.006) + 5*Math.sin(x*.019+z*.011);
-  const plateau=40*Math.exp(-Math.pow((x-930)/370,2)-Math.pow((z+1150)/280,2));
+  const plateau=32*Math.exp(-Math.pow((x-744)/296,2)-Math.pow((z+920)/224,2));
   const natural=(hills+plateau)*(smooth(.87,1.42,radius)) + (lake.y-3)*(1-smooth(.87,1.42,radius));
   const nearest=closestRoad(x,z), blend=1-smooth(5,65,nearest.distance);
   return natural*(1-blend)+(nearest.point.y-.12)*blend;
@@ -62,7 +62,7 @@ export function roadRibbon(start:number,end:number,width:number,offset=0,lift=0)
 }
 export function activeRoadSectors(distance:number) {
   const current=Math.min(sectorCount-1,Math.floor(distance/sectorLength)),result=new Set<number>();
-  for(let i=-2;i<=3;i++)result.add((current+i+sectorCount)%sectorCount);
+  for(let i=-2;i<=3;i++)if(current+i>=0&&current+i<sectorCount)result.add(current+i);
   return [...result].sort((a,b)=>a-b);
 }
 export function roadForestDensity(t:number) {

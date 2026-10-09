@@ -8,7 +8,7 @@ export interface RoadInput { pedal?:boolean; strong?:boolean; brake?:boolean; st
 export class RoadPhysics {
   distance=0;speed=0;gear=7;cadence=0;grade=0;offset=0;steering=0;heading=0;lean=0;braking=0;
   state:RidingState="stopped"; stopAt:number|null=null; atStop=false; ended=false; recovered=false; lastSafe=0;
-  private point=new Vector3();private tangent=new Vector3();
+  private point=new Vector3();private tangent=new Vector3();private nextPoint=new Vector3();private nextTangent=new Vector3();
   shift(direction:number){const before=this.gear;this.gear=Math.max(1,Math.min(12,this.gear+direction));return before!==this.gear;}
   step(delta:number,input:RoadInput,gradeOverride?:number) {
     if(input.blocked)return;
@@ -41,7 +41,11 @@ export class RoadPhysics {
     this.heading=Math.max(-.18,Math.min(.18,this.heading));
     this.offset+=Math.sin(this.heading)*this.speed*dt;
     if(Math.abs(this.offset)>1.85){this.heading-=Math.sign(this.offset)*(.03+Math.abs(this.offset)*.08)*dt;this.offset=Math.max(-2.24,Math.min(2.24,this.offset));}
-    this.lean+=((this.speed*this.speed*this.steering/9.81/1.01)*.38-this.lean)*(1-Math.exp(-dt*5));
+    roadSample(Math.min(roadLength,this.distance+2),this.nextPoint,this.nextTangent);
+    const yaw=Math.atan2(-this.tangent.x,-this.tangent.z),nextYaw=Math.atan2(-this.nextTangent.x,-this.nextTangent.z);
+    const curvature=-Math.atan2(Math.sin(nextYaw-yaw),Math.cos(nextYaw-yaw))/2;
+    // 曲线本身也产生侧倾；头部只保留其中很小一部分，不能把转弯全部转嫁给镜头。
+    this.lean+=(Math.atan(this.speed*this.speed*(curvature+this.steering/1.01)/9.81)*.42-this.lean)*(1-Math.exp(-dt*5));
     this.lean=Math.max(-.15,Math.min(.15,this.lean));
     this.distance=Math.min(roadLength,this.distance+this.speed*Math.cos(this.heading)*dt);
     if((remaining<.16&&this.speed<.7)||this.distance>=roadLength){this.speed=0;this.stopAt=null;this.atStop=true;this.ended=this.distance>=roadLength;}
