@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { usePalaceStore } from "../../systems/store";
 import { roomViews } from "../../world/visitView";
 import { useMotionCue } from "../../motion/useMotionCue";
-import { activeRoadSectors } from "./route";
+import { activeRoadSectors,roadForestDensity,roadLength } from "./route";
 import { useRoadRide,roadCommand } from "./state";
 import "./road.css";
 
@@ -15,6 +15,9 @@ function returnToPalace(){
 export default function RoadHud(){
   const r=useRoadRide(),motion=useMotionCue<HTMLSpanElement>(r.gearSequence,"copy",r.mounted);
   const muted=usePalaceStore(s=>s.mute);
+  const forestShade=roadForestDensity(r.distance/roadLength)>.45;
+  // 纹理树冠不能由原建筑色取样判断亮度；只给新路线林间使用原馆标的浅色墨，不改字体或构图。
+  useEffect(()=>{const root=document.querySelector<HTMLElement>(".palace-app");if(root)root.dataset.cyclingShade=String(forestShade);return()=>{if(root)delete root.dataset.cyclingShade;};},[forestShade]);
   useEffect(()=>{const root=document.querySelector<HTMLElement>(".palace-app");if(root)root.dataset.activityPhoto=String(r.photo);return()=>{if(root)delete root.dataset.activityPhoto;};},[r.photo]);
   return <div className="road-ui" data-mounted={r.mounted} data-photo={r.photo}>
     <output className="road-status sr-only" aria-live="off" data-state={r.state} data-speed={r.speed.toFixed(3)} data-distance={r.distance.toFixed(2)} data-grade={r.grade.toFixed(4)} data-cadence={r.cadence.toFixed(1)} data-gear={r.gear} data-mounted={r.mounted} data-sectors={activeRoadSectors(r.distance).join(",")} data-photo={r.photo}>The Long Way Home · {r.state}</output>

@@ -29,6 +29,8 @@
 .road-place>small{font-size:8px;letter-spacing:.1em;opacity:.5}
 .palace-app[data-activity-world="cycling"] .room-caption{display:none}
 .palace-app[data-activity-world="cycling"] .explore-controls{opacity:.55}
+.palace-app[data-activity-world="cycling"][data-cycling-shade="true"] .wordmark{color:#dbeaf2;text-shadow:0 1px 5px #14262b99}
+.palace-app[data-activity-world="cycling"][data-cycling-shade="true"] .wordmark:hover{color:#e1edf4}
 .road-ui[data-photo="true"]{text-shadow:0 1px 4px #182824}
 @media(prefers-reduced-motion:reduce){.road-gear-note{animation:none;opacity:.65}.road-photo-tools{transition:none}}
 @media(max-width:700px){.road-entry-copy{left:22px;bottom:105px;max-width:260px}.road-entry-copy h2{font-size:18px}.road-minimal,.road-options{right:22px}.road-entry-return{right:22px}.road-options{width:218px}}

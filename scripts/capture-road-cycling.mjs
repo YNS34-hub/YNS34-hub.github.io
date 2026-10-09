@@ -9,6 +9,7 @@ const frames=[["stationary-cockpit",0],["forest-road",.045],["woodland-s-curve",
 const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:true,args:["--use-angle=d3d11"]});
 try{for(const size of [{width:1920,height:1080},{width:2560,height:1440}].filter(s=>!process.env.PALACE_CAPTURE_WIDTH||s.width===Number(process.env.PALACE_CAPTURE_WIDTH))){
  const context=await browser.newContext({viewport:size,deviceScaleFactor:1});
+ await context.route("**/personal-media/manifest.json",r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
  await context.addInitScript(()=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality:"medium",tutorialDone:true,roomSoundtracks:false},version:0})));
  const page=await context.newPage();page.setDefaultTimeout(90000);page.on("pageerror",e=>report.errors.push(e.message));page.on("console",m=>{if(m.type()==="error")report.errors.push(m.text());});
  await page.route(base+"/__road_fixture__",route=>route.fulfill({contentType:"text/html",body:"<!doctype html><title>Saved-route fixture</title>"}));

@@ -91,7 +91,14 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
     }
     const stem=new CylinderGeometry(.06,.65,1,12),leaf=new PlaneGeometry(1,1),stone=new DodecahedronGeometry(1,1),cube=new BoxGeometry(1,1,1);
     const blade=new BufferGeometry(),gp:number[]=[],guv:number[]=[],gi:number[]=[];
-    for(let b=0;b<9;b++){const angle=b*2.4,dx=Math.cos(angle)*2,dz=Math.sin(angle)*.08,n=gp.length/3;gp.push(dx-.24,-.5,dz,dx+.24,-.5,dz,dx+.05,.08,dz+.08,dx+.38,.12,dz+.1,dx+.75,.5,dz+.2);guv.push(0,0,1,0,0,.6,1,.65,.6,1);gi.push(n,n+1,n+2,n+1,n+3,n+2,n+2,n+3,n+4);}
+    // 同一低成本草簇中也区分叶高、宽度与弯曲，停稳时不能呈现九片等高的平行条带。
+    const bladeRandom=seeded(617);
+    for(let b=0;b<9;b++){
+      const angle=b*2.4,dx=Math.cos(angle)*(.6+bladeRandom()*1.1),dz=Math.sin(angle)*.055,n=gp.length/3;
+      const height=.55+bladeRandom()*.7,width=.12+bladeRandom()*.16,bend=(bladeRandom()-.5)*1.1;
+      gp.push(dx-width,-.5,dz,dx+width,-.5,dz,dx+bend*.35-width*.55,-.5+height*.58,dz+.03,dx+bend*.35+width*.55,-.5+height*.58,dz+.03,dx+bend,-.5+height,dz+.075);
+      guv.push(0,0,1,0,0,.58,1,.58,.5,1);gi.push(n,n+1,n+2,n+1,n+3,n+2,n+2,n+3,n+4);
+    }
     blade.setAttribute("position",new Float32BufferAttribute(gp,3));blade.setAttribute("uv",new Float32BufferAttribute(guv,2));blade.setIndex(gi);blade.computeVertexNormals();
     const road=roadRibbon(start,end,6.4),edges=[roadRibbon(start,end,.1,-2.95,.012),roadRibbon(start,end,.1,2.95,.012)];
     return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass,markers};
@@ -156,7 +163,7 @@ function RoadLake(){
   // 有限天空反射与波面法线，明确不声称倒映山体；不用额外相机和实时反射目标。
   const vertex="varying vec3 waterWorld;varying vec2 waterLocal;void main(){waterWorld=(modelMatrix*vec4(position,1.)).xyz;waterLocal=position.xy;gl_Position=projectionMatrix*viewMatrix*vec4(waterWorld,1.);}";
   const fragment=`uniform float time;varying vec3 waterWorld;varying vec2 waterLocal;
-  void main(){vec2 p=waterWorld.xz;float t=time;vec3 n=normalize(vec3(sin(p.x*.33+t*.39)*.038+sin(p.y*.91-t*.55)*.018,1.,cos(p.y*.29-t*.34)*.04+sin(p.x*.76+t*.48)*.017));
+  void main(){vec2 p=waterWorld.xz;float t=time;vec3 n=normalize(vec3(sin(p.x*.33+p.y*.17+t*.39)*.019+sin(p.y*.91-p.x*.31-t*.55)*.010,1.,cos(p.y*.29+p.x*.11-t*.34)*.018+sin(p.x*.76+p.y*.47+t*.48)*.008));
   vec3 v=normalize(cameraPosition-waterWorld);vec3 r=reflect(-v,n);float f=.02+.98*pow(1.-max(0.,dot(n,v)),5.);
   vec3 depth=mix(vec3(.028,.105,.119),vec3(.061,.144,.136),smoothstep(.75,1.,length(waterLocal)));
   vec3 sky=mix(vec3(.245,.345,.39),vec3(.065,.18,.28),pow(max(0.,r.y),.45));
