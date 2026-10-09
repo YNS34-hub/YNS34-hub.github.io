@@ -63,7 +63,7 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
       roadSample(d,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),density=roadForestDensity(d/roadLength);
       for(const side of [-1,1]){
         for(let j=0;j<38;j++){
-          const a=side*(3.55+random()*8),x=p.x+nx/r*a+(random()-.5)*2,z=p.z+nz/r*a+(random()-.5)*2;
+          const a=side*(3.65+random()*8),along=(random()-.5)*3,tr=Math.hypot(t.x,t.z),x=p.x+nx/r*a+t.x/tr*along,z=p.z+nz/r*a+t.z/tr*along;
           if(lakeDistance(x,z)<1.02)continue;
           grass.push({position:[x,terrainHeight(x,z)+.12,z],scale:[.05+random()*.045,.14+random()*.22,1],rotation:[0,random()*Math.PI,(random()-.5)*.3],color:["#64794c","#78824f","#566d43","#858a59"][j%4]});
         }
@@ -139,11 +139,17 @@ function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
     const canvas=document.createElement("canvas");canvas.width=512;canvas.height=1024;const ctx=canvas.getContext("2d")!;ctx.fillStyle="#5c6350";ctx.fillRect(250,130,9,894);
     const painter=seeded(991);for(const p of pineShape.crown){const x=256+p[0]*48,y=1024-p[1]/pineShape.height*1010;ctx.save();ctx.translate(x,y);ctx.rotate((painter()-.5)*1.6);ctx.drawImage(maps.pine.image as CanvasImageSource,-15,-36,30,72);ctx.restore();}
     const crown=new CanvasTexture(canvas);crown.colorSpace=SRGBColorSpace;crown.anisotropy=2;
+    // 远林必须落在实际粗网格三角形上，不能把精细高度加到下移后的远景表面而悬空。
+    const farGround=(x:number,z:number)=>{
+      const gx=(x+550)/2400*n,gz=(z+1920)/2500*n,col=Math.max(0,Math.min(n-1,Math.floor(gx))),row=Math.max(0,Math.min(n-1,Math.floor(gz))),u=gx-col,v=gz-row,a=row*(n+1)+col;
+      const h00=points[a*3+1],h10=points[(a+1)*3+1],h01=points[(a+n+1)*3+1],h11=points[(a+n+2)*3+1];
+      return u+v<=1?h00+(h10-h00)*u+(h01-h00)*v:h11+(h01-h11)*(1-u)+(h10-h11)*(1-v);
+    };
     const tree=new PlaneGeometry(1,1),forest:Instance[]=[],random=seeded(417);
     for(let i=0;i<4000;i++){
       const x=-300+random()*2000,z=-1520+random()*1750;
       const h=terrainHeight(x,z),near=closestRoad(x,z);if(lakeDistance(x,z)<1.10||h<10||near.distance<90||near.distance<180&&roadForestDensity(near.progress)<.25)continue;
-      const height=13+random()*7,width=height*.50,a=random()*Math.PI;for(const angle of [a,a+Math.PI/2])forest.push({position:[x,h+height/2,z],scale:[width,height,1],rotation:[0,angle,0],color:["#a5b3a5","#b3bba6","#8faca0"][i%3]});
+      const height=13+random()*7,width=height*.50,a=random()*Math.PI;for(const angle of [a,a+Math.PI/2])forest.push({position:[x,farGround(x,z)+height/2,z],scale:[width,height,1],rotation:[0,angle,0],color:["#a5b3a5","#b3bba6","#8faca0"][i%3]});
     }
     return{g,r,tree,forest,crown};
   },[maps.pine.image,pineShape]);
