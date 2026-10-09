@@ -1,0 +1,34 @@
+.road-ui{position:fixed;inset:0;z-index:14;pointer-events:none;color:#e7ece6;font-family:"Space Grotesk",sans-serif;text-shadow:0 1px 5px #14262b99}
+.road-status{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;pointer-events:none}
+.road-ui button{pointer-events:auto;font:500 10px "Space Grotesk",sans-serif;letter-spacing:.04em;color:inherit;background:transparent;border:0;border-bottom:1px solid #dce5da50;padding:8px 0;cursor:pointer;text-shadow:inherit}
+.road-ui button:hover,.road-ui button:focus-visible{border-color:#f7eed3;color:#fff6e5}
+.road-ui button:disabled{opacity:.35;cursor:default}
+.road-entry-copy{position:absolute;bottom:110px;left:48px;max-width:370px;background:linear-gradient(90deg,#142a2938,transparent);padding:15px 26px 15px 0}
+.road-entry-copy>span{font-size:8px;letter-spacing:.18em;opacity:.65}
+.road-entry-copy h2{font-size:22px;letter-spacing:.08em;font-weight:500;margin:10px 0 12px}
+.road-entry-copy p{font-size:11px;opacity:.68;line-height:1.6}
+.road-entry-return{position:absolute;bottom:45px;right:48px}
+.road-minimal{position:absolute;bottom:90px;right:48px;display:flex;align-items:baseline;gap:22px}
+.road-velocity{display:flex;align-items:baseline;gap:8px}
+.road-velocity strong{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.road-velocity span{font-size:8px;letter-spacing:.13em;opacity:.55}
+.road-minimal>button{font-size:9px;opacity:.65}
+.road-gear-note{position:absolute;bottom:140px;right:48px;font-size:9px;letter-spacing:.16em;animation:road-gear 2.2s both}
+@keyframes road-gear{0%{opacity:0;transform:translateY(3px)}15%,60%{opacity:.75;transform:none}100%{opacity:0;transform:none}}
+.road-options{position:absolute;right:48px;bottom:90px;width:244px;padding:16px 20px;background:rgba(8,18,25,.20);backdrop-filter:blur(8px);pointer-events:auto}
+.road-options-heading{display:flex;justify-content:space-between;align-items:baseline;gap:15px}
+.road-options-heading>span{font-size:9px;letter-spacing:.12em;opacity:.7}
+.road-options-heading>button{border:0;font-size:18px;padding:0}
+.road-options p{font-size:10px;line-height:1.9;opacity:.68;margin:14px 0}
+.road-readouts{display:flex;gap:14px;font-size:8px;letter-spacing:.08em;opacity:.65;margin-bottom:10px}
+.road-options>button{display:block;text-align:left;width:100%;margin-top:3px}
+.road-photo-tools{position:absolute;bottom:28px;right:48px;display:flex;gap:22px;opacity:.45;transition:opacity .18s}
+.road-photo-tools:hover,.road-photo-tools:focus-within{opacity:1}
+.road-place{position:absolute;bottom:140px;left:48px;display:flex;flex-direction:column;gap:9px}
+.road-place>span{font-size:11px;letter-spacing:.13em}
+.road-place>small{font-size:8px;letter-spacing:.1em;opacity:.5}
+.palace-app[data-activity-world="cycling"] .room-caption{display:none}
+.palace-app[data-activity-world="cycling"] .explore-controls{opacity:.55}
+.road-ui[data-photo="true"]{text-shadow:0 1px 4px #182824}
+@media(prefers-reduced-motion:reduce){.road-gear-note{animation:none;opacity:.65}.road-photo-tools{transition:none}}
+@media(max-width:700px){.road-entry-copy{left:22px;bottom:105px;max-width:260px}.road-entry-copy h2{font-size:18px}.road-minimal,.road-options{right:22px}.road-entry-return{right:22px}.road-options{width:218px}}

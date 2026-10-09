@@ -1,0 +1,43 @@
+import assert from "node:assert/strict";
+import {chromium} from "playwright";
+import {mkdir,writeFile} from "node:fs/promises";
+import path from "node:path";
+import {execFileSync} from "node:child_process";
+const base=process.env.PALACE_URL||"http://127.0.0.1:5190",out=path.resolve(process.env.PALACE_ARTIFACTS||"qa-artifacts/road-cycling");
+await mkdir(out,{recursive:true});
+const report={base,sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),checks:[],errors:[]};
+const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:process.env.PALACE_HEADED!=="1",args:["--use-angle=d3d11"]});
+const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1});
+await context.addInitScript(()=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality:"medium",tutorialDone:true,roomSoundtracks:false},version:0})));
+const page=await context.newPage();page.setDefaultTimeout(90000);
+page.on("pageerror",error=>report.errors.push(error.message));page.on("console",message=>{if(message.type()==="error")report.errors.push(message.text());});
+const shot=name=>page.screenshot({path:path.join(out,name+".png")});
+const status=()=>page.locator(".road-status");
+try{
+ await page.goto(base+"/cycling/");await page.locator(".world-ready canvas").waitFor();await status().waitFor({state:"attached"});
+ assert.equal(await status().getAttribute("data-mounted"),"false");await shot("threshold");console.log("Road threshold ready");
+ await page.keyboard.down("w");await page.waitForFunction(()=>!document.querySelector(".road-mount")?.disabled,{},{timeout:8000});await page.keyboard.up("w");
+ await page.getByRole("button",{name:"Mount / ride · E",exact:true}).waitFor();await page.waitForFunction(()=>!document.querySelector(".road-mount")?.disabled);await shot("road-bike");
+ report.checks.push("Enter on foot and physically approach the waiting road bike");
+ await page.keyboard.press("e");await page.waitForFunction(()=>document.querySelector(".road-status")?.dataset.state!=="mounting"&&document.querySelector(".road-status")?.dataset.mounted==="true");await shot("cockpit-still");
+ report.checks.push("Native E mounts with a road cockpit and stationary start");
+ await page.keyboard.down("w");await page.waitForTimeout(15000);await page.keyboard.up("w");
+ const speed=Number(await status().getAttribute("data-speed"));assert.ok(speed>6);await shot("forest-road");
+ await page.waitForTimeout(2000);assert.ok(Number(await status().getAttribute("data-speed"))>speed*.75);
+ await page.keyboard.press("q");assert.equal(await status().getAttribute("data-gear"),"6");await page.keyboard.press("e");assert.equal(await status().getAttribute("data-gear"),"7");
+ report.checks.push("Genuine pedal input, inertial coasting and native easier/harder gear feedback");
+ await page.keyboard.down("s");await page.waitForTimeout(6000);await page.keyboard.up("s");assert.equal(Number(await status().getAttribute("data-speed")),0);await shot("stopped");
+ await page.keyboard.press("p");await page.getByRole("button",{name:"Save this view",exact:true}).waitFor();await shot("photo");
+ const download=page.waitForEvent("download");await page.getByRole("button",{name:"Save this view",exact:true}).click();await(await download).saveAs(path.join(out,"actual-photo.png"));
+ await page.keyboard.press("Escape");assert.equal(await status().getAttribute("data-photo"),"false");
+ report.checks.push("Progressive braking, photo view, actual local PNG and single-level Escape");
+ await page.getByRole("button",{name:"Ride options",exact:true}).click();await page.getByRole("button",{name:"Camera motion · full",exact:true}).click();
+ await page.getByRole("button",{name:"Sound on",exact:true}).click();await page.getByRole("button",{name:"Sound off",exact:true}).click();await shot("options");
+ const distance=Number(await status().getAttribute("data-distance"));await page.reload();await page.locator(".world-ready canvas").waitFor();await status().waitFor({state:"attached"});
+ assert.ok(Math.abs(Number(await status().getAttribute("data-distance"))-distance)<.2);assert.equal(await status().getAttribute("data-mounted"),"false");
+ await page.getByRole("button",{name:"Return to the Palace",exact:true}).click();await page.locator(".world-ready canvas").waitFor();
+ report.checks.push("Sound switch, camera comfort, refresh restoration stopped on foot and museum return");
+ assert.deepEqual(report.errors,[]);report.passed=true;
+}catch(error){report.failure=error.stack;process.exitCode=1;console.error(error.stack);await shot("failure").catch(()=>{});}
+finally{await writeFile(path.join(out,"validation.json"),JSON.stringify(report,null,2));await browser.close();}
+console.log("Road ride: "+report.checks.length+" checks; "+(report.passed?"PASS":"FAIL"));
