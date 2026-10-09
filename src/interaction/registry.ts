@@ -14,6 +14,7 @@ export const interactives = new Map<string, Interactive>();
 export interface InteractionSnapshot {
   id: string; title: string; hint: string; secondary: boolean;
   feedback: string; sequence: number;
+  nearId?: string; nearTitle?: string;
 }
 let snapshot: InteractionSnapshot = { id: "", title: "", hint: "", secondary: false, feedback: "", sequence: 0 };
 const listeners = new Set<() => void>();
@@ -23,6 +24,13 @@ export const subscribeInteraction = (listener: () => void) => {
   return () => { listeners.delete(listener); };
 };
 export const readInteraction = () => snapshot;
+export function publishPresence(id: string) {
+  const target = interactives.get(id);
+  const nearId = target ? id : "";
+  if (snapshot.nearId === nearId) return;
+  snapshot = { ...snapshot, nearId, nearTitle: target?.title || "" };
+  listeners.forEach(listener => listener());
+}
 export function publishFocus(id: string) {
   if (id === snapshot.id) return;
   const target = interactives.get(id);

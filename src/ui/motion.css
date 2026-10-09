@@ -75,7 +75,27 @@ html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
 .guide-panel { animation: motion-panel-in var(--motion-enter) var(--motion-ease-enter); }
 @keyframes motion-hint-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes motion-panel-in { from { opacity: .82; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+/* 保持原两行排版，仅分离词组的显现时序；结束后遮罩完全释放。 */
+.world-ready .hero-word { display:inline-block; animation:hero-word-resolve var(--motion-hero) var(--motion-ease-enter) both; }
+.world-ready .hero-word-memory { animation-delay:80ms; }
+.welcome-caption h1 .hero-word-the,.welcome-caption h1 .hero-word-memory { letter-spacing:inherit; }
+.world-ready .hero-word-palace { animation-delay:170ms; }
+.world-ready .hero-infinity { animation:motion-hint-in var(--motion-copy) var(--motion-ease-settle) 300ms backwards; }
+@keyframes hero-word-resolve { from { clip-path:inset(0 0 100% 0); translate:0 7px; opacity:.3; } to { clip-path:inset(0); translate:0 0; opacity:1; } }
+.enter-button svg { transition:translate var(--motion-copy) var(--motion-ease-enter); }
+.enter-button:hover svg,.enter-button:focus-visible svg { translate:4px 0; }
+.import-process { display:flex; justify-content:space-between; gap:20px; font-size:10px; letter-spacing:.08em; animation:motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
+.import-process span { opacity:.5; font-variant-numeric:tabular-nums; }
+.import-drafts article { transition:opacity var(--motion-copy), border-color var(--motion-copy); }
+.import-drafts article[data-placed="true"] { border-color:#719d92; }
+.import-drafts article[data-failed="true"] { border-color:#ba8465; }
+.guide-panel .floor-plan path { animation:guide-lines var(--motion-scene) var(--motion-ease-enter) backwards; stroke-dasharray:900; }
+@keyframes guide-lines { from { stroke-dashoffset:900; opacity:0; } to { stroke-dashoffset:0; opacity:1; } }
+html[data-motion="reduced"] .hero-word,html[data-motion="reduced"] .hero-infinity,html[data-motion="reduced"] .floor-plan path { animation:none; }
+html[data-motion="reduced"] .enter-button svg { transition:none; translate:none; }
 @media (prefers-reduced-motion: reduce) {
   .palace-app .world-reveal, .palace-app.world-ready .world-reveal { transition: none; }
   .near-caption, .core-information, .tutorial, .guide-panel { animation: none; }
+  .world-ready .hero-word,.world-ready .hero-infinity,.guide-panel .floor-plan path { animation:none; }
+  .enter-button svg { transition:none; translate:none; }
 }

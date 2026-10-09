@@ -34,6 +34,8 @@ export default function WorkAttention({ width, height, hovered, warm = false, at
     strength.current = quiet ? target : settleMotion(strength.current, target, dt, 0.14, 0.2);
     edge.current.visible = strength.current > 0.001;
     edge.current.material.opacity = strength.current * 0.42;
+    // 只移动短角标而不缩放图片；摄影更克制，发光展品以边框深度回应。
+    edge.current.position.z = 0.15 + (quiet ? 0 : strength.current * (warm ? .012 : .045));
   });
   return <lineSegments ref={edge} geometry={geometry} position={[0, 0, 0.15]} name="work-attention-edge" visible={false} raycast={() => {}}>
     <lineBasicMaterial color={warm ? "#e3c49e" : "#b5d8e5"} transparent opacity={0} depthWrite={false} toneMapped={false} />
