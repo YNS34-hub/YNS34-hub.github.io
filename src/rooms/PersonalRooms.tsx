@@ -156,7 +156,7 @@ export function PersonalProjects() {
       />
     );
   const works = projects.filter((p) => p.id !== "the-memory-palace");
-  const hero = works.find((p) => p.id === "void-echo") || works[0];
+  const hero = works.find((p) => p.id === "big-mouth-burger") || works[0];
   return (
     <group>
       <ProjectArchitecture />

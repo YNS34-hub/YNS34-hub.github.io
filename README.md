@@ -61,7 +61,7 @@ personal-media/
 
 运行 `npm run sync:github`，使用已经登录的 GitHub CLI (`gh`) 检查 YNS34-hub 当前公开仓库、README 和 `docs/public/assets/screenshots/preview/images`。审计快照位于 `content/public-project-audit.json`。运行和 build 不需要联网或 GitHub token。
 
-Hero 展品使用真实项目截图：The Memory Palace、VOID//ECHO、Big Mouth Burger、Giannis Editorial、Sci-Fi Portfolio；Nonlinear Glass Study 使用原有真实玻璃研究素材并链接保留页面。有真实 demo 才显示 **ENTER PROJECT**，公开源码显示 **SOURCE**。截图来源见 [项目视觉说明](public/media/projects/README.md)。
+Hero 展品使用真实项目截图：The Memory Palace、Big Mouth Burger、Giannis Editorial、Sci-Fi Portfolio；Nonlinear Glass Study 使用原有真实玻璃研究素材并链接保留页面。有真实 demo 才显示 **ENTER PROJECT**，公开源码显示 **SOURCE**。截图来源见 [项目视觉说明](public/media/projects/README.md)。`content/curation.json` 保留用户明确撤下的项目 ID，后续 GitHub 扫描不会重新展出它们。
 
 Research Vault 单独展示数学与 Reviewer-First Audit；后者只展示已经公开的合成数据演示图，不暴露私人仓库、评审或论文。fork 明确标为 REFERENCE；未经过策展的新原创仓库先进入 Archive / PROTOTYPE，不会自动成为 Hero。
 

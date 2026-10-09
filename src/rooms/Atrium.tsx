@@ -138,7 +138,7 @@ function Core() {
 /** Compression → release → a luminous optical solid against a recessed blue archive. */
 export default function Atrium() {
   const images = useLibraryStore((s) => s.wallpapers);
-  const hero = projects.find((x) => x.id === "void-echo");
+  const hero = projects.find((x) => x.id === "giannis-fansite");
   return (
     <group>
       <Floor width={42} depth={54} color="#bfced5" />
@@ -307,7 +307,7 @@ export default function Atrium() {
             position={[0, 0, 0.2]}
           />
           <Label
-            text="VOID//ECHO"
+            text={hero.title.toUpperCase()}
             position={[-4.7, -3.1, 0.2]}
             align="left"
             size={0.22}

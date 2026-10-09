@@ -61,6 +61,14 @@ function withoutAdditions(file: string, source: string) {
     return "";
   });
   expect(seen.sort(), file + " insertion points").toEqual((additions[file] || []).slice().sort());
+  // 用户于 2026-10-09 明确撤下 VOID//ECHO；仅还原两处展品数据表达式作基线比对，建筑其余字节仍严格保护。
+  if (file === "src/rooms/Atrium.tsx") {
+    expect(clean).toContain('const hero = projects.find((x) => x.id === "giannis-fansite");');
+    expect(clean).toContain('text={hero.title.toUpperCase()}');
+    return clean
+      .replace('const hero = projects.find((x) => x.id === "giannis-fansite");', 'const hero = projects.find((x) => x.id === "void-echo");')
+      .replace('text={hero.title.toUpperCase()}', 'text="VOID//ECHO"');
+  }
   return clean;
 }
 
