@@ -7,6 +7,9 @@
   --motion-hero: 600ms;
   --motion-lyric: 640ms;
   --motion-threshold: 420ms;
+  --motion-layout: 480ms;
+  --motion-scene: 820ms;
+  --motion-cinematic: 1200ms;
   --motion-ease-enter: cubic-bezier(.16, 1, .3, 1);
   --motion-ease-settle: cubic-bezier(.22, .68, .2, 1);
   --motion-ease-exit: cubic-bezier(.4, 0, 1, 1);

@@ -7,11 +7,15 @@ export const motionTime = Object.freeze({
   hero: 600,
   lyric: 640,
   threshold: 420,
+  layout: 480,
+  scene: 820,
+  cinematic: 1200,
 });
 export const motionEase = Object.freeze({
   enter: "cubic-bezier(0.16, 1, 0.3, 1)",
   settle: "cubic-bezier(0.22, 0.68, 0.2, 1)",
   exit: "cubic-bezier(0.4, 0, 1, 1)",
+  cinematic: "cubic-bezier(0.65, 0, 0.35, 1)",
 });
 
 // 限制暂停后台后的大 dt；指数包络在不同帧率下有相同的响应时间，不制造节拍。
