@@ -20,6 +20,7 @@ import { useLibraryStore } from "../systems/library";
 import { PalaceMark } from "./primitives";
 import { useIdentityTone } from "../systems/identityTone";
 import { useMotionCue } from "../motion/useMotionCue";
+import NowPlayingSignal from "../motion/NowPlayingSignal";
 export default function Hud({ ready }: { ready: boolean }) {
   const s = usePalaceStore();
   const audio = useAudioStore(
@@ -267,6 +268,7 @@ export default function Hud({ ready }: { ready: boolean }) {
                 {audio.playing ? "NOW PLAYING" : "ON THE TURNTABLE"}
               </small>
               <strong>{track.title}</strong>
+              <em className="mini-artist">{track.artist}</em>
             </span>
           </button>
           <button
@@ -277,6 +279,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           >
             {audio.playing ? <Pause size={14} /> : <Play size={14} />}
           </button>
+          <NowPlayingSignal />
         </div>
       )}
     </div>

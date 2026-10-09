@@ -103,7 +103,7 @@ export default function WallpaperPanel({
           {error}
         </p>
       )}
-      <div className="visual-archive">
+      <div className={`visual-archive ${baseRoom === "editorial" && !editing ? "editorial-strip" : ""}`}>
         {images.map((item, index) => (
           <article className="visual-work" key={item.id}>
             <button

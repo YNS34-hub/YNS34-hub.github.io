@@ -68,6 +68,38 @@ html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
 }
 .cinema-controls button:active { opacity: .64; }
 
+/* 播放进度与能量只读现有音频；艺术家悬停揭示不会改变迷你播放器的静止占位。 */
+.mini-progress { position:absolute; left:0; right:0; bottom:0; height:1px; background:#8eaca322; pointer-events:none; }
+.mini-progress > span { display:block; width:100%; height:100%; background:#7b9d98; transform:scaleX(0); transform-origin:left; }
+.mini-energy { position:absolute; right:10px; top:8px; width:3px; height:3px; border-radius:50%; background:#8fae9d; pointer-events:none; }
+.mini-artist { position:absolute; top:calc(100% + 7px); right:0; padding:3px 8px; background:rgba(8,18,25,.16); color:var(--ui-ink); font:500 9px "Space Grotesk",sans-serif; opacity:0; translate:0 -3px; pointer-events:none; transition:opacity var(--motion-copy), translate var(--motion-copy) var(--motion-ease-enter); }
+.now-playing-tag:hover .mini-artist,.now-playing-tag:focus-within .mini-artist { opacity:.85; translate:0 0; }
+.player-anchor-transfer { position:fixed; z-index:90; pointer-events:none!important; transform-origin:top left; overflow:hidden; }
+.lyric-wall[data-playing="true"] .lyric-line[data-side="-1"] .lyric-line-content { transform:translateX(-2px); }
+.lyric-wall[data-playing="true"] .lyric-line[data-side="1"] .lyric-line-content { transform:translateX(3px); }
+.lyric-wall[data-reduced="true"] .lyric-line .lyric-line-content { transform:none; }
+.cinema-controls { transition:opacity var(--motion-copy) var(--motion-ease-settle); }
+.cinema-controls[data-idle="true"]:not(:hover):not(:focus-within) { opacity:.12; }
+.cinema-index { font:500 8px "Space Grotesk",sans-serif; letter-spacing:.14em; margin-right:14px; opacity:.5; }
+.cinema-controls button[aria-pressed="true"] svg { animation:favorite-settle var(--motion-copy) var(--motion-ease-enter); }
+@keyframes favorite-settle { from { opacity:.45; } to { opacity:1; } }
+/* 仅编辑设计收藏采用手风琴；原图 contain，不裁切人物，也不改变键盘顺序。 */
+@media (min-width:1000px) {
+  .editorial-strip { display:flex; align-items:stretch; gap:12px; overflow-x:auto; padding-bottom:12px; }
+  .editorial-strip > article { flex:1 0 76px; min-width:0; transition:flex-grow var(--motion-layout) var(--motion-ease-enter), flex-basis var(--motion-layout) var(--motion-ease-enter); }
+  .editorial-strip > article:hover,.editorial-strip > article:focus-within { flex:5 0 340px; }
+  .editorial-strip .visual-work-image { height:270px; background:transparent; }
+  .editorial-strip .visual-work-image img { height:100%; width:100%; object-fit:contain; }
+  .editorial-strip .visual-caption { padding-top:12px; gap:8px; }
+  .editorial-strip .visual-caption h3 { font-size:12px; overflow-wrap:anywhere; }
+  .editorial-strip .visual-caption p,.editorial-strip .work-tags { display:none; }
+  .editorial-strip .visual-actions { flex-wrap:wrap; }
+  .editorial-strip .visual-actions button { font-size:8px; }
+  .editorial-strip > article:not(:hover):not(:focus-within) .visual-actions { visibility:hidden; }
+}
+html[data-motion="reduced"] .editorial-strip > article { transition:none; }
+@media (prefers-reduced-motion:reduce) { .editorial-strip > article { transition:none; } }
+
 /* 门槛仍由原导航与真实 ready 决定；只缩短已有薄幕的时间，不遮挡或延迟控制。 */
 .palace-app .world-reveal { transition: opacity var(--motion-exit) var(--motion-ease-exit); }
 .palace-app.world-ready .world-reveal { transition: opacity var(--motion-threshold) var(--motion-ease-settle); }
