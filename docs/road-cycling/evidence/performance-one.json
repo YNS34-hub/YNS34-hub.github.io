@@ -1,0 +1,364 @@
+{
+  "sha": "670d7c771a9ff526bd41bc6c27049b1b4e01a156",
+  "dirty": true,
+  "when": "2026-10-09T03:54:40.820Z",
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "build": "Vite development build with original read-only diagnostics; public production is verified separately.",
+  "gpu": [
+    {
+      "Name": "MuMu Virtual Display Adapter",
+      "DriverVersion": "20.36.41.498"
+    },
+    {
+      "Name": "GameViewer Virtual Display Adapter",
+      "DriverVersion": "15.6.5.199"
+    },
+    {
+      "Name": "Intel(R) UHD Graphics",
+      "DriverVersion": "31.0.101.2141"
+    },
+    {
+      "Name": "NVIDIA GeForce GTX 1650",
+      "DriverVersion": "32.0.15.9186"
+    }
+  ],
+  "scope": "Real RAF wall intervals including simulation. Main-pass renderer.info counts exclude shadow/offscreen passes; material-map MB excludes full VRAM. No GPU timer query. Native mount/pedal; valid saved-position staging is used for geographic samples.",
+  "samples": [
+    {
+      "label": "trailhead / stationary",
+      "fps": 112.9679924021387,
+      "medianMs": 7,
+      "p95Ms": 13.899999999999636,
+      "maxMs": 118.10000000000036,
+      "frames": 678,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 77,
+        "triangles": 2285874,
+        "textures": 20,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 77,
+        "triangles": 2285874,
+        "textures": 20,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "dense forest / stationary",
+      "fps": 92.19810943948303,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 166.60000000000036,
+      "frames": 554,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 73,
+        "triangles": 2275530,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 73,
+        "triangles": 2275530,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "dense forest / native pedaling",
+      "fps": 90.48104938346663,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 166.79999999999927,
+      "frames": 736,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 78,
+        "triangles": 2000734,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 80,
+        "triangles": 2437250,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "dense forest / coasting",
+      "fps": 94.94037281462886,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 180.59999999999854,
+      "frames": 574,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 77,
+        "triangles": 1998494,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 78,
+        "triangles": 2000734,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "climb / stationary",
+      "fps": 128.4486205517793,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7,
+      "maxMs": 90.29999999999927,
+      "frames": 771,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 65,
+        "triangles": 1651522,
+        "textures": 17,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 65,
+        "triangles": 1651522,
+        "textures": 17,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "lake reveal / stationary",
+      "fps": 113.48108648557164,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 187.40000000000146,
+      "frames": 681,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 80,
+        "triangles": 1888874,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 80,
+        "triangles": 1888874,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "shore road / stationary",
+      "fps": 127.28666155745265,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7,
+      "maxMs": 97.19999999999891,
+      "frames": 764,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 71,
+        "triangles": 1731752,
+        "textures": 18,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 71,
+        "triangles": 1731752,
+        "textures": 18,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "high meadow / stationary",
+      "fps": 136.5915413189158,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 41.70000000000073,
+      "frames": 820,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 49,
+        "triangles": 392666,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 49,
+        "triangles": 392666,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "golden valley / stationary",
+      "fps": 136.11222177794704,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 48.600000000000364,
+      "frames": 817,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 65,
+        "triangles": 816902,
+        "textures": 17,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 65,
+        "triangles": 816902,
+        "textures": 17,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "fast descent / stationary",
+      "fps": 133.3111148141728,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 83.39999999999964,
+      "frames": 800,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 66,
+        "triangles": 931406,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 66,
+        "triangles": 931406,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "fast descent / native pedaling",
+      "fps": 124.71570318160764,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.099999999998545,
+      "maxMs": 125,
+      "frames": 998,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 62,
+        "triangles": 615390,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 114,
+        "triangles": 1176864,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "fast descent / coasting",
+      "fps": 123.15640363301534,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000002183,
+      "maxMs": 166.70000000000437,
+      "frames": 739,
+      "last": {
+        "room": "cycling",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 86,
+        "triangles": 981562,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      },
+      "peak": {
+        "calls": 91,
+        "triangles": 981960,
+        "textures": 22,
+        "lights": 2,
+        "mapMB": 35.6328125
+      }
+    },
+    {
+      "label": "museum wing / after road exits",
+      "fps": 144.09701977378498,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7,
+      "maxMs": 7.100000000000364,
+      "frames": 865,
+      "last": {
+        "room": "worlds",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 27,
+        "triangles": 2814,
+        "textures": 11,
+        "lights": 2,
+        "mapMB": 17.8155517578125
+      },
+      "peak": {
+        "calls": 27,
+        "triangles": 2814,
+        "textures": 11,
+        "lights": 2,
+        "mapMB": 17.8155517578125
+      }
+    }
+  ],
+  "errors": [],
+  "meets45Mean": true,
+  "meets60Mean": true,
+  "passed": true
+}

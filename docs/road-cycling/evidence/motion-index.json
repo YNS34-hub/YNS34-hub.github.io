@@ -1,0 +1,76 @@
+{
+  "scope": "Native controls; all clips from the continuous journey, no injected distance. Only actual-freehub carries captured sound; other clips are silent. Source capture precedes the final grass/contrast-only refinement.",
+  "sha": "5809a1fc0ef4e7bd00aef1e25674053c81e7a85b",
+  "clips": [
+    {
+      "name": "museum-to-nature",
+      "sourceSeconds": 2.2159999999999997,
+      "duration": 7
+    },
+    {
+      "name": "mounting",
+      "sourceSeconds": 8.959999999999999,
+      "duration": 4
+    },
+    {
+      "name": "acceleration",
+      "sourceSeconds": 11.253,
+      "duration": 7
+    },
+    {
+      "name": "cruise",
+      "sourceSeconds": 53.123,
+      "duration": 7
+    },
+    {
+      "name": "shifting",
+      "sourceSeconds": 25.847,
+      "duration": 6
+    },
+    {
+      "name": "actual-freehub",
+      "sourceSeconds": 22.833000000000002,
+      "duration": 4
+    },
+    {
+      "name": "climbing",
+      "sourceSeconds": 150.537,
+      "duration": 7
+    },
+    {
+      "name": "crest-reveal",
+      "sourceSeconds": 289.83,
+      "duration": 8
+    },
+    {
+      "name": "gravity-descent",
+      "sourceSeconds": 306.723,
+      "duration": 8
+    },
+    {
+      "name": "braking",
+      "sourceSeconds": 28.354,
+      "duration": 7
+    },
+    {
+      "name": "cornering",
+      "sourceSeconds": 311.827,
+      "duration": 6
+    },
+    {
+      "name": "scenic-stop",
+      "sourceSeconds": 122.582,
+      "duration": 6
+    },
+    {
+      "name": "photo-mode",
+      "sourceSeconds": 127.24699999999999,
+      "duration": 4
+    },
+    {
+      "name": "museum-return",
+      "sourceSeconds": 446.813,
+      "duration": 6
+    }
+  ]
+}
