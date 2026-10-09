@@ -24,7 +24,7 @@ function WorldsWing() {
     <Label text="Choose a rhythm. Make a moment." position={[0, 5.52, -7.6]} size={.14} color="#c3c9bd" />
     <WorldPortal id="basketball" title="Street Basketball Court" position={[-6.1, 3.1, -11.2]} />
     <WorldPortal id="atrium" title="Return to the Atrium" position={[0, 2.8, 15]} rotation={[0, Math.PI, 0]} compact />
-    <WorldPortal id="cycling" title="Scenic Cycling Route" position={[6.1, 3.1, -11.2]} />
+    <WorldPortal id="cycling" title="The Long Way Home" position={[6.1, 3.1, -11.2]} />
   </group>;
 }
 export function MuseumWorldsEntry({ roomId }: { roomId: string }) {
