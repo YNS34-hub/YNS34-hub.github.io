@@ -10,6 +10,10 @@ import { roomViews } from "./visitView";
 import { useLibraryStore } from "../systems/library";
 import { imageLayout } from "./spatialLayout";
 import { worksForRoom } from "../systems/mediaPlacement";
+// 交互扩展开始 player-import
+import { setWorldView } from "../worlds/worldConfig";
+import { applyCyclingLook } from "../worlds/cyclingRoute";
+// 交互扩展结束
 
 const EYE = 1.65;
 const worldPosition = new Vector3();
@@ -81,6 +85,9 @@ export default function Player({ roomId }: { roomId: string }) {
         -8,
       );
     }
+    // 交互扩展开始 player-world-view
+    setWorldView(camera, roomId);
+    // 交互扩展结束
     angle.current.setFromQuaternion(camera.quaternion, "YXZ");
     velocity.current.set(0, 0, 0);
     keys.current.clear();
@@ -227,6 +234,9 @@ export default function Player({ roomId }: { roomId: string }) {
       return;
     }
     camera.quaternion.setFromEuler(angle.current);
+    // 交互扩展开始 player-cycle-locomotion
+    if (roomId === "cycling") { applyCyclingLook(camera, angle.current); return; }
+    // 交互扩展结束
     const input = keys.current;
     const x =
       (input.has("KeyD") || input.has("ArrowRight") ? 1 : 0) -

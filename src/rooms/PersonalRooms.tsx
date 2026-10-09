@@ -20,6 +20,8 @@ import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import { worksForRoom } from "../systems/mediaPlacement";
 import WorkAttention from "../motion/WorkAttention";
+import { useInteractable } from "../interaction/useInteractable";
+import { acknowledge } from "../interaction/registry";
 
 function Heading({
   title,
@@ -79,8 +81,15 @@ export function ProjectScreen({
   medium?: "screen" | "print" | "projection";
 }) {
   const hovered = useRef(false);
+  const frame = useRef<Group>(null);
+  const open = () => {
+    acknowledge("Opening " + item.title);
+    usePalaceStore.getState().focusItem(item);
+  };
+  const attention = useInteractable(frame, { title: item.title, hint: "View project", radius: 13, activate: open });
   return (
     <group
+      ref={frame}
       name={`project:${item.id}`}
       position={position}
       rotation={rotation}
@@ -89,7 +98,7 @@ export function ProjectScreen({
       onClick={(e) => {
         if (e.delta < 5) {
           e.stopPropagation();
-          usePalaceStore.getState().focusItem(item);
+          open();
         }
       }}
     >
@@ -106,7 +115,7 @@ export function ProjectScreen({
         height={height}
         position={[0, 0, 0.12]}
       />
-      <WorkAttention width={width} height={height} hovered={hovered} warm={medium === "print"} />
+      <WorkAttention width={width} height={height} hovered={hovered} warm={medium === "print"} attention={attention} />
       <Block
         position={[0, -height / 2 - 0.1, 0]}
         scale={[width, 0.035, 0.22]}
@@ -413,6 +422,19 @@ export function VisualWall({
   const atmosphereId = useId();
   const frame = useRef<Group>(null);
   const hovered = useRef(false);
+  const open = () => {
+    acknowledge("Viewing " + item.title);
+    usePalaceStore.getState().openCinema(item);
+  };
+  const collect = async () => {
+    try {
+      await useLibraryStore.getState().favoriteWallpaper(item.id);
+      const library = useLibraryStore.getState();
+      const saved = [...library.wallpapers, ...library.personal.visuals, ...library.personal.projects, ...library.personal.research].find(work => work.id === item.id)?.favorite;
+      acknowledge(saved ? "Kept in My Collection" : "Released from My Collection");
+    } catch { acknowledge("Could not save. Try again."); }
+  };
+  const attention = useInteractable(frame, { title: item.title, hint: "View image", radius: 12, activate: open, secondary: () => { void collect(); } });
   const tint = useRef(new Color(item.color || "#679ac3"));
   useEffect(() => {
     if (frame.current && atmosphere && medium !== "print") {
@@ -468,7 +490,7 @@ export function VisualWall({
       onClick={(e) => {
         if (e.delta < 5) {
           e.stopPropagation();
-          usePalaceStore.getState().openCinema(item);
+          open();
         }
       }}
     >
@@ -484,7 +506,7 @@ export function VisualWall({
         height={actualHeight}
         position={[0, 0, 0.135]}
       />
-      <WorkAttention width={actualWidth} height={actualHeight} hovered={hovered} warm={medium === "print"} />
+      <WorkAttention width={actualWidth} height={actualHeight} hovered={hovered} warm={medium === "print"} attention={attention} />
       <Label
         text={item.title.toUpperCase()}
         align="left"

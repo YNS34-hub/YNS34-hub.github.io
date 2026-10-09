@@ -1,6 +1,9 @@
 import { MathUtils, Vector3 } from "three";
 import { resolveRoomPlan } from "./roomPlan";
 import { corridorClearWidth, corridorProfile } from "./spatialLayout";
+// 交互扩展开始 collision-import
+import { worldBounds, worldFootprints } from "../worlds/worldConfig";
+// 交互扩展结束
 
 export type Footprint =
   | { x: number; z: number; radius: number }
@@ -8,6 +11,10 @@ export type Footprint =
 const CLEARANCE = 0.3;
 
 export function roomBounds(roomId: string): [number, number, number, number] {
+  // 交互扩展开始 collision-world-bounds
+  const extension = worldBounds(roomId);
+  if (extension) return extension;
+  // 交互扩展结束
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [-20.7, 20.7, -24.4, 25];
   if (roomId === "corridor") return [-6.1, 6.1, -Infinity, Infinity];
@@ -22,6 +29,10 @@ export function roomBounds(roomId: string): [number, number, number, number] {
 }
 
 export function roomFootprints(roomId: string): Footprint[] {
+  // 交互扩展开始 collision-world-footprints
+  const extension = worldFootprints(roomId);
+  if (extension) return extension;
+  // 交互扩展结束
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
   if (["cosmic", "imagined-worlds"].includes(roomId.split("-page-")[0]))

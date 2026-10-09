@@ -1,0 +1,128 @@
+{
+  "baseline": "0e50661bcab27e0249ef57832599f14c740ab9c5",
+  "codeCommit": "feb26c8eda883b41b212ad8a2a001e291eba7ef8",
+  "units": {
+    "files": 19,
+    "passed": 99
+  },
+  "typeScript": "PASS (tsc -b in build:public)",
+  "lint": "PASS",
+  "publicBuild": {
+    "passed": true,
+    "shareableRoutes": 67,
+    "privateCatalogArrays": 5,
+    "privateCatalogItems": 0,
+    "privateFiles": 0
+  },
+  "tests": [
+    {
+      "name": "museum spatial and import regression",
+      "source": null,
+      "passed": 12,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "motion and locked identity regression",
+      "source": "f3e09d0f8298d2fc15395354aa9fc055a8f9bedb",
+      "passed": 10,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "accessibility and reduced motion",
+      "source": null,
+      "passed": 6,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "interaction, artwork and lyric attention",
+      "source": "f51f4ed61ee29bc19c7dbb28fb1d3a9e32e6ecb5",
+      "passed": 8,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "court native journeys at two resolutions",
+      "source": "f51f4ed61ee29bc19c7dbb28fb1d3a9e32e6ecb5",
+      "passed": 2,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "cycling native journeys at two resolutions",
+      "source": "f51f4ed61ee29bc19c7dbb28fb1d3a9e32e6ecb5",
+      "passed": 6,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "player continuity and audio travel",
+      "source": "f51f4ed61ee29bc19c7dbb28fb1d3a9e32e6ecb5",
+      "passed": 6,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "cancellable preparations and bounded resources",
+      "source": "6ca732ac81e7b034758f38ebd686397024d67602",
+      "passed": 5,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "public production browser scenarios",
+      "source": null,
+      "passed": 8,
+      "skipped": [
+        "first-person controls move smoothly and corridor walls contain the visitor"
+      ],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "public production native audio and lyrics",
+      "source": null,
+      "passed": 5,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    },
+    {
+      "name": "public production native activities and Pointer Lock",
+      "source": null,
+      "passed": 4,
+      "skipped": [],
+      "errors": 0,
+      "uploads": 0
+    }
+  ],
+  "localAudio": {
+    "tested": 38,
+    "passed": 38,
+    "allocatedSlots": 2,
+    "activeSlots": 1,
+    "privateNamesPathsIDsAndRecordings": "excluded"
+  },
+  "visualComparison": {
+    "before": "0e50661bcab27e0249ef57832599f14c740ab9c5",
+    "after": "f3e09d0f8298d2fc15395354aa9fc055a8f9bedb",
+    "count": 38,
+    "capture": "Actual installed Edge screenshots, 1920x1080 and 2560x1440, medium, DPR 1, identical catalog and camera poses. Headless capture timing is not performance evidence.",
+    "composition": "Image resizing and comparison labels only; no synthetic pixels or retouching."
+  },
+  "newImages": {
+    "production": "feb26c8eda883b41b212ad8a2a001e291eba7ef8",
+    "overlook": "working tree immediately before feb26c8; same committed geometry"
+  },
+  "note": "Stage evidence retains its original source commit. Later changes were confined to new-scene preparation, audio layers and terrace/bench construction; final production native flows cover the final code. No private titles, IDs, paths, recordings or catalogs are packaged."
+}

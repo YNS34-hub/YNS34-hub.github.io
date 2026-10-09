@@ -22,6 +22,10 @@ import CinemaControls from "./ui/CinemaControls";
 import LyricsProjection from "./ui/LyricsProjection";
 import { Dialog } from "./ui/primitives";
 import { AudioSystem } from "./audio/AudioSystem";
+// 交互扩展开始 app-import
+import InteractionHud from "./interaction/InteractionHud";
+const ActivityHud = lazy(() => import("./worlds/ActivityHud"));
+// 交互扩展结束
 const World = lazy(() => import("./world/World"));
 class WorldBoundary extends Component<
   { children: ReactNode; onError: () => void },
@@ -133,6 +137,10 @@ export default function App() {
     >
       <RouteSync />
       <AudioSystem />
+      {/* 交互扩展开始 app-hud */}
+      <InteractionHud />
+      {["basketball", "cycling"].includes(s.roomId) && <Suspense fallback={null}><ActivityHud /></Suspense>}
+      {/* 交互扩展结束 */}
       {s.mode === "index" ? (
         <IndexView />
       ) : (

@@ -199,7 +199,9 @@ async function category(name) {
 async function travel(id) {
   await page.locator(".guide-button").click();
   const room = rooms.find((value) => value.id === id);
-  await page.locator(".room-link").filter({ hasText: room.title }).click();
+  // 新区域的说明会引用旧房间名；以真实编号和标题定位同一入口。
+  const escaped = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  await page.getByRole("button", { name: new RegExp("^" + escaped(room.number) + "\\s+" + escaped(room.title)) }).click();
   await page.locator(".room-caption").filter({ hasText: room.title }).waitFor();
   await page.waitForTimeout(450);
 }

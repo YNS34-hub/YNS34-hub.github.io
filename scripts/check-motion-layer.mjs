@@ -11,8 +11,8 @@ const base = process.env.PALACE_URL || "http://127.0.0.1:5190";
 const out = path.resolve(process.env.PALACE_ARTIFACTS || "qa-artifacts/motion-layer");
 const publicMedia = { wallpapers: [], visuals: [], music: [], projects: [], research: [] };
 const report = {
-  phase, reference: "63805572054147816699f5ab5b8e513e7447c530", url: base,
-  gitHead: baseline ? "63805572054147816699f5ab5b8e513e7447c530" : execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
+  phase, reference: process.env.PALACE_REFERENCE_SHA || "63805572054147816699f5ab5b8e513e7447c530", url: base,
+  gitHead: baseline ? (process.env.PALACE_SOURCE_SHA || "63805572054147816699f5ab5b8e513e7447c530") : execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
   runnerHead: execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(),
   workingTreeModified: !!execFileSync("git", ["status", "--porcelain"]).toString().trim(),
   quality: "medium", dpr: 1, content: "Identical public catalog and original browser-local Palace Study fixtures. No private recordings or manifests.",

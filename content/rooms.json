@@ -205,5 +205,29 @@
     "subtitle": "Typography, people and warm visual references.",
     "type": "image-gallery",
     "color": "#57452e"
+  },
+  {
+    "title": "WORLDS BEYOND",
+    "subtitle": "A threshold from the archive into play.",
+    "id": "worlds",
+    "number": "W0",
+    "color": "#41595b",
+    "type": "black-box"
+  },
+  {
+    "title": "STREET BASKETBALL COURT",
+    "subtitle": "After hours. A place to take your shot.",
+    "id": "basketball",
+    "number": "W1",
+    "color": "#ad7952",
+    "type": "white-cube"
+  },
+  {
+    "subtitle": "Golden forest, open water, a slower kind of journey.",
+    "type": "white-cube",
+    "number": "W2",
+    "title": "SCENIC CYCLING ROUTE",
+    "color": "#7e9b76",
+    "id": "cycling"
   }
 ]
