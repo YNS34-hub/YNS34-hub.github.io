@@ -11,13 +11,16 @@ import { useWorldTexture } from "./materials";
 import { useSceneAudio } from "./sceneAudio";
 import { useActivity, type CourtCommand } from "./activity";
 import { WorldPortal } from "./WorldPortal";
+import { useQuietMotion } from "../motion/useMotionCue";
+import { dribblePresentation, impactStrength } from "../motion/choreography";
 
 function PracticeBall() {
   const { camera, gl } = useThree(), ball = useRef<Group>(null), shadow = useRef<Group>(null);
   const simulation = useMemo(() => new BallPhysics(), []);
   const sound = useSceneAudio("court");
+  const quiet = useQuietMotion();
   const scratch = useRef({ aim: new Vector3(), hand: new Vector3(), forward: new Vector3() });
-  const state = useRef({ charging: false, charge: 0, dribble: false, dribbleTime: 0, publish: 0 });
+  const state = useRef({ charging: false, charge: 0, dribble: false, dribbleTime: 0, publish: 0, contact: 0, pickup: 0 });
   const texture = useWorldTexture("ball");
   const publish = () => useActivity.setState({ ...simulation.stats, mode: simulation.mode, dribbling: state.current.dribble, charge: state.current.charge });
   const enabled = () => {
@@ -28,7 +31,7 @@ function PracticeBall() {
   const pickup = () => {
     sound.unlock();
     if (simulation.mode !== "held" && distance() < 3.3) {
-      simulation.pickup(); state.current.dribble = false; publish(); acknowledge("Ball in hand · hold Space, release to shoot");
+      simulation.pickup(); state.current.dribble = false; state.current.pickup = .24; publish(); acknowledge("Ball in hand · hold Space, release to shoot");
     } else if (simulation.mode === "held") { state.current.dribble = !state.current.dribble; publish(); }
   };
   useInteractable(ball, { title: "THE PRACTICE BALL", hint: "Pick up / dribble", radius: 5, activate: pickup });
@@ -96,11 +99,13 @@ function PracticeBall() {
       }
       Object.assign(simulation.position, { x: hand.x, y: hand.y, z: hand.z });
     } else {
+      const impact = impactStrength(Math.hypot(simulation.velocity.x, simulation.velocity.y, simulation.velocity.z));
       for (const event of simulation.step(dt)) {
-        if (event !== "missed") sound.sound(event);
+        if (event !== "missed") sound.sound(event, event === "made" ? 1 : .18 + impact * .82);
+        if (event === "bounce") local.contact = impact;
         if (event === "rim" || event === "made" || event === "backboard") {
           courtResponse.hoop = simulation.position.z < 0 ? -1 : 1;
-          if (event === "rim") courtResponse.rim = 1; else if (event === "backboard") courtResponse.board = 1; else courtResponse.net = 1;
+          if (event === "rim") courtResponse.rim = impact; else if (event === "backboard") courtResponse.board = impact; else courtResponse.net = 1;
         }
         if (event === "made" || event === "missed") {
           useActivity.setState({ ...simulation.stats, result: event === "made" ? "MADE · " + simulation.stats.streak + " IN A ROW" : "MISSED · TRY AGAIN" });
@@ -109,8 +114,20 @@ function PracticeBall() {
       }
     }
     const p = simulation.position;
-    ball.current.position.set(p.x, p.y, p.z);
-    if (simulation.mode === "flight") ball.current.rotation.x += dt * simulation.velocity.z * 1.8;
+    // 物理坐标始终权威；拾起的短暂跟随与接触压缩只作用于可见球壳。
+    if (simulation.mode === "held" && local.pickup > 0 && !quiet) {
+      ball.current.position.lerp(scratch.current.hand, 1 - Math.exp(-dt * 22));
+      local.pickup = Math.max(0, local.pickup - dt);
+    } else { ball.current.position.set(p.x, p.y, p.z); local.pickup = 0; }
+    const shell = ball.current.children[0] as Mesh;
+    const shape = local.dribble ? dribblePresentation(local.dribbleTime / .65, quiet) : { y: 1 - (quiet ? 0 : local.contact * .035), xz: 1 + (quiet ? 0 : local.contact * .0175) };
+    shell.scale.set(shape.xz, shape.y, shape.xz);
+    local.contact *= Math.exp(-dt * 28);
+    if (local.contact < .001) local.contact = 0;
+    if (simulation.mode === "flight") {
+      shell.rotation.x += dt * simulation.velocity.z * 1.8;
+      shell.rotation.z -= dt * simulation.velocity.x * 1.8;
+    }
     if (shadow.current) {
       shadow.current.position.set(p.x, 0, p.z);
       const mesh = shadow.current.children[0] as Mesh;

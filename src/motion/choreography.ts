@@ -25,3 +25,7 @@ export function dribblePresentation(phase: number, quiet = false) {
   const contact = quiet ? 0 : Math.max(0, 1 - Math.min(p, 1 - p) / .075);
   return { y: 1 - contact * .045, xz: 1 + contact * .0225 };
 }
+
+export function impactStrength(speed: number) {
+  return Number.isFinite(speed) ? Math.min(1, Math.abs(speed) / 8) : 0;
+}

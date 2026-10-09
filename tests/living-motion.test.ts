@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { boundedProgress, dribblePresentation, imageTransition, nearbyRank } from "../src/motion/choreography";
+import { boundedProgress, dribblePresentation, imageTransition, nearbyRank, impactStrength } from "../src/motion/choreography";
 
 describe("living-world presentation boundaries", () => {
+  it("keeps contact feedback bounded and proportional to actual impact speed", () => {
+    expect(impactStrength(0)).toBe(0);
+    expect(impactStrength(2)).toBeLessThan(impactStrength(8));
+    expect(impactStrength(-8)).toBe(impactStrength(8));
+    expect(impactStrength(200)).toBe(1);
+    expect(impactStrength(NaN)).toBe(0);
+  });
   it("never exposes progress outside its track or divides by missing duration", () => {
     expect(boundedProgress(30, 60)).toBe(.5);
     expect(boundedProgress(80, 60)).toBe(1);
