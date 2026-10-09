@@ -1,0 +1,98 @@
+  .closing-contact p { font-size: 14px; margin-bottom: 16px; }
+  .contact-primary { font-size: 31px; gap: 40px; }
+  .email { font-size: 12px; }
+  .footer-bottom { gap: 3px 25px; padding: 17px 0 23px; font-size: 12px; }
+  .footer-bottom > span { flex: 0 0 100%; padding-block: 5px; }
+  .footer-bottom nav { justify-content: flex-start; flex: 0 0 100%; gap: 22px; }
+  .footer-bottom .back-top { margin-left: 0; }
+  .motion-toggle { font-size: 12px; }
+  .article { padding: 34px 0 62px; }
+  .article-header { padding-bottom: 35px; }
+  .breadcrumb { margin-bottom: 24px; font-size: 12px; }
+  .article-header h1 { font-size: clamp(40px,10.5vw,69px); line-height: 1.06; letter-spacing: -.045em; }
+  .article-deck { font-size: 16px; line-height: 1.65; margin-top: 26px; }
+  .article-meta { font-size: 12px; gap: 16px; margin-top: 26px; }
+  .article-meta > span + span { padding-left: 16px; }
+  .article-layout { display: block; padding-top: 30px; }
+  .article-aside { position: static; margin-bottom: 44px; padding-bottom: 24px; border-bottom: 1px solid var(--rule); }
+  .article-aside nav { flex-direction: row; flex-wrap: wrap; gap: 0 22px; }
+  .article-aside nav .utility { width: 100%; margin-bottom: 9px; font-size: 12px; }
+  .article-aside nav a { font-size: 12px; min-height: 44px; }
+  .article-aside .aside-note { display: none; }
+  .prose { max-width: none; font-size: 16px; line-height: 1.8; }
+  .prose h2 { font-size: 30px; line-height: 1.17; margin-bottom: 22px; }
+  .prose > section + section { margin-top: 42px; padding-top: 10px; }
+  .prose p + p { margin-top: 18px; }
+  .equation { padding: 32px 0 22px; }
+  .equation math { font-size: 24px; }
+  .equation-note { font-size: 12px; }
+  .definition-list > div { grid-template-columns: 1fr; gap: 10px; padding-block: 20px; }
+  .definition-list dd { font-size: 14px; }
+  .definition-list dt { font-size: 14px; }
+  .editorial-note { padding-left: 18px; }
+  .editorial-note p { font-size: 14px; }
+  .workflow-tabs button { min-height: 58px; font-size: 12px; padding-inline: 2px; }
+  .workflow-panel h3 { font-size: 32px; }
+  .workflow-panel > p { font-size: 15px; }
+  .workflow-panel { padding-top: 26px; }
+  .identity-note { display: flex; align-items: center; gap: 25px; }
+  .identity-initial { font-size: 77px; margin: 0; }
+  .identity-note > p:not(.aside-note) { font-size: 13px; }
+  .contact-list li { font-size: 12px; gap: 10px; }
+  .contact-list a { gap: 7px; }
+  .inline-formula { font-size: 18px; }
+  .not-found { padding-block: 60px 80px; }
+}
+@media (max-width: 359px) {
+  :root { --gutter: 18px; }
+  .opening-thought { font-size: 25px; }
+  .figure-top .utility { font-size: 12px; }
+  .figure-bottom { font-size: 12px; }
+  .article-header h1 { font-size: 37px; }
+  .work-title h3 { font-size: 27px; }
+  .workflow-tabs button { font-size: 12px; }
+}
+/* Reduced-motion mode is a reading design, not hidden content. */
+.reduced-motion { scroll-behavior: auto; }
+.reduced-motion *, .reduced-motion *::before, .reduced-motion *::after { animation: none !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+.reduced-motion .display-name, .reduced-motion .closing-grid h2 { transform: none !important; will-change: auto; }
+.reduced-motion .research-figure { position: relative; top: auto; }
+.reduced-motion .closing-field { clip-path: none; }
+.reduced-motion .story-step { min-height: 0; padding-bottom: 40px; }
+.reduced-motion .follow-page { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+  .display-name, .closing-grid h2 { transform: none !important; will-change: auto; }
+  .research-figure { position: relative; top: auto; }
+  .closing-field { clip-path: none; }
+  .story-step { min-height: 0; padding-bottom: 40px; }
+}
+@media print {
+  body { color: #000; background: #fff; font-size: 11pt; }
+  .site-header, .site-footer, .skip-link, .diagram-controls, .article-aside, .entry-index, .site-menu { display: none !important; }
+  .container { width: 100%; max-width: none; }
+  .article { padding: 0; }
+  .article-header h1 { font-size: 34pt; }
+  .article-deck { font-size: 13pt; }
+  .article-layout { display: block; padding-top: 24pt; }
+  .prose { max-width: none; font-size: 11pt; }
+  .prose h2 { font-size: 20pt; }
+  .prose section { break-inside: avoid; }
+  .research-chapter { background: none; padding-top: 30pt; }
+  .research-story { display: block; }
+  .research-figure { position: static; max-width: 420px; }
+  .story-step { min-height: 0; padding: 20pt 0; }
+  .display-name { font-size: 80pt; transform: none !important; }
+  .opening { padding-top: 0; }
+  .opening-intro { padding-bottom: 20pt; }
+  .work-row { break-inside: avoid; }
+  .workflow-tabs { display: none !important; }
+  .workflow-panel[hidden] { display: block !important; }
+}
+
+.no-dialog .desktop-nav { display: flex; }
+.js .workflow-panel { min-height: 430px; }
+@media (max-height: 719px) and (min-width: 1000px) { .research-figure { position: relative; top: auto; } .story-step { min-height: 0; padding-bottom: 50px; } .display-name { transform: none !important; } }
+
+@media (max-width: 700px) { .profile-chart .chart-label { font-size: 24px; } .sample-line { stroke-width: 1.7; } .figure-top .utility { max-width: 19ch; } .figure-state { max-width: 18ch; } .range-endpoints { line-height: 1.6; } .opening-meta > p:last-child { max-width: 20ch; } .opening-meta { gap: 22px; } }
