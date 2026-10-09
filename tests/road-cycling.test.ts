@@ -38,4 +38,14 @@ describe("authored road ride",()=>{
     expect(b.atStop).toBe(true);expect(b.speed).toBe(0);expect(b.distance).toBeGreaterThan(536);expect(b.distance).toBeLessThan(540);expect(jump).toBeLessThan(.1);
     b.step(.016,{pedal:true},0);expect(b.atStop).toBe(true);b.atStop=false;advance(b,2,{pedal:true});expect(b.speed).toBeGreaterThan(0);
   });
+  it("finishes the authored route in 5–8 minutes with ordinary continuous effort and suitable gears",()=>{
+    const b=new RoadPhysics();let seconds=0,lastShift=0;
+    while(!b.ended&&seconds<600){
+      const desired=b.grade>.07?1:b.grade>.045?3:b.grade>.02?5:b.speed>12?11:b.speed>8?8:7;
+      if(seconds-lastShift>3){b.shift(Math.sign(desired-b.gear));lastShift=seconds;}
+      b.step(1/90,{pedal:true});seconds+=1/90;
+    }
+    expect(b.ended).toBe(true);expect(seconds).toBeGreaterThan(300);expect(seconds).toBeLessThan(480);
+    console.log("Route physics elapsed seconds:",seconds.toFixed(1));
+  });
 });

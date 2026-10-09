@@ -125,7 +125,7 @@ function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
       const erosion=(Math.sin(wx*.038+wz*.011)*Math.sin(wz*.041)*24+Math.sin(wx*.097+wz*.089)*8),height=(peak+erosion)*Math.sin(z/rows*Math.PI)**.85+8;
       ridge.push(wx,height,wz);ridgeUv.push(wx/20,wz/20);const crag=.68+.28*Math.sin(wx*.026+wz*.011)**2;
       ridgeColors.push(crag*.91,crag*.96,crag*.92);
-      if(x<cols&&z<rows){const a=z*(cols+1)+x;ix.push(a,a+1,a+cols+1,a+1,a+cols+2,a+cols+1);}
+      if(x<cols&&z<rows){const a=z*(cols+1)+x;ix.push(a,a+cols+1,a+1,a+1,a+cols+1,a+cols+2);}
     }
     const r=new BufferGeometry();r.setAttribute("position",new Float32BufferAttribute(ridge,3));r.setAttribute("uv",new Float32BufferAttribute(ridgeUv,2));r.setAttribute("color",new Float32BufferAttribute(ridgeColors,3));r.setIndex(ix);r.computeVertexNormals();
     // 远林用同一松针图像离线式合成的透明树冠；不用近处可识别的实体圆锥代替森林。
@@ -182,7 +182,7 @@ function Trailhead(){
 }
 function RoadStops(){
   return <>{roadStops.map((stop,i)=>{
-    const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=i===1?-1:1;
+    const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=Math.sign(nx*(lake.x-p.x)+nz*(lake.z-p.z))||1;
     return <group key={i} position={[p.x+nx/r*4.7*side,p.y-.08,p.z+nz/r*4.7*side]} rotation={[0,Math.atan2(t.x,t.z),0]}>
       <Block position={[0,-.22,0]} scale={[4,.42,5]} color="#969990" roughness={1}/>
       <Block position={[1.05,.49,1.5]} scale={[1.8,.1,.46]} color="#887a5a" roughness={.72}/>

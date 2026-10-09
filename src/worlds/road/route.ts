@@ -17,7 +17,7 @@ export const sectorLength = 160;
 export const sectorCount = Math.ceil(roadLength / sectorLength);
 export const lake = { x: 520, z: -452, rx: 244, rz: 180, y: 12.08 };
 export function lakeDistance(x: number, z: number) { return Math.hypot((x-lake.x)/lake.rx,(z-lake.z)/lake.rz); }
-export const roadStops = [.23,.475,.89].map((t,i) => ({ distance: t*roadLength, title: ["LAKE EDGE","HIGH MEADOW","LAST LIGHT"][i] }));
+export const roadStops = [.23,.487,.89].map((t,i) => ({ distance: t*roadLength, title: ["LAKE EDGE","HIGH MEADOW","LAST LIGHT"][i] }));
 export const roadChapters = [
   [0,"TRAILHEAD"],[.025,"CEDAR SHADE"],[.075,"FIRST LIGHT"],[.12,"FOREST ROLLERS"],
   [.185,"LAKE REVEAL"],[.23,"SHORE ROAD"],[.27,"THE CLIMB"],[.46,"CREST"],
@@ -47,7 +47,9 @@ export function terrainHeight(x:number,z:number) {
   const hills=16 + 8*Math.sin(x*.005)*Math.cos(z*.006) + 5*Math.sin(x*.019+z*.011);
   const plateau=32*Math.exp(-Math.pow((x-744)/296,2)-Math.pow((z+920)/224,2));
   const natural=(hills+plateau)*(smooth(.87,1.42,radius)) + (lake.y-3)*(1-smooth(.87,1.42,radius));
-  const nearest=closestRoad(x,z), blend=1-smooth(5,65,nearest.distance);
+  const nearest=closestRoad(x,z),towardLake=(x-nearest.point.x)*(lake.x-nearest.point.x)+(z-nearest.point.z)*(lake.z-nearest.point.z)>0;
+  const overlook=nearest.progress>.41&&nearest.progress<.53&&towardLake;
+  const blend=1-smooth(overlook?3.5:5,overlook?22:65,nearest.distance);
   return natural*(1-blend)+(nearest.point.y-.12)*blend;
 }
 export function roadRibbon(start:number,end:number,width:number,offset=0,lift=0) {
