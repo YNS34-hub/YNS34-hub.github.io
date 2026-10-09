@@ -26,18 +26,26 @@ try{
  await page.waitForTimeout(2000);assert.ok(Number(await status().getAttribute("data-speed"))>speed*.75);
  await page.keyboard.press("q");assert.equal(await status().getAttribute("data-gear"),"6");await page.waitForTimeout(800);await shot("gear-easier");await page.keyboard.press("e");assert.equal(await status().getAttribute("data-gear"),"7");await page.waitForTimeout(800);await shot("gear-harder");
  report.checks.push("Genuine pedal input, inertial coasting and native easier/harder gear feedback");
- await page.keyboard.down("s");await page.waitForTimeout(6000);await page.keyboard.up("s");assert.equal(Number(await status().getAttribute("data-speed")),0);await shot("stopped");
+ await page.keyboard.down("s");await page.waitForFunction(()=>document.querySelector(".road-status")?.dataset.state==="braking"||Number(document.querySelector(".road-status")?.dataset.speed)===0,{},{timeout:5000});
+ await page.waitForFunction(()=>Number(document.querySelector(".road-status")?.dataset.speed)===0,{},{timeout:12000});await page.keyboard.up("s");await shot("stopped");
  await page.keyboard.press("p");await page.getByRole("button",{name:"Save this view",exact:true}).waitFor();await shot("photo");
  const download=page.waitForEvent("download");await page.getByRole("button",{name:"Save this view",exact:true}).click();await(await download).saveAs(path.join(out,"actual-photo.png"));
  await page.keyboard.press("Escape");assert.equal(await status().getAttribute("data-photo"),"false");
  report.checks.push("Progressive braking, photo view, actual local PNG and single-level Escape");
+ const held=await status().getAttribute("data-distance");await page.keyboard.press("m");await page.getByRole("dialog").waitFor();await shot("guide-top-layer");
+ await page.keyboard.down("w");await page.waitForTimeout(600);await page.keyboard.up("w");await page.keyboard.press("Escape");
+ await page.getByRole("dialog").waitFor({state:"hidden"});assert.equal(await status().getAttribute("data-distance"),held);assert.equal(await page.locator(".road-options").count(),0);await shot("guide-return");
+ report.checks.push("Original Guide owns Escape and blocks pedal input without opening underlying ride options");
  await page.getByRole("button",{name:"Ride options",exact:true}).click();await page.getByRole("button",{name:"Camera motion · full",exact:true}).click();
  await page.getByRole("button",{name:"Sound on",exact:true}).click();await page.getByRole("button",{name:"Sound off",exact:true}).click();await shot("options");
+ await page.getByRole("button",{name:"My listening library",exact:true}).click();await page.getByRole("dialog").waitFor();await shot("listening-top-layer");await page.keyboard.press("Escape");
+ await page.getByRole("dialog").waitFor({state:"hidden"});assert.ok(await page.locator(".road-options").isVisible());await shot("listening-return");
+ report.checks.push("One Escape closes only the original listening panel and preserves underlying ride options");
  const distance=Number(await status().getAttribute("data-distance"));await page.reload();await page.locator(".world-ready canvas").waitFor();await status().waitFor({state:"attached"});
  assert.ok(Math.abs(Number(await status().getAttribute("data-distance"))-distance)<.2);assert.equal(await status().getAttribute("data-mounted"),"false");
  await page.getByRole("button",{name:"Return to the Palace",exact:true}).click();await page.locator(".world-ready canvas").waitFor();
  report.checks.push("Sound switch, camera comfort, refresh restoration stopped on foot and museum return");
  assert.deepEqual(report.errors,[]);report.passed=true;
-}catch(error){report.failure=error.stack;process.exitCode=1;console.error(error.stack);await shot("failure").catch(()=>{});}
+}catch(error){report.failure=error.stack;report.failureState=await page.evaluate(()=>({visibility:document.visibilityState,focused:document.activeElement?.tagName,status:{...document.querySelector(".road-status")?.dataset}})).catch(()=>null);process.exitCode=1;console.error(error.stack);await shot("failure").catch(()=>{});}
 finally{await context.close();if(process.env.PALACE_VIDEO==="1")await page.video()?.saveAs(path.join(out,"native-road-check.webm"));await writeFile(path.join(out,"validation.json"),JSON.stringify(report,null,2));await browser.close();}
 console.log("Road ride: "+report.checks.length+" checks; "+(report.passed?"PASS":"FAIL"));

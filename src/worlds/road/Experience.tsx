@@ -75,7 +75,10 @@ function RoadRider(){
     const up=(event:KeyboardEvent)=>local.current.keys.delete(event.code);
     const halt=()=>{local.current.keys.clear();local.current.brakeLatch=true;model.speed=0;saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort);useRoadRide.setState({speed:0,easy:false});sound.update({speed:0,cadence:0,pedaling:false,brake:0,nearWater:0,forest:.5,stopped:true});};
     const escape=(event:KeyboardEvent)=>{
-      if(event.key!=="Escape")return;const s=useRoadRide.getState();
+      if(event.key!=="Escape")return;
+      // 原馆弹窗与二维入口拥有最上层 ESC；骑行选项/照片不得抢先关闭底层状态。
+      const palace=usePalaceStore.getState();if(palace.overlay||palace.focus||palace.mode==="index")return;
+      const s=useRoadRide.getState();
       if(s.photo||s.controls){event.preventDefault();event.stopImmediatePropagation();useRoadRide.setState({photo:false,controls:false});}
       else if(!document.pointerLockElement){local.current.brakeLatch=true;useRoadRide.setState({easy:false,controls:true});}
     };
