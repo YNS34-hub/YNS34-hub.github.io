@@ -10,8 +10,8 @@ export const useRoadRide=create<{
 }>(()=>({mounted:false,state:"stopped",nearBike:false,speed:0,distance:0,cadence:0,gear:7,grade:0,photo:false,controls:false,easy:false,comfort:false,place:"",gearSequence:0,recovery:false}));
 export type RoadCommand="mount"|"dismount"|"pedal"|"brake"|"stop"|"photo"|"save"|"easier"|"harder"|"restart";
 export function roadCommand(detail:RoadCommand){window.dispatchEvent(new CustomEvent("palace:road",{detail}));}
-export const roadView={active:false,mounted:false,yaw:0,pitch:0,roll:0,baseYaw:0,basePitch:0,headYaw:0,headPitch:0,distance:0,speed:0,offset:0,lean:0,steer:0,brake:0,cadence:0,walkX:0,walkY:18,walkZ:0,mountProgress:0,parkYaw:-.4};
-export interface RoadCinemaReturn {distance:number;gear:number;offset:number;heading:number;headYaw:number;headPitch:number;mounted:boolean;photo:boolean;comfort:boolean}
+export const roadView={active:false,mounted:false,yaw:0,pitch:0,roll:0,baseYaw:0,basePitch:0,headYaw:0,headPitch:0,lookPending:false,distance:0,speed:0,offset:0,lean:0,steer:0,brake:0,cadence:0,walkX:0,walkY:18,walkZ:0,mountProgress:0,parkYaw:-.4};
+export interface RoadCinemaReturn {distance:number;gear:number;offset:number;heading:number;headYaw:number;headPitch:number;yaw:number;pitch:number;roll:number;mounted:boolean;photo:boolean;comfort:boolean}
 let cinemaReturn:RoadCinemaReturn|null=null;
 // Cinema 的同次访问保留骑姿与朝向，速度安全归零；不写数据库，不在刷新后自动上车。
 export function rememberRoadCinema(value:RoadCinemaReturn){cinemaReturn={...value};}
@@ -21,6 +21,7 @@ export function roadTravel(previous:string,next:string){if(next==="cycling"&&pre
 const look=new Euler(0,0,0,"YXZ");
 export function applyRoadLook(camera:Camera,userAngle:Euler){
   if(!roadView.active||!roadView.mounted)return false;
+  if(roadView.lookPending){roadView.baseYaw=userAngle.y-roadView.headYaw;roadView.basePitch=userAngle.x-roadView.headPitch;roadView.lookPending=false;}
   const yaw=Math.atan2(Math.sin(userAngle.y-roadView.baseYaw),Math.cos(userAngle.y-roadView.baseYaw));
   const photo=useRoadRide.getState().photo;
   const targetYaw=photo?yaw:Math.max(-1.15,Math.min(1.15,yaw));

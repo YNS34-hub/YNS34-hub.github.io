@@ -1,7 +1,8 @@
 import {beforeEach,describe,expect,it,vi} from "vitest";
+import {Euler,PerspectiveCamera,Quaternion} from "three";
 import {roadLength} from "../src/worlds/road/route";
 import {routeLength} from "../src/worlds/cyclingRoute";
-import {readRoadSave,saveRoadRide,rememberRoadCinema,peekRoadCinemaReturn,takeRoadCinemaReturn,roadTravel} from "../src/worlds/road/state";
+import {readRoadSave,saveRoadRide,rememberRoadCinema,peekRoadCinemaReturn,takeRoadCinemaReturn,roadTravel,roadView,applyRoadLook} from "../src/worlds/road/state";
 const saved=new Map<string,string>();
 beforeEach(()=>{saved.clear();vi.stubGlobal("localStorage",{getItem:(key:string)=>saved.get(key)??null,setItem:(key:string,value:string)=>saved.set(key,value)});roadTravel("cinema","worlds");});
 describe("road persistence without destructive migration",()=>{
@@ -17,8 +18,14 @@ describe("road persistence without destructive migration",()=>{
   vi.stubGlobal("localStorage",{getItem:()=>{throw new Error("Denied");},setItem:()=>{throw new Error("Denied");}});expect(readRoadSave().distance).toBe(0);expect(()=>saveRoadRide(20,2,false)).not.toThrow();
  });
  it("restores only a direct Cinema roundtrip, consumes once and never remounts from a fresh room",()=>{
-  const pose={distance:123,gear:3,offset:.4,heading:.02,headYaw:.2,headPitch:.1,mounted:true,photo:false,comfort:true};
+  const pose={distance:123,gear:3,offset:.4,heading:.02,headYaw:.2,headPitch:.1,yaw:.7,pitch:0,roll:0,mounted:true,photo:false,comfort:true};
   rememberRoadCinema(pose);roadTravel("cycling","cinema");roadTravel("cinema","cycling");expect(peekRoadCinemaReturn()).toEqual(pose);expect(takeRoadCinemaReturn()).toEqual(pose);expect(takeRoadCinemaReturn()).toBeNull();
   rememberRoadCinema(pose);roadTravel("cinema","atrium");expect(peekRoadCinemaReturn()).toBeNull();rememberRoadCinema(pose);roadTravel("worlds","cycling");expect(peekRoadCinemaReturn()).toBeNull();
+ });
+ it("rebases head look from the restored Player angle without a Cinema mount-order jump",()=>{
+  const camera=new PerspectiveCamera(),angle=new Euler(.1,.9,0,"YXZ"),expected=new Quaternion().setFromEuler(angle);
+  Object.assign(roadView,{active:true,mounted:true,yaw:.7,pitch:0,roll:0,headYaw:.2,headPitch:.1,lookPending:true});
+  expect(applyRoadLook(camera,angle)).toBe(true);expect(camera.quaternion.angleTo(expected)).toBeLessThan(.00001);expect(roadView.lookPending).toBe(false);
+  roadView.active=false;expect(applyRoadLook(camera,angle)).toBe(false);
  });
 });

@@ -16,15 +16,17 @@ export { primeRoadTextures as preloadRoadAssets } from "./textures";
 function RoadRider(){
   const {camera,gl,scene}=useThree(),quiet=useQuietMotion(),sound=useRoadAudio();
   const model=useMemo(()=>{const saved=peekRoadCinemaReturn()??readRoadSave(),b=new RoadPhysics();b.distance=saved.distance;b.gear=saved.gear;b.lastSafe=b.distance;return b;},[]);
-  const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false});
+  const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false,cinemaResume:peekRoadCinemaReturn()});
   useLayoutEffect(()=>{
     const saved=readRoadSave(),p=local.current.point,t=local.current.tangent;roadSample(model.distance,p,t);
-    Object.assign(roadView,{active:true,mounted:false,distance:model.distance,speed:0,walkX:p.x,walkY:p.y,walkZ:p.z,mountProgress:0,offset:0});
+    Object.assign(roadView,{active:true,mounted:false,distance:model.distance,speed:0,walkX:p.x,walkY:p.y,walkZ:p.z,mountProgress:0,offset:0,lookPending:false});
     useRoadRide.setState({mounted:false,state:"stopped",nearBike:false,speed:0,distance:model.distance,gear:model.gear,cadence:0,photo:false,easy:false,controls:false,place:"",comfort:saved.comfort});
-    const resume=takeRoadCinemaReturn();if(resume){
+    // 返回快照只由这个骑行实例消费；StrictMode 的 effect 重播仍使用该快照，不会丢失骑姿。
+    const resume=local.current.cinemaResume;if(resume){
+      takeRoadCinemaReturn();
       model.offset=resume.offset;model.heading=resume.heading;local.current.brakeLatch=true;local.current.mountTime=1;
-      const angles=new Euler().setFromQuaternion(camera.quaternion,"YXZ");
-      Object.assign(roadView,{mounted:resume.mounted,mountProgress:resume.mounted?1:0,offset:resume.offset,headYaw:resume.headYaw,headPitch:resume.headPitch,baseYaw:angles.y-resume.headYaw,basePitch:angles.x-resume.headPitch});
+      local.current.yawReady=true;
+      Object.assign(roadView,{mounted:resume.mounted,mountProgress:resume.mounted?1:0,offset:resume.offset,headYaw:resume.headYaw,headPitch:resume.headPitch,yaw:resume.yaw,pitch:resume.pitch,roll:resume.roll,lookPending:resume.mounted});
       useRoadRide.setState({mounted:resume.mounted,photo:resume.photo,comfort:resume.comfort});
     }
     return()=>{saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort);roadView.active=false;roadView.mounted=false;roadView.speed=0;useRoadRide.setState({mounted:false,photo:false,speed:0,easy:false});};
@@ -78,7 +80,7 @@ function RoadRider(){
       else if(!document.pointerLockElement){local.current.brakeLatch=true;useRoadRide.setState({easy:false,controls:true});}
     };
     const unsubscribe=usePalaceStore.subscribe((s,p)=>{
-      if(p.roomId==="cycling"&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,mounted:r.mounted,photo:r.photo,comfort:r.comfort});}
+      if(p.roomId==="cycling"&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort});}
       if((s.overlay&&!p.overlay)||(s.focus&&!p.focus)||s.mode==="index"&&p.mode!=="index")halt();
     });
     window.addEventListener("palace:road",command);document.addEventListener("keydown",down);document.addEventListener("keyup",up);window.addEventListener("keydown",escape,true);window.addEventListener("blur",halt);window.addEventListener("pagehide",halt);
