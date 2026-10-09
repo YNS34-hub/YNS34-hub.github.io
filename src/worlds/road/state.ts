@@ -10,12 +10,15 @@ export const useRoadRide=create<{
 }>(()=>({mounted:false,state:"stopped",nearBike:false,speed:0,distance:0,cadence:0,gear:7,grade:0,photo:false,controls:false,easy:false,comfort:false,place:"",gearSequence:0,recovery:false}));
 export type RoadCommand="mount"|"dismount"|"pedal"|"brake"|"stop"|"photo"|"save"|"easier"|"harder"|"restart";
 export function roadCommand(detail:RoadCommand){window.dispatchEvent(new CustomEvent("palace:road",{detail}));}
-export const roadView={active:false,mounted:false,yaw:0,pitch:0,roll:0,baseYaw:0,basePitch:0,headYaw:0,headPitch:0,distance:0,speed:0,lean:0,steer:0,brake:0,cadence:0,walkX:0,walkY:18,walkZ:0};
+export const roadView={active:false,mounted:false,yaw:0,pitch:0,roll:0,baseYaw:0,basePitch:0,headYaw:0,headPitch:0,distance:0,speed:0,offset:0,lean:0,steer:0,brake:0,cadence:0,walkX:0,walkY:18,walkZ:0,mountProgress:0,parkYaw:-.4};
 const look=new Euler(0,0,0,"YXZ");
 export function applyRoadLook(camera:Camera,userAngle:Euler){
   if(!roadView.active||!roadView.mounted)return false;
   const yaw=Math.atan2(Math.sin(userAngle.y-roadView.baseYaw),Math.cos(userAngle.y-roadView.baseYaw));
-  roadView.headYaw=Math.max(-1.15,Math.min(1.15,yaw));roadView.headPitch=Math.max(-.65,Math.min(.5,userAngle.x-roadView.basePitch));
+  const photo=useRoadRide.getState().photo;
+  const targetYaw=photo?yaw:Math.max(-1.15,Math.min(1.15,yaw));
+  roadView.headYaw+=Math.atan2(Math.sin(targetYaw-roadView.headYaw),Math.cos(targetYaw-roadView.headYaw))*.3;
+  roadView.headPitch=Math.max(photo?-.95:-.65,Math.min(photo?.95:.5,userAngle.x-roadView.basePitch));
   look.set(roadView.pitch+roadView.headPitch,roadView.yaw+roadView.headYaw,roadView.roll,"YXZ");camera.quaternion.setFromEuler(look);return true;
 }
 export function readRoadSave(){
