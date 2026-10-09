@@ -8,6 +8,7 @@ await mkdir(out,{recursive:true});
 const report={base,sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),checks:[],errors:[]};
 const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:process.env.PALACE_HEADED!=="1",args:["--use-angle=d3d11"]});
 const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,...(process.env.PALACE_VIDEO==="1"?{recordVideo:{dir:path.join(out,"video"),size:{width:960,height:540}}}:{})});
+await context.route("**/personal-media/manifest.json",route=>route.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
 await context.addInitScript(()=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality:"medium",tutorialDone:true,roomSoundtracks:false},version:0})));
 const page=await context.newPage();page.setDefaultTimeout(90000);
 page.on("pageerror",error=>report.errors.push(error.message));page.on("console",message=>{if(message.type()==="error")report.errors.push(message.text());});

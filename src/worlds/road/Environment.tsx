@@ -5,6 +5,7 @@ import { useProgress,useGLTF } from "@react-three/drei";
 import { usePalaceStore } from "../../systems/store";
 import { useLibraryStore } from "../../systems/library";
 import { textureStatus } from "../../world/textureCache";
+import { useQuietMotion } from "../../motion/useMotionCue";
 
 const vertex="varying vec3 direction;void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}";
 const fragment=`uniform float time;varying vec3 direction;
@@ -17,6 +18,7 @@ float mask=smoothstep(.60,.76,cloud)*smoothstep(.06,.3,h)*(1.-smoothstep(.6,.9,h
 gl_FragColor=vec4(c,1.);#include <tonemapping_fragment>
 #include <colorspace_fragment>}`.replace(";#include",";\n#include");
 export default function RoadEnvironment({onReady}:{onReady?:()=>void}){
+  const quiet=useQuietMotion();
   const {camera,gl,scene}=useThree(),quality=usePalaceStore(s=>s.effectiveQuality),{active}=useProgress();
   const sun=useRef<DirectionalLight>(null),sky=useRef<Mesh>(null),sent=useRef(false),uniforms=useRef({time:{value:0}});
   useEffect(()=>{
@@ -26,7 +28,7 @@ export default function RoadEnvironment({onReady}:{onReady?:()=>void}){
     return()=>{target.dispose();scene.environment=null;camera.far=far;if(camera instanceof PerspectiveCamera)camera.fov=60;camera.updateProjectionMatrix();};
   },[camera,gl,scene]);
   useFrame((_,dt)=>{
-    uniforms.current.time.value+=Math.min(dt,.06);sky.current?.position.copy(camera.position);
+    if(!quiet)uniforms.current.time.value+=Math.min(dt,.06);sky.current?.position.copy(camera.position);
     if(sun.current){sun.current.position.set(camera.position.x-67,camera.position.y+28,camera.position.z-53);sun.current.target.position.copy(camera.position);sun.current.target.updateMatrixWorld();}
     if(!sent.current&&scene.getObjectByName("long-way-home-road-world")&&scene.getObjectByName("prepared-world:cycling")?.userData.prepared&&useLibraryStore.getState().ready&&!active&&!textureStatus().pending){sent.current=true;onReady?.();}
   });

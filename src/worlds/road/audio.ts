@@ -43,8 +43,9 @@ export function createRoadAudio(){
     const v=Math.min(1,input.speed/15.28),rolling=input.speed>.08;
     debug.freehub=rolling&&!input.pedaling;debug.wind=Math.pow(v,1.65)*.42*duck;debug.tire=Math.pow(v,.8)*.095*duck;
     debug.chain=input.pedaling?Math.min(1,input.cadence/100)*.035*duck:0;debug.water=input.nearWater*(input.stopped?.075:.03)*duck;
-    layers.wind.gain.setTargetAtTime(debug.wind,now,.35);layers.tire.gain.setTargetAtTime(debug.tire,now,.22);layers.chain.gain.setTargetAtTime(debug.chain,now,.12);
-    layers.hub.gain.setTargetAtTime(debug.freehub?.29*duck:0,now,.065);hub!.playbackRate.setTargetAtTime(Math.max(.05,input.speed/2.14),now,.1);
+    layers.wind.gain.setTargetAtTime(debug.wind,now,.35);layers.tire.gain.setTargetAtTime(debug.tire,now,.22);layers.chain.gain.setTargetAtTime(debug.chain,now,input.pedaling?.12:.20);
+    // 松开踏板时链条先收束、棘轮再接入；重新踩踏迅速退掉棘轮，停车时不留下虚假的滚动声。
+    layers.hub.gain.setTargetAtTime(debug.freehub?.29*duck:0,now,debug.freehub?.16:.065);hub!.playbackRate.setTargetAtTime(Math.max(.05,input.speed/2.14),now,.1);
     layers.water.gain.setTargetAtTime(debug.water,now,.7);layers.leaves.gain.setTargetAtTime(input.forest*(input.stopped?.018:.009)*duck,now,.8);
     birdAt+=dt;
     if(birdAt>14&&input.forest>.4&&voices.size<4&&!state.mute){
