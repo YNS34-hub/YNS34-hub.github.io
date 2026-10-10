@@ -30,3 +30,11 @@
 .ride-photo-controls button { color:#ecdfbc; background:#132b3438; border:0; padding:9px 14px; font:500 10px "Space Grotesk",sans-serif; letter-spacing:.06em; }
 .palace-app[data-activity-world="cycling"] .room-caption,.palace-app[data-activity-world="basketball"] .room-caption,.palace-app[data-activity-world="cycling"] .explore-controls { color:#e4deca; text-shadow:0 1px 5px #182923; }
 @media(max-width:700px) { .activity-hud { top:120px; right:20px; width:190px; } .practice-score strong { font-size:30px; } .activity-hud > small { font-size:9px; } }
+/* 视角选择沿用活动区的小型文字控件，不改变馆标或全局导航。 */
+.perspective-controls { display:flex; gap:12px; align-items:center; }
+.perspective-controls button { border:0; background:transparent; color:inherit; padding:7px 0; font:500 10px var(--font-ui, "Space Grotesk"),sans-serif; letter-spacing:.04em; opacity:.55; cursor:pointer; }
+.perspective-controls button[aria-pressed="true"] { opacity:1; text-decoration:underline; text-underline-offset:5px; }
+.perspective-controls button:hover { opacity:1; }
+.perspective-controls button:focus-visible { outline:1px solid currentColor; outline-offset:4px; }
+.road-ui > .perspective-controls { position:fixed; bottom:28px; right:32px; pointer-events:auto; color:#f2f4ef; text-shadow:0 1px 3px #172720; }
+@media(max-width:700px) { .road-ui > .perspective-controls { bottom:92px; right:20px; } }

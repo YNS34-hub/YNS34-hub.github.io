@@ -5,6 +5,7 @@ import { useMotionCue } from "../../motion/useMotionCue";
 import {getRideMap,isRideScene,rideMaps} from "./maps";
 import { useRoadRide,roadCommand } from "./state";
 import "./road.css";
+import PerspectiveControls from "../presence/Controls";
 
 let returnRoom="worlds";
 export function rememberRoadReturn(previous:string){if(!isRideScene(previous)&&previous!=="cinema")returnRoom=previous==="basketball"?"worlds":previous;}
@@ -54,5 +55,6 @@ export default function RoadHud(){
     {r.photo&&<div className="road-photo-tools"><button onClick={()=>roadCommand("save")}>Save this view</button><button onClick={()=>roadCommand("photo")}>Exit photo view · ESC</button></div>}
     {!r.mounted&&!r.controls&&<div className="ride-entry-maps" aria-label="Choose cycling map">{rideMaps.map(m=><button key={m.id} aria-current={m.id===map.id?"page":undefined} disabled={m.id===map.id} onClick={()=>usePalaceStore.getState().enterRoom(m.id)}>{m.subtitle}</button>)}</div>}
     {!r.mounted&&!r.controls&&<button className="road-entry-return" onClick={returnToPalace}>Return to the Palace</button>}
+    {!r.photo&&!r.controls&&<PerspectiveControls roomId={map.id==="alpine-ride"?"alpine-ride":"cycling"} />}
   </div>;
 }

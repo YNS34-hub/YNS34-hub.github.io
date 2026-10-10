@@ -50,17 +50,28 @@ const digest = (source: string) => createHash("sha256").update(source.replace(/\
 // 这保留原有摘要检查，不能通过重新记录新摘要掩盖对旧播放器、建筑或导航的改写。
 const additions: Record<string, string[]> = {
   "src/App.tsx": ["app-import", "app-hud"],
-  "src/world/World.tsx": ["world-import", "world-interaction", "world-environment-open", "world-environment-close", "world-boundary-open", "world-boundary-close"],
-  "src/world/Player.tsx": ["player-import", "player-world-view", "player-cycle-locomotion"],
+  "src/world/World.tsx": ["world-import", "world-interaction", "world-environment-open", "world-environment-close", "world-boundary-open", "world-boundary-close", "world-presence-camera"],
+  "src/world/Player.tsx": ["player-import", "player-world-view", "player-cycle-locomotion", "player-presence-init", "player-presence-pause", "player-court-finish", "player-presence-sprint", "player-presence-speed"],
   "src/world/collision.ts": ["collision-import", "collision-world-bounds", "collision-world-footprints"],
 };
 function withoutAdditions(file: string, source: string) {
   const seen: string[] = [];
-  const clean = source.replace(/^[ \t]*(?:\/\/|\{\/\*) 交互扩展开始 ([\w-]+).*\r?\n[\s\S]*?^[ \t]*(?:\/\/|\{\/\*) 交互扩展结束.*\r?\n/gm, (_, id: string) => {
+  let clean = source.replace(/^[ \t]*(?:\/\/|\{\/\*) 交互扩展开始 ([\w-]+).*\r?\n[\s\S]*?^[ \t]*(?:\/\/|\{\/\*) 交互扩展结束.*\r?\n/gm, (_, id: string) => {
     seen.push(id);
     return "";
   });
   expect(seen.sort(), file + " insertion points").toEqual((additions[file] || []).slice().sort());
+  if (file === "src/world/Player.tsx") {
+    // 第三人称仅在户外接入逻辑相机和更新顺序；逐项校验适配表达式后还原，固定原摘要不变。
+    const adapters = [
+      ['const { camera: renderCamera, gl } = useThree();\n  const camera = actorCamera(renderCamera, roomId);', 'const { camera, gl } = useThree();'],
+      ['input.has("ShiftLeft") || input.has("ShiftRight") ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;', 'input.has("ShiftLeft") || input.has("ShiftRight") ? 4.45 : 2.7;'],
+      ['clock.elapsedTime - footstepsAt.current > (roomId === "basketball" && presence.speed > 4 ? .33 : .58)', 'clock.elapsedTime - footstepsAt.current > 0.58'],
+      ['}, isAdventureRoom(roomId) ? -4 : 0);', '});'],
+    ];
+    clean = clean.replace(/\r\n/g, '\n');
+    for (const [current, original] of adapters) { expect(clean, "explicit outdoor adapter").toContain(current); clean = clean.replace(current, original); }
+  }
   // 用户于 2026-10-09 明确撤下 VOID//ECHO；仅还原两处展品数据表达式作基线比对，建筑其余字节仍严格保护。
   if (file === "src/rooms/Atrium.tsx") {
     expect(clean).toContain('const hero = projects.find((x) => x.id === "giannis-fansite");');

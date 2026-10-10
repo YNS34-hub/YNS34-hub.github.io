@@ -1,4 +1,4 @@
-import { Group, InstancedMesh, Line, LineSegments, Mesh, MeshDepthMaterial, Points, WebGLRenderTarget, BackSide, DoubleSide, FrontSide, RGBADepthPacking, type Camera, type Material, type Object3D, type Scene, type WebGLRenderer } from "three";
+import { Group, InstancedMesh, SkinnedMesh, Line, LineSegments, Mesh, MeshDepthMaterial, Points, WebGLRenderTarget, BackSide, DoubleSide, FrontSide, RGBADepthPacking, type Camera, type Material, type Object3D, type Scene, type WebGLRenderer } from "three";
 
 // r180 的 compile 提交程序后，由当前版本的 isReady 查询 KHR_parallel_shader_compile。
 // 不创建另一个 renderer、不绘制离屏画面。原材质仍由原组件拥有，帧内轮询允许随时取消。
@@ -10,6 +10,11 @@ export function warmPrograms(renderer: WebGLRenderer, root: Object3D, camera: Ca
     const copy = (material: Material | Material[]) => {
       if (object instanceof InstancedMesh) {
         const mesh = new InstancedMesh(object.geometry, material, 0); mesh.instanceColor = object.instanceColor; return mesh;
+      }
+      if(object instanceof SkinnedMesh){
+        // 骨骼阴影有独立 shader 变体；预编译复用原绑定，不创建或销毁人物的共享骨架。
+        const mesh=new SkinnedMesh(object.geometry,material);mesh.skeleton=object.skeleton;mesh.bindMode=object.bindMode;
+        mesh.bindMatrix.copy(object.bindMatrix);mesh.bindMatrixInverse.copy(object.bindMatrixInverse);return mesh;
       }
       if (object instanceof Mesh) return new Mesh(object.geometry, material);
       if (object instanceof LineSegments) return new LineSegments(object.geometry, material);

@@ -39,6 +39,8 @@ import InteractionFrame from "../interaction/InteractionFrame";
 import ListeningAttention from "../interaction/ListeningAttention";
 import WorldsBoundary, { MuseumWorldsEntry } from "../worlds/WorldsBoundary";
 import WorldsEnvironment from "../worlds/OutdoorEnvironment";
+import AdventureCamera from "../worlds/presence/CameraRig";
+import { isAdventureRoom } from "../worlds/presence/state";
 // 交互扩展结束
 
 function Environment({
@@ -308,6 +310,9 @@ function Scene({
         </WorldsBoundary>
         {/* 交互扩展结束 */}
       </group>
+      {/* 交互扩展开始 world-presence-camera */}
+      {isAdventureRoom(roomId) && <AdventureCamera key={"presence-camera:" + roomId} roomId={roomId} />}
+      {/* 交互扩展结束 */}
     </>
   );
 }

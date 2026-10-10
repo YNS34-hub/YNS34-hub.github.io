@@ -1,8 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
-import { BoxGeometry, Group, InstancedMesh, MeshBasicMaterial, PerspectiveCamera, Scene, type Material, type WebGLRenderer } from "three";
+import { Bone, Skeleton, SkinnedMesh, BoxGeometry, Group, InstancedMesh, MeshBasicMaterial, PerspectiveCamera, Scene, type Material, type WebGLRenderer } from "three";
 import { warmPrograms } from "../src/worlds/warmPrograms";
 
 describe("cancellable new-scene preparation", () => {
+  it("prepares the skinned depth variant without disposing the athlete's owned skeleton",()=>{
+    const scene=new Scene(),root=new Group(),geometry=new BoxGeometry(),material=new MeshBasicMaterial(),skeleton=new Skeleton([new Bone()]);
+    const athlete=new SkinnedMesh(geometry,material);athlete.bind(skeleton);athlete.castShadow=true;root.add(athlete);scene.add(root);
+    const dispose=vi.spyOn(skeleton,"dispose"),programs=new Map<Material,{currentProgram:{isReady:()=>boolean}}>();let depthSkinned=false;
+    const renderer={compile:(source:Group)=>{const materials=new Set<Material>();source.traverse(o=>{if(o instanceof SkinnedMesh){const m=o.material as Material;materials.add(m);programs.set(m,{currentProgram:{isReady:()=>true}});if(m.type==="MeshDepthMaterial"){depthSkinned=true;expect(o.skeleton).toBe(skeleton);expect(o.bindMatrix.equals(athlete.bindMatrix)).toBe(true);}}});return materials;},properties:{get:(m:Material)=>programs.get(m)},getContext:()=>({isContextLost:()=>false}),getRenderTarget:()=>null,getActiveCubeFace:()=>0,getActiveMipmapLevel:()=>0,setRenderTarget:vi.fn()} as unknown as WebGLRenderer;
+    const job=warmPrograms(renderer,root,new PerspectiveCamera(),scene);expect(job.ready()).toBe(true);expect(depthSkinned).toBe(true);job.dispose();expect(dispose).not.toHaveBeenCalled();geometry.dispose();material.dispose();skeleton.dispose();
+  });
   it("keeps original materials and geometry intact, waits for actual readiness and can cancel pending programs", () => {
     const scene = new Scene(), root = new Group(), geometry = new BoxGeometry(), material = new MeshBasicMaterial();
     const object = new InstancedMesh(geometry, material, 1); object.castShadow = true; root.add(object); scene.add(root); root.visible = false;

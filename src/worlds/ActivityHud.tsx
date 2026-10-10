@@ -7,6 +7,7 @@ import RoadHud, { rememberRoadReturn } from "./road/Hud";
 import {roadTravel} from "./road/state";
 import {isRideScene} from "./road/maps";
 import { useCourtTime } from "./court/state";
+import PerspectiveControls from "./presence/Controls";
 
 export default function ActivityHud() {
   const room = usePalaceStore(s => s.roomId), blocked = usePalaceStore(s => !!s.overlay || !!s.focus || s.mode === "index" || !s.started);
@@ -37,11 +38,13 @@ export default function ActivityHud() {
       {a.mode === "held" && <button onPointerDown={event => { event.currentTarget.setPointerCapture(event.pointerId); courtCommand("charge"); }} onPointerUp={() => courtCommand("release")} onPointerCancel={() => courtCommand("cancel")} onBlur={() => courtCommand("cancel")} onKeyDown={event => { if (event.code === "Space" && !event.repeat) { event.preventDefault(); courtCommand("charge"); } }} onKeyUp={event => { if (event.code === "Space") { event.preventDefault(); courtCommand("release"); } }}>Hold / release · Shoot</button>}
       <button onClick={() => courtCommand("recall")}>R · Recall ball</button>
       <button aria-pressed={a.assist} onClick={() => useActivity.setState({ assist: !a.assist })}>Arc assist {a.assist ? "on" : "off"}</button>
+      {a.mode === "held" && <><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("layup")}>F · Layup</button><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("dunk")}>G · Dunk</button></>}
     </div>
+    <PerspectiveControls roomId="basketball" />
     <div className="court-time" role="group" aria-label="Court lighting">
       <button aria-pressed={courtTime.time === "day"} onClick={() => courtTime.setTime("day")}>Daylight</button>
       <button aria-pressed={courtTime.time === "night"} onClick={() => courtTime.setTime("night")}>Night lights</button>
     </div>
-    <small>WASD move · E pick up / dribble · hold Space or locked-view click, release to shoot · aim at either hoop</small>
+    <small>WASD move · Shift sprint / fast dribble · F layup · G running dunk<br />Hold Space or locked-view click, release to shoot · V switch view</small>
   </aside>;
 }
