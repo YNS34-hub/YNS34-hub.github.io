@@ -9,6 +9,7 @@ This is an original first-person cycling scene inspired by the road framing, sun
 - `swissimage.webp`: 3072 × 2560 bounded offline SWISSIMAGE atlas from the official EPSG:3857 WMTS at zoom 14, approximately 6.56 m ground pixels at this latitude.
 - `swissimage-near.webp`: 3584 × 1792 zoom-16 atlas, approximately 1.64 m ground pixels. Near scenery blends to this atlas; original aerial pixels remain bounded to their actual geographic position.
 - `geography.json`: local frame, grid dimensions and atlas projection metadata. It contains no personal information.
+- `terrain-sun.webp`: 961 × 761 linear-data visibility field calculated from this measured terrain at 20 m spacing, tracing up to 3 km toward the scene's fixed sun. It only modulates direct sunlight; environment lighting and the existing nearby contact-shadow map remain separate. This is an artistic fixed lighting state, not a measured time-of-day reconstruction.
 
 Accessed 2026-10-10 through the [official STAC catalogue](https://data.geo.admin.ch/api/stac/v1/collections/ch.swisstopo.swissalti3d) and [WMTS service](https://docs.geo.admin.ch/visualize-data/wmts.html). Processing and redistribution are permitted by [swisstopo's free-geodata terms](https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices), with the required **© swisstopo** source acknowledgement. Terrain tinting, roadbed alignment and near-field material blending are artistic processing; this is not survey or navigation data.
 
@@ -25,7 +26,7 @@ All original downloads and derivatives below are [CC0](https://polyhaven.com/lic
 - `meadow-color/normal.webp`: [Aerial Grass Rock](https://polyhaven.com/a/aerial_grass_rock), 2K.
 - `rock-color/normal.webp`: [Rock 01](https://polyhaven.com/a/rock_01), 2K.
 - `road-color/normal.webp`: [Asphalt 01](https://polyhaven.com/a/asphalt_01), 2K, rendered with neutral colour grading.
-- `clear-daylight-2k.hdr`: [Kloofendal 48d Partly Cloudy Pure Sky](https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky), 2K.
+- `clear-daylight-2k.hdr` and `clear-sky-8k.webp`: [Kloofendal 48d Partly Cloudy Pure Sky](https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky). The 2K HDR supplies reflection lighting. The separate 8192 × 4096 viewing background derives from the API's original CC0 tonemapped JPEG, preserving cloud detail without generating an 8K lighting render target. Its sRGB display is not tone-mapped twice.
 - `rock_09/` and `rock_face_01/`: [Rock 09](https://polyhaven.com/a/rock_09) and [Rock Face 01](https://polyhaven.com/a/rock_face_01), actual scans with 1K diffuse/normal/roughness maps. Offline LODs keep 1738 / 4031 triangles and preserve UVs and normals. Source meshes remain alongside their runtime LODs.
 - `grass_medium_01/`: [Grass Medium 01](https://polyhaven.com/a/grass_medium_01). Three complete clumps are reduced to 180 / 160 / 240 triangles, using original photographed diffuse, alpha and normal maps at 1K. A separately packed transparent clump atlas is used for dense low-cost meadow instances. No grass shadow render pass is added.
 - Lower-route pines reuse the existing [Pine Tree 01](https://polyhaven.com/a/pine_tree_01) CC0 trunk and foliage under `/media/road/`. The original forest map and its assets are unchanged.
@@ -44,6 +45,7 @@ python scripts/prepare-alpine-scans.py
 node scripts/prepare-alpine-rock-lod.mjs
 python scripts/prepare-alpine-grass.py
 node scripts/prepare-alpine-grass-lod.mjs
+python scripts/prepare-alpine-sun.py
 ```
 
 The near-image preparation augments `geography.json` after the DEM / wide-atlas preparation. The older `prepare-alpine-assets.py` prepares the previous checkpoint; it is not the preparation command for this version. No Python tools run during site builds. Public builds retain the existing exclusion of all private music, lyrics, HTML, personal manifests and browser imports.

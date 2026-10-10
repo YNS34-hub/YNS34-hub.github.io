@@ -1,12 +1,13 @@
 import {useEffect,useLayoutEffect,useMemo,useRef,useState} from "react";
 import {useFrame} from "@react-three/fiber";
-import {BufferGeometry,CylinderGeometry,DoubleSide,Float32BufferAttribute,Group,InstancedMesh,MeshStandardMaterial,Vector3} from "three";
+import {BufferGeometry,CylinderGeometry,DoubleSide,Float32BufferAttribute,Group,InstancedMesh,Mesh,MeshStandardMaterial,Vector3} from "three";
 import Instances,{type Instance} from "../Instances";
 import {Block,Label} from "../../world/primitives";
 import {usePalaceStore} from "../../systems/store";
 import {useQuietMotion} from "../../motion/useMotionCue";
 import {roadView,useRoadRide} from "../road/state";
-import {useAlpineTextures} from "./assets";
+import {useAlpineTextures,useAlpineGeography} from "./assets";
+import {applyAlpineSunlight} from "./sunlight";
 import Geography from "./Geography";
 import {ScanInstances,useAlpineScans} from "./Scans";
 import {AlpineVegetation} from "./Vegetation";
@@ -101,8 +102,11 @@ function Viewpoints(){
   })}<PassHouse distance={alpineLength*.30} side={-1}/><PassHouse distance={alpineLength*.945}/></>;
 }
 export default function AlpineLandscape(){
-  const maps=useAlpineTextures(),scans=useAlpineScans(),root=useRef<Group>(null),[sectors,setSectors]=useState(()=>alpineSectors(roadView.distance)),last=useRef(-1),clock=useRef(0);
+  const maps=useAlpineTextures(),meta=useAlpineGeography(),scans=useAlpineScans(),root=useRef<Group>(null),[sectors,setSectors]=useState(()=>alpineSectors(roadView.distance)),last=useRef(-1),clock=useRef(0),quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion();
   useFrame((_,dt)=>{clock.current+=dt;if(clock.current<.25)return;clock.current=0;const current=Math.floor(roadView.distance/alpineSectorLength);if(current!==last.current){last.current=current;setSectors(alpineSectors(roadView.distance));}});
-  useLayoutEffect(()=>{root.current?.traverse(object=>{if(object instanceof InstancedMesh||object instanceof Group)return;object.raycast=()=>{};});},[sectors]);
+  useLayoutEffect(()=>{root.current?.traverse(object=>{
+    if(object instanceof Mesh)for(const m of Array.isArray(object.material)?object.material:[object.material])if(m instanceof MeshStandardMaterial)applyAlpineSunlight(m,maps.sun,meta.sun);
+    if(object instanceof InstancedMesh||object instanceof Group)return;object.raycast=()=>{};
+  });},[sectors,maps,meta,quality,quiet]);
   return <group ref={root} name="alpine-geographic-landscape"><Geography maps={maps}/><RoadSurface maps={maps}/><Viewpoints/>{sectors.map(index=><AlpineSector key={index} index={index} scans={scans}/>)}<group position={[0,alpineMap.ground(0,0),8]}><Block position={[-3.9,.6,0]} scale={[.07,1.2,.07]} color="#646d59"/><Label text="THE ALPINE DESCENT" position={[-3.9,1.35,.04]} size={.16} color="#f0e3c3" maxWidth={3}/></group></group>;
 }

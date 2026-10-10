@@ -51,8 +51,15 @@ for asset,prefix in [("aerial_grass_rock","meadow"),("rock_01","rock"),("asphalt
         if not file.exists():
             file.write_bytes(fetch(data[key]["2k"]["jpg"]["url"]))
         Image.open(file).save(DEST / (prefix+"-"+suffix+".webp"),"WEBP",quality=94)
-sky=source("kloofendal_48d_partly_cloudy_puresky")["hdri"]["2k"]["hdr"]
+sky_data=source("kloofendal_48d_partly_cloudy_puresky")
+sky=sky_data["hdri"]["2k"]["hdr"]
 file=CACHE/"clear-daylight-2k.hdr"
 if not file.exists():file.write_bytes(fetch(sky["url"]))
 (DEST/"clear-daylight-2k.hdr").write_bytes(file.read_bytes())
-print("prepared 1K scans, 2K near-field materials and daylight HDR",flush=True)
+file=CACHE/"daylight-tone.jpg"
+if not file.exists():file.write_bytes(fetch(sky_data["tonemapped"]["url"]))
+# 这是下载 API 提供的原始色调映射文件，不是网站缩略预览。JPEG 半分辨率解码避免占用整个高精原图。
+Image.MAX_IMAGE_PIXELS=200_000_000
+image=Image.open(file);image.draft("RGB",(8192,4096))
+image.convert("RGB").resize((8192,4096),Image.Resampling.LANCZOS).save(DEST/"clear-sky-8k.webp","WEBP",quality=91)
+print("prepared 1K scans, 2K near-field materials, 2K lighting HDR and 8K viewing sky",flush=True)

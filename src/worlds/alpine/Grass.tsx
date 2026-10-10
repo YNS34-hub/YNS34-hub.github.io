@@ -17,7 +17,7 @@ export function useAlpineGrass(){
       g.translate(-(box.min.x+box.max.x)*.5,-box.min.y,-(box.min.z+box.max.z)*.5);g.scale(1/height,1/height,1/height);g.computeBoundingSphere();
       return {geometry:g,material:mesh.material as MeshStandardMaterial};
     });
-    // 远处使用同一照片中的完整草簇，近景仍保留真实叶片曲面。UV 按 glTF 的上方原点取图。
+    // 远处使用同一照片中的完整草簇，近景仍保留真实叶片曲面；远景纹理沿 TextureLoader 的原点取图。
     const clumps=[[0,.5,.5,1],[.5,.5,1,1],[0,0,.5,.5]];
     const flatMaterial=full[0].material.clone();flatMaterial.map=clumpMap;flatMaterial.normalMap=null;
     const flat=clumps.map(([left,top,right,bottom])=>{

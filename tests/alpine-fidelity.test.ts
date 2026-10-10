@@ -4,9 +4,27 @@ import {Vector3} from "three";
 import {alpineLength,nearestAlpine,sampleAlpine,setAlpineHeightfield,setAlpineDetailfield,alpineGround,alpineElevation} from "../src/worlds/alpine/route";
 import {atlasUV,type ImageAtlas} from "../src/worlds/alpine/projection";
 import {buildAlpineTerrain} from "../src/worlds/alpine/terrainMesh";
+import {alpineSunUV,applyAlpineSunlight} from "../src/worlds/alpine/sunlight";
+import {MeshStandardMaterial,Texture} from "three";
 
 const meta=JSON.parse(readFileSync("public/media/alpine/geography.json","utf8"));
 describe("measured alpine detail",()=>{
+  it("keeps measured solar visibility registered to terrain and preserves existing material shaders",()=>{
+    const f=meta.sun;
+    expect(f.direction).toEqual([-100,95,90]);expect(f.rayDistance).toBe(3000);
+    expect(alpineSunUV(f,f.x0,f.z0)).toEqual([0,1]);
+    expect(alpineSunUV(f,f.x0+(f.width-1)*f.step,f.z0+(f.height-1)*f.step)).toEqual([1,0]);
+    const material=new MeshStandardMaterial(),map=new Texture();let calls=0;
+    material.onBeforeCompile=()=>{calls++;};material.customProgramCacheKey=()=>"retained-grass-shader";
+    applyAlpineSunlight(material,map,f);const callback=material.onBeforeCompile;applyAlpineSunlight(material,map,f);
+    expect(material.onBeforeCompile).toBe(callback);expect(material.customProgramCacheKey()).toBe("retained-grass-shader:alpine-measured-sun-v1");
+    const shader={uniforms:{},vertexShader:"#include <project_vertex>",fragmentShader:"#include <lights_fragment_begin>"};
+    // 编译插入点验证实际调用旧 shader，并只削减直射光，保留环境照明分工。
+    callback.call(material,shader as Parameters<typeof callback>[0],{} as Parameters<typeof callback>[1]);
+    expect(calls).toBe(1);expect(shader.vertexShader).toContain("instanceMatrix*alpineSunWorld");
+    expect(shader.fragmentShader).toContain("directLight.color*=mix");expect(shader.fragmentShader).toContain("getHemisphereLightIrradiance");
+    material.dispose();map.dispose();
+  });
   it("loads bounded, complete signed elevation grids with a continuous detail border",()=>{
     for(const name of["massif","detail"]){
       const file=readFileSync("public/media/alpine/"+name+"-dem.bin"),data=meta[name];
