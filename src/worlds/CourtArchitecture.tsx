@@ -6,12 +6,15 @@ import { useQuietMotion } from "../motion/useMotionCue";
 import { Block } from "../world/primitives";
 import CourtPark from "./court/Park";
 import CourtSurface from "./court/Surface";
+import { makeBackboardGlass } from "./court/backboardGlass";
 
 
 export const courtResponse = { hoop: -1, rim: 0, net: 0, board: 0 };
 function Hoop({ side }: { side: number }) {
   const rim = useRef<Group>(null), net = useRef<Group>(null), board = useRef<MeshPhysicalMaterial>(null);
   const quiet = useQuietMotion();
+  const glass = useMemo(makeBackboardGlass, []);
+  useEffect(() => () => glass.dispose(), [glass]);
   const geometry = useMemo(() => {
     const points: Vector3[] = [];
     for (let row = 0; row < 5; row++) for (let i = 0; i < 16; i++) {
@@ -53,7 +56,7 @@ function Hoop({ side }: { side: number }) {
     <Block position={[0, 3.32, side * 12.94]} scale={[.19, .17, .46]} color="#354340" metalness={.7} roughness={.35} />
     <Block position={[0, 3.33, side * 12.775]} scale={[.24, .44, .09]} color="#43524c" metalness={.65} roughness={.38} />
     <mesh position={[0, 3.6, side * 12.72]} castShadow>
-      <boxGeometry args={[1.8, 1.05, .055]} /><meshPhysicalMaterial ref={board} color="#eff9f6" transmission={.94} thickness={.055} ior={1.48} roughness={.045} metalness={0} emissive="#e8c597" emissiveIntensity={0} />
+      <boxGeometry args={[1.8, 1.05, .055]} /><primitive object={glass} attach="material" ref={board} />
     </mesh>
     {[-1, 1].map(s => <Block key={s} position={[s * .91, 3.6, side * 12.72]} scale={[.035, 1.09, .07]} color="#d9e0d2" metalness={.4} />)}
     {[3.06, 4.14].map(y => <Block key={y} position={[0, y, side * 12.72]} scale={[1.86, .035, .07]} color="#d9e0d2" metalness={.4} />)}

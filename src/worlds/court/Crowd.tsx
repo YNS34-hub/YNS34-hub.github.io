@@ -41,6 +41,6 @@ function CrowdBatch({ geometry, material, positions }: { geometry: BufferGeometr
       ref.current!.setColorAt(i, c.set(i % 2 ? "#e2e8e8" : "#fff0dd"));
     }); ref.current!.instanceMatrix.needsUpdate = true; ref.current!.instanceColor!.needsUpdate = true; ref.current!.computeBoundingSphere();
   }, [positions]);
-  return <instancedMesh ref={ref} args={[geometry, material, positions.length]} castShadow receiveShadow />;
+  return <instancedMesh ref={ref} args={[geometry, material, positions.length]} castShadow receiveShadow raycast={() => {}} />;
 }
 export default function CourtCrowd() { return <group name="licensed-park-spectators">{crowdNames.map((name, type) => <SpectatorType key={name} name={name} type={type} />)}</group>; }

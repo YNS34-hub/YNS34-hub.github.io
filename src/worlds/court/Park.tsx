@@ -53,7 +53,7 @@ function ParkContext() {
     const brick: Instance[] = [], trim: Instance[] = [], windows: Instance[] = [];
     // 街区位于树林后方，提供距离线索，球场周围留给真实树冠与场边人群。
     for (let i = 0; i < 9; i++) {
-      const x = -58 + i * 14.5, h = 11 + i * 7 % 17, z = -65 - i % 3 * 5;
+      const x = -58 + i * 14.5, h = 5 + i * 7 % 6, z = -65 - i % 3 * 5;
       brick.push({ position: [x, h * .5, z], scale: [10.4, h, 10], color: ["#9e8f7a", "#a69e90", "#8c8f88"][i % 3] });
       trim.push({ position: [x, h - .1, z], scale: [10.7, .35, 10.2], color: "#c3bba9" });
       trim.push({ position: [x, .45, z + 5.1], scale: [10.5, .9, .25], color: "#747c73" });

@@ -14,7 +14,7 @@ for (const [part, count] of [[0, 3300], [1, 2200]]) {
   let [indices, error] = MeshoptSimplifier.simplifyWithAttributes(sourceIndex, positions, 3, attributes, 5, [.02, .02, .02, .1, .1], null, count * 3, .05, ["Prune"]);
   if (indices.length > 24000) {
     // 原扫描的 UV 接缝阻止边折叠时，用小网格聚合保留枝干轮廓；只在离线执行。
-    const cells = new Map(), representative = new Uint32Array(positions.length / 3), grid = part === 0 ? .15 : .075;
+    const cells = new Map(), representative = new Uint32Array(positions.length / 3), grid = part === 0 ? .24 : .12;
     for (let i = 0; i < representative.length; i++) { const key = [positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]].map(n => Math.round(n / grid)).join(":"); if (!cells.has(key)) cells.set(key, i); representative[i] = cells.get(key); }
     const compact = [], seen = new Set();
     for (let i = 0; i < sourceIndex.length; i += 3) { const a = representative[sourceIndex[i]], b = representative[sourceIndex[i + 1]], c = representative[sourceIndex[i + 2]], key = [a, b, c].sort((x, y) => x - y).join(":"); if (a !== b && b !== c && a !== c && !seen.has(key)) { compact.push(a, b, c); seen.add(key); } }

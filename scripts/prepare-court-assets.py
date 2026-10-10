@@ -41,7 +41,7 @@ def photo_asset(name):
     print(name, "source files ready", flush=True)
 
 def people():
-    tree = requests.get("https://api.github.com/repos/microsoft/Microsoft-Rocketbox/git/trees/master?recursive=1", timeout=50).json()
+    tree = requests.get("https://api.github.com/repos/microsoft/Microsoft-Rocketbox/git/trees/0943055db6ec570bcef9f2c8b41c9e5467c808f9?recursive=1", timeout=50).json()
     commit = tree["sha"]
     names = ["Male_Adult_03", "Male_Adult_08", "Male_Adult_12", "Female_Adult_05", "Female_Adult_08", "Male_Adult_19"]
     jobs = []

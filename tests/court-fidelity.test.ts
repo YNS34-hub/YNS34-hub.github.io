@@ -1,9 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
+import { NoColorSpace, RepeatWrapping, SRGBColorSpace, Texture } from "three";
+import { cloneTreeTextures } from "../src/worlds/court/assets";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.resetModules(); });
 describe("additive park court package", () => {
+  it("preserves repeated glTF branch UVs and color spaces on owned texture clones", () => {
+    const sources = Array.from({ length: 5 }, () => new Texture()), maps = cloneTreeTextures(sources);
+    expect(maps[0]).not.toBe(sources[0]); expect(maps[0].wrapS).toBe(RepeatWrapping); expect(maps[0].wrapT).toBe(RepeatWrapping);
+    expect(maps[0].flipY).toBe(false); expect(sources[0].flipY).toBe(true); expect(sources[0].wrapS).not.toBe(RepeatWrapping);
+    expect(maps[0].colorSpace).toBe(SRGBColorSpace); expect(maps[1].colorSpace).toBe(NoColorSpace); expect(maps[3].colorSpace).toBe(NoColorSpace);
+    expect(maps[4].flipY).toBe(true); expect(maps[4].colorSpace).toBe(SRGBColorSpace);
+    maps.forEach(t => t.dispose()); sources.forEach(t => t.dispose());
+  });
   it("restores the court's own lighting preference without clearing or rewriting the museum library", async () => {
     const values = new Map([["memory-palace:court-light:v1", "night"], ["existing-private-library", "preserve"]]);
     vi.stubGlobal("localStorage", { getItem: (k: string) => values.get(k) || null, setItem: (k: string, v: string) => values.set(k, v) });

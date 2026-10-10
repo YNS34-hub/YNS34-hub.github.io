@@ -1,16 +1,17 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
-import { BufferGeometry, DoubleSide, Float32BufferAttribute, InstancedMesh, MeshDepthMaterial, MeshStandardMaterial, NoColorSpace, Object3D, RGBADepthPacking, SRGBColorSpace, Vector3, type WebGLProgramParametersWithUniforms } from "three";
+import { BufferGeometry, DoubleSide, Float32BufferAttribute, Group, InstancedMesh, Mesh, MeshDepthMaterial, MeshStandardMaterial, Object3D, RGBADepthPacking, Vector3, type WebGLProgramParametersWithUniforms } from "three";
 import { useQuietMotion } from "../../motion/useMotionCue";
 import { usePalaceStore } from "../../systems/store";
 import Instances, { type Instance } from "../Instances";
-import { useTreeShape } from "./assets";
+import { cloneTreeTextures, useTreeShape } from "./assets";
 
 export default function CourtTrees() {
+  const root = useRef<Group>(null);
   const shape = useTreeShape(), quiet = useQuietMotion(), tier = usePalaceStore(s => s.effectiveQuality);
   const sources = useTexture(["branches-color", "branches-normal", "trunk-color", "trunk-normal", "leaves-color"].map(n => "/media/court/tree/" + n + ".webp"));
-  const maps = useMemo(() => sources.map((s, i) => { const t = s.clone(); t.colorSpace = i === 1 || i === 3 ? NoColorSpace : SRGBColorSpace; if (i < 4) t.flipY = false; t.anisotropy = 4; t.needsUpdate = true; return t; }), [sources]);
+  const maps = useMemo(() => cloneTreeTextures(sources), [sources]);
   const wood = useMemo(() => shape.parts.map(p => { const g = new BufferGeometry(); g.setAttribute("position", new Float32BufferAttribute(p.position, 3)); g.setAttribute("normal", new Float32BufferAttribute(p.normal, 3)); g.setAttribute("uv", new Float32BufferAttribute(p.uv, 2)); g.setIndex(p.index); g.computeBoundingSphere(); return g; }), [shape]);
   const locations = useMemo(() => {
     const list: Instance[] = [];
@@ -23,7 +24,7 @@ export default function CourtTrees() {
   }, []);
   const crown = useMemo(() => {
     const position: number[] = [], uv: number[] = [], indices: number[] = [], center = new Vector3(), right = new Vector3(), up = new Vector3(), p = new Vector3();
-    const budget = tier === "low" ? 1800 : tier === "high" ? 6000 : 3600, stride = Math.max(1, shape.crown.length / budget);
+    const budget = tier === "low" ? 1200 : tier === "high" ? 6000 : 3200, stride = Math.max(1, shape.crown.length / budget);
     const patches = [[.49, .51, .997, .995], [.001, .19, .51, .62], [.28, .001, .998, .4]];
     for (let n = 0; n < Math.min(budget, shape.crown.length); n++) {
       const i = Math.floor(n * stride); center.set(...shape.crown[i]);
@@ -50,8 +51,10 @@ export default function CourtTrees() {
   useEffect(() => () => wood.forEach(g => g.dispose()), [wood]);
   useEffect(() => () => crown.dispose(), [crown]);
   useEffect(() => () => { leaves.material.dispose(); leaves.depth.dispose(); }, [leaves]);
+  // 树木在围栏外，不参与门、球或场内遮挡；无需让品牌采样/注视射线遍历每片叶子的三角形。
+  useLayoutEffect(() => { root.current?.traverse(o => { if (o instanceof Mesh) o.raycast = () => {}; }); }, [wood, crown]);
   useFrame(({ clock }) => { motion.time.value = clock.elapsedTime; motion.amplitude.value = quiet ? 0 : .028; });
-  return <group name="real-jacaranda-park-canopy">
+  return <group ref={root} name="real-jacaranda-park-canopy">
     {wood.map((g, i) => <Instances key={i} items={locations} geometry={g} map={maps[i * 2]} normalMap={maps[i * 2 + 1]} color="#b9b7aa" roughness={.94} shadows />)}
     <CrownInstances locations={locations} geometry={crown} material={leaves.material} depth={leaves.depth} />
   </group>;
