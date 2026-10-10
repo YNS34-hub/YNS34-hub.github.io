@@ -10,9 +10,10 @@ export function buildAlpineTerrain(field:Pick<AlpineHeightfield,"width"|"height"
     const d=distance(field.x0+(i+.5)*step,field.z0+(j+.5)*step);
     divisions[j*nx+i]=d<50?16:d<150?8:d<1600?4:quality==="low"?1:2;
   }
-  const points:number[]=[],uv:number[]=[],indices:number[]=[],lookup=new Map<string,number>(),tiles=new Map<string,number[]>();
+  const points:number[]=[],uv:number[]=[],indices:number[]=[],lookup=new Map<number,number>(),tiles=new Map<string,number[]>(),rowWidth=Math.ceil(nx*step*.8)+1;
   const vertex=(x:number,z:number)=>{
-    const key=Math.round(x*1000)+":"+Math.round(z*1000),prior=lookup.get(key);if(prior!==undefined)return prior;
+    // 最细单元的中心仍落在 1.25 米整数格。数字键避免百万个临时字符串及冷启动 GC。
+    const key=Math.round((z-field.z0)*.8)*rowWidth+Math.round((x-field.x0)*.8),prior=lookup.get(key);if(prior!==undefined)return prior;
     const index=points.length/3;points.push(x,height(x,z)-.035,z);uv.push(x/3,z/3);lookup.set(key,index);return index;
   };
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){

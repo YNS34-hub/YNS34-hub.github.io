@@ -1,4 +1,5 @@
 import {useEffect,useLayoutEffect,useMemo,useRef} from "react";
+import {useFrame,useThree} from "@react-three/fiber";
 import {useGLTF,useTexture} from "@react-three/drei";
 import {BufferGeometry,DoubleSide,Float32BufferAttribute,InstancedMesh,Mesh,MeshStandardMaterial,Object3D,SRGBColorSpace} from "three";
 import type {Instance} from "../Instances";
@@ -32,19 +33,27 @@ export function useAlpineGrass(){
   },[model,clumpMap]);
   useEffect(()=>()=>{templates.forEach(t=>t.geometry.dispose());templates[3].material.dispose();},[templates]);return templates;
 }
-export function GrassField({template,items,time,wind}:{template:ReturnType<typeof useAlpineGrass>[number];items:Instance[];time:{value:number};wind:{value:number}}){
+export function GrassField({template,items,time,wind,near=false,blend=false}:{template:ReturnType<typeof useAlpineGrass>[number];items:Instance[];time:{value:number};wind:{value:number};near?:boolean;blend?:boolean}){
   const ref=useRef<InstancedMesh>(null);
+  const {camera}=useThree();
   const material=useMemo(()=>{
     const m=template.material.clone();m.side=DoubleSide;m.transparent=false;m.alphaTest=.42;m.alphaToCoverage=true;m.forceSinglePass=true;
     m.normalScale.set(.3,.3);m.map!.anisotropy=8;m.color.set("#c3dd94");
     m.onBeforeCompile=shader=>{
       shader.uniforms.alpineGrassTime=time;shader.uniforms.alpineGrassWind=wind;
-      shader.vertexShader="uniform float alpineGrassTime;uniform float alpineGrassWind;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ntransformed.x+=sin(alpineGrassTime*.7+instanceMatrix[3].x*.23)*alpineGrassWind*position.y*position.y;");
+      shader.vertexShader="varying vec3 alpineGrassPosition;uniform float alpineGrassTime;uniform float alpineGrassWind;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ntransformed.x+=sin(alpineGrassTime*.7+instanceMatrix[3].x*.23)*alpineGrassWind*position.y*position.y;alpineGrassPosition=(modelMatrix*instanceMatrix*vec4(transformed,1.)).xyz;");
       // 薄叶片保留少量透光；根部仍有暗部，不把背光的整簇草压成黑色。
-      shader.fragmentShader=shader.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\ndiffuseColor.rgb*=vec3(1.6,1.9,1.25);").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.30;\n#include <opaque_fragment>");
-    };m.customProgramCacheKey=()=>"alpine-photographed-grass-v1";return m;
-  },[template,time,wind]);
+      shader.fragmentShader="varying vec3 alpineGrassPosition;\n"+shader.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\ndiffuseColor.rgb*=vec3(1.6,1.9,1.25);").replace("#include <alphatest_fragment>",(blend?"diffuseColor.a*="+(near?"1.-":"")+"smoothstep(60.,85.,distance(cameraPosition,alpineGrassPosition));\n":"")+"#include <alphatest_fragment>").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.30;\n#include <opaque_fragment>");
+    };m.customProgramCacheKey=()=>"alpine-photographed-grass-v2:"+near+":"+blend;return m;
+  },[template,time,wind,near,blend]);
   useEffect(()=>()=>material.dispose(),[material]);
-  useLayoutEffect(()=>{const p=new Object3D();items.forEach((item,i)=>{p.position.set(...item.position);p.scale.set(...item.scale);p.rotation.set(...(item.rotation??[0,0,0]));p.updateMatrix();ref.current!.setMatrixAt(i,p.matrix);});ref.current!.instanceMatrix.needsUpdate=true;ref.current!.computeBoundingSphere();},[items]);
+  const update=useMemo(()=>{const p=new Object3D();let lastX=Infinity,lastZ=Infinity;
+    return ()=>{if(!ref.current||Math.hypot(camera.position.x-lastX,camera.position.z-lastZ)<5)return;lastX=camera.position.x;lastZ=camera.position.z;let n=0;
+      for(const item of items){if(near&&(item.position[0]-lastX)**2+(item.position[2]-lastZ)**2>92**2)continue;
+        p.position.set(...item.position);p.scale.set(...item.scale);p.rotation.set(...(item.rotation??[0,0,0]));p.updateMatrix();ref.current.setMatrixAt(n++,p.matrix);}
+      ref.current.count=n;ref.current.instanceMatrix.needsUpdate=true;ref.current.computeBoundingSphere();
+    };
+  },[items,near,camera]);
+  useLayoutEffect(update,[update]);useFrame(()=>{if(near)update();});
   return <instancedMesh ref={ref} name="photographed-alpine-grass" args={[template.geometry,material,items.length]} receiveShadow raycast={()=>{}} dispose={null}/>;
 }

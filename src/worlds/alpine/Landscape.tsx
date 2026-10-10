@@ -73,7 +73,7 @@ function AlpineSector({index,scans}:{index:number;scans:ReturnType<typeof useAlp
       }
     }
 
-    return {posts,rocks,cliffs,grass,markers,rail:guardrail(start,end,side),post:new CylinderGeometry(.7,.7,1,4),clock:{value:0},wind:{value:quiet?0:.012}};
+    return {posts,rocks,cliffs,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,rail:guardrail(start,end,side),post:new CylinderGeometry(.7,.7,1,4),clock:{value:0},wind:{value:quiet?0:.012}};
   },[index,quality,quiet]);
   useEffect(()=>()=>[data.rail,data.post].forEach(g=>g.dispose()),[data]);
   useFrame((_,dt)=>{if(!quiet)data.clock.value+=Math.min(.06,dt);});
@@ -82,7 +82,7 @@ function AlpineSector({index,scans}:{index:number;scans:ReturnType<typeof useAlp
     <Instances geometry={data.post} items={data.posts} color="#939a96" metalness={.7} roughness={.5} shadows={Math.abs(index-riderSector)<2}/>
     <Instances geometry={data.post} items={data.markers} color="#dedbcc" roughness={.85}/>
     <ScanInstances scan={scans[0]} items={data.rocks} shadows={Math.abs(index-riderSector)<2}/><ScanInstances scan={scans[1]} items={data.cliffs} shadows={Math.abs(index-riderSector)<2}/>
-    {grassTemplates.map((template,i)=><GrassField key={i} template={template} items={data.grass[i]} time={data.clock} wind={data.wind}/>)}<AlpineVegetation index={index}/>
+    {grassTemplates.map((template,i)=><GrassField key={i} template={template} items={i<3?data.grass[i]:data.farGrass[i-3]} time={data.clock} wind={data.wind} near={i<3} blend={quality!=="low"}/>)}<AlpineVegetation index={index}/>
   </group>;
 }
 function PassHouse({distance,side=1}:{distance:number;side?:number}){
