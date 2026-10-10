@@ -155,3 +155,5 @@ npm run qa:performance # 可见桌面浏览器；实际 renderer 写入报告
 新增独立地图 **THE ALPINE DESCENT** 位于 `/alpine-ride/`，原 `/cycling/` 继续保留。Worlds 翼或骑行选项可在停车后选择地图；两图使用独立进度，共享现有骑行控制与声音。新路线依据 Furka Pass 的开放地形/道路资料，约 10.17 km，参考指定视频的高山草甸、山壁和深谷构图，不宣称是视频的确切地点。来源、截图、验证与未测范围见 [高山地图记录](docs/alpine-ride/README.md)。
 
 最新画面精度更新使用 swisstopo 实测高程、对应航拍、真实扫描岩石/草叶和分离的 8K 天空；同路段前后对照、实际 GTX 1650 样本及具体限制见 [画面精度验收](docs/alpine-fidelity/README.md)。
+
+街头篮球场按指定视频的公园构图增量更新：铜棕球场、真实树木、旁观者、完整篮架与可切换昼夜照明，保留原自由练投和馆内能力。同机位 1080p / 1440p 对照、原生操作、公开隐私与实际 GTX 1650 短样本见 [球场画面验收](docs/court-fidelity/README.md)。
