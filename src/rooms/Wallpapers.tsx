@@ -154,7 +154,7 @@ export function WallpaperCinema() {
         metalness={0.5}
         roughness={0.3}
       />
-      <ProjectionReveal resourceKey={texture?.uuid || "loading"} ready={!!texture} variant={transition}>
+      <ProjectionReveal resourceKey={texture?.uuid || "loading"} ready={!!texture} source={image?.displaySrc || image?.src} variant={transition}>
         <Picture
           texture={texture}
           width={27}
