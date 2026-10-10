@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useGLTF, useProgress, useTexture } from "@react-three/drei";
 import { Color, DirectionalLight, EquirectangularReflectionMapping, HemisphereLight, PMREMGenerator, SpotLight, SRGBColorSpace } from "three";
@@ -17,7 +17,8 @@ export default function CourtEnvironment({ onReady }: { onReady?: () => void }) 
   const [lightingMode, setLightingMode] = useState<"day" | "night" | "transition">(time);
   useEffect(() => { setLightingMode(current => current === time ? current : "transition"); }, [time]);
   const colors = useMemo(() => ({ day: new Color("#bdc6c8"), night: new Color("#090f19"), sky: new Color("#c8d9eb"), ground: new Color("#716953"), nightSky: new Color("#53718a"), nightGround: new Color("#292829") }), []);
-  useEffect(() => {
+  // 在首个渲染帧之前保存外部曝光；普通 effect 可能晚于 useFrame，误把球场自己的 1.08 当作还原值。
+  useLayoutEffect(() => {
     const far = camera.far, exposure = gl.toneMappingExposure; camera.far = 650; camera.updateProjectionMatrix();
     hdr.mapping = EquirectangularReflectionMapping;
     const generator = new PMREMGenerator(gl), env = generator.fromEquirectangular(hdr); generator.dispose();
