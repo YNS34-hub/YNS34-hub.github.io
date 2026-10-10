@@ -2,7 +2,7 @@ import { BufferGeometry, CatmullRomCurve3, Float32BufferAttribute, Vector3 } fro
 import points from "./road-data.json" with { type: "json" };
 import type { RideMap } from "../road/mapTypes";
 
-// 使用独立的 OSM 山口公路与 EU-DEM 高程。米制坐标、真实垂直比例；原湖谷路线不参与计算。
+// 使用独立的 OSM 山口公路与 swisstopo 实测高程。米制坐标、真实垂直比例；原湖谷路线不参与计算。
 export const alpineCurve = new CatmullRomCurve3(points.map(p => new Vector3(...p as [number, number, number])), false, "centripetal");
 alpineCurve.arcLengthDivisions = 12000;
 export const alpineLength = alpineCurve.getLength();
@@ -20,19 +20,33 @@ export function sampleAlpine(distance: number, point: Vector3, tangent: Vector3)
   point.y=heights[a]+(heights[a+1]-heights[a])*f;
   tangent.y=(heights[a+1]-heights[a])/heightStep*Math.hypot(tangent.x,tangent.z);tangent.normalize();
 }
-const samples: Vector3[] = [], bins = new Map<string, number[]>(), cell = 60;
+const samples: Vector3[] = [];
 for (let i = 0; i <= Math.ceil(alpineLength / 4); i++) {
   const p = new Vector3(); sampleAlpine(i*4,p,new Vector3()); samples.push(p);
-  const key = `${Math.floor(p.x / cell)}:${Math.floor(p.z / cell)}`;
-  const bin = bins.get(key) ?? []; bin.push(i); bins.set(key, bin);
 }
+// 静态二维索引使近景批量放置与骑行时的高度查询不再遍历整片 60 米路网。
+// 搜索不设距离截断，远处弯道也不会错误地关联到起点。
+interface RoadNode {index:number;axis:0|1;left:RoadNode|null;right:RoadNode|null;minX:number;maxX:number;minZ:number;maxZ:number}
+function roadIndex(indices:number[],depth=0):RoadNode|null {
+  if(!indices.length)return null;
+  const axis=depth%2 as 0|1,coordinate=(i:number)=>axis?samples[i].z:samples[i].x;
+  indices.sort((a,b)=>coordinate(a)-coordinate(b));const middle=Math.floor(indices.length/2);
+  const index=indices[middle],left=roadIndex(indices.slice(0,middle),depth+1),right=roadIndex(indices.slice(middle+1),depth+1),p=samples[index];
+  return {index,axis,left,right,minX:Math.min(p.x,left?.minX??Infinity,right?.minX??Infinity),maxX:Math.max(p.x,left?.maxX??-Infinity,right?.maxX??-Infinity),minZ:Math.min(p.z,left?.minZ??Infinity,right?.minZ??Infinity),maxZ:Math.max(p.z,left?.maxZ??-Infinity,right?.maxZ??-Infinity)};
+}
+const tree=roadIndex(samples.map((_,i)=>i));
 export function nearestAlpine(x: number, z: number) {
   let distance = Infinity, index = 0;
-  const bx = Math.floor(x / cell), bz = Math.floor(z / cell);
-  for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) for (const i of bins.get(`${bx+a}:${bz+b}`) ?? []) {
-    const p = samples[i], d = (p.x-x)**2+(p.z-z)**2;
-    if (d < distance) { distance = d; index = i; }
-  }
+  const bound=(node:RoadNode|null)=>{
+    if(!node)return Infinity;const dx=Math.max(0,node.minX-x,x-node.maxX),dz=Math.max(0,node.minZ-z,z-node.maxZ);return dx*dx+dz*dz;
+  };
+  const visit=(node:RoadNode|null)=>{
+    if(!node||bound(node)>distance)return;
+    const p=samples[node.index],dx=p.x-x,dz=p.z-z,d=dx*dx+dz*dz;
+    if(d<distance){distance=d;index=node.index;}
+    const first=bound(node.left)<bound(node.right)?node.left:node.right,second=first===node.left?node.right:node.left;
+    visit(first);visit(second);
+  };visit(tree);
   let along=index*4,xp=samples[index].x,yp=samples[index].y,zp=samples[index].z;
   // 投影到线段而不是最近离散点；急弯和路肩不应每四米产生一道台阶或穿出路面的地形。
   for(const i of [index-1,index])if(i>=0&&i<samples.length-1){
@@ -43,23 +57,37 @@ export function nearestAlpine(x: number, z: number) {
   }
   return { distance: Math.sqrt(distance), point:new Vector3(xp,yp,zp), distanceAlong:Math.min(alpineLength,along) };
 }
-export interface AlpineHeightfield {width: number; height: number; step: number; x0: number; z0: number; base: number; values: number[]}
+export interface AlpineHeightfield {width: number; height: number; step: number; x0: number; z0: number; base: number; values: number[] | Int16Array}
 let field: AlpineHeightfield | undefined;
+let detailField: AlpineHeightfield | undefined;
 export function setAlpineHeightfield(data: AlpineHeightfield) { field = data; }
-export function alpineElevation(x: number, z: number) {
-  if (!field) return nearestAlpine(x, z).point.y;
-  const { width, height, step, x0, z0, values } = field;
+export function setAlpineDetailfield(data: AlpineHeightfield) { detailField = data; }
+function heightAt(data: AlpineHeightfield, x: number, z: number) {
+  const { width, height, step, x0, z0, values } = data;
   const u = Math.max(0, Math.min(width-1.001, (x-x0)/step)), v = Math.max(0, Math.min(height-1.001, (z-z0)/step));
   const i = Math.floor(u), j = Math.floor(v), a = u-i, b = v-j;
   const y00 = values[j*width+i], y10 = values[j*width+i+1], y01 = values[(j+1)*width+i], y11 = values[(j+1)*width+i+1];
   return ((y00*(1-a)+y10*a)*(1-b)+(y01*(1-a)+y11*a)*b)*.5;
 }
-export function alpineGround(x: number, z: number) {
-  const natural = alpineElevation(x,z), near = nearestAlpine(x,z);
+export function alpineElevation(x: number, z: number) {
+  if (!field) return nearestAlpine(x, z).point.y;
+  const broad=heightAt(field,x,z);
+  if (!detailField) return broad;
+  const d=detailField,edge=Math.min(x-d.x0,z-d.z0,d.x0+(d.width-1)*d.step-x,d.z0+(d.height-1)*d.step-z);
+  if(edge<=0)return broad;
+  // 两级实测数据以 80 米边带连续衔接，地面、草叶、石块与行走器共用同一高度。
+  const t=Math.min(1,edge/80),blend=t*t*(3-2*t);
+  return broad+(heightAt(d,x,z)-broad)*blend;
+}
+export function alpineGround(x: number, z: number, nearby?:ReturnType<typeof nearestAlpine>) {
+  const natural = alpineElevation(x,z);
+  // 绝大部分远山不可能进入最大 32 米路基；直接取实测高程，避免初始地形构建做百万次远距搜索。
+  if(!nearby&&tree&&(x<tree.minX-32||x>tree.maxX+32||z<tree.minZ-32||z>tree.maxZ+32))return natural;
+  const near=nearby??nearestAlpine(x,z);
   // 近公路平整路基，远处回到真实山坡。不能把陡崖全压平成宽阔的游戏平台。
   // DEM 与平滑路面在陡坡上可能相差数米；缓和切坡过渡，避免窄路基变成直立的土柱。
-  const radius=Math.min(58,18+Math.abs(near.point.y-.16-natural)*.55);
-  const t = Math.max(0, Math.min(1, (near.distance-6.0)/(radius-6))), blend = t*t*(3-2*t);
+  const radius=Math.min(32,11+Math.abs(near.point.y-.16-natural)*.48);
+  const t = Math.max(0, Math.min(1, (near.distance-4.15)/(radius-4.15))), blend = t*t*(3-2*t);
   return near.distance < radius ? (near.point.y-.16)*(1-blend)+natural*blend : natural;
 }
 export function alpineSectors(distance: number) {

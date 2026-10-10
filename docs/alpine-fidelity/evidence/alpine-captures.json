@@ -1,0 +1,260 @@
+{
+  "sha": "744a46ad61b14903acaec27089b78520849449ec",
+  "dirty": true,
+  "scope": "Static camera staging through valid saved route positions; approach and mount use native input. Separate journeys verify continuous travel.",
+  "frames": [
+    {
+      "name": "high-pass",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "0.0004",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "upper-corniche",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.12,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1218.80",
+        "grade": "-0.0788",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "4,5,6,7,8,9",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "rock-cut",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.28,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2843.87",
+        "grade": "-0.0847",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "13,14,15,16,17,18",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "high-overlook",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.43,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "4367.38",
+        "grade": "-0.0592",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "22,23,24,25,26,27",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "switchbacks",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.61,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "6195.58",
+        "grade": "-0.0618",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "32,33,34,35,36,37",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "lower-meadow",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.87,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "8836.32",
+        "grade": "-0.0482",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "47,48,49,50,51,52",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "arrival",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.98,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "9953.56",
+        "grade": "-0.0573",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "53,54,55,56",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "high-pass",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "0.0004",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "upper-corniche",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.12,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1218.80",
+        "grade": "-0.0788",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "4,5,6,7,8,9",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "rock-cut",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.28,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2843.87",
+        "grade": "-0.0847",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "13,14,15,16,17,18",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "high-overlook",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.43,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "4367.38",
+        "grade": "-0.0592",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "22,23,24,25,26,27",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "switchbacks",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.61,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "6195.58",
+        "grade": "-0.0618",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "32,33,34,35,36,37",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "lower-meadow",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.87,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "8836.32",
+        "grade": "-0.0482",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "47,48,49,50,51,52",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    },
+    {
+      "name": "arrival",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.98,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "9953.56",
+        "grade": "-0.0573",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "53,54,55,56",
+        "photo": "false",
+        "map": "alpine-ride"
+      }
+    }
+  ],
+  "errors": []
+}
