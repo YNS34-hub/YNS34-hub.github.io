@@ -103,6 +103,15 @@ html[data-motion="reduced"] .editorial-strip > article { transition:none; }
 /* 门槛仍由原导航与真实 ready 决定；只缩短已有薄幕的时间，不遮挡或延迟控制。 */
 .palace-app .world-reveal { transition: opacity var(--motion-exit) var(--motion-ease-exit); }
 .palace-app.world-ready .world-reveal { transition: opacity var(--motion-threshold) var(--motion-ease-settle); }
+.threshold-continuity{position:fixed;left:48px;bottom:116px;width:70px;height:1px;display:flex;gap:6px;pointer-events:none;opacity:0;color:var(--ui-ink);transition:opacity var(--motion-copy)}
+.threshold-continuity i{width:32px;height:1px;background:currentColor;transform-origin:center;transition:translate var(--motion-scene) var(--motion-ease-settle)}
+.hud[data-threshold="approach"] .threshold-continuity,.hud[data-threshold="loading"] .threshold-continuity{opacity:.4}
+.hud[data-threshold="approach"] .threshold-continuity i:first-child{translate:3px 0}
+.hud[data-threshold="approach"] .threshold-continuity i:last-child{translate:-3px 0}
+.hud[data-threshold="arrived"] .threshold-continuity{animation:threshold-settle var(--motion-scene) var(--motion-ease-settle) both}
+@keyframes threshold-settle{from{opacity:.4}to{opacity:0}}
+html[data-motion="reduced"] .threshold-continuity,html[data-motion="reduced"] .threshold-continuity i{animation:none!important;transition:none;translate:none!important}
+@media(prefers-reduced-motion:reduce){.threshold-continuity,.threshold-continuity i{animation:none!important;transition:none;translate:none!important}}
 .near-caption, .core-information, .tutorial { animation: motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
 .guide-panel { animation: motion-panel-in var(--motion-enter) var(--motion-ease-enter); }
 @keyframes motion-hint-in { from { opacity: 0; } to { opacity: 1; } }
