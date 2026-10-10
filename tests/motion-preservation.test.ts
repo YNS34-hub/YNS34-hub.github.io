@@ -80,7 +80,8 @@ function architecture(source: string) {
   const visit = (node: ts.Node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const tag = node.tagName.getText(ast);
-      if (!["WorkAttention", "ProjectionReveal"].includes(tag)) {
+      // 新标题包装层只接收原尺寸；继续遍历其内部原展品属性，摘要不变。
+      if (!["WorkAttention", "ProjectionReveal", "PosterCaption"].includes(tag)) {
         const attrs = node.attributes.properties.filter(a => ts.isJsxAttribute(a) && physical.has(a.name.getText(ast)))
           .map(a => a.getText(ast).replace(/\s+/g, ""));
         if (attrs.length) result.push([tag, attrs]);
