@@ -1,0 +1,491 @@
+{
+  "sha": "a15d81bd83b543a96689c5c9217c203cc5453b20",
+  "dirty": true,
+  "quality": "medium",
+  "dpr": 1,
+  "scope": "Fixed camera staging; gameplay is verified separately through native input.",
+  "frames": [
+    {
+      "file": "1920-day-entry.png",
+      "width": 1920,
+      "mode": "day",
+      "name": "entry",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          0.017665166007222937,
+          0.047227220636988435,
+          -0.0008353395725170425,
+          0.9987276073828344
+        ]
+      }
+    },
+    {
+      "file": "1920-day-matched-wide.png",
+      "width": 1920,
+      "mode": "day",
+      "name": "matched-wide",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          6.5,
+          1.65,
+          10
+        ],
+        "quaternion": [
+          0.019948331344453583,
+          0.15643841749238369,
+          -0.003160247934038321,
+          0.9874811889054121
+        ]
+      }
+    },
+    {
+      "file": "1920-day-hoop.png",
+      "width": 1920,
+      "mode": "day",
+      "name": "hoop",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2.5,
+          1.65,
+          -9.3
+        ],
+        "quaternion": [
+          0.1855520448841781,
+          0.30572652963007607,
+          -0.060875140703229726,
+          0.9318776448461528
+        ]
+      }
+    },
+    {
+      "file": "1920-day-surface.png",
+      "width": 1920,
+      "mode": "day",
+      "name": "surface",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          3,
+          1.65,
+          0
+        ],
+        "quaternion": [
+          -0.11367786768548792,
+          0.22818030036393266,
+          0.02683570431100183,
+          0.9665872634679388
+        ]
+      }
+    },
+    {
+      "file": "1920-day-sideline.png",
+      "width": 1920,
+      "mode": "day",
+      "name": "sideline",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -7,
+          1.65,
+          -1
+        ],
+        "quaternion": [
+          0.014985309109092772,
+          0.4131603296646777,
+          -0.0067998571393634395,
+          0.9105096070032231
+        ]
+      }
+    },
+    {
+      "file": "1920-day-return.png",
+      "width": 1920,
+      "mode": "day",
+      "name": "return",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -4,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          -0.00922382469425383,
+          0.9735442588035287,
+          -0.03994745264266391,
+          -0.22479034284430427
+        ]
+      }
+    },
+    {
+      "file": "1920-night-entry.png",
+      "width": 1920,
+      "mode": "night",
+      "name": "entry",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          0.017665166007222937,
+          0.047227220636988435,
+          -0.0008353395725170425,
+          0.9987276073828344
+        ]
+      }
+    },
+    {
+      "file": "1920-night-matched-wide.png",
+      "width": 1920,
+      "mode": "night",
+      "name": "matched-wide",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          6.5,
+          1.65,
+          10
+        ],
+        "quaternion": [
+          0.019948331344453583,
+          0.15643841749238369,
+          -0.003160247934038321,
+          0.9874811889054121
+        ]
+      }
+    },
+    {
+      "file": "1920-night-hoop.png",
+      "width": 1920,
+      "mode": "night",
+      "name": "hoop",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2.5,
+          1.65,
+          -9.3
+        ],
+        "quaternion": [
+          0.1855520448841781,
+          0.30572652963007607,
+          -0.060875140703229726,
+          0.9318776448461528
+        ]
+      }
+    },
+    {
+      "file": "1920-night-surface.png",
+      "width": 1920,
+      "mode": "night",
+      "name": "surface",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          3,
+          1.65,
+          0
+        ],
+        "quaternion": [
+          -0.11367786768548792,
+          0.22818030036393266,
+          0.02683570431100183,
+          0.9665872634679388
+        ]
+      }
+    },
+    {
+      "file": "1920-night-sideline.png",
+      "width": 1920,
+      "mode": "night",
+      "name": "sideline",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -7,
+          1.65,
+          -1
+        ],
+        "quaternion": [
+          0.014985309109092772,
+          0.4131603296646777,
+          -0.0067998571393634395,
+          0.9105096070032231
+        ]
+      }
+    },
+    {
+      "file": "1920-night-return.png",
+      "width": 1920,
+      "mode": "night",
+      "name": "return",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -4,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          -0.00922382469425383,
+          0.9735442588035287,
+          -0.03994745264266391,
+          -0.22479034284430427
+        ]
+      }
+    },
+    {
+      "file": "2560-day-entry.png",
+      "width": 2560,
+      "mode": "day",
+      "name": "entry",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          0.017665166007222937,
+          0.047227220636988435,
+          -0.0008353395725170425,
+          0.9987276073828344
+        ]
+      }
+    },
+    {
+      "file": "2560-day-matched-wide.png",
+      "width": 2560,
+      "mode": "day",
+      "name": "matched-wide",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          6.5,
+          1.65,
+          10
+        ],
+        "quaternion": [
+          0.019948331344453583,
+          0.15643841749238369,
+          -0.003160247934038321,
+          0.9874811889054121
+        ]
+      }
+    },
+    {
+      "file": "2560-day-hoop.png",
+      "width": 2560,
+      "mode": "day",
+      "name": "hoop",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2.5,
+          1.65,
+          -9.3
+        ],
+        "quaternion": [
+          0.1855520448841781,
+          0.30572652963007607,
+          -0.060875140703229726,
+          0.9318776448461528
+        ]
+      }
+    },
+    {
+      "file": "2560-day-surface.png",
+      "width": 2560,
+      "mode": "day",
+      "name": "surface",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          3,
+          1.65,
+          0
+        ],
+        "quaternion": [
+          -0.11367786768548792,
+          0.22818030036393266,
+          0.02683570431100183,
+          0.9665872634679388
+        ]
+      }
+    },
+    {
+      "file": "2560-day-sideline.png",
+      "width": 2560,
+      "mode": "day",
+      "name": "sideline",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -7,
+          1.65,
+          -1
+        ],
+        "quaternion": [
+          0.014985309109092772,
+          0.4131603296646777,
+          -0.0067998571393634395,
+          0.9105096070032231
+        ]
+      }
+    },
+    {
+      "file": "2560-day-return.png",
+      "width": 2560,
+      "mode": "day",
+      "name": "return",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -4,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          -0.00922382469425383,
+          0.9735442588035287,
+          -0.03994745264266391,
+          -0.22479034284430427
+        ]
+      }
+    },
+    {
+      "file": "2560-night-entry.png",
+      "width": 2560,
+      "mode": "night",
+      "name": "entry",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          0.017665166007222937,
+          0.047227220636988435,
+          -0.0008353395725170425,
+          0.9987276073828344
+        ]
+      }
+    },
+    {
+      "file": "2560-night-matched-wide.png",
+      "width": 2560,
+      "mode": "night",
+      "name": "matched-wide",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          6.5,
+          1.65,
+          10
+        ],
+        "quaternion": [
+          0.019948331344453583,
+          0.15643841749238369,
+          -0.003160247934038321,
+          0.9874811889054121
+        ]
+      }
+    },
+    {
+      "file": "2560-night-hoop.png",
+      "width": 2560,
+      "mode": "night",
+      "name": "hoop",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          2.5,
+          1.65,
+          -9.3
+        ],
+        "quaternion": [
+          0.1855520448841781,
+          0.30572652963007607,
+          -0.060875140703229726,
+          0.9318776448461528
+        ]
+      }
+    },
+    {
+      "file": "2560-night-surface.png",
+      "width": 2560,
+      "mode": "night",
+      "name": "surface",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          3,
+          1.65,
+          0
+        ],
+        "quaternion": [
+          -0.11367786768548792,
+          0.22818030036393266,
+          0.02683570431100183,
+          0.9665872634679388
+        ]
+      }
+    },
+    {
+      "file": "2560-night-sideline.png",
+      "width": 2560,
+      "mode": "night",
+      "name": "sideline",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -7,
+          1.65,
+          -1
+        ],
+        "quaternion": [
+          0.014985309109092772,
+          0.4131603296646777,
+          -0.0067998571393634395,
+          0.9105096070032231
+        ]
+      }
+    },
+    {
+      "file": "2560-night-return.png",
+      "width": 2560,
+      "mode": "night",
+      "name": "return",
+      "view": {
+        "roomId": "basketball",
+        "position": [
+          -4,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          -0.00922382469425383,
+          0.9735442588035287,
+          -0.03994745264266391,
+          -0.22479034284430427
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

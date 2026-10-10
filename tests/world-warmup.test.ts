@@ -26,6 +26,23 @@ describe("cancellable new-scene preparation", () => {
     expect(retainedDepth.type).toBe("MeshDepthMaterial");
     object.dispose(); material.dispose(); geometry.dispose();
   });
+  it("detects released program snapshots without querying deleted GL programs and can prepare the replacement", () => {
+    const scene = new Scene(), root = new Group(), geometry = new BoxGeometry(), material = new MeshBasicMaterial();
+    root.add(new InstancedMesh(geometry, material, 1)); scene.add(root); root.visible = false;
+    const poll = vi.fn(() => true), original = { program: {} as WebGLProgram | undefined, isReady: poll };
+    let current = original;
+    const renderer = { compile: () => new Set([material]), properties: { get: () => ({ currentProgram: current }) },
+      getContext: () => ({ isContextLost: () => false }), getRenderTarget: () => null, getActiveCubeFace: () => 0,
+      getActiveMipmapLevel: () => 0, setRenderTarget: vi.fn() } as unknown as WebGLRenderer;
+    const first = warmPrograms(renderer, root, new PerspectiveCamera(), scene);
+    expect(first.stale()).toBe(false);
+    original.program = undefined;
+    expect(first.stale()).toBe(true); expect(first.ready()).toBe(false); expect(poll).not.toHaveBeenCalled();
+    first.dispose(); current = { program: {} as WebGLProgram, isReady: poll };
+    const replacement = warmPrograms(renderer, root, new PerspectiveCamera(), scene);
+    expect(replacement.stale()).toBe(false); expect(replacement.ready()).toBe(true); expect(root.visible).toBe(false);
+    replacement.dispose(); material.dispose(); geometry.dispose();
+  });
   it("restores visibility and the existing render target when compilation fails", () => {
     const scene = new Scene(), root = new Group(); root.visible = false; scene.add(root);
     const previous = { name: "existing-view" }, setRenderTarget = vi.fn();

@@ -1,0 +1,16 @@
+{
+  "sha": "a15d81bd83b543a96689c5c9217c203cc5453b20",
+  "base": "http://127.0.0.1:5191",
+  "checkedAt": "2026-10-10T13:02:55.170Z",
+  "scope": "Actual public production build, native UI and keys only. No application debug exports, injected player state or altered physics.",
+  "checks": [
+    "Clean public personal-media catalog and independently generated activity deep links",
+    "Original Guide reaches court; native recall, pickup, dribble, timed shot and assist feedback",
+    "Cached court re-entry, day/night switching and lighting restoration after production refresh",
+    "Guide cycling arrival honors genuine pedal input; brake, photo, local PNG, one-level Escape, refresh and return work without debug globals",
+    "Legacy /museum entry and actual Pointer Lock / single Escape remain available"
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

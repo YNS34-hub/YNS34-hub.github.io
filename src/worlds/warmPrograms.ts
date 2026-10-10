@@ -53,8 +53,11 @@ export function warmPrograms(renderer: WebGLRenderer, root: Object3D, camera: Ca
       return entry.programs ? [...entry.programs.values()] : entry.currentProgram ? [entry.currentProgram] : [];
     }));
     const pending = [...programs];
+    // 场景切换/异步资源提交可能替换材质。r180 释放程序时清空 program；失效快照必须重新编译，而非无限查询已删除的 GL 对象。
+    const stale = () => pending.some(program => "program" in program && !(program as unknown as { program?: WebGLProgram }).program);
     return {
-      ready: () => !cancelled && !renderer.getContext().isContextLost() && pending.every(program => program.isReady()),
+      stale,
+      ready: () => !cancelled && !renderer.getContext().isContextLost() && !stale() && pending.every(program => program.isReady()),
       dispose,
     };
   } catch (error) { dispose(); throw error; }

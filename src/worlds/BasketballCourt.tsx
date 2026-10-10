@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Group, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { usePalaceStore } from "../systems/store";
@@ -13,6 +13,8 @@ import { useActivity, type CourtCommand } from "./activity";
 import { WorldPortal } from "./WorldPortal";
 import { useQuietMotion } from "../motion/useMotionCue";
 import { dribblePresentation, impactStrength } from "../motion/choreography";
+import { preloadCourtAssets } from "./court/assets";
+export { preloadCourtAssets } from "./court/assets";
 
 function PracticeBall() {
   const { camera, gl } = useThree(), ball = useRef<Group>(null), shadow = useRef<Group>(null);
@@ -145,6 +147,9 @@ function PracticeBall() {
   </>;
 }
 export default function BasketballCourt() {
+  const [prepared, setPrepared] = useState(false);
+  useEffect(() => { preloadCourtAssets(); setPrepared(true); }, []);
+  if (!prepared) return null;
   return <group name="basketball-practice-world">
     <CourtArchitecture /><PracticeBall />
     <WorldPortal id="worlds" title="Back to the palace" position={[0, 2.4, 17.2]} rotation={[0, Math.PI, 0]} compact />

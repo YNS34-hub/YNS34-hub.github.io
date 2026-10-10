@@ -1,4 +1,4 @@
-export const loadCourt = () => import("./BasketballCourt");
+export const loadCourt = () => import("./BasketballCourt").then(module => { module.preloadCourtAssets(); return module; });
 // Promise 回调中启动纹理缓存，避免 Loader 在 React 渲染阶段通知已挂载的进度观察者。
 export const loadRide = () => import("./road/Experience").then(module => { module.preloadRoadAssets(); return module; });
 export const loadAlpine = () => import("./alpine/Experience").then(module => { module.preloadAlpineAssets(); return module; });
