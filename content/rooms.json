@@ -229,5 +229,13 @@
     "title": "THE LONG WAY HOME",
     "color": "#7e9b76",
     "id": "cycling"
+  },
+  {
+    "id": "alpine-ride",
+    "number": "W3",
+    "title": "THE ALPINE DESCENT",
+    "subtitle": "An original alpine descent, inspired by the saved cycling film.",
+    "type": "white-cube",
+    "color": "#8da6a1"
   }
 ]

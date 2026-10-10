@@ -2,7 +2,8 @@ import { useEffect,useMemo,useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { BufferGeometry,Float32BufferAttribute,CatmullRomCurve3,TubeGeometry,Vector3,LatheGeometry,Vector2,Group,MeshStandardMaterial,CanvasTexture,RepeatWrapping,SRGBColorSpace } from "three";
 import { roadView,useRoadRide } from "./state";
-import { roadSample,terrainHeight } from "./route";
+import {forestMap} from "./maps";
+import type {RideMap} from "./mapTypes";
 
 type V=[number,number,number];
 function tube(points:V[],radius:number,segments=12){return new TubeGeometry(new CatmullRomCurve3(points.map(p=>new Vector3(...p))),segments,radius,8,false);}
@@ -32,7 +33,8 @@ function useBikeParts(){
   return parts;
 }
 // 原创公路车尺寸：约 1.15 m 轴距，700C 外径，30 mm 轮胎与 54 mm 深截面轮圈。无商业标识。
-export default function RoadBike(){
+export default function RoadBike({map=forestMap}:{map?:RideMap}){
+  const {sample:roadSample,ground:terrainHeight}=map;
   const p=useBikeParts(),root=useRef<Group>(null),cockpit=useRef<Group>(null),cranks=useRef<Group>(null),frontWheel=useRef<Group>(null),rearWheel=useRef<Group>(null);
   const pose=useMemo(()=>({point:new Vector3(),tangent:new Vector3(),spin:0,pedal:0}),[]);
   const paint=useMemo(()=>new MeshStandardMaterial({color:"#c6dce0",metalness:.28,roughness:.25}),[]);

@@ -39,3 +39,9 @@
 html[data-motion="reduced"] .road-moment,html[data-motion="reduced"] .road-photo-tools,html[data-motion="reduced"] .road-options{animation:none;clip-path:none;transform:none}
 @media(prefers-reduced-motion:reduce){.road-moment,.road-options,.road-photo-tools{animation:none;clip-path:none;transform:none}.road-moment{opacity:.65}.road-photo-tools{transition:none}}
 @media(max-width:700px){.road-entry-copy{left:22px;bottom:105px;max-width:260px}.road-entry-copy h2{font-size:18px}.road-minimal,.road-options{right:22px}.road-entry-return{right:22px}.road-options{width:218px}}
+
+/* 地图入口保持原馆标与轻量骑行 UI，切换前先停稳，两张地图独立存档。 */
+.ride-entry-maps{position:absolute;bottom:52px;left:48px;display:flex;gap:22px;pointer-events:auto}.ride-entry-maps button[aria-current="page"]{opacity:.9;border-color:#eee4c5}.ride-map-choices{display:flex;flex-direction:column;gap:5px;margin:14px 0 8px}.ride-map-choices button{text-align:left}.palace-app[data-activity-world="alpine-ride"] .room-caption{display:none}.palace-app[data-activity-world="alpine-ride"] .explore-controls{opacity:.55}.palace-app[data-activity-world="alpine-ride"] .wordmark{color:#20333e;text-shadow:0 1px 5px #f4f5edb0}
+@media(max-width:700px){.ride-entry-maps{left:22px;bottom:64px;gap:12px}.ride-entry-maps button{font-size:9px}.road-entry-copy{bottom:136px}}
+
+.road-options{max-height:calc(100svh - 180px);overflow-y:auto}.ride-map-choices small{font-size:9px;opacity:.6;line-height:1.7}.alpine-attribution a{color:inherit;text-underline-offset:3px}

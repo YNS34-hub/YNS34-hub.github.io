@@ -235,7 +235,7 @@ export default function Player({ roomId }: { roomId: string }) {
     }
     camera.quaternion.setFromEuler(angle.current);
     // 交互扩展开始 player-cycle-locomotion
-    if (roomId === "cycling" && applyRoadLook(camera, angle.current)) return;
+    if (["cycling", "alpine-ride"].includes(roomId) && applyRoadLook(camera, angle.current)) return;
     // 交互扩展结束
     const input = keys.current;
     const x =

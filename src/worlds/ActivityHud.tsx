@@ -5,6 +5,7 @@ import { useMotionCue } from "../motion/useMotionCue";
 import "./worlds.css";
 import RoadHud, { rememberRoadReturn } from "./road/Hud";
 import {roadTravel} from "./road/state";
+import {isRideScene} from "./road/maps";
 
 export default function ActivityHud() {
   const room = usePalaceStore(s => s.roomId), blocked = usePalaceStore(s => !!s.overlay || !!s.focus || s.mode === "index" || !s.started);
@@ -13,15 +14,15 @@ export default function ActivityHud() {
   const score = useMotionCue<HTMLElement>(a.made, "copy", room === "basketball" && !blocked && a.made > 0);
   useEffect(() => usePalaceStore.subscribe((state, previous) => {
     if(state.roomId!==previous.roomId)roadTravel(previous.roomId,state.roomId);
-    if (state.roomId === "cycling" && previous.roomId !== "cycling") rememberRoadReturn(previous.roomId);
+    if (isRideScene(state.roomId) && previous.roomId !== state.roomId) rememberRoadReturn(previous.roomId);
   }), []);
   useEffect(() => {
     const root = document.querySelector<HTMLElement>(".palace-app");
-    if (root) root.dataset.activityPhoto = String(room === "cycling" && a.photo);
+    if (root) root.dataset.activityPhoto = String(isRideScene(room) && a.photo);
     if (root) root.dataset.activityWorld = room;
     return () => { if (root) { delete root.dataset.activityPhoto; delete root.dataset.activityWorld; } };
   }, [room, a.photo]);
-  if (!blocked && !a.warming && room === "cycling") {
+  if (!blocked && !a.warming && isRideScene(room)) {
     return <RoadHud />;
   }
   if (blocked || a.warming || room !== "basketball") return null;

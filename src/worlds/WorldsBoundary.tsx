@@ -1,11 +1,12 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Block, Floor, Label } from "../world/primitives";
 import { WorldPortal } from "./WorldPortal";
-import { loadCourt, loadRide } from "./preload";
+import { loadCourt, loadRide, loadAlpine } from "./preload";
 import WorldWarmup from "./WorldWarmup";
 
 const Basketball = lazy(loadCourt);
 const Cycling = lazy(loadRide);
+const Alpine = lazy(loadAlpine);
 function WorldsWing() {
   return <group name="worlds-threshold-wing">
     <Floor width={26} depth={32} color="#494f48" />
@@ -25,6 +26,7 @@ function WorldsWing() {
     <WorldPortal id="basketball" title="Street Basketball Court" position={[-6.1, 3.1, -11.2]} />
     <WorldPortal id="atrium" title="Return to the Atrium" position={[0, 2.8, 15]} rotation={[0, Math.PI, 0]} compact />
     <WorldPortal id="cycling" title="The Long Way Home" position={[6.1, 3.1, -11.2]} />
+    <WorldPortal id="alpine-ride" title="The Alpine Descent" position={[12.45,3.1,2]} rotation={[0,-Math.PI/2,0]} museum />
   </group>;
 }
 export function MuseumWorldsEntry({ roomId }: { roomId: string }) {
@@ -34,5 +36,6 @@ export default function WorldsBoundary({ roomId, children }: { roomId: string; c
   if (roomId === "worlds") return <WorldWarmup key={roomId} roomId={roomId}><WorldsWing /></WorldWarmup>;
   if (roomId === "basketball") return <Suspense fallback={null}><WorldWarmup key={roomId} roomId={roomId}><Basketball /></WorldWarmup></Suspense>;
   if (roomId === "cycling") return <Suspense fallback={null}><WorldWarmup key={roomId} roomId={roomId}><Cycling /></WorldWarmup></Suspense>;
+  if (roomId === "alpine-ride") return <Suspense fallback={null}><WorldWarmup key={roomId} roomId={roomId}><Alpine /></WorldWarmup></Suspense>;
   return children;
 }
