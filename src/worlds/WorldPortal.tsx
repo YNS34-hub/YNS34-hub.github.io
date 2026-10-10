@@ -26,11 +26,11 @@ export function WorldPortal({ id, title, position, rotation = [0, 0, 0], compact
   const attention = useInteractable(ref, { title, hint: "Enter world", radius: compact ? 7 : 12, activate: enter });
   useFrame(() => { if (!warmed.current && attention.current.proximity > .2) { warmed.current = true; void preloadWorld(id).catch(() => { /* 预热不产生未处理的拒绝。 */ }); } });
   const width = compact ? 2.5 : museum ? 4.6 : 6.4, height = compact ? 3.5 : 4.8;
-  const view = !compact && (id === "basketball" || id === "cycling");
+  const view = !compact && (id === "basketball" || id === "cycling" || id === "alpine-ride");
   return <group ref={ref} position={position} rotation={rotation} name={"world-portal:" + id} onPointerOver={() => { hovered.current = true; }} onPointerOut={() => { hovered.current = false; }} onClick={event => { if (event.delta < 5) { event.stopPropagation(); enter(); } }}>
     <Block scale={[width + .18, height + .18, .22]} color="#344a50" roughness={.35} metalness={.55} />
     <Block position={[0, 0, .14]} scale={[width, height, .06]} color={id === "basketball" ? "#986341" : id === "cycling" ? "#466952" : "#142c36"} roughness={.8} />
-    {view ? <Picture src={"/media/worlds/" + (id === "basketball" ? "after-hours" : "cycling") + ".webp"} width={6.4} height={3.6} position={[0, .6, .19]} medium="screen" /> : <Label text={compact ? "RETURN ↗" : "WORLDS\nBEYOND"} position={[0, .6, .19]} size={compact ? .28 : .67} color="#e8dfcd" maxWidth={width - .4} />}
+    {view ? <Picture src={id === "alpine-ride" ? "/media/alpine/preview.webp" : "/media/worlds/" + (id === "basketball" ? "after-hours" : "cycling") + ".webp"} width={width} height={width * 9 / 16} position={[0, .6, .19]} medium="screen" /> : <Label text={compact ? "RETURN ↗" : "WORLDS\nBEYOND"} position={[0, .6, .19]} size={compact ? .28 : .67} color="#e8dfcd" maxWidth={width - .4} />}
     <Label text={title} position={[0, compact ? -.7 : -1.25, .19]} size={.16} color="#c5d5cf" maxWidth={width - .3} />
     <Label text="ENTER ↗" position={[0, -height / 2 + .42, .2]} size={.14} color="#b7d5d9" />
     <WorkAttention width={width} height={height} hovered={hovered} attention={attention} />

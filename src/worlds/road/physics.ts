@@ -9,8 +9,11 @@ export class RoadPhysics {
   distance=0;speed=0;gear=7;cadence=0;grade=0;offset=0;steering=0;heading=0;lean=0;braking=0;
   state:RidingState="stopped"; stopAt:number|null=null; atStop=false; ended=false; recovered=false; lastSafe=0;
   private point=new Vector3();private tangent=new Vector3();private nextPoint=new Vector3();private nextTangent=new Vector3();
+  // 默认值逐字沿用旧路线；新地图只注入采样器和终点，动力、档位与刹车规则保持共用。
+  constructor(private geography:{length:number;sample:typeof roadSample}={length:roadLength,sample:roadSample}){}
   shift(direction:number){const before=this.gear;this.gear=Math.max(1,Math.min(12,this.gear+direction));return before!==this.gear;}
   step(delta:number,input:RoadInput,gradeOverride?:number) {
+    const {length:roadLength,sample:roadSample}=this.geography;
     if(input.blocked)return;
     const dt=Math.max(0,Math.min(.06,Number.isFinite(delta)?delta:0));
     if(!Number.isFinite(this.distance)||!Number.isFinite(this.offset)||!Number.isFinite(this.speed)||Math.abs(this.offset)>8) {

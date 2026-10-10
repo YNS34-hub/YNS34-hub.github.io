@@ -139,7 +139,7 @@ export default function App() {
       <AudioSystem />
       {/* 交互扩展开始 app-hud */}
       <InteractionHud />
-      {["basketball", "cycling"].includes(s.roomId) && <Suspense fallback={null}><ActivityHud /></Suspense>}
+      {["basketball", "cycling", "alpine-ride"].includes(s.roomId) && <Suspense fallback={null}><ActivityHud /></Suspense>}
       {/* 交互扩展结束 */}
       {s.mode === "index" ? (
         <IndexView />

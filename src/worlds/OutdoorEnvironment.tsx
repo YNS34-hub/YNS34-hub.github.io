@@ -6,6 +6,7 @@ import { isWorldScene } from "./worldConfig";
 import { useProgress, useGLTF } from "@react-three/drei";
 import { textureStatus } from "../world/textureCache";
 import { useLibraryStore } from "../systems/library";
+import AlpineEnvironment from "./alpine/Environment";
 import RoadEnvironment from "./road/Environment";
 
 const vertex = "varying vec3 direction; void main(){direction=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}";
@@ -66,6 +67,7 @@ function Outdoor({ roomId, onReady }: { roomId: string; onReady?: () => void }) 
   </>;
 }
 export default function WorldsEnvironment({ roomId, onReady, children }: { roomId: string; onReady?: () => void; children: ReactNode }) {
+  if (roomId === "alpine-ride") return <AlpineEnvironment key={roomId} onReady={onReady} />;
   if (roomId === "cycling") return <RoadEnvironment key={roomId} onReady={onReady} />;
   return isWorldScene(roomId) ? <Outdoor key={roomId} roomId={roomId} onReady={onReady} /> : children;
 }

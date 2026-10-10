@@ -1,4 +1,4 @@
-import { useEffect,useLayoutEffect,useMemo,useRef } from "react";
+import { useEffect,useLayoutEffect,useMemo,useRef,type ReactNode } from "react";
 import { useFrame,useThree } from "@react-three/fiber";
 import { Vector3,Euler,Quaternion,PerspectiveCamera } from "three";
 import { usePalaceStore } from "../../systems/store";
@@ -7,18 +7,20 @@ import { acknowledge } from "../../interaction/registry";
 import { useActivity } from "../activity";
 import { useRoadAudio } from "./audio";
 import { RoadPhysics } from "./physics";
-import { roadLength,roadSample,roadStops,roadChapter,lakeDistance,terrainHeight,roadForestDensity } from "./route";
+import {getRideMap} from "./maps";
+import type {RideMap} from "./mapTypes";
 import { roadView,useRoadRide,readRoadSave,saveRoadRide,rememberRoadCinema,takeRoadCinemaReturn,peekRoadCinemaReturn,type RoadCommand } from "./state";
 import RoadLandscape from "./Landscape";
 import RoadBike from "./RoadBike";
 export { primeRoadTextures as preloadRoadAssets } from "./textures";
 
-function RoadRider(){
+function RoadRider({map}:{map:RideMap}){
+  const {length:roadLength,sample:roadSample,stops:roadStops,chapter:roadChapter,ground:terrainHeight,forest:roadForestDensity}=map;
   const {camera,gl,scene}=useThree(),quiet=useQuietMotion(),sound=useRoadAudio();
-  const model=useMemo(()=>{const saved=peekRoadCinemaReturn()??readRoadSave(),b=new RoadPhysics();b.distance=saved.distance;b.gear=saved.gear;b.lastSafe=b.distance;return b;},[]);
-  const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false,cinemaResume:peekRoadCinemaReturn()});
+  const model=useMemo(()=>{const saved=peekRoadCinemaReturn(map.id)??readRoadSave(map),b=new RoadPhysics(map);b.distance=saved.distance;b.gear=saved.gear;b.lastSafe=b.distance;return b;},[map]);
+  const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false,cinemaResume:peekRoadCinemaReturn(map.id)});
   useLayoutEffect(()=>{
-    const saved=readRoadSave(),p=local.current.point,t=local.current.tangent;roadSample(model.distance,p,t);
+    const saved=readRoadSave(map),p=local.current.point,t=local.current.tangent;roadSample(model.distance,p,t);
     Object.assign(roadView,{active:true,mounted:false,distance:model.distance,speed:0,walkX:p.x,walkY:p.y,walkZ:p.z,mountProgress:0,offset:0,lookPending:false});
     useRoadRide.setState({mounted:false,state:"stopped",nearBike:false,speed:0,distance:model.distance,gear:model.gear,cadence:0,photo:false,easy:false,controls:false,place:"",comfort:saved.comfort});
     // 返回快照只由这个骑行实例消费；StrictMode 的 effect 重播仍使用该快照，不会丢失骑姿。
@@ -29,8 +31,8 @@ function RoadRider(){
       Object.assign(roadView,{mounted:resume.mounted,mountProgress:resume.mounted?1:0,offset:resume.offset,headYaw:resume.headYaw,headPitch:resume.headPitch,yaw:resume.yaw,pitch:resume.pitch,roll:resume.roll,lookPending:resume.mounted});
       useRoadRide.setState({mounted:resume.mounted,photo:resume.photo,comfort:resume.comfort});
     }
-    return()=>{saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort);roadView.active=false;roadView.mounted=false;roadView.speed=0;useRoadRide.setState({mounted:false,photo:false,speed:0,easy:false});};
-  },[model,camera]);
+    return()=>{saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort,map);roadView.active=false;roadView.mounted=false;roadView.speed=0;useRoadRide.setState({mounted:false,photo:false,speed:0,easy:false});};
+  },[model,camera,map,roadSample]);
   useEffect(()=>{
     const command=(event:Event)=>{
       const palace=usePalaceStore.getState(),s=useRoadRide.getState(),l=local.current;
@@ -56,8 +58,8 @@ function RoadRider(){
         else if(model.speed<.2){model.speed=0;l.keys.clear();useRoadRide.setState({photo:true,easy:false,controls:false});}
         else{l.photoPending=true;l.brakeLatch=true;useRoadRide.setState({easy:false});acknowledge("Settling into a still view");}
       }
-      if(action==="save"&&s.photo){gl.render(scene,camera);gl.domElement.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download="the-long-way-home.png";link.click();setTimeout(()=>URL.revokeObjectURL(url),5000);});}
-      if(action==="restart"&&model.speed<.2){model.distance=0;model.lastSafe=0;model.offset=0;model.ended=false;model.stopAt=null;model.atStop=false;roadSample(0,l.point,l.tangent);Object.assign(roadView,{walkX:l.point.x,walkY:l.point.y,walkZ:l.point.z,distance:0,mounted:false,mountProgress:0});camera.position.set(.2,19.65,7.5);useRoadRide.setState({mounted:false,photo:false,easy:false,distance:0});saveRoadRide(0,model.gear,s.comfort);}
+      if(action==="save"&&s.photo){gl.render(scene,camera);gl.domElement.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=map.id==="cycling"?"the-long-way-home.png":"the-alpine-descent.png";link.click();setTimeout(()=>URL.revokeObjectURL(url),5000);});}
+      if(action==="restart"&&model.speed<.2){model.distance=0;model.lastSafe=0;model.offset=0;model.ended=false;model.stopAt=null;model.atStop=false;roadSample(0,l.point,l.tangent);Object.assign(roadView,{walkX:l.point.x,walkY:l.point.y,walkZ:l.point.z,distance:0,mounted:false,mountProgress:0});camera.position.set(l.point.x+.2,l.point.y+1.65,l.point.z+7.5);useRoadRide.setState({mounted:false,photo:false,easy:false,distance:0});saveRoadRide(0,model.gear,s.comfort,map);}
     };
     const down=(event:KeyboardEvent)=>{
       const palace=usePalaceStore.getState(),s=useRoadRide.getState(),l=local.current;
@@ -73,7 +75,7 @@ function RoadRider(){
       }
     };
     const up=(event:KeyboardEvent)=>local.current.keys.delete(event.code);
-    const halt=()=>{local.current.keys.clear();local.current.brakeLatch=true;model.speed=0;saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort);useRoadRide.setState({speed:0,easy:false});sound.update({speed:0,cadence:0,pedaling:false,brake:0,nearWater:0,forest:.5,stopped:true});};
+    const halt=()=>{local.current.keys.clear();local.current.brakeLatch=true;model.speed=0;saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort,map);useRoadRide.setState({speed:0,easy:false});sound.update({speed:0,cadence:0,pedaling:false,brake:0,nearWater:0,forest:.5,stopped:true});};
     const escape=(event:KeyboardEvent)=>{
       if(event.key!=="Escape")return;
       // 原馆弹窗与二维入口拥有最上层 ESC；骑行选项/照片不得抢先关闭底层状态。
@@ -83,14 +85,14 @@ function RoadRider(){
       else if(!document.pointerLockElement){local.current.brakeLatch=true;useRoadRide.setState({easy:false,controls:true});}
     };
     const unsubscribe=usePalaceStore.subscribe((s,p)=>{
-      if(p.roomId==="cycling"&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort});}
+      if(p.roomId===map.id&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({mapId:map.id,distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort});}
       if((s.overlay&&!p.overlay)||(s.focus&&!p.focus)||s.mode==="index"&&p.mode!=="index")halt();
     });
     window.addEventListener("palace:road",command);document.addEventListener("keydown",down);document.addEventListener("keyup",up);window.addEventListener("keydown",escape,true);window.addEventListener("blur",halt);window.addEventListener("pagehide",halt);
     // 原生测试只能读取这些开发诊断；生产构建没有注入状态入口。
     const debug=window as Window&{__ROAD_DEBUG__?:unknown};if(import.meta.env.DEV)debug.__ROAD_DEBUG__={model,view:roadView,audio:sound};
     return()=>{unsubscribe();window.removeEventListener("palace:road",command);document.removeEventListener("keydown",down);document.removeEventListener("keyup",up);window.removeEventListener("keydown",escape,true);window.removeEventListener("blur",halt);window.removeEventListener("pagehide",halt);delete debug.__ROAD_DEBUG__;};
-  },[camera,gl,scene,model,sound]);
+  },[camera,gl,scene,model,sound,map,roadStops,roadSample]);
   useFrame((_,rawDelta)=>{
     const palace=usePalaceStore.getState(),s=useRoadRide.getState(),l=local.current;
     if(!palace.started||palace.overlay||palace.focus||palace.mode==="index"||useActivity.getState().warming||document.hidden)return;
@@ -99,7 +101,7 @@ function RoadRider(){
       camera.position.y=terrainHeight(camera.position.x,camera.position.z)+1.77;
       const near=camera.position.distanceToSquared(l.target.set(roadView.walkX+3.2,roadView.walkY+.7,roadView.walkZ-3.2))<10.5;
       if(near!==s.nearBike)useRoadRide.setState({nearBike:near});roadView.speed=0;roadView.cadence=0;
-      sound.update({speed:0,cadence:0,pedaling:false,brake:0,nearWater:Math.max(0,1-(lakeDistance(camera.position.x,camera.position.z)-1)/.65),forest:1,stopped:true});return;
+      sound.update({speed:0,cadence:0,pedaling:false,brake:0,nearWater:map.water(camera.position.x,camera.position.z),forest:map.id==="cycling"?1:map.forest(model.distance/map.length),stopped:true});return;
     }
     const keys=l.keys,pedal=keys.has("KeyW")||keys.has("ArrowUp")||s.easy,brake=l.brakeLatch||keys.has("KeyS")||keys.has("ArrowDown")||keys.has("Space"),steer=(keys.has("KeyD")||keys.has("ArrowRight")?1:0)-(keys.has("KeyA")||keys.has("ArrowLeft")?1:0);
     const mounting=roadView.mountProgress<1;
@@ -124,10 +126,10 @@ function RoadRider(){
     const fov=60+(comfort?0:Math.max(0,Math.min(3,(model.speed-9)*.6)));
     if(camera instanceof PerspectiveCamera&&Math.abs(camera.fov-fov)>.01){camera.fov+=(fov-camera.fov)*(1-Math.exp(-dt*2));camera.updateProjectionMatrix();}
     const still=mounting||s.photo||s.controls;
-    sound.update({speed:still?0:model.speed,cadence:still?0:model.cadence,pedaling:pedal&&!brake&&!still,brake:model.braking,nearWater:Math.max(0,1-(lakeDistance(l.point.x,l.point.z)-1)/.65),forest:roadForestDensity(model.distance/roadLength),stopped:still||model.speed<.2});
+    sound.update({speed:still?0:model.speed,cadence:still?0:model.cadence,pedaling:pedal&&!brake&&!still,brake:model.braking,nearWater:map.water(l.point.x,l.point.z),forest:roadForestDensity(model.distance/roadLength),stopped:still||model.speed<.2});
     l.publish+=dt;l.save+=dt;if(l.publish>.15){l.publish=0;useRoadRide.setState({speed:model.speed,distance:model.distance,cadence:model.cadence,grade:model.grade,state:mounting?"mounting":model.state,recovery:model.recovered});useActivity.setState({distance:model.distance,speed:model.speed,riding:pedal,stopped:model.speed<.1,scenic:roadChapter(model.distance)});}
-    if(l.save>3){l.save=0;saveRoadRide(model.distance,model.gear,s.comfort);}
+    if(l.save>3){l.save=0;saveRoadRide(model.distance,model.gear,s.comfort,map);}
   });
   return null;
 }
-export default function RoadExperience(){return <group name="long-way-home-road-world"><RoadLandscape/><RoadRider/><RoadBike/></group>;}
+export default function RoadExperience({landscape}:{landscape?:ReactNode}){const map=getRideMap(usePalaceStore(s=>s.roomId));return <group name={map.sceneName}>{landscape??<RoadLandscape/>}<RoadRider map={map}/><RoadBike map={map}/></group>;}
