@@ -29,7 +29,9 @@ try{for(const size of [{width:1920,height:1080},{width:2560,height:1440}].filter
   if(name==="high-overlook"){
    await page.keyboard.press("p");await page.getByRole("button",{name:"Save this view",exact:true}).waitFor();
    await page.mouse.move(size.width*.5,size.height*.5);await page.mouse.down();await page.mouse.move(size.width*.53,size.height*.56,{steps:24});await page.mouse.up();await page.waitForTimeout(450);
-   await page.screenshot({path:path.join(out,size.width+"-photo-mode.png")});await page.keyboard.press("Escape");
+   await page.screenshot({path:path.join(out,size.width+"-photo-mode.png")});
+   const download=page.waitForEvent("download");await page.getByRole("button",{name:"Save this view",exact:true}).click();
+   await(await download).saveAs(path.join(out,size.width+"-photo-image.png"));await page.keyboard.press("Escape");
   }
   console.log(size.width+" "+name);
  }
