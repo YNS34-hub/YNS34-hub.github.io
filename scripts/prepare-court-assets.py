@@ -1,7 +1,6 @@
 """仅获取公开许可素材；视频只用于观察，不进入网站资源。"""
 import argparse
 import concurrent.futures
-import hashlib
 import json
 from pathlib import Path
 import requests
@@ -30,6 +29,15 @@ def photo_asset(name):
     jobs = [(v["url"], folder / k) for k, v in asset["include"].items()]
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(lambda j: download(*j), jobs))
+    alpha = download(info["leaves_alpha"]["1k"]["png"]["url"], CACHE / "jacaranda-alpha.png")
+    destination = OUT / "tree"; destination.mkdir(parents=True, exist_ok=True)
+    for part in ["branches", "trunk", "leaves"]:
+        for channel, short in [("diff", "color"), ("nor_gl", "normal")]:
+            im = Image.open(folder / "textures" / (name + "_" + part + "_" + channel + "_1k.jpg")).convert("RGBA")
+            if part == "leaves" and channel == "diff": im.putalpha(Image.open(alpha).convert("L"))
+            im.save(destination / (part + "-" + short + ".webp"), quality=91)
+    sky = Image.open(ROOT / "public/media/alpine/clear-sky-8k.webp")
+    sky.resize((4096, 2048), Image.Resampling.LANCZOS).save(OUT / "day-sky.webp", quality=88)
     print(name, "source files ready", flush=True)
 
 def people():

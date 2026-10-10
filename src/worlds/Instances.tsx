@@ -5,8 +5,8 @@ export interface Instance {
   position: [number, number, number]; scale: [number, number, number];
   rotation?: [number, number, number]; color?: string;
 }
-export default function Instances({ items, geometry, color = "#586154", shadows = false, roughness = 0.8, metalness = 0, map, bumpMap, cutout = false }: {
-  items: Instance[]; geometry: BufferGeometry; color?: string; shadows?: boolean; roughness?: number; metalness?: number; map?: Texture; bumpMap?: Texture; cutout?: boolean;
+export default function Instances({ items, geometry, color = "#586154", shadows = false, roughness = 0.8, metalness = 0, map, bumpMap, normalMap, cutout = false }: {
+  items: Instance[]; geometry: BufferGeometry; color?: string; shadows?: boolean; roughness?: number; metalness?: number; map?: Texture; bumpMap?: Texture; normalMap?: Texture; cutout?: boolean;
 }) {
   const ref = useRef<InstancedMesh>(null);
   useLayoutEffect(() => {
@@ -21,6 +21,6 @@ export default function Instances({ items, geometry, color = "#586154", shadows 
     ref.current!.computeBoundingSphere();
   }, [items]);
   return <instancedMesh ref={ref} args={[geometry, undefined, items.length]} castShadow={shadows} receiveShadow={shadows}>
-    <meshStandardMaterial color={items.some(i => i.color) ? "#ffffff" : color} roughness={roughness} metalness={metalness} map={map} bumpMap={bumpMap} bumpScale={.015} alphaTest={cutout ? .42 : 0} side={cutout ? DoubleSide : FrontSide} />
+    <meshStandardMaterial color={items.some(i => i.color) ? "#ffffff" : color} roughness={roughness} metalness={metalness} map={map} bumpMap={bumpMap} normalMap={normalMap} bumpScale={.015} alphaTest={cutout ? .42 : 0} side={cutout ? DoubleSide : FrontSide} />
   </instancedMesh>;
 }
