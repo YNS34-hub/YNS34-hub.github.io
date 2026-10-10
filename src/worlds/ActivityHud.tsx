@@ -10,6 +10,7 @@ export default function ActivityHud() {
   const room = usePalaceStore(s => s.roomId), blocked = usePalaceStore(s => !!s.overlay || !!s.focus || s.mode === "index" || !s.started);
   const a = useActivity();
   const result = useMotionCue<HTMLParagraphElement>(a.result, "copy", room === "basketball" && !blocked);
+  const score = useMotionCue<HTMLElement>(a.made, "copy", room === "basketball" && !blocked && a.made > 0);
   useEffect(() => usePalaceStore.subscribe((state, previous) => {
     if(state.roomId!==previous.roomId)roadTravel(previous.roomId,state.roomId);
     if (state.roomId === "cycling" && previous.roomId !== "cycling") rememberRoadReturn(previous.roomId);
@@ -25,7 +26,7 @@ export default function ActivityHud() {
   }
   if (blocked || a.warming || room !== "basketball") return null;
   return <aside className="activity-hud court-hud" aria-label="Basketball practice controls">
-    <div className="practice-score"><span>PRACTICE / AFTER HOURS</span><strong>{a.made}<small> / {a.shots}</small></strong><span>MADE / ATTEMPTED{a.streak > 1 ? " · STREAK " + a.streak : ""}</span></div>
+    <div className="practice-score"><span>PRACTICE / AFTER HOURS</span><strong ref={score}>{a.made}<small> / {a.shots}</small></strong><span>MADE / ATTEMPTED{a.streak > 1 ? " · STREAK " + a.streak : ""}</span></div>
     <p className="shot-result" ref={result} role="status">{a.result || "Find your spot."}</p>
     {a.mode === "held" && <div className="release-meter" aria-label="Shot release" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(a.charge * 100)}><span className="release-zone" /><i style={{ width: a.charge * 100 + "%" }} /></div>}
     <div className="activity-actions">

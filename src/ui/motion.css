@@ -7,6 +7,9 @@
   --motion-hero: 600ms;
   --motion-lyric: 640ms;
   --motion-threshold: 420ms;
+  --motion-layout: 480ms;
+  --motion-scene: 820ms;
+  --motion-cinematic: 1200ms;
   --motion-ease-enter: cubic-bezier(.16, 1, .3, 1);
   --motion-ease-settle: cubic-bezier(.22, .68, .2, 1);
   --motion-ease-exit: cubic-bezier(.4, 0, 1, 1);
@@ -65,14 +68,75 @@ html[data-motion="reduced"] .palace-app .record-disc { animation: none; }
 }
 .cinema-controls button:active { opacity: .64; }
 
+/* 播放进度与能量只读现有音频；艺术家悬停揭示不会改变迷你播放器的静止占位。 */
+.mini-progress { position:absolute; left:0; right:0; bottom:0; height:1px; background:#8eaca322; pointer-events:none; }
+.mini-progress > span { display:block; width:100%; height:100%; background:#7b9d98; transform:scaleX(0); transform-origin:left; }
+.mini-energy { position:absolute; right:10px; top:8px; width:3px; height:3px; border-radius:50%; background:#8fae9d; pointer-events:none; }
+.mini-artist { position:absolute; top:calc(100% + 7px); right:0; padding:3px 8px; background:rgba(8,18,25,.16); color:var(--ui-ink); font:500 9px "Space Grotesk",sans-serif; opacity:0; translate:0 -3px; pointer-events:none; transition:opacity var(--motion-copy), translate var(--motion-copy) var(--motion-ease-enter); }
+.now-playing-tag:hover .mini-artist,.now-playing-tag:focus-within .mini-artist { opacity:.85; translate:0 0; }
+.player-anchor-transfer { position:fixed; z-index:90; pointer-events:none!important; transform-origin:top left; overflow:hidden; }
+.lyric-wall[data-playing="true"] .lyric-line[data-side="-1"] .lyric-line-content { transform:translateX(-2px); }
+.lyric-wall[data-playing="true"] .lyric-line[data-side="1"] .lyric-line-content { transform:translateX(3px); }
+.lyric-wall[data-reduced="true"] .lyric-line .lyric-line-content { transform:none; }
+.cinema-controls { transition:opacity var(--motion-copy) var(--motion-ease-settle); }
+.cinema-controls[data-idle="true"]:not(:hover):not(:focus-within) { opacity:.12; }
+.cinema-index { font:500 8px "Space Grotesk",sans-serif; letter-spacing:.14em; margin-right:14px; opacity:.5; }
+.cinema-controls button[aria-pressed="true"] svg { animation:favorite-settle var(--motion-copy) var(--motion-ease-enter); }
+@keyframes favorite-settle { from { opacity:.45; } to { opacity:1; } }
+/* 仅编辑设计收藏采用手风琴；原图 contain，不裁切人物，也不改变键盘顺序。 */
+@media (min-width:1000px) {
+  .editorial-strip { display:flex; align-items:stretch; gap:12px; overflow-x:auto; padding-bottom:12px; }
+  .editorial-strip > article { flex:1 0 76px; min-width:0; transition:flex-grow var(--motion-layout) var(--motion-ease-enter), flex-basis var(--motion-layout) var(--motion-ease-enter); }
+  .editorial-strip > article:hover,.editorial-strip > article:focus-within { flex:5 0 340px; }
+  .editorial-strip .visual-work-image { height:270px; background:transparent; }
+  .editorial-strip .visual-work-image img { height:100%; width:100%; object-fit:contain; }
+  .editorial-strip .visual-caption { padding-top:12px; gap:8px; }
+  .editorial-strip .visual-caption h3 { font-size:12px; overflow-wrap:anywhere; }
+  .editorial-strip .visual-caption p,.editorial-strip .work-tags { display:none; }
+  .editorial-strip .visual-actions { flex-wrap:wrap; }
+  .editorial-strip .visual-actions button { font-size:8px; }
+  .editorial-strip > article:not(:hover):not(:focus-within) .visual-actions { visibility:hidden; }
+}
+html[data-motion="reduced"] .editorial-strip > article { transition:none; }
+@media (prefers-reduced-motion:reduce) { .editorial-strip > article { transition:none; } }
+
 /* 门槛仍由原导航与真实 ready 决定；只缩短已有薄幕的时间，不遮挡或延迟控制。 */
 .palace-app .world-reveal { transition: opacity var(--motion-exit) var(--motion-ease-exit); }
 .palace-app.world-ready .world-reveal { transition: opacity var(--motion-threshold) var(--motion-ease-settle); }
+.threshold-continuity{position:fixed;left:48px;bottom:116px;width:70px;height:1px;display:flex;gap:6px;pointer-events:none;opacity:0;color:var(--ui-ink);transition:opacity var(--motion-copy)}
+.threshold-continuity i{width:32px;height:1px;background:currentColor;transform-origin:center;transition:translate var(--motion-scene) var(--motion-ease-settle)}
+.hud[data-threshold="approach"] .threshold-continuity,.hud[data-threshold="loading"] .threshold-continuity{opacity:.4}
+.hud[data-threshold="approach"] .threshold-continuity i:first-child{translate:3px 0}
+.hud[data-threshold="approach"] .threshold-continuity i:last-child{translate:-3px 0}
+.hud[data-threshold="arrived"] .threshold-continuity{animation:threshold-settle var(--motion-scene) var(--motion-ease-settle) both}
+@keyframes threshold-settle{from{opacity:.4}to{opacity:0}}
+html[data-motion="reduced"] .threshold-continuity,html[data-motion="reduced"] .threshold-continuity i{animation:none!important;transition:none;translate:none!important}
+@media(prefers-reduced-motion:reduce){.threshold-continuity,.threshold-continuity i{animation:none!important;transition:none;translate:none!important}}
 .near-caption, .core-information, .tutorial { animation: motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
 .guide-panel { animation: motion-panel-in var(--motion-enter) var(--motion-ease-enter); }
 @keyframes motion-hint-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes motion-panel-in { from { opacity: .82; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+/* 保持原两行排版，仅分离词组的显现时序；结束后遮罩完全释放。 */
+.world-ready .hero-word { display:inline-block; animation:hero-word-resolve var(--motion-hero) var(--motion-ease-enter) both; }
+.world-ready .hero-word-memory { animation-delay:80ms; }
+.welcome-caption h1 .hero-word-the,.welcome-caption h1 .hero-word-memory { letter-spacing:inherit; }
+.world-ready .hero-word-palace { animation-delay:170ms; }
+.world-ready .hero-infinity { animation:motion-hint-in var(--motion-copy) var(--motion-ease-settle) 300ms backwards; }
+@keyframes hero-word-resolve { from { clip-path:inset(0 0 100% 0); translate:0 7px; opacity:.3; } to { clip-path:inset(0); translate:0 0; opacity:1; } }
+.enter-button svg { transition:translate var(--motion-copy) var(--motion-ease-enter); }
+.enter-button:hover svg,.enter-button:focus-visible svg { translate:4px 0; }
+.import-process { display:flex; justify-content:space-between; gap:20px; font-size:10px; letter-spacing:.08em; animation:motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
+.import-process span { opacity:.5; font-variant-numeric:tabular-nums; }
+.import-drafts article { transition:opacity var(--motion-copy), border-color var(--motion-copy); }
+.import-drafts article[data-placed="true"] { border-color:#719d92; }
+.import-drafts article[data-failed="true"] { border-color:#ba8465; }
+.guide-panel .floor-plan path { animation:guide-lines var(--motion-scene) var(--motion-ease-enter) backwards; stroke-dasharray:900; }
+@keyframes guide-lines { from { stroke-dashoffset:900; opacity:0; } to { stroke-dashoffset:0; opacity:1; } }
+html[data-motion="reduced"] .hero-word,html[data-motion="reduced"] .hero-infinity,html[data-motion="reduced"] .floor-plan path { animation:none; }
+html[data-motion="reduced"] .enter-button svg { transition:none; translate:none; }
 @media (prefers-reduced-motion: reduce) {
   .palace-app .world-reveal, .palace-app.world-ready .world-reveal { transition: none; }
   .near-caption, .core-information, .tutorial, .guide-panel { animation: none; }
+  .world-ready .hero-word,.world-ready .hero-infinity,.guide-panel .floor-plan path { animation:none; }
+  .enter-button svg { transition:none; translate:none; }
 }

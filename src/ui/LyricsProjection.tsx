@@ -26,7 +26,7 @@ const LyricDocument = memo(function LyricDocument({ lyrics, index }: { lyrics: T
     <div className="lyric-viewport" aria-live="off" data-snap={snap}>
       <div className="lyric-roll" style={{ transform: `translateY(${82.5 - Math.max(0, index) * 70}px)`, transition: snap ? "none" : undefined }}>
         {/* 文本包装只负责层次，不更改现有索引、70 px 步长和七行窗口；跳转仍直接定位。 */}
-        {lyrics.lines.slice(first, Math.max(4, index + 4)).map((line, i) => <p key={first + i} style={{ top: (first + i) * 70 }} data-distance={Math.min(3, Math.abs(first + i - index))} className={`lyric-line ${first + i === index ? "is-current" : ""}`}><span className="lyric-line-content">{line.text}</span></p>)}
+        {lyrics.lines.slice(first, Math.max(4, index + 4)).map((line, i) => <p key={first + i} style={{ top: (first + i) * 70 }} data-side={Math.sign(first + i - index)} data-distance={Math.min(3, Math.abs(first + i - index))} className={`lyric-line ${first + i === index ? "is-current" : ""}`}><span className="lyric-line-content">{line.text}</span></p>)}
       </div>
     </div>
   );

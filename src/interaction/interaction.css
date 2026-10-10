@@ -4,6 +4,13 @@
 .interaction-hint button:hover,.interaction-hint button:focus-visible { opacity:1; }
 .interaction-hint kbd { font:inherit; opacity:.5; margin-right:6px; }
 .interaction-response { position:fixed; top:97px; left:50%; transform:translateX(-50%); z-index:45; background:rgba(8,18,25,.45); padding:8px 15px; color:#e8f4ed; font:500 11px "Space Grotesk",sans-serif; letter-spacing:.06em; pointer-events:none; }
+.interaction-presence { position:fixed; bottom:134px; left:50%; translate:-50% 0; z-index:12; display:flex; gap:12px; align-items:center; max-width:70vw; color:#dce9ec; font:500 10px "Space Grotesk",sans-serif; letter-spacing:.08em; text-shadow:0 1px 5px #081219; pointer-events:none; animation:motion-hint-in var(--motion-copy) var(--motion-ease-enter); }
+.interaction-presence i { width:3px; height:3px; background:currentColor; border-radius:50%; }
+.interaction-presence small { font-size:8px; opacity:.5; }
+.view-point { transition:opacity var(--motion-feedback), outline-color var(--motion-feedback); outline:1px solid transparent; outline-offset:4px; }
+[data-attention="near"] .view-point { opacity:.8; outline-color:#d5e6e650; }
+[data-attention="gaze"] .view-point { opacity:1; outline-color:#d5e6e6a0; }
+.palace-app:has(.interaction-presence) .near-caption { display:none; }
 .palace-app:has(.interaction-hint) .near-caption { display:none; }
 .player-art-transfer { position:fixed; pointer-events:none; z-index:90; transform-origin:top left; overflow:hidden; }
 .player-art-transfer img { width:100%; height:100%; object-fit:cover; }

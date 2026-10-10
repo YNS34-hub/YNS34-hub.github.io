@@ -8,6 +8,7 @@ import { roadView,useRoadRide } from "./state";
 import { useRoadTextures,usePineShape,type PineShape } from "./textures";
 import { useWorldTexture } from "../materials";
 import { usePalaceStore } from "../../systems/store";
+import { useQuietMotion } from "../../motion/useMotionCue";
 
 function seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
 function makeTerrain(start:number,end:number){
@@ -38,6 +39,7 @@ function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
   return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-v1"}/></mesh>;
 }
 function WindField(props:Parameters<typeof Instances>[0]){
+  const quiet=useQuietMotion();
   const root=useRef<Group>(null),wind=useRef({time:{value:0},amount:{value:.08},eye:{value:new Vector3()}});
   useEffect(()=>{
     root.current?.traverse(object=>{
@@ -51,7 +53,7 @@ function WindField(props:Parameters<typeof Instances>[0]){
       material.customProgramCacheKey=()=>"road-near-wind-v1";material.needsUpdate=true;
     });
   },[]);
-  useFrame(({camera},dt)=>{wind.current.time.value+=Math.min(dt,.06);wind.current.amount.value=.08+Math.min(1,roadView.speed/15.28)*.18;wind.current.eye.value.copy(camera.position);});
+  useFrame(({camera},dt)=>{if(!quiet)wind.current.time.value+=Math.min(dt,.06);wind.current.amount.value=quiet?0:.08+Math.min(1,roadView.speed/15.28)*.18;wind.current.eye.value.copy(camera.position);});
   return <group ref={root}><Instances {...props}/></group>;
 }
 function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry}){
@@ -164,8 +166,9 @@ function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
   </group>;
 }
 function RoadLake(){
+  const quiet=useQuietMotion();
   const uniforms=useRef({time:{value:0}});
-  useFrame((_,dt)=>{uniforms.current.time.value+=Math.min(dt,.06);});
+  useFrame((_,dt)=>{if(!quiet)uniforms.current.time.value+=Math.min(dt,.06);});
   // 有限天空反射与波面法线，明确不声称倒映山体；不用额外相机和实时反射目标。
   const vertex="varying vec3 waterWorld;varying vec2 waterLocal;void main(){waterWorld=(modelMatrix*vec4(position,1.)).xyz;waterLocal=position.xy;gl_Position=projectionMatrix*viewMatrix*vec4(waterWorld,1.);}";
   const fragment=`uniform float time;varying vec3 waterWorld;varying vec2 waterLocal;

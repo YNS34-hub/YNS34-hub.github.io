@@ -21,7 +21,10 @@ function Hoop({ side }: { side: number }) {
     return new BufferGeometry().setFromPoints(points);
   }, []);
   useEffect(() => () => geometry.dispose(), [geometry]);
-  useFrame((_, dt) => {
+  useFrame(({ clock }, dt) => {
+    // 风只轻轻带动篮网，安静模式归零；不移动篮圈、篮板或碰撞体。
+    const breeze = quiet ? 0 : Math.sin(clock.elapsedTime * .43 + side) * .002;
+    if (net.current) net.current.rotation.x = breeze;
     if (courtResponse.hoop !== side) {
       if (rim.current) rim.current.rotation.z = 0;
       if (net.current) { net.current.scale.y = 1; net.current.rotation.y = 0; }

@@ -20,6 +20,7 @@ import { useLibraryStore } from "../systems/library";
 import { PalaceMark } from "./primitives";
 import { useIdentityTone } from "../systems/identityTone";
 import { useMotionCue } from "../motion/useMotionCue";
+import NowPlayingSignal from "../motion/NowPlayingSignal";
 export default function Hud({ ready }: { ready: boolean }) {
   const s = usePalaceStore();
   const audio = useAudioStore(
@@ -38,8 +39,8 @@ export default function Hud({ ready }: { ready: boolean }) {
   const welcomeEnabled = ready && !s.started;
   const eyebrowCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled);
   const heroCue = useMotionCue<HTMLHeadingElement>("welcome", "hero", welcomeEnabled, 60);
-  const subtitleCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled, 160);
-  const entryCue = useMotionCue<HTMLDivElement>("welcome", "copy", welcomeEnabled, 240);
+  const subtitleCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled, 360);
+  const entryCue = useMotionCue<HTMLDivElement>("welcome", "copy", welcomeEnabled, 440);
   const memoryCue = useMotionCue<HTMLElement>(String(s.memoryReveal), "copy", s.coreNear && !s.overlay && !s.focus);
   const trackCue = useMotionCue<HTMLSpanElement>(`${audio.currentId}:${track?.title}`, "copy", !!track && s.started);
   const playbackCue = useMotionCue<HTMLButtonElement>(String(audio.playing), "identity", !!track && s.started);
@@ -59,7 +60,8 @@ export default function Hud({ ready }: { ready: boolean }) {
     s.enterRoom(continueLast ? s.lastRoom : s.roomId);
   };
   return (
-    <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`}>
+    <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`} data-threshold={s.pendingDoor ? "approach" : ready ? "arrived" : "loading"}>
+      {s.started && s.roomId !== "cinema" && <div key={s.roomId} className="threshold-continuity" aria-hidden="true"><i /><i /></div>}
       <header className="hud-header">
         <button
           ref={identityCue}
@@ -97,10 +99,10 @@ export default function Hud({ ready }: { ready: boolean }) {
             <span className="status-dot" /> A DIGITAL MUSEUM BY JIE TIAN
           </p>
           <h1 ref={heroCue}>
-            THE MEMORY
+            <span className="hero-word hero-word-the">THE</span>{" "}<span className="hero-word hero-word-memory">MEMORY</span>
             <br />
-            <span>PALACE</span>
-            <sup>∞</sup>
+            <span className="hero-word hero-word-palace">PALACE</span>
+            <sup className="hero-infinity">∞</sup>
           </h1>
           <p className="welcome-subtitle" ref={subtitleCue}>
             An infinite gallery of projects, research,
@@ -267,6 +269,7 @@ export default function Hud({ ready }: { ready: boolean }) {
                 {audio.playing ? "NOW PLAYING" : "ON THE TURNTABLE"}
               </small>
               <strong>{track.title}</strong>
+              <em className="mini-artist">{track.artist}</em>
             </span>
           </button>
           <button
@@ -277,6 +280,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           >
             {audio.playing ? <Pause size={14} /> : <Play size={14} />}
           </button>
+          <NowPlayingSignal />
         </div>
       )}
     </div>

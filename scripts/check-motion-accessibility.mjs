@@ -86,7 +86,7 @@ try {
     assert.equal(await disc.evaluate(() => window.__QA_DISC__.currentTime), paused.time);
     assert.equal(paused.same, true); assert.equal(paused.state, "paused");
     await page.getByRole("dialog").getByRole("button", { name: "Play music", exact: true }).click();
-    await page.waitForTimeout(180);
+    await page.waitForFunction(time=>window.__QA_DISC__?.playState==="running"&&window.__QA_DISC__.currentTime>time,paused.time);
     assert.ok(await disc.evaluate(() => window.__QA_DISC__.currentTime) > paused.time);
     await page.keyboard.press("Escape");
   });
@@ -95,7 +95,8 @@ try {
     await page.evaluate(() => { const d = window.__PALACE_DEV__; d.state.getState().openCinema(d.library.getState().wallpapers[0]); });
     await ready();
     for (let i = 0; i < 5; i++) { await page.keyboard.press("ArrowRight"); await page.waitForTimeout(40); }
-    await page.waitForTimeout(750);
+    await page.waitForFunction(()=>!window.__PALACE_DEBUG__.scene.getObjectByName("cinema-outgoing"));
+    await page.waitForTimeout(100);
     const projection = await page.evaluate(() => {
       const group = window.__PALACE_DEBUG__.scene.getObjectByName("cinema-projection"), result = [];
       group.traverse(o => { if (o.isMesh && o.material.isMeshBasicMaterial) result.push({ color: o.material.color.toArray(), opacity: o.material.opacity }); });

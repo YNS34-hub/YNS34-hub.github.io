@@ -13,7 +13,7 @@ const browser = await chromium.launch({ executablePath: "C:/Program Files (x86)/
 report.browser = browser.version();
 try {
   for (const width of [1920, 2560]) {
-    const context = await browser.newContext({ viewport: { width, height: width === 1920 ? 1080 : 1440 }, deviceScaleFactor: 1 });
+    const context = await browser.newContext({ viewport: { width, height: width === 1920 ? 1080 : 1440 }, deviceScaleFactor: 1, ...(process.env.PALACE_VIDEO === "1" ? {recordVideo:{dir:out,size:{width:1920,height:1080}}} : {}) });
     await context.route("**/personal-media/manifest.json", route => route.fulfill({ json: { wallpapers: [], visuals: [], music: [], projects: [], research: [] } }));
     await context.addInitScript(() => localStorage.setItem("memory-palace:v3", JSON.stringify({ state: { quality: "medium", tutorialDone: true, reducedMotion: false, roomSoundtracks: false }, version: 0 })));
     const page = await context.newPage(); page.setDefaultTimeout(45000);
@@ -57,6 +57,9 @@ try {
     assert.ok(work);
     await pose([work.position[0] + work.forward[0] * 6, 1.65, work.position[2] + work.forward[2] * 6], work.position);
     await page.locator(".interaction-hint").filter({ hasText: "View image" }).waitFor();
+    await page.waitForFunction(()=>{let visible=false;window.__PALACE_DEBUG__.scene.traverse(o=>{if(o.name==="editorial-caption-rule"&&o.visible)visible=true;});return visible;});
+    await shot("poster-caption-response",100);await page.waitForTimeout(950);
+    assert.equal(await page.evaluate(()=>{let offset=0;window.__PALACE_DEBUG__.scene.traverse(o=>{if(o.name==="editorial-caption-motion")offset=Math.max(offset,Math.abs(o.position.y));});return offset;}),0);
     const savedBefore = await page.evaluate(id => window.__PALACE_DEV__.library.getState().personal.visuals.find(w => w.id === id)?.favorite, work.id);
     await page.keyboard.press("f");
     await page.getByRole("status").filter({ hasText: savedBefore ? "Released" : "Kept" }).waitFor();

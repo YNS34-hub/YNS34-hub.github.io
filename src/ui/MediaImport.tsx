@@ -168,6 +168,7 @@ export default function MediaImport({ roomHint }: { roomHint?: string }) {
   return (
     <div
       className="media-import"
+      data-stage={!drafts.length ? "select" : drafts.some(d => d.reading) ? "recognize" : busy ? "placing" : drafts.every(d => d.done) ? "complete" : "arrange"}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
@@ -201,6 +202,7 @@ export default function MediaImport({ roomHint }: { roomHint?: string }) {
       )}
       {drafts.length > 0 && (
         <>
+          <p className="import-process" role="status">{drafts.some(d => d.reading) ? "01 / Reading your files" : busy ? "03 / Placing in the room" : drafts.every(d => d.done) ? "04 / Ready to visit" : "02 / Choose a place"}<span>{drafts.filter(d => d.done).length} / {drafts.length}</span></p>
           <label>
             Target gallery
             <select
@@ -253,7 +255,7 @@ export default function MediaImport({ roomHint }: { roomHint?: string }) {
           )}
           <div className="import-drafts">
             {drafts.map((d, i) => (
-              <article key={d.file.name + "-" + i}>
+              <article key={d.file.name + "-" + i} data-placed={!!d.done} data-failed={!!d.error}>
                 {d.url ? (
                   <img src={d.url} alt="Import preview" />
                 ) : (

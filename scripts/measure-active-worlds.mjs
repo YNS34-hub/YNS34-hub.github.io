@@ -88,6 +88,19 @@ try {
     await page.mouse.down(); await page.waitForTimeout(895); await page.mouse.up();
     await page.waitForFunction(() => document.querySelector(".practice-score strong")?.textContent?.replace(/\s/g, "") === "1/1");
   });
+  if (process.env.PALACE_COURT_ONLY === "1") {
+    // 第三轮沿用球场采样；公路骑行使用独立的新路线测量器，避免触发旧版骑行按钮。
+    await goto("editorial");
+    await page.getByRole("button", { name: /OPEN COLLECTION/ }).click();
+    await page.locator(".editorial-strip > article").first().locator(".visual-work-image").focus();
+    await measure("editorial / keyboard accordion");
+    await page.locator(".editorial-strip > article").first().getByRole("button", { name: /ENTER WALLPAPER CINEMA/ }).click();
+    await ready(); await page.waitForTimeout(1200);
+    await measure("cinema / resting image");
+    await measure("cinema / native image transitions", 8, async () => {
+      for (let i = 0; i < 5; i++) { await page.keyboard.press("ArrowRight"); await page.waitForTimeout(950); }
+    });
+  } else {
   await goto("cycling"); await measure("cycling / forest resting");
   await page.getByRole("button", { name: "Start / resume ride", exact: true }).click();
   await page.keyboard.down("w"); await measure("cycling / forest accelerating and wind", 8); await page.keyboard.up("w");
@@ -113,6 +126,7 @@ try {
     }
   });
   await page.waitForTimeout(1500); await measure("worlds / settled after repeated exits");
+  }
   assert.deepEqual(report.errors, []);
   report.meetsMean45 = report.samples.every(sample => sample.fps >= 45);
   report.meetsP95Frame22ms = report.samples.every(sample => sample.p95Ms <= 1000 / 45);

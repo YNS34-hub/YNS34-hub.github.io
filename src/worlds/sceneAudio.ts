@@ -11,7 +11,7 @@ export function useSceneAudio(kind: "court" | "cycling") {
   return useMemo(() => ({
     unlock: () => ref.current?.unlock(),
     update: (speed = 0, nearWater = 0) => ref.current?.update(speed, nearWater),
-    sound: (name: Parameters<ReturnType<typeof sceneAudio>["sound"]>[0]) => ref.current?.sound(name),
+    sound: (name: Parameters<ReturnType<typeof sceneAudio>["sound"]>[0], strength = 1) => ref.current?.sound(name, strength),
     dispose: () => ref.current?.dispose(),
   }), []);
 }
@@ -61,11 +61,12 @@ export function sceneAudio(kind: "court" | "cycling") {
     if (tires && Math.abs(tireLevel - lastTires) > .001) { tires.gain.setTargetAtTime(tireLevel, context.currentTime, .3); lastTires = tireLevel; }
     if (water && Math.abs(waterLevel - lastWater) > .001) { water.gain.setTargetAtTime(waterLevel, context.currentTime, .6); lastWater = waterLevel; }
   };
-  const sound = (name: "bounce" | "rim" | "backboard" | "made" | "step" | "bird") => {
+  const sound = (name: "bounce" | "rim" | "backboard" | "made" | "step" | "bird", strength = 1) => {
     if (!context || !bus || context.state !== "running" || disposed || voices.size >= 8 || usePalaceStore.getState().mute) return;
     const ctx = context, now = ctx.currentTime, envelope = ctx.createGain();
     const duration = name === "made" ? 0.38 : name === "bird" ? 0.22 : 0.16;
-    const level = name === "bounce" ? 1.9 : name === "step" ? 0.16 : name === "bird" ? 0.12 : 0.6;
+    const energy = Number.isFinite(strength) ? Math.max(.05, Math.min(1, strength)) : 1;
+    const level = (name === "bounce" ? 1.9 : name === "step" ? 0.16 : name === "bird" ? 0.12 : 0.6) * energy;
     envelope.gain.setValueAtTime(0.0001, now);
     envelope.gain.exponentialRampToValueAtTime(level, now + 0.006);
     envelope.gain.exponentialRampToValueAtTime(0.0001, now + duration);
@@ -79,7 +80,7 @@ export function sceneAudio(kind: "court" | "cycling") {
     } else {
       const oscillator = ctx.createOscillator(); source = oscillator;
       oscillator.type = name === "rim" ? "triangle" : "sine";
-      const hz = name === "bounce" ? 180 : name === "rim" ? 820 : 2400;
+      const hz = name === "bounce" ? 145 + energy * 35 : name === "rim" ? 820 : 2400;
       oscillator.frequency.setValueAtTime(hz, now);
       oscillator.frequency.exponentialRampToValueAtTime(name === "bounce" ? 58 : hz * 0.72, now + duration);
       oscillator.connect(envelope);

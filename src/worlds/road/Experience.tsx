@@ -104,6 +104,8 @@ function RoadRider(){
     const keys=l.keys,pedal=keys.has("KeyW")||keys.has("ArrowUp")||s.easy,brake=l.brakeLatch||keys.has("KeyS")||keys.has("ArrowDown")||keys.has("Space"),steer=(keys.has("KeyD")||keys.has("ArrowRight")?1:0)-(keys.has("KeyA")||keys.has("ArrowLeft")?1:0);
     const mounting=roadView.mountProgress<1;
     l.accumulator=Math.min(l.accumulator+dt,.06);while(l.accumulator>=1/90){model.step(1/90,{pedal,brake,steer,strong:keys.has("ShiftLeft")||keys.has("ShiftRight"),blocked:mounting||s.photo||s.controls});l.accumulator-=1/90;}
+      // 高刷新帧可能尚未推进固定物理步；等待原恢复机制，不能先用无效距离采样相机。
+      if(!Number.isFinite(model.distance))return;
     if(model.atStop&&s.easy)useRoadRide.setState({easy:false,place:roadStops.find(stop=>Math.abs(stop.distance-model.distance)<3)?.title??"HOME"});
     if(l.photoPending&&model.speed===0){l.photoPending=false;l.keys.clear();useRoadRide.setState({photo:true,controls:false});}
     l.autoShift+=dt;

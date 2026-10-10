@@ -20,6 +20,7 @@ import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
 import { worksForRoom } from "../systems/mediaPlacement";
 import WorkAttention from "../motion/WorkAttention";
+import PosterCaption from "../motion/PosterCaption";
 import { useInteractable } from "../interaction/useInteractable";
 import { acknowledge } from "../interaction/registry";
 
@@ -507,6 +508,7 @@ export function VisualWall({
         position={[0, 0, 0.135]}
       />
       <WorkAttention width={actualWidth} height={actualHeight} hovered={hovered} warm={medium === "print"} attention={attention} />
+      <PosterCaption enabled={item.category === "editorial"} width={actualWidth} height={actualHeight} hovered={hovered} attention={attention}>
       <Label
         text={item.title.toUpperCase()}
         align="left"
@@ -522,6 +524,7 @@ export function VisualWall({
         color="#8ea7b5"
         maxWidth={width}
       />
+      </PosterCaption>
     </group>
   );
 }

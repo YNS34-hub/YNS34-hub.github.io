@@ -14,6 +14,7 @@ import {
 import { RoomShell } from "./Architecture";
 import { sampledColor } from "../world/imageColor";
 import ProjectionReveal from "../motion/ProjectionReveal";
+import { imageTransition } from "../motion/choreography";
 
 function FramedWork({ item, index }: { item: WallpaperItem; index: number }) {
   const side = index % 2 ? 1 : -1;
@@ -133,6 +134,9 @@ export function WallpaperCinema() {
   const images = useLibraryStore((s) => s.wallpapers),
     selected = usePalaceStore((s) => s.cinemaImage);
   const image = selected || images[0];
+  const previousImage = useRef<WallpaperItem | undefined>(undefined);
+  const transition = useMemo(() => image ? imageTransition(previousImage.current, image) : "room-tone", [image]);
+  useEffect(() => { previousImage.current = image; }, [image]);
   const texture = useImageTexture(image?.displaySrc || image?.src),
     tint = useMemo(() => sampledColor(texture, "#95b5c3"), [texture]);
   const light = useRef<import("three").PointLight>(null);
@@ -150,7 +154,7 @@ export function WallpaperCinema() {
         metalness={0.5}
         roughness={0.3}
       />
-      <ProjectionReveal resourceKey={texture?.uuid || "loading"} ready={!!texture}>
+      <ProjectionReveal resourceKey={texture?.uuid || "loading"} ready={!!texture} source={image?.displaySrc || image?.src} variant={transition}>
         <Picture
           texture={texture}
           width={27}

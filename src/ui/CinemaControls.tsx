@@ -7,6 +7,14 @@ export default function CinemaControls() {
   const library = useLibraryStore();
   const image = usePalaceStore((s) => s.cinemaImage);
   const [metadata, setMetadata] = useState(false);
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const wake = () => { setIdle(false); clearTimeout(timer); timer = setTimeout(() => setIdle(true), 3200); };
+    // 先于原 Cinema 的捕获键处理唤醒，避免其 stopImmediatePropagation 吞掉显示反馈。
+    window.addEventListener("pointermove", wake); window.addEventListener("keydown", wake, true); window.addEventListener("pointerdown", wake); wake();
+    return () => { clearTimeout(timer); window.removeEventListener("pointermove", wake); window.removeEventListener("keydown", wake, true); window.removeEventListener("pointerdown", wake); };
+  }, []);
   const images = [
     ...library.wallpapers,
     ...library.personal.visuals,
@@ -50,11 +58,11 @@ export default function CinemaControls() {
     return () => window.removeEventListener("keydown", key, true);
   });
   return (
-    <aside className="cinema-controls" ref={controlsCue} aria-label="Wallpaper cinema controls">
+    <aside className="cinema-controls" ref={controlsCue} data-idle={idle && !metadata} aria-label="Wallpaper cinema controls">
       <button aria-label="Previous image" onClick={() => move(-1)}>
         <ChevronLeft size={20} />
       </button>
-      <span ref={titleCue}>{selected?.title || "Wallpaper Cinema"}</span>
+      <span ref={titleCue}><small className="cinema-index">{String(Math.max(0, images.findIndex(x => x.id === selected?.id)) + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}</small>{selected?.title || "Wallpaper Cinema"}</span>
       <button aria-label="Next image" onClick={() => move(1)}>
         <ChevronRight size={20} />
       </button>
