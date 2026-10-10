@@ -17,6 +17,7 @@ export default function WorldWarmup({ roomId, children }: { roomId: string; chil
   }, [roomId]);
   useFrame(() => {
     if (!root.current || root.current.userData.prepared || active || textureStatus().pending || !scene.environment) return;
+    if (job.current?.stale()) { job.current.dispose(); job.current = null; }
     if (!job.current) job.current = warmPrograms(gl, root.current, camera, scene);
     if (job.current.ready()) {
       root.current.visible = true; root.current.userData.prepared = true; useActivity.setState({ warming: false });
