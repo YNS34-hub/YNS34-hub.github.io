@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const base = process.env.PALACE_URL || "http://127.0.0.1:5191", out = path.resolve(process.env.PALACE_ARTIFACTS || "qa-artifacts/worlds-production");
 await mkdir(out, { recursive: true });
-const report = { base, checkedAt: new Date().toISOString(), scope: "Actual public production build, native UI and keys only. No application debug exports, injected player state or altered physics.", checks: [], errors: [], uploads: [] };
+const report = { sha: execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(), base, checkedAt: new Date().toISOString(), scope: "Actual public production build, native UI and keys only. No application debug exports, injected player state or altered physics.", checks: [], errors: [], uploads: [] };
 const browser = await chromium.launch({ executablePath: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", headless: true, args: ["--use-angle=d3d11"] });
 const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
 await context.addInitScript(() => { if (!localStorage.getItem("memory-palace:v3")) localStorage.setItem("memory-palace:v3", JSON.stringify({ state: { quality: "medium", tutorialDone: true, roomSoundtracks: false }, version: 0 })); });
@@ -16,7 +17,14 @@ page.on("request", request => { if (request.method() === "POST") report.uploads.
 page.on("response", response => { if (response.status() >= 400) report.errors.push(response.status() + " " + response.url()); });
 const ready = () => page.locator(".world-ready canvas").waitFor();
 const shot = name => page.screenshot({ path: path.join(out, name + ".png") });
-const travel = async prefix => { await page.locator(".guide-button").click(); await page.getByRole("button", { name: new RegExp("^" + prefix + "\\s+") }).click(); await ready(); };
+const travel = async prefix => {
+  await page.locator(".guide-button").click(); await page.getByRole("button", { name: new RegExp("^" + prefix + "\\s+") }).click();
+  // 不把上个房间遗留的一帧 world-ready 当作新目的地就绪；真实控制只在资源准备结束后出现。
+  if (prefix === "W1") await page.locator(".court-hud").waitFor();
+  if (prefix === "W2") await page.locator(".road-status").waitFor();
+  if (prefix === "W0") await page.locator(".room-caption").filter({ hasText: "WORLDS BEYOND" }).waitFor();
+  await ready();
+};
 try {
   const catalog = await (await context.request.get(base + "/personal-media/manifest.json")).json();
   for (const key of ["wallpapers", "visuals", "music", "projects", "research"]) assert.deepEqual(catalog[key], []);
@@ -38,6 +46,13 @@ try {
   await page.getByRole("button", { name: "Arc assist on", exact: true }).click();
   assert.equal(await page.getByRole("button", { name: "Arc assist off", exact: true }).getAttribute("aria-pressed"), "false");
   report.checks.push("Original Guide reaches court; native recall, pickup, dribble, timed shot and assist feedback");
+  // 公开打包后的直接入口与资源缓存后的重入都必须可用，捕获旧环境清理覆盖新环境的生命周期回归。
+  await travel("W0"); await travel("W1");
+  await page.getByRole("button", { name: "Night lights", exact: true }).click(); await page.waitForTimeout(2600);
+  await shot("court-night-public"); await page.reload(); await ready();
+  assert.equal(await page.getByRole("button", { name: "Night lights", exact: true }).getAttribute("aria-pressed"), "true");
+  await page.getByRole("button", { name: "Daylight", exact: true }).click(); await page.waitForTimeout(2600);
+  report.checks.push("Cached court re-entry, day/night switching and lighting restoration after production refresh");
   await travel("W2");
   const progress = page.locator(".road-status");
   assert.equal(await progress.getAttribute("data-mounted"),"false");

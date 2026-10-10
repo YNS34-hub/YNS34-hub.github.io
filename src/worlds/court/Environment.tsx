@@ -20,12 +20,16 @@ export default function CourtEnvironment({ onReady }: { onReady?: () => void }) 
   // 在首个渲染帧之前保存外部曝光；普通 effect 可能晚于 useFrame，误把球场自己的 1.08 当作还原值。
   useLayoutEffect(() => {
     const far = camera.far, exposure = gl.toneMappingExposure; camera.far = 650; camera.updateProjectionMatrix();
+    return () => { camera.far = far; camera.updateProjectionMatrix(); gl.toneMappingExposure = exposure; };
+  }, [camera, gl]);
+  // 环境接管仍在 passive effect：直接从 Guide 进入时，旧室外环境的 passive 清理必须先完成，不能随后清空新 PMREM。
+  useEffect(() => {
     hdr.mapping = EquirectangularReflectionMapping;
     const generator = new PMREMGenerator(gl), env = generator.fromEquirectangular(hdr); generator.dispose();
     scene.environment = env.texture; scene.background = sky; courtAtmosphere.night = useCourtTime.getState().time === "night" ? 1 : 0;
     useGLTF.preload("/assets/memory-glass.glb");
-    return () => { env.dispose(); sky.dispose(); if (scene.environment === env.texture) scene.environment = null; if (scene.background === sky) scene.background = null; scene.backgroundIntensity = 1; camera.far = far; camera.updateProjectionMatrix(); gl.toneMappingExposure = exposure; };
-  }, [camera, gl, hdr, scene, sky]);
+    return () => { env.dispose(); sky.dispose(); if (scene.environment === env.texture) scene.environment = null; if (scene.background === sky) scene.background = null; scene.backgroundIntensity = 1; };
+  }, [gl, hdr, scene, sky]);
   useEffect(() => {
     if (left.current) { left.current.target.position.set(-2, 0, -1); left.current.target.updateMatrixWorld(); }
     if (right.current) { right.current.target.position.set(2, 0, 1); right.current.target.updateMatrixWorld(); }

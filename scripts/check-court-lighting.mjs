@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const base = process.env.PALACE_URL || "http://127.0.0.1:5190";
 const out = path.resolve(process.env.PALACE_ARTIFACTS || "qa-artifacts/court-lighting"); await mkdir(out, { recursive: true });
-const report = { scope: "Native lighting/player input; declared debug camera staging and read-only scene diagnostics.", checks: [], errors: [], cycles: [] };
+const report = { sha: execFileSync("git", ["rev-parse", "HEAD"]).toString().trim(), scope: "Native lighting/player input; declared debug camera staging and read-only scene diagnostics.", checks: [], errors: [], cycles: [] };
 const browser = await chromium.launch({ executablePath: "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", headless: true, args: ["--use-angle=d3d11"] });
 const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
 await context.route("**/personal-media/manifest.json", r => r.fulfill({ json: { wallpapers: [], visuals: [], music: [], projects: [], research: [] } }));
@@ -14,7 +15,13 @@ const page = await context.newPage(); page.setDefaultTimeout(60000);
 page.on("pageerror", e => report.errors.push(e.message)); page.on("console", m => { if (m.type() === "error") report.errors.push(m.text()); });
 const ready = () => page.locator(".world-ready canvas").waitFor();
 const activity = () => page.evaluate(async () => (await import("/src/worlds/activity.ts")).useActivity.getState());
-const travel = async prefix => { await page.locator(".guide-button").click(); await page.getByRole("button", { name: new RegExp("^" + prefix + "\\s+") }).click(); await ready(); };
+const travel = async prefix => {
+  await page.locator(".guide-button").click(); await page.getByRole("button", { name: new RegExp("^" + prefix + "\\s+") }).click();
+  // 等待目的地本身的可见状态，避免误读上一室尚未移除的 world-ready。
+  if (prefix === "W1") await page.locator(".court-hud").waitFor();
+  if (prefix === "W0") await page.locator(".room-caption").filter({ hasText: "WORLDS BEYOND" }).waitFor();
+  await ready();
+};
 try {
   await page.goto(base + "/basketball/"); await ready();
   await page.getByRole("button", { name: "R · Recall ball", exact: true }).click();
