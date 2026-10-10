@@ -1,0 +1,264 @@
+{
+  "sha": "bbd959951885e214377def2c8563c583716f2781",
+  "dirty": true,
+  "when": "2026-10-10T05:08:07.329Z",
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "build": "Vite development build with original read-only diagnostics; public production is verified separately.",
+  "gpu": [
+    {
+      "Name": "MuMu Virtual Display Adapter",
+      "DriverVersion": "20.36.41.498"
+    },
+    {
+      "Name": "GameViewer Virtual Display Adapter",
+      "DriverVersion": "15.6.5.199"
+    },
+    {
+      "Name": "Intel(R) UHD Graphics",
+      "DriverVersion": "31.0.101.2141"
+    },
+    {
+      "Name": "NVIDIA GeForce GTX 1650",
+      "DriverVersion": "32.0.15.9186"
+    }
+  ],
+  "scope": "Real RAF wall intervals including simulation. Main-pass renderer.info counts exclude shadow/offscreen passes; material-map MB excludes full VRAM. No GPU timer query. Native mount/pedal; valid saved-position staging is used for geographic samples.",
+  "samples": [
+    {
+      "label": "high pass / stationary",
+      "fps": 140.6643222613131,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.200000000000728,
+      "maxMs": 27.900000000001455,
+      "frames": 844,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 66,
+        "triangles": 1243378,
+        "textures": 21,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 66,
+        "triangles": 1243378,
+        "textures": 21,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "upper corniche / stationary",
+      "fps": 132.5826976248541,
+      "medianMs": 7,
+      "p95Ms": 13.799999999999272,
+      "maxMs": 41.80000000000109,
+      "frames": 796,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 68,
+        "triangles": 1243889,
+        "textures": 18,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 68,
+        "triangles": 1243889,
+        "textures": 18,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "upper corniche / native pedaling",
+      "fps": 136.2523728644284,
+      "medianMs": 7,
+      "p95Ms": 7.30000000000291,
+      "maxMs": 34.799999999995634,
+      "frames": 1091,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 97,
+        "triangles": 1248863,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 97,
+        "triangles": 1248863,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "upper corniche / coasting",
+      "fps": 129.82684199123372,
+      "medianMs": 7,
+      "p95Ms": 13.900000000001455,
+      "maxMs": 69.40000000000146,
+      "frames": 779,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 95,
+        "triangles": 1245086,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 101,
+        "triangles": 1275285,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "switchbacks / stationary",
+      "fps": 137.94482207114584,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.299999999999272,
+      "maxMs": 34.39999999999782,
+      "frames": 828,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 68,
+        "triangles": 1250520,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 68,
+        "triangles": 1250520,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "switchbacks / native pedaling",
+      "fps": 138.8715282117753,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.200000000000728,
+      "maxMs": 48.30000000000291,
+      "frames": 1111,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 66,
+        "triangles": 1251360,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 66,
+        "triangles": 1260797,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "switchbacks / coasting",
+      "fps": 132.03902893870085,
+      "medianMs": 7,
+      "p95Ms": 13.900000000001455,
+      "maxMs": 34.69999999999709,
+      "frames": 793,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 64,
+        "triangles": 1251088,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 66,
+        "triangles": 1251360,
+        "textures": 19,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "lower meadow / stationary",
+      "fps": 140.72310023816425,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000002183,
+      "maxMs": 34.70000000000073,
+      "frames": 845,
+      "last": {
+        "room": "alpine-ride",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 57,
+        "triangles": 1156889,
+        "textures": 20,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      },
+      "peak": {
+        "calls": 57,
+        "triangles": 1156889,
+        "textures": 20,
+        "lights": 2,
+        "mapMB": 36.494313557942704
+      }
+    },
+    {
+      "label": "museum wing / after road exits",
+      "fps": 143.61161554739132,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 13.899999999999636,
+      "frames": 862,
+      "last": {
+        "room": "worlds",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "effectiveQuality": "medium",
+        "calls": 30,
+        "triangles": 3032,
+        "textures": 12,
+        "lights": 2,
+        "mapMB": 23.931406656901043
+      },
+      "peak": {
+        "calls": 30,
+        "triangles": 3032,
+        "textures": 12,
+        "lights": 2,
+        "mapMB": 23.931406656901043
+      }
+    }
+  ],
+  "errors": [],
+  "meets45Mean": true,
+  "meets60Mean": true,
+  "passed": true
+}

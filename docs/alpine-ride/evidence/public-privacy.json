@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "privateItems": {
+    "wallpapers": 0,
+    "visuals": 0,
+    "music": 0,
+    "projects": 0,
+    "research": 0
+  },
+  "forbiddenFiles": [],
+  "preservedRoutes": [
+    "alpine-ride/index.html",
+    "cycling/index.html",
+    "legacy/index.html"
+  ],
+  "publicFiles": 310
+}

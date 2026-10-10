@@ -1,0 +1,93 @@
+{
+  "sha": "a1666d4c39505b65503e6e9f97aae1c067be06ad",
+  "dirty": false,
+  "scope": "Static camera staging through valid saved route positions; approach and mount use native input. Separate journeys verify continuous travel.",
+  "frames": [
+    {
+      "name": "forest-road",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.045,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "158.84",
+        "grade": "0.0173",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "woodland-s-curve",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.1,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "352.97",
+        "grade": "-0.0128",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4,5",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "first-lake-reveal",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.185,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "653.00",
+        "grade": "0.0109",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "2,3,4,5,6,7",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "high-meadow",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.487,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1718.97",
+        "grade": "-0.0316",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "descent",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.6,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2117.83",
+        "grade": "-0.0908",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "11,12,13,14,15,16",
+        "photo": "false"
+      }
+    }
+  ],
+  "errors": []
+}

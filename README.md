@@ -151,3 +151,5 @@ npm run qa:performance # 可见桌面浏览器；实际 renderer 写入报告
 第一轮新增靠近/注视/操作反馈、街头篮球练习场和 Worlds 翼，保留原馆的建筑、音频、歌词和私人素材边界，见 [交互与活动验证记录](docs/interaction-worlds/README.md)。
 
 第二轮从已完成的第一轮派生，`/cycling` 现在进入 **THE LONG WAY HOME**：先步行靠近原创弯把公路车，再按 E 上车。约 3.53 km 连续铺装路线经过森林、湖岸、真实爬坡、山脊、草甸与下坡。W 踩踏，松开滑行并听真实轮速棘轮声；Q/E 换挡，S/Space 制动，P 静止照片；Ride options 可选连续踩踏、下个观景停点、低动态与返回。旧骑行 URL、原馆和篮球仍保留。实际截图、原生录像、测试和性能范围见 [公路骑行验证记录](docs/road-cycling/README.md)。
+
+新增独立地图 **THE ALPINE DESCENT** 位于 `/alpine-ride/`，原 `/cycling/` 继续保留。Worlds 翼或骑行选项可在停车后选择地图；两图使用独立进度，共享现有骑行控制与声音。新路线依据 Furka Pass 的开放地形/道路资料，约 10.17 km，参考指定视频的高山草甸、山壁和深谷构图，不宣称是视频的确切地点。来源、截图、验证与未测范围见 [高山地图记录](docs/alpine-ride/README.md)。
