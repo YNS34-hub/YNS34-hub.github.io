@@ -11,7 +11,7 @@ export function makeBackboardGlass() {
       float surfaceF=.03746+.96254*pow(1.-facing,5.);
       float paneF=clamp(2.*surfaceF/(1.+surfaceF),.072,1.);
       // 双界面增加反射，透射背景按视角守恒混合；不使用固定的低 opacity 冒充玻璃。
-      gl_FragColor=vec4(outgoingLight*2./max(paneF,.001),paneF);
+      gl_FragColor=vec4(outgoingLight*(2./(1.+surfaceF))/max(paneF,.001),paneF);
     `);
   };
   material.customProgramCacheKey = () => "park-flat-pane-fresnel-v1";
