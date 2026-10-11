@@ -1,4 +1,5 @@
 import {MeshStandardMaterial,type Texture} from "three";
+import {lake} from "../road/route";
 
 type GroundMaps={rock:Texture;rockNormal:Texture;meadow:Texture;meadowNormal:Texture};
 // 远景共享四张 1K 实拍材质；近处才采样细法线，不把林叶纹理平铺到整座山上。
@@ -31,7 +32,9 @@ export function valleyTerrainMaterial(maps:GroundMaps,mountain=false){
         pasture=mix(photoGrass*.76,pasture,smoothstep(90.,240.,vd));stone=mix(photoStone*.75,stone,smoothstep(90.,240.,vd));
       }
       vec3 valleySurface=mix(pasture,stone,stoneMask)*(.70+.43*vm);
-      diffuseColor.rgb*=valleySurface;
+      float shoreRadius=length((vp.xz-vec2(${lake.x.toFixed(1)},${lake.z.toFixed(1)}))/vec2(${lake.rx.toFixed(1)},${lake.rz.toFixed(1)}));
+      float shoreWet=(1.-smoothstep(.04,.9,abs(vp.y-${lake.y})))*(1.-smoothstep(1.22,1.45,shoreRadius));
+      diffuseColor.rgb*=valleySurface*mix(1.,.60,shoreWet);
     `).replace("#include <normal_fragment_maps>",`
       normal=normalize((viewMatrix*vec4(vn,0.)).xyz);
       if(vd<85.){
@@ -40,6 +43,6 @@ export function valleyTerrainMaterial(maps:GroundMaps,mountain=false){
         vec3 detail=mix(vec3(grass.x,0.,grass.y)*.18,rocks,stoneMask)*.32*(1.-smoothstep(30.,85.,vd));
         normal=normalize((viewMatrix*vec4(normalize(vn+detail),0.)).xyz);
       }
-    `);
-  };m.customProgramCacheKey=()=>"photographed-valley-earth-v4:"+mountain;return m;
+    `).replace("#include <roughnessmap_fragment>","#include <roughnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.86,shoreWet);");
+  };m.customProgramCacheKey=()=>"photographed-valley-earth-v5:"+mountain;return m;
 }
