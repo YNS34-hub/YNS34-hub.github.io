@@ -7,6 +7,7 @@ import {usePineShape} from "../road/textures";
 import {usePalaceStore} from "../../systems/store";
 import {useQuietMotion} from "../../motion/useMotionCue";
 import {alpineGround,alpineLength,alpineSectorLength,nearestAlpine,sampleAlpine} from "./route";
+import {habitat} from "../scenery/ecology";
 
 const urls=["/media/road/bark.webp","/media/road/pine.webp"];
 export function preloadAlpineVegetation(){useTexture.preload(urls);useLoader.preload(FileLoader,"/media/road/pine-shape.json",loader=>loader.setResponseType("json"));}
@@ -21,14 +22,14 @@ export function AlpineVegetation({index}:{index:number}){
     for(let d=start+12;d<end;d+=12){
       sampleAlpine(d,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz);
       for(const side of[-1,1]){
-        const off=side*(12+rand()*65),x=p.x+nx/r*off,z=p.z+nz/r*off,y=alpineGround(x,z);
+        const off=side*(10+rand()**1.3*68),along=(rand()-.5)*9,x=p.x+nx/r*off+t.x/r*along,z=p.z+nz/r*off+t.z/r*along,y=alpineGround(x,z);
         // 林线在海拔约 2050 米淡出，不在山口凭空种树林；陡坡和公路保持开放。
-        if(y>570||rand()>(570-y)/260||nearestAlpine(x,z).distance<9||Math.hypot(alpineGround(x+2,z)-alpineGround(x-2,z),alpineGround(x,z+2)-alpineGround(x,z-2))>3.5)continue;
-        const size=(10+rand()*9)/shape.height,angle=rand()*Math.PI*2,cs=Math.cos(angle),sn=Math.sin(angle);
-        trees.push({position:[x,y-.08,z],scale:[size,size,size],rotation:[0,angle,0]});
+        if(y>570||rand()>(570-y)/260*(.35+habitat(x,z))||nearestAlpine(x,z).distance<9||Math.hypot(alpineGround(x+2,z)-alpineGround(x-2,z),alpineGround(x,z+2)-alpineGround(x,z-2))>3.5)continue;
+        const size=(7+rand()**.6*13)/shape.height,sx=size*(.78+rand()*.40),sz=size*(.8+rand()*.36),angle=rand()*Math.PI*2,cs=Math.cos(angle),sn=Math.sin(angle);
+        trees.push({position:[x,y-.08,z],scale:[sx,size,sz],rotation:[0,angle,0]});
         for(let k=0;k<shape.crown.length;k+=tier==="low"?8:2){
           const a=shape.crown[k],w=.90+rand()*.22;
-          twigs.push({position:[x+(a[0]*cs+a[2]*sn)*size,y+a[1]*size,z+(-a[0]*sn+a[2]*cs)*size],scale:[.8*w*size,1.9*w*size,1],rotation:[(rand()-.5)*1.4,rand()*6.28,(rand()-.5)*1.7]});
+          twigs.push({position:[x+a[0]*sx*cs+a[2]*sz*sn,y+a[1]*size,z-a[0]*sx*sn+a[2]*sz*cs],scale:[.8*w*size,1.9*w*size,1],rotation:[(rand()-.5)*1.4,rand()*6.28,(rand()-.5)*1.7]});
         }
       }
     }
@@ -44,7 +45,8 @@ export function AlpineVegetation({index}:{index:number}){
       m.onBeforeCompile=shader=>{
         shader.uniforms.alpineLeafTime=data.time;shader.uniforms.alpineLeafWind=data.wind;
         shader.vertexShader="uniform float alpineLeafTime;uniform float alpineLeafWind;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ntransformed.x+=sin(alpineLeafTime*.6+instanceMatrix[3].x*.2)*alpineLeafWind*uv.y;");
-      };m.customProgramCacheKey=()=>"alpine-pine-breeze-v1";m.needsUpdate=true;
+        shader.fragmentShader=shader.fragmentShader.replace("#include <normal_fragment_maps>","#include <normal_fragment_maps>\nnormal=normalize(mix(normal,(viewMatrix*vec4(0.,1.,0.,0.)).xyz,.42));").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.09;\n#include <opaque_fragment>");
+      };m.customProgramCacheKey=()=>"alpine-readable-canopy-v2";m.needsUpdate=true;
     });
   },[data,maps]);
   useFrame((_,dt)=>{if(!quiet)data.time.value+=Math.min(.06,dt);});

@@ -22,7 +22,7 @@ describe("two-map preservation",()=>{
     rememberRoadCinema(pose);roadTravel("alpine-ride","cinema");roadTravel("cinema","alpine-ride");expect(peekRoadCinemaReturn("alpine-ride")).toEqual(pose);expect(peekRoadCinemaReturn("cycling")).toBeNull();expect(takeRoadCinemaReturn()).toEqual(pose);
     rememberRoadCinema(pose);roadTravel("alpine-ride","cycling");expect(peekRoadCinemaReturn("alpine-ride")).toBeNull();
   });
-  it("keeps accepted forest source apart from the declared approach and bounded surface adapters",()=>{
+  it("keeps accepted forest source apart from declared approach, surface and authorized scenic adapters",()=>{
     const files={"Landscape.tsx":"e3cf62583056b1e456224dd96c8c92b3927d0a801f127e12842536fadd1fdf1d","Environment.tsx":"6b3635d1ee9cb985b02feedb4e5033cc46c707cd6c0fac2944f321f8b1845190","route.ts":"461930b1630198c802e11052692c7f3b4c6d361d3f1395f82fe6dfda0548be53"};
     const adapters={
       "Landscape.tsx":["    const roadStart=index===0?-12:start;\n    const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];","    const road=roadRibbon(start,end,6.4),edges=[roadRibbon(start,end,.1,-2.95,.012),roadRibbon(start,end,.1,2.95,.012)];"],
@@ -30,6 +30,10 @@ describe("two-map preservation",()=>{
     };
     for(const [file,digest] of Object.entries(files)){
       let source=readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n");
+      // 本轮用户明确授权环境美术修改。先逐段撤销记录的视觉 diff，再沿用旧补丁和原始摘要，不扩大到物理或导航。
+      const art=JSON.parse(readFileSync("tests/fixtures/cycling-art-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+      expect(art.baseline).toBe("48303b694e149f18b3d580fbc0d2ce1bc99cf730");
+      for(const patch of art.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
       if(file==="Landscape.tsx"){
         // 显式保存局部材质/草根补丁的前后文本；其余源码仍由原摘要约束，不刷新原摘要。
         const surfaces=JSON.parse(readFileSync("tests/fixtures/forest-surface-adapters.json","utf8")) as {id:number;before:string;after:string}[];
