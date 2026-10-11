@@ -6,6 +6,7 @@ import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { setAlpineHeightfield, setAlpineDetailfield, type AlpineHeightfield } from "./route";
 import type {ImageAtlas} from "./projection";
 import type {AlpineSunField} from "./sunlight";
+import {scenicSky} from "../scenery/lighting";
 
 export const alpineSky = "/media/alpine/clear-daylight-2k.hdr";
 export const alpineBackdrop = "/media/alpine/clear-sky-8k.webp";
@@ -18,7 +19,7 @@ export interface AlpineGeography {
 }
 const terrainUrl="/media/alpine/geography.json",demUrls=["/media/alpine/massif-dem.bin","/media/alpine/detail-dem.bin"];
 const urls = ['road-color','road-normal','meadow-color','meadow-normal','rock-color','rock-normal','swissimage','swissimage-near','terrain-sun'].map(n=>"/media/alpine/"+n+".webp");
-export function preloadAlpineAssets() { useTexture.preload(urls);useTexture.preload(alpineBackdrop); useLoader.preload(RGBELoader,alpineSky); useLoader.preload(GeographyLoader,terrainUrl);useLoader.preload(ElevationLoader,demUrls); }
+export function preloadAlpineAssets() { useTexture.preload(urls);useTexture.preload(scenicSky); useLoader.preload(RGBELoader,alpineSky); useLoader.preload(GeographyLoader,terrainUrl);useLoader.preload(ElevationLoader,demUrls); }
 export function useAlpineGeography(){return useLoader(GeographyLoader,terrainUrl) as unknown as AlpineGeography;}
 export function useAlpineHeightfield() {
   const meta=useAlpineGeography(),buffers=useLoader(ElevationLoader,demUrls) as unknown as ArrayBuffer[];

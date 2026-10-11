@@ -2,12 +2,14 @@ import { useMemo,useEffect } from "react";
 import { useTexture } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
 import { RepeatWrapping,SRGBColorSpace,NoColorSpace,FileLoader } from "three";
+import {RGBELoader} from "three/addons/loaders/RGBELoader.js";
+import {scenicSky,scenicHDR} from "../scenery/lighting";
 
 export const roadTextureUrls=["asphalt","asphalt-normal","bark","pine","ground","grass"].map(name=>"/media/road/"+name+".webp");
 export interface PineShape {height:number;position:number[];normal:number[];uv:number[];index:number[];crown:number[][]}
 const json=(loader:FileLoader)=>loader.setResponseType("json"),shapeUrl="/media/road/pine-shape.json";
 export function usePineShape(){return useLoader(FileLoader,shapeUrl,json) as unknown as PineShape;}
-export function primeRoadTextures(){useTexture.preload(roadTextureUrls);useLoader.preload(FileLoader,shapeUrl,json);}
+export function primeRoadTextures(){useTexture.preload(roadTextureUrls);useTexture.preload(scenicSky);useLoader.preload(RGBELoader,scenicHDR);useLoader.preload(FileLoader,shapeUrl,json);}
 // 解码缓存由 drei 管理，各路线挂载只拥有克隆的 sampler。卸载不会销毁另一处仍在用的原纹理。
 export function useRoadTextures(){
   const originals=useTexture(roadTextureUrls);

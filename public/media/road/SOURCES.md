@@ -7,5 +7,6 @@ These are public-domain CC0 assets from Poly Haven, resized/encoded as 1K WebP f
 - `pine-shape.json`: an offline, vertex-clustered version of that CC0 tree's wood (3,756 triangles), with 1,700 sampled canopy positions rendered as cutout twig cards. The 905 MB needle model is never shipped. `scripts/prepare-road-tree.mjs` records this conversion. Each streamed sector instances the small shared geometry; distant crowns are locally composed from the same canopy and texture.
 - `ground.webp`: [Forest Leaves 04](https://polyhaven.com/a/forest_leaves_04).
 - `grass.webp`: [Leafy Grass](https://polyhaven.com/a/leafy_grass).
+- `sky-4k.webp`: a 4096 × 2048 display-only derivative of the already licensed [Kloofendal 48d Partly Cloudy Pure Sky](https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky) under `/media/alpine/clear-sky-8k.webp`. `scripts/prepare-cycling-sky.py` only resizes, with no colour grading. Both maps share this image; reflection lighting reuses the original 2K HDR, with a single PMREM per active scene. No new animation, live reflection or postprocessing is introduced.
 
 License: [Poly Haven CC0](https://polyhaven.com/license). Bicycle, road, terrain, architectural and UI geometry is original project code; the pine shape is explicitly attributed above. The site does not use any commercial road-bike logos.
