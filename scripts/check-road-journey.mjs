@@ -3,6 +3,7 @@ import {chromium} from "playwright";
 import {mkdir,writeFile} from "node:fs/promises";
 import {execFileSync} from "node:child_process";
 import path from "node:path";
+import {Quaternion} from "three";
 import {roadLength,roadStops} from "../src/worlds/road/route.ts";
 const base=process.env.PALACE_URL||"http://127.0.0.1:5190",out=path.resolve(process.env.PALACE_ARTIFACTS||"qa-artifacts/road-journey");
 await mkdir(out,{recursive:true});
@@ -56,7 +57,11 @@ try{
  const end=await read();check("Continuous full route finishes without teleport or infinite loading",end.model.ended);report.journeySeconds=(Date.now()-start)/1000;check("Bounded streaming traverses the full authored geography",visited.size>=18&&Number(end.s.sectors.split(",").length)<=6);await mark("15-last-road-stop");
  // 通过原 Cinema API 验证同次访问原位返回；不会改动 Cinema 数据或导航。
  const before=await read();await page.evaluate(()=>{const lib=window.__PALACE_DEV__.library.getState();window.__PALACE_DEV__.state.getState().openCinema(lib.wallpapers[0]||lib.personal.visuals[0]);});await page.waitForFunction(()=>window.__PALACE_DEBUG__?.roomId==="cinema"&&document.querySelector(".world-ready"));await page.evaluate(()=>window.__PALACE_DEV__.state.getState().exitCinema());await page.locator(".road-status").waitFor({state:"attached"});await page.locator(".world-ready canvas").waitFor();await page.waitForTimeout(600);
- const after=await read();check("Cinema restores road posture, distance, spatial position and head orientation",after.s.mounted==="true"&&Math.abs(after.model.distance-before.model.distance)<.05&&after.camera.every((n,i)=>Math.abs(n-before.camera[i])<.08)&&after.quaternion.every((n,i)=>Math.abs(n-before.quaternion[i])<.001));await mark("16-cinema-return");
+ const after=await read();
+ // q 与 -q 表示同一朝向，逐分量比较会误判跨场景重建；仍严格比较真实旋转角和位置。
+ const angle=new Quaternion(...before.quaternion).normalize().angleTo(new Quaternion(...after.quaternion).normalize());
+ report.cinemaReturn={positionDelta:Math.hypot(...after.camera.map((n,i)=>n-before.camera[i])),angleRadians:angle,distanceDelta:Math.abs(after.model.distance-before.model.distance)};
+ check("Cinema restores road posture, distance, spatial position and head orientation",after.s.mounted==="true"&&report.cinemaReturn.distanceDelta<.05&&after.camera.every((n,i)=>Math.abs(n-before.camera[i])<.08)&&Number.isFinite(angle)&&angle<.002);await mark("16-cinema-return");
  await page.evaluate(()=>window.__ROAD_DEBUG__.model.distance=NaN);await page.waitForTimeout(600);const recovered=await read();check("Explicit invalid-state recovery returns the last safe point stopped",recovered.model.recovered&&recovered.model.speed===0&&Number.isFinite(recovered.model.distance));
  await options();await page.getByRole("button",{name:"Return to the Palace",exact:true}).click();await page.waitForFunction(()=>window.__PALACE_DEBUG__?.roomId==="worlds"&&document.querySelector(".world-ready"));await mark("17-museum-return");
  await page.evaluate(()=>window.__PALACE_DEV__.state.getState().enterRoom("cycling"));await page.locator(".road-mount").waitFor();check("Fresh re-entry restores progress on foot without stale riding controls",(await read()).s.mounted==="false");await mark("18-safe-re-entry");
