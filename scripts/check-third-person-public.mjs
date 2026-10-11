@@ -25,7 +25,7 @@ try{
   await page.keyboard.up("w");await page.keyboard.up("Shift");assert.ok(accepted,"Actual native run-up must reach an eligible dunk");
   await page.waitForFunction(()=>document.querySelector(".practice-score strong")?.textContent?.replace(/\s/g,"")==="1/1");
   await page.keyboard.press("v");assert.equal(await page.getByRole("button",{name:"First person",exact:true}).getAttribute("aria-pressed"),"true");
-  await page.keyboard.press("v");await page.reload();await page.locator(".world-ready canvas").waitFor();await page.locator(".court-hud").waitFor();assert.equal(await page.getByRole("button",{name:"Third person · V",exact:true}).getAttribute("aria-pressed"),"true");
+  await page.keyboard.press("v");await page.goto(base+"/basketball");await page.locator(".world-ready canvas").waitFor();await page.locator(".court-hud").waitFor();assert.equal(await page.getByRole("button",{name:"Third person · V",exact:true}).getAttribute("aria-pressed"),"true");
   await page.screenshot({path:path.join(out,`${width}-court.png`)});report.checks.push({width,name:"Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"});
   for(const room of["cycling","alpine-ride"]){
    await page.goto(base+"/"+room+"?view=third");await page.locator(".world-ready canvas").waitFor();await page.locator(".road-mount").waitFor();

@@ -36,7 +36,7 @@ try{
   assert.ok(await page.evaluate(()=>{const root=window.__PALACE_DEBUG__.scene.getObjectByName("visitor-athlete"),hand=root.getObjectByName("Bip01_R_Hand"),point=hand.position.clone();hand.getWorldPosition(point);return point.y-root.position.y<1.65;}),"Finishing IK must settle back to the underlying idle arm pose");
   await pickup();await page.waitForTimeout(400);await page.keyboard.press("g");assert.match((await read()).activity.result,/run-up/);
   await page.keyboard.press("f");await page.waitForTimeout(150);await page.locator(".guide-button").click();const paused=await read();await page.waitForTimeout(500);assert.equal((await read()).jump,paused.jump);assert.equal((await read()).activity.shots,paused.activity.shots);await page.keyboard.press("Escape");await page.waitForTimeout(1600);
-  await page.reload();await ready("basketball");assert.equal((await read()).view,"third");
+  await page.goto(base+"/basketball");await ready("basketball");assert.equal((await read()).view,"third");
   await pose([0,1.65,13.8],[0,2.4,17.2]);await page.locator(".interaction-hint").filter({hasText:"Back to the palace"}).waitFor();await page.keyboard.press("e");await ready("worlds");
   report.checks.push({width,name:"Court: first/third, real sprint dribble, layup, running dunk, invalid dunk feedback, action pause/resume, refresh preference, physical return"});
 

@@ -7,6 +7,7 @@ import { useActivity } from "../activity";
 import { roadView, useRoadRide } from "../road/state";
 import { getRideMap } from "../road/maps";
 import { followPose } from "./math";
+import { limitCourtBoom } from "./courtBoom";
 import { presence, usePerspective, type AdventureRoom } from "./state";
 
 export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
@@ -36,7 +37,10 @@ export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
     if (mode === "third") {
       const ground = roomId === "basketball" ? 0 : getRideMap(roomId).ground(scratch.position.x, scratch.position.z);
       scratch.position.y = Math.max(scratch.position.y, ground + .75);
-      if (roomId === "basketball") { scratch.position.x = Math.max(-12.3, Math.min(12.3, scratch.position.x)); scratch.position.z = Math.max(-18.3, Math.min(18.3, scratch.position.z)); }
+      if (roomId === "basketball") {
+        scratch.position.x = Math.max(-12.3, Math.min(12.3, scratch.position.x)); scratch.position.z = Math.max(-18.3, Math.min(18.3, scratch.position.z));
+        limitCourtBoom(scratch.eye, scratch.position);
+      }
       scratch.matrix.lookAt(scratch.position, scratch.target, scratch.up); scratch.quaternion.setFromRotationMatrix(scratch.matrix);
     } else scratch.quaternion.copy(body.quaternion);
     if (last.current !== mode) { last.current = mode; transition.current = comfort ? 0 : .4; }
@@ -44,6 +48,10 @@ export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
     const smooth = initialized.current && !comfort && (mode === "third" || transition.current > 0);
     if (smooth) { const blend = 1 - Math.exp(-dt * (transition.current > 0 ? 12 : 16)); camera.position.lerp(scratch.position, blend); camera.quaternion.slerp(scratch.quaternion, blend); }
     else { camera.position.copy(scratch.position); camera.quaternion.copy(scratch.quaternion); }
+    // 平滑轨迹也要避障，避免上一帧的长镜头仍把篮板夹在镜头与球员之间。
+    if (mode === "third" && roomId === "basketball" && limitCourtBoom(scratch.eye, camera.position)) {
+      scratch.matrix.lookAt(camera.position, scratch.target, scratch.up); camera.quaternion.setFromRotationMatrix(scratch.matrix);
+    }
     transition.current = Math.max(0, transition.current - dt); initialized.current = true;
     if (camera instanceof PerspectiveCamera && Math.abs(camera.fov - body.fov) > .01) { camera.fov = body.fov; camera.updateProjectionMatrix(); }
   }, -1);
