@@ -1,4 +1,5 @@
 import { Group, InstancedMesh, SkinnedMesh, Line, LineSegments, Mesh, MeshDepthMaterial, Points, WebGLRenderTarget, BackSide, DoubleSide, FrontSide, RGBADepthPacking, type Camera, type Material, type Object3D, type Scene, type WebGLRenderer } from "three";
+import { prepareCourtLighting } from "./court/lightingPrograms";
 
 // r180 的 compile 提交程序后，由当前版本的 isReady 查询 KHR_parallel_shader_compile。
 // 不创建另一个 renderer、不绘制离屏画面。原材质仍由原组件拥有，帧内轮询允许随时取消。
@@ -45,13 +46,16 @@ export function warmPrograms(renderer: WebGLRenderer, root: Object3D, camera: Ca
     // 让编译器读取真实灯光组合；同步提交后立刻恢复隐藏，不会出现一帧闪现。
     root.visible = true;
     const materials = renderer.compile(scene, camera);
+    if(root.getObjectByName("basketball-practice-world"))for(const material of prepareCourtLighting(renderer,root,camera,scene))materials.add(material);
     const offscreen = [...materials].some(material => (material as Material & { transmission?: number }).transmission) || !!root.getObjectByName("sky-reflecting-lake") || depths.size > 0;
     if (offscreen) {
       // 玻璃、湖面与阴影还使用线性输出变体；1×1 临时目标只用于正确编译，完全不绘制并立即释放。
       variantTarget = new WebGLRenderTarget(1, 1, { depthBuffer: false, stencilBuffer: false });
       renderer.setRenderTarget(variantTarget);
       renderer.compile(scene, camera).forEach(material => materials.add(material));
+      if(root.getObjectByName("basketball-practice-world"))for(const material of prepareCourtLighting(renderer,root,camera,scene))materials.add(material);
       renderer.compile(holder, camera, scene).forEach(material => materials.add(material));
+      if(root.getObjectByName("basketball-practice-world"))for(const material of prepareCourtLighting(renderer,holder,camera,scene))materials.add(material);
     }
     const programs = new Set([...materials].flatMap(material => {
       const entry = renderer.properties.get(material) as { currentProgram?: { isReady: () => boolean }; programs?: Map<string, { isReady: () => boolean }> };

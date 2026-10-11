@@ -18,7 +18,10 @@ try{
  if(process.env.PALACE_NIGHT_ONLY==="1"){
   for(const[port,label,view]of[[5192,"e9a3b43","first"],[5190,"new","third"]]){
    const c=await context(),page=await c.newPage();page.setDefaultTimeout(90000);page.on("pageerror",e=>report.errors.push(e.message));
-   await page.goto(`http://127.0.0.1:${port}/basketball/?view=${view}`);await ready(page,"basketball");await measure(page,label+" / daylight",5);
+   const entryView=process.env.PALACE_TOGGLE_VIEW==="1"&&label==="new"?"first":view;
+   await page.goto(`http://127.0.0.1:${port}/basketball/?view=${entryView}`);await ready(page,"basketball");
+   if(entryView!==view){await page.getByRole("button",{name:"Third person · V",exact:true}).click();await page.waitForTimeout(700);}
+   await measure(page,label+" / daylight",5);
    await page.getByRole("button",{name:"Night lights",exact:true}).click();await page.waitForTimeout(2400);await measure(page,label+" / first night interval",8);await measure(page,label+" / settled night",8);
    await page.getByRole("button",{name:"Daylight",exact:true}).click();await page.waitForTimeout(2400);await page.getByRole("button",{name:"Night lights",exact:true}).click();await page.waitForTimeout(2400);await measure(page,label+" / repeat night",5);await c.close();
   }

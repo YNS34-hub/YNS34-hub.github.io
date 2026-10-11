@@ -1,14 +1,42 @@
 import { describe, expect, it, vi } from "vitest";
 import { Bone, Skeleton, SkinnedMesh, BoxGeometry, Group, InstancedMesh, MeshBasicMaterial, PerspectiveCamera, Scene, type Material, type WebGLRenderer } from "three";
 import { warmPrograms } from "../src/worlds/warmPrograms";
+import { prepareCourtLighting } from "../src/worlds/court/lightingPrograms";
 
 describe("cancellable new-scene preparation", () => {
+  it("prepares all four court lighting topologies without adding live lights or rendering",()=>{
+    const scene=new Scene(),root=new Group(),material=new MeshBasicMaterial(),snapshots:unknown[]=[];scene.add(root);
+    const compile=vi.fn((source:Group,_camera:PerspectiveCamera,target:Scene)=>{
+      expect(source).toBe(root);expect(target).not.toBe(scene);expect(target.parent).toBeNull();expect(target.environment).toBe(scene.environment);
+      snapshots.push(target.children.map(light=>[light.type,(light as unknown as {castShadow:boolean}).castShadow]));return new Set([material]);
+    });
+    const render=vi.fn(),renderer={compile,render,shadowMap:{enabled:true}} as unknown as WebGLRenderer;
+    expect(prepareCourtLighting(renderer,root,new PerspectiveCamera(),scene).has(material)).toBe(true);
+    expect(snapshots).toEqual([
+      [["HemisphereLight",false],["DirectionalLight",true]],
+      [["HemisphereLight",false],["DirectionalLight",false],["SpotLight",true],["SpotLight",false]],
+      [["HemisphereLight",false],["SpotLight",true],["SpotLight",false]],
+      [["HemisphereLight",false],["DirectionalLight",true],["SpotLight",false],["SpotLight",false]]
+    ]);
+    expect(scene.children).toEqual([root]);expect(render).not.toHaveBeenCalled();material.dispose();
+  });
   it("prepares the skinned depth variant without disposing the athlete's owned skeleton",()=>{
     const scene=new Scene(),root=new Group(),geometry=new BoxGeometry(),material=new MeshBasicMaterial(),skeleton=new Skeleton([new Bone()]);
     const athlete=new SkinnedMesh(geometry,material);athlete.bind(skeleton);athlete.castShadow=true;root.add(athlete);scene.add(root);
     const dispose=vi.spyOn(skeleton,"dispose"),programs=new Map<Material,{currentProgram:{isReady:()=>boolean}}>();let depthSkinned=false;
     const renderer={compile:(source:Group)=>{const materials=new Set<Material>();source.traverse(o=>{if(o instanceof SkinnedMesh){const m=o.material as Material;materials.add(m);programs.set(m,{currentProgram:{isReady:()=>true}});if(m.type==="MeshDepthMaterial"){depthSkinned=true;expect(o.skeleton).toBe(skeleton);expect(o.bindMatrix.equals(athlete.bindMatrix)).toBe(true);}}});return materials;},properties:{get:(m:Material)=>programs.get(m)},getContext:()=>({isContextLost:()=>false}),getRenderTarget:()=>null,getActiveCubeFace:()=>0,getActiveMipmapLevel:()=>0,setRenderTarget:vi.fn()} as unknown as WebGLRenderer;
     const job=warmPrograms(renderer,root,new PerspectiveCamera(),scene);expect(job.ready()).toBe(true);expect(depthSkinned).toBe(true);job.dispose();expect(dispose).not.toHaveBeenCalled();geometry.dispose();material.dispose();skeleton.dispose();
+  });
+  it("includes future night skin-shadow programs in readiness without rendering a shadow target",()=>{
+    const scene=new Scene(),root=new Group(),geometry=new BoxGeometry(),material=new MeshBasicMaterial(),skeleton=new Skeleton([new Bone()]);root.name="basketball-practice-world";
+    const athlete=new SkinnedMesh(geometry,material);athlete.bind(skeleton);athlete.castShadow=true;root.add(athlete);scene.add(root);
+    let nightDepth=false;const programs=new Map<Material,{currentProgram:{isReady:()=>boolean}}>();
+    const renderer={shadowMap:{enabled:true},compile:(source:Group,_camera:PerspectiveCamera,target?:Scene)=>{
+      const result=new Set<Material>();source.traverse(o=>{if(o instanceof SkinnedMesh){const m=o.material as Material;result.add(m);programs.set(m,{currentProgram:{isReady:()=>true}});
+        if(m.type==="MeshDepthMaterial"&&target?.children.filter(o=>o.type==="SpotLight").length===2){nightDepth=true;expect(o.skeleton).toBe(skeleton);}
+      }});return result;
+    },properties:{get:(m:Material)=>programs.get(m)},getContext:()=>({isContextLost:()=>false}),getRenderTarget:()=>null,getActiveCubeFace:()=>0,getActiveMipmapLevel:()=>0,setRenderTarget:vi.fn()} as unknown as WebGLRenderer;
+    const job=warmPrograms(renderer,root,new PerspectiveCamera(),scene);expect(nightDepth).toBe(true);expect(job.ready()).toBe(true);job.dispose();material.dispose();geometry.dispose();skeleton.dispose();
   });
   it("keeps original materials and geometry intact, waits for actual readiness and can cancel pending programs", () => {
     const scene = new Scene(), root = new Group(), geometry = new BoxGeometry(), material = new MeshBasicMaterial();
