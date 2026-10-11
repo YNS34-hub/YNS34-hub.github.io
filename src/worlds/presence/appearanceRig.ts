@@ -65,7 +65,8 @@ export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: Outfi
           bool jersey = source.b > source.r * 1.18 && source.b > source.g * 1.10;
           bool upperLeg = (vMapUv.x < .31 || vMapUv.x > .69) && vMapUv.y < .194;
           bool trouser = athleteDenim > .5 && vAthleteRest.z < .90 && vAthleteRest.z > .17;
-          bool sleeve = athleteStyle > 1.5 && (vMapUv.x < .31 || vMapUv.x > .69) && vMapUv.y > .48 && vMapUv.y < .85;
+          // 外套跨越原无袖球衣 / 手臂的 UV 岛；用绑定姿态的手臂位置保持肩部连续，手掌仍保留肤色。
+          bool sleeve = athleteStyle > 1.5 && abs(vAthleteRest.x) > .18 && abs(vAthleteRest.x) < .58 && vAthleteRest.z > 1.23 && vAthleteRest.z < 1.58;
           bool urbanLeg = athleteStyle > 1.5 && vAthleteRest.z < .90 && vAthleteRest.z > .15;
           bool torso = abs(vAthleteRest.x) < .25 && vAthleteRest.z > .98 && vAthleteRest.z < 1.56;
           if ((jersey || torso) && athleteStyle > .5 && athleteStyle < 1.5) {
