@@ -32,7 +32,7 @@ export default function Geography({maps}:{maps:Maps}){
         vec3 aw=alpinePosition,an=normalize(alpineNormal),weights=pow(abs(an),vec3(4.));weights/=max(.001,weights.x+weights.y+weights.z);
         float eyeDistance=distance(cameraPosition,aw),macro=alpineNoise(aw.xz*.010),steep=1.-abs(an.y);
         vec2 grassUV=aw.xz/3.5;
-        vec3 grass=mix(texture2D(map,grassUV).rgb,texture2D(map,mat2(.8,-.6,.6,.8)*grassUV*.93+vec2(.31,.73)).rgb,macro)*vec3(.48,.83,.36);
+        vec3 grass=mix(texture2D(map,grassUV).rgb,texture2D(map,mat2(.8,-.6,.6,.8)*grassUV*.93+vec2(.31,.73)).rgb,macro)*vec3(.61,.72,.48);
         vec3 rock=alpineTri(alpineRock,aw,weights,2.8);
         float rockMask=smoothstep(.28,.62,steep+(alpineNoise(aw.xz*.027)-.5)*.10);
         vec2 aerialUV=alpineUV(alpineAtlas,alpineProjectionCurve.xy,aw),nearUV=alpineUV(alpineNearAtlas,alpineProjectionCurve.zw,aw);
@@ -44,7 +44,7 @@ export default function Geography({maps}:{maps:Maps}){
         aerial=mix(aerial,pow(max(aerial,vec3(.001)),vec3(.85)),.14);
         float saturation=(max(max(aerial.r,aerial.g),aerial.b)-min(min(aerial.r,aerial.g),aerial.b))/max(.001,max(max(aerial.r,aerial.g),aerial.b));
         float vegetation=smoothstep(.010,.070,aerial.g-aerial.b-max(0.,aerial.r-aerial.g)*2.)*smoothstep(.12,.30,saturation)*(1.-rockMask);
-        aerial*=mix(vec3(.62),vec3(.33,.62,.22),vegetation);
+        aerial*=mix(vec3(.62),vec3(.46,.60,.34),vegetation);
         vec3 surface=mix(grass,rock,rockMask);
         float aerialWeight=mix(.28,.94,smoothstep(20.,240.,eyeDistance));
         surface=mix(surface,aerial,aerialWeight);
@@ -55,11 +55,11 @@ export default function Geography({maps}:{maps:Maps}){
         vec3 tx=texture2D(alpineRockNormal,aw.yz/2.8).xyz*2.-1.,ty=texture2D(alpineRockNormal,aw.xz/2.8).xyz*2.-1.,tz=texture2D(alpineRockNormal,aw.xy/2.8).xyz*2.-1.;
         vec3 rockDetail=vec3(0.,tx.x,tx.y)*weights.x+vec3(ty.x,0.,ty.y)*weights.y+vec3(tz.x,tz.y,0.)*weights.z;
         vec3 grassDetail=texture2D(normalMap,grassUV).xyz*2.-1.;
-        vec3 detail=mix(vec3(grassDetail.x,0.,grassDetail.y)*.40,rockDetail,rockMask);
+        vec3 detail=mix(vec3(grassDetail.x,0.,grassDetail.y)*.22,rockDetail,rockMask);
         normal=normalize((viewMatrix*vec4(normalize(an+detail*normalStrength),0.)).xyz);
       `);
     };
-    m.customProgramCacheKey=()=>"alpine-measured-ortho-triplanar-v2";return m;
+    m.customProgramCacheKey=()=>"alpine-measured-ortho-triplanar-v3";return m;
   },[maps,meta]);
   useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);useEffect(()=>()=>material.dispose(),[material]);
   return <group name="real-elevation-alpine-massif">{geometries.map(g=><mesh key={g.name} name={"alpine-terrain-tile:"+g.name} geometry={g} material={material} castShadow receiveShadow dispose={null}/>)}</group>;
