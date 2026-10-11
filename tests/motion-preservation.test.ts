@@ -51,8 +51,9 @@ const digest = (source: string) => createHash("sha256").update(source.replace(/\
 const additions: Record<string, string[]> = {
   "src/App.tsx": ["app-import", "app-hud"],
   "src/world/World.tsx": ["world-import", "world-interaction", "world-environment-open", "world-environment-close", "world-boundary-open", "world-boundary-close", "world-presence-camera"],
-  "src/world/Player.tsx": ["player-import", "player-world-view", "player-cycle-locomotion", "player-presence-init", "player-presence-pause", "player-court-finish", "player-presence-sprint", "player-presence-speed"],
+  "src/world/Player.tsx": ["player-import", "player-world-view", "player-cycle-locomotion", "player-presence-init", "player-presence-pause", "player-court-finish", "player-presence-sprint", "player-presence-speed", "player-court-keyboard"],
   "src/world/collision.ts": ["collision-import", "collision-world-bounds", "collision-world-footprints"],
+  "scripts/register-personal-media.mjs": ["media-avatar-import", "media-avatar-register"],
 };
 function withoutAdditions(file: string, source: string) {
   const seen: string[] = [];
@@ -65,7 +66,7 @@ function withoutAdditions(file: string, source: string) {
     // 第三人称仅在户外接入逻辑相机和更新顺序；逐项校验适配表达式后还原，固定原摘要不变。
     const adapters = [
       ['const { camera: renderCamera, gl } = useThree();\n  const camera = actorCamera(renderCamera, roomId);', 'const { camera, gl } = useThree();'],
-      ['input.has("ShiftLeft") || input.has("ShiftRight") ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;', 'input.has("ShiftLeft") || input.has("ShiftRight") ? 4.45 : 2.7;'],
+      ['input.has("ShiftLeft") || input.has("ShiftRight") || roomId === "basketball" && (input.has("Enter") || input.has("NumpadEnter")) ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;', 'input.has("ShiftLeft") || input.has("ShiftRight") ? 4.45 : 2.7;'],
       ['clock.elapsedTime - footstepsAt.current > (roomId === "basketball" && presence.speed > 4 ? .33 : .58)', 'clock.elapsedTime - footstepsAt.current > 0.58'],
       ['}, isAdventureRoom(roomId) ? -4 : 0);', '});'],
     ];
