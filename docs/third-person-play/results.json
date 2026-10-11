@@ -1,0 +1,977 @@
+{
+  "repository": "YNS34-hub/YNS34-hub.github.io",
+  "branch": "codex/memory-palace-third-person-play",
+  "baselineCommit": "e9a3b43e17e659b5021d00eade3c9370673e7558",
+  "baselinePr": 20,
+  "runtimeLastChangedCommit": "072cdcfe4e9e5c858c00f66d9109671bce0d87b6",
+  "summarySourceCommit": "4edb70d1459ab5f4c619c1fdb979614488477f29",
+  "checkedOn": "2026-10-11",
+  "checks": {
+    "typecheck": {
+      "command": "npx tsc -b",
+      "exitCode": 0
+    },
+    "lint": {
+      "command": "npm run lint",
+      "exitCode": 0
+    },
+    "unit": {
+      "command": "npm test -- --maxWorkers=2",
+      "passed": 167,
+      "files": 31,
+      "exitCode": 0,
+      "note": "Earlier concurrent file-system tests hit their original 5s timeout; no assertions or timeouts changed. Full suite passed with bounded workers."
+    },
+    "publicBuild": {
+      "command": "npm run build:public",
+      "exitCode": 0,
+      "shareableRoutes": 66,
+      "indexedRoutes": 52,
+      "logArtifact": "qa-artifacts/third-person/final-build.log"
+    }
+  },
+  "nativeDevelopment": {
+    "sourceCommit": "cd36749ebf5a520764fa2f92a01feea2454506a9",
+    "artifact": "qa-artifacts/third-person/final-native-visible/validation.json",
+    "checks": [
+      {
+        "width": 1920,
+        "name": "Court: first/third, real sprint dribble, layup, running dunk, invalid dunk feedback, action pause/resume, refresh preference, physical return"
+      },
+      {
+        "width": 1920,
+        "name": "cycling: third-person mount, cadence/feet, first-person toggle during movement, gears, brake, photo/ESC, Cinema exact pose/progress return, dismount, Palace return"
+      },
+      {
+        "width": 1920,
+        "name": "alpine-ride: third-person mount, cadence/feet, first-person toggle during movement, gears, brake, photo/ESC, Cinema exact pose/progress return, dismount, Palace return"
+      },
+      {
+        "width": 2560,
+        "name": "Court: first/third, real sprint dribble, layup, running dunk, invalid dunk feedback, action pause/resume, refresh preference, physical return"
+      },
+      {
+        "width": 2560,
+        "name": "cycling: third-person mount, cadence/feet, first-person toggle during movement, gears, brake, photo/ESC, Cinema exact pose/progress return, dismount, Palace return"
+      },
+      {
+        "width": 2560,
+        "name": "alpine-ride: third-person mount, cadence/feet, first-person toggle during movement, gears, brake, photo/ESC, Cinema exact pose/progress return, dismount, Palace return"
+      }
+    ],
+    "scope": "Native keyboard / buttons; declared camera staging positions only. Physics, speed, cadence and scores are never injected.",
+    "browser": "148.0.3967.70",
+    "headed": null,
+    "passed": true
+  },
+  "nativePublicRounds": [
+    {
+      "sourceCommit": "03920eea4003d480b97baece8b1a127938391edf",
+      "artifact": "qa-artifacts/third-person/final-release-public-trace/validation.json",
+      "checks": [
+        {
+          "width": 1920,
+          "name": "Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"
+        },
+        {
+          "width": 1920,
+          "name": "cycling: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        },
+        {
+          "width": 1920,
+          "name": "alpine-ride: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        },
+        {
+          "width": 2560,
+          "name": "Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"
+        },
+        {
+          "width": 2560,
+          "name": "cycling: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        },
+        {
+          "width": 2560,
+          "name": "alpine-ride: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        }
+      ],
+      "scope": "Actual public build; native keys/buttons and visible DOM only. No debug APIs, camera staging or simulation injection.",
+      "browser": "148.0.3967.70",
+      "headed": true,
+      "passed": true
+    },
+    {
+      "sourceCommit": "4b6ab2f30370e7e4d6b81e490475585e96271533",
+      "artifact": "qa-artifacts/third-person/final-release-public-repeat/validation.json",
+      "checks": [
+        {
+          "width": 1920,
+          "name": "Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"
+        },
+        {
+          "width": 1920,
+          "name": "cycling: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        },
+        {
+          "width": 1920,
+          "name": "alpine-ride: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        },
+        {
+          "width": 2560,
+          "name": "Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"
+        },
+        {
+          "width": 2560,
+          "name": "cycling: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        },
+        {
+          "width": 2560,
+          "name": "alpine-ride: public third-person native mount/ride/brake, views, photo/ESC, Palace return"
+        }
+      ],
+      "scope": "Actual public build; native keys/buttons and visible DOM only. No debug APIs, camera staging or simulation injection.",
+      "browser": "148.0.3967.70",
+      "headed": true,
+      "passed": true
+    }
+  ],
+  "legacyPublic": {
+    "sourceCommit": "4b6ab2f30370e7e4d6b81e490475585e96271533",
+    "artifact": "qa-artifacts/third-person/final-release-worlds/validation.json",
+    "checks": [
+      "Clean public personal-media catalog and independently generated activity deep links",
+      "Original Guide reaches court; native recall, pickup, dribble, timed shot and assist feedback",
+      "Cached court re-entry, day/night switching and lighting restoration after production refresh",
+      "Guide cycling arrival honors genuine pedal input; brake, photo, local PNG, one-level Escape, refresh and return work without debug globals",
+      "Legacy /museum entry and actual Pointer Lock / single Escape remain available"
+    ],
+    "scope": "Actual public production build, native UI and keys only. No application debug exports, injected player state or altered physics.",
+    "browser": null,
+    "headed": true,
+    "passed": true
+  },
+  "originalCourt": {
+    "sourceCommit": null,
+    "artifact": "qa-artifacts/third-person/original-court/validation.json",
+    "checks": [
+      {
+        "width": 1920,
+        "name": "Physical threshold → walk → gaze pickup → real dribble → timed shot made → miss → recall → modal pause → physical return"
+      },
+      {
+        "width": 2560,
+        "name": "Physical threshold → walk → gaze pickup → real dribble → timed shot made → miss → recall → modal pause → physical return"
+      }
+    ],
+    "scope": null,
+    "browser": "148.0.3967.70",
+    "headed": null,
+    "passed": true
+  },
+  "lighting": {
+    "sourceCommit": "feb619bcfc6bfbaed770ccc400de817158c56f18",
+    "artifact": "qa-artifacts/third-person/release-lighting/validation.json",
+    "checks": [
+      "Day → night retains the held ball, live dribble and counters",
+      "Night lighting preference restores after refresh",
+      "Reduced motion settles the lighting immediately; gameplay remains available",
+      "Three consecutive returns restore the museum environment without growing GPU resource counts"
+    ],
+    "scope": "Native lighting/player input; declared debug camera staging and read-only scene diagnostics.",
+    "browser": null,
+    "headed": null,
+    "passed": true
+  },
+  "continuousRide": {
+    "sourceCommit": "03920eea4003d480b97baece8b1a127938391edf",
+    "artifact": "qa-artifacts/third-person/final-stop-ride-verified/journey.json",
+    "passed": true,
+    "checks": [
+      "Enter from the museum on foot",
+      "Native approach and E mount",
+      "Low-speed steering has real authority",
+      "Genuine acceleration and cadence",
+      "Coasting preserves momentum and starts wheel-speed freehub",
+      "Real native Web Audio produces nonzero samples",
+      "Pedaling removes freehub",
+      "Shift easier",
+      "Shift harder",
+      "Progressive braking reaches a stop",
+      "Photo mode creates a local PNG and Escape handles only that layer",
+      "Comfort and sound-off acknowledge their state",
+      "Actual gradual stop at the lake viewpoint",
+      "Climb is a real positive grade and lower-gear effort",
+      "Gravity and wind contribute on descent",
+      "High-speed steering is smaller than low-speed authority",
+      "Continuous full route finishes without teleport or infinite loading",
+      "Bounded streaming traverses the full authored geography",
+      "Cinema restores road posture, distance, spatial position and head orientation",
+      "Explicit invalid-state recovery returns the last safe point stopped",
+      "Fresh re-entry restores progress on foot without stale riding controls"
+    ],
+    "moments": 18,
+    "seconds": 415.497,
+    "distanceMetres": 3529.720322699531,
+    "realAudioRms": 0.0024296286291671854,
+    "cinemaReturn": {
+      "positionDelta": 0.0004115030122397496,
+      "angleRadians": 5.543552409928541e-07,
+      "distanceDelta": 0
+    },
+    "headed": true,
+    "browser": "148.0.3967.70",
+    "browserArgs": [
+      "--use-angle=d3d11",
+      "--disable-background-timer-throttling",
+      "--disable-backgrounding-occluded-windows",
+      "--disable-renderer-backgrounding"
+    ],
+    "videoRecorded": false,
+    "note": "Native continuous travel. Camera staging is confined to separate static comparisons. No route, speed or progress injection; one explicitly labelled invalid-state recovery fault follows the completed route."
+  },
+  "privacy": {
+    "sha": "4b6ab2f30370e7e4d6b81e490475585e96271533",
+    "manifestCounts": {
+      "wallpapers": 0,
+      "visuals": 0,
+      "music": 0,
+      "projects": 0,
+      "research": 0
+    },
+    "privateAudio": 0,
+    "privateDocuments": 0,
+    "routes": {
+      "index.html": true,
+      "alpine-ride/index.html": true,
+      "cycling/index.html": true,
+      "museum/index.html": true,
+      "legacy/index.html": true
+    },
+    "passed": true
+  },
+  "performance": {
+    "samples": [
+      {
+        "label": "e9a3b43 / court first-person entry",
+        "fps": 142.26742275991572,
+        "rafFps": 142.26742275991572,
+        "frames": 996,
+        "renderedFrames": 996,
+        "duplicateTicks": 0,
+        "medianMs": 6.900000000001455,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 27.700000000000728,
+        "peak": {
+          "calls": 96,
+          "triangles": 1125487,
+          "textures": 50
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "basketball",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 213.16080729166686,
+        "programs": 41,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      },
+      {
+        "label": "new / court first-person entry",
+        "fps": 142.2923772960318,
+        "rafFps": 142.2923772960318,
+        "frames": 997,
+        "renderedFrames": 997,
+        "duplicateTicks": 0,
+        "medianMs": 6.900000000001455,
+        "p95Ms": 7.100000000000364,
+        "maxMs": 27.799999999999272,
+        "peak": {
+          "calls": 96,
+          "triangles": 1125487,
+          "textures": 52
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "basketball",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 242.49414062500023,
+        "programs": 155,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      },
+      {
+        "label": "new / court third-person daylight",
+        "fps": 135.52689830484272,
+        "rafFps": 135.52689830484272,
+        "frames": 949,
+        "renderedFrames": 949,
+        "duplicateTicks": 0,
+        "medianMs": 6.900000000001455,
+        "p95Ms": 13.799999999999272,
+        "maxMs": 27.799999999999272,
+        "peak": {
+          "calls": 118,
+          "triangles": 1138283,
+          "textures": 63
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "basketball",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 242.49414062500023,
+        "programs": 156,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      },
+      {
+        "label": "new / court third-person night",
+        "fps": 123.5626026712641,
+        "rafFps": 123.5626026712641,
+        "frames": 865,
+        "renderedFrames": 865,
+        "duplicateTicks": 0,
+        "medianMs": 7,
+        "p95Ms": 13.900000000001455,
+        "maxMs": 111,
+        "peak": {
+          "calls": 118,
+          "triangles": 1138283,
+          "textures": 64
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "basketball",
+        "quality": "medium",
+        "activeLights": 3,
+        "shadowLights": 1,
+        "materialMiB": 242.49414062500023,
+        "programs": 183,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": [
+            {
+              "atMs": 125.39999999850988,
+              "gapMs": 111,
+              "hidden": false,
+              "focused": true,
+              "renderFrame": 2833
+            }
+          ]
+        }
+      },
+      {
+        "label": "new / night sprint dribble (native, includes boundary stop)",
+        "fps": 117.97404570994385,
+        "rafFps": 117.97404570994385,
+        "frames": 590,
+        "renderedFrames": 590,
+        "duplicateTicks": 0,
+        "medianMs": 7,
+        "p95Ms": 13.900000000001455,
+        "maxMs": 41.69999999999709,
+        "peak": {
+          "calls": 120,
+          "triangles": 1138499,
+          "textures": 63
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "basketball",
+        "quality": "medium",
+        "activeLights": 3,
+        "shadowLights": 1,
+        "materialMiB": 242.49414062500023,
+        "programs": 183,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      },
+      {
+        "label": "new / cycling third-person still",
+        "fps": 120.0734003509916,
+        "rafFps": 120.0734003509916,
+        "frames": 602,
+        "renderedFrames": 602,
+        "duplicateTicks": 0,
+        "medianMs": 7,
+        "p95Ms": 13.900000000001455,
+        "maxMs": 41.599999999998545,
+        "peak": {
+          "calls": 153,
+          "triangles": 2226184,
+          "textures": 33
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "cycling",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 56.96614583333334,
+        "programs": 45,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      },
+      {
+        "label": "new / cycling third-person native pedaling",
+        "fps": 118.13441897007357,
+        "rafFps": 118.13441897007357,
+        "frames": 827,
+        "renderedFrames": 827,
+        "duplicateTicks": 0,
+        "medianMs": 7,
+        "p95Ms": 14,
+        "maxMs": 41.70000000000073,
+        "peak": {
+          "calls": 153,
+          "triangles": 2226184,
+          "textures": 33
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "cycling",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 56.96614583333334,
+        "programs": 45,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      },
+      {
+        "label": "new / alpine-ride third-person still",
+        "fps": 114.7518042422183,
+        "rafFps": 114.7518042422183,
+        "frames": 574,
+        "renderedFrames": 574,
+        "duplicateTicks": 0,
+        "medianMs": 7,
+        "p95Ms": 14,
+        "maxMs": 62.29999999999927,
+        "peak": {
+          "calls": 184,
+          "triangles": 2254500,
+          "textures": 54
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "alpine-ride",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 182.10230509440112,
+        "programs": 46,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": [
+            {
+              "atMs": 1502,
+              "gapMs": 62.29999999999927,
+              "hidden": false,
+              "focused": true,
+              "renderFrame": 1314
+            }
+          ]
+        }
+      },
+      {
+        "label": "new / alpine-ride third-person native pedaling",
+        "fps": 117.55127692394336,
+        "rafFps": 117.55127692394336,
+        "frames": 823,
+        "renderedFrames": 823,
+        "duplicateTicks": 0,
+        "medianMs": 7,
+        "p95Ms": 13.900000000001455,
+        "maxMs": 48.599999999998545,
+        "peak": {
+          "calls": 189,
+          "triangles": 2309912,
+          "textures": 54
+        },
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "room": "alpine-ride",
+        "quality": "medium",
+        "activeLights": 2,
+        "shadowLights": 1,
+        "materialMiB": 182.10230509440112,
+        "programs": 46,
+        "visibility": {
+          "hiddenFrames": 0,
+          "unfocusedFrames": 0,
+          "longFrames": []
+        }
+      }
+    ],
+    "errors": [],
+    "browserArgs": [
+      "--use-angle=d3d11",
+      "--window-position=0,0",
+      "--window-size=1920,1080",
+      "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+    ],
+    "scope": "Short visible Edge / actual NVIDIA samples. Rendered-frame wall intervals observed by RAF, not GPU timers. Duplicate RAF ticks do not count as rendered frames. Main-pass calls/triangles; sampled material bytes, not complete VRAM. Native locomotion; only the explicitly labelled court shot starting pose is staged. No competing QA browsers during measurement. Both versions use the same native-window-occlusion test exception.",
+    "viewport": [
+      1920,
+      1080
+    ],
+    "quality": "medium",
+    "dpr": 1,
+    "headed": true,
+    "browser": "148.0.3967.70",
+    "when": "2026-10-11T12:12:27.099Z",
+    "sha": "4b6ab2f30370e7e4d6b81e490475585e96271533",
+    "dirty": true,
+    "passed": true,
+    "artifact": "qa-artifacts/third-person/final-rendered-performance/performance.json",
+    "playwright": "1.63.0",
+    "measureScriptSha256": "ce14fa749cce4395d47c01ef06951428890505cf85591901074bc914ccfc033f",
+    "note": "Measured HEAD has only QA/doc changes after runtime commit. The then-uncommitted measurement script is committed as 4edb70d. Both versions preserve Playwright default feature switches and add CalculateNativeWinOcclusion to disabled features. Main rendering frames, not duplicated RAF ticks, determine FPS."
+  },
+  "earlierIncompleteRuns": [
+    {
+      "artifact": "qa-artifacts/third-person/final-release-public/validation.json",
+      "sourceCommit": "03920eea4003d480b97baece8b1a127938391edf",
+      "failure": "AssertionError [ERR_ASSERTION]: Actual native run-up must reach an eligible dunk\n    at file:///C:/Users/86135/Documents/Codex/2026-10-04/the-memory-palace-stop-building-a/work/palace/scripts/check-third-person-public.mjs:25:70",
+      "completedChecks": 3,
+      "partialPerformance": []
+    },
+    {
+      "artifact": "qa-artifacts/third-person/final-release-public-verified/validation.json",
+      "sourceCommit": "03920eea4003d480b97baece8b1a127938391edf",
+      "failure": "AssertionError [ERR_ASSERTION]: Actual native run-up must reach an eligible dunk\n    at file:///C:/Users/86135/Documents/Codex/2026-10-04/the-memory-palace-stop-building-a/work/palace/scripts/check-third-person-public.mjs:29:70",
+      "completedChecks": 3,
+      "partialPerformance": []
+    },
+    {
+      "artifact": "qa-artifacts/third-person/final-release-performance/performance.json",
+      "sourceCommit": "4b6ab2f30370e7e4d6b81e490475585e96271533",
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at C:\\Users\\86135\\Documents\\Codex\\2026-10-04\\the-memory-palace-stop-building-a\\work\\palace\\scripts\\measure-third-person-play.mjs:35:171",
+      "completedChecks": 0,
+      "partialPerformance": [
+        {
+          "label": "e9a3b43 / court first-person entry",
+          "fps": 129.9016458966644,
+          "p95Ms": 13.899999999999636,
+          "maxMs": 34.70000000000073
+        },
+        {
+          "label": "new / court first-person entry",
+          "fps": 40.858725761789714,
+          "p95Ms": 13.899999999999636,
+          "maxMs": 1007
+        },
+        {
+          "label": "new / court third-person daylight",
+          "fps": 29.18855808523369,
+          "p95Ms": 20.899999999997817,
+          "maxMs": 1006.8999999999978
+        },
+        {
+          "label": "new / court third-person night",
+          "fps": 120.52494038016468,
+          "p95Ms": 13.900000000001455,
+          "maxMs": 97.09999999999854
+        },
+        {
+          "label": "new / night sprint dribble (native, includes boundary stop)",
+          "fps": 130.9312660675173,
+          "p95Ms": 13.900000000001455,
+          "maxMs": 34.80000000000291
+        }
+      ]
+    },
+    {
+      "artifact": "qa-artifacts/third-person/final-release-performance-diagnostic/performance.json",
+      "sourceCommit": "4b6ab2f30370e7e4d6b81e490475585e96271533",
+      "failure": "page.waitForFunction: Timeout 20000ms exceeded.\n    at C:\\Users\\86135\\Documents\\Codex\\2026-10-04\\the-memory-palace-stop-building-a\\work\\palace\\scripts\\measure-third-person-play.mjs:37:171",
+      "completedChecks": 0,
+      "partialPerformance": [
+        {
+          "label": "e9a3b43 / court first-person entry",
+          "fps": 124.31846079189651,
+          "p95Ms": 13.899999999999636,
+          "maxMs": 48.600000000000364
+        },
+        {
+          "label": "new / court first-person entry",
+          "fps": 124.52339811786881,
+          "p95Ms": 14,
+          "maxMs": 48.70000000000073
+        },
+        {
+          "label": "new / court third-person daylight",
+          "fps": 104.70457333598497,
+          "p95Ms": 14.200000000000728,
+          "maxMs": 76.40000000000146
+        },
+        {
+          "label": "new / court third-person night",
+          "fps": 124.02945878055674,
+          "p95Ms": 13.900000000001455,
+          "maxMs": 111.09999999999854
+        },
+        {
+          "label": "new / night sprint dribble (native, includes boundary stop)",
+          "fps": 131.83652271189624,
+          "p95Ms": 13.80000000000291,
+          "maxMs": 48.80000000000291
+        }
+      ]
+    },
+    {
+      "artifact": "qa-artifacts/third-person/final-stop-ride/journey.json",
+      "sourceCommit": "a2393c69e39b87a2402942906e159fa81bf2f6ab",
+      "failure": "AssertionError [ERR_ASSERTION]: Continuous full route finishes without teleport or infinite loading\n    at check (file:///C:/Users/86135/Documents/Codex/2026-10-04/the-memory-palace-stop-building-a/work/palace/scripts/check-road-journey.mjs:24:44)\n    at file:///C:/Users/86135/Documents/Codex/2026-10-04/the-memory-palace-stop-building-a/work/palace/scripts/check-road-journey.mjs:60:25",
+      "completedChecks": 16,
+      "partialPerformance": [
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        },
+        {
+          "label": null,
+          "fps": null,
+          "p95Ms": null,
+          "maxMs": null
+        }
+      ]
+    }
+  ],
+  "nativeOcclusionControl": {
+    "beforeArtifact": "qa-artifacts/third-person/native-mount-diagnostic/report.json",
+    "afterArtifact": "qa-artifacts/third-person/native-mount-no-occlusion/report.json",
+    "before": "15s native walking advances roughly 2m despite document focus / visibility; no mount proximity.",
+    "after": "Around 3s native walking reaches mount proximity when native occlusion calculation is disabled in the isolated test browser.",
+    "applicationChanged": false,
+    "chromiumSource": "https://chromium.googlesource.com/chromium/src/+/main/ui/base/ui_base_features.cc",
+    "note": "Consistent with native window occlusion throttling. Does not prove every earlier intermittent automation failure had the same cause."
+  },
+  "visualEvidence": {
+    "images": [
+      {
+        "file": "images/alpine-ride-third-pedal.webp",
+        "sha256": "d019100d4c01d9b7e299428c88a348d44e4f6f1593ca5378d525cf13a32ffd7f"
+      },
+      {
+        "file": "images/court-dunk.webp",
+        "sha256": "306c07567dd9fb23f37e768c3fe68355df1b68af03cff4a1b5df22b6d8378435"
+      },
+      {
+        "file": "images/court-sprint-dribble.webp",
+        "sha256": "7fe7b247b64c8a0e4761de09500adb738dee62b968abb773b16e224bb3a2cba1"
+      },
+      {
+        "file": "images/cycling-third-detail-angle.webp",
+        "sha256": "246d055014b84c65e375aaa71429f7c9f0e548342e4a5844fba21fb5aa33c67a"
+      },
+      {
+        "file": "images/full-ride.webp",
+        "sha256": "fd51cc36796a584b691f558eaae02733a0f5c0051ed2c3662d128e3f3734aae5"
+      },
+      {
+        "file": "images/matched-entry-1920.webp",
+        "sha256": "c5cb4cf20ce1711d8536a646e76d11bdd3cb2f086d03cc3d8aeaea0552473df9"
+      },
+      {
+        "file": "images/matched-entry-2560.webp",
+        "sha256": "2b0e765f04389d48490a028e1318b0843db7c01ef47fcdbf85d8fbfd734df6b8"
+      },
+      {
+        "file": "images/matched-hoop-1920.webp",
+        "sha256": "3e4db8bbecb4522c04c646321b7994b4ed6152b2180447cea9f094d5951fc37c"
+      },
+      {
+        "file": "images/matched-hoop-2560.webp",
+        "sha256": "9b660c7c572b53b5684b99b85edb206c9f8cfc76dc9d695654c88a89cdf1f2b2"
+      },
+      {
+        "file": "images/overview.webp",
+        "sha256": "47f4027cb11b584d327bc4005dd362e2f1b513d850adbb3fbd656da2264a8b6b"
+      },
+      {
+        "file": "images/scenic-stops-1920.webp",
+        "sha256": "3b054e87326cbbc928926f2adbde9f168f505c5b845045e06f5539ae2f93b66c"
+      },
+      {
+        "file": "images/scenic-stops-2560.webp",
+        "sha256": "901bc0844b93d8f31ac68bb3053af75a5df850de980562709fe013adbdeea04c"
+      },
+      {
+        "file": "images/surface-court-1920.webp",
+        "sha256": "166f46d7e1777a6b5849edd87e1edc9929762c7605fc281ff85b14230891d6fb"
+      },
+      {
+        "file": "images/surface-court-2560.webp",
+        "sha256": "4c30fd35c55944c26c169b4238446d38b078e00b8da1ce6a60a3d6f6690dbaae"
+      },
+      {
+        "file": "images/surface-rides-1920.webp",
+        "sha256": "17ce61e0cd2f2c730b03d1910145bf1f2d33e04ae26778551594cec8ad7c1048"
+      },
+      {
+        "file": "images/surface-rides-2560.webp",
+        "sha256": "a3a0d141fa41a5fc2de3677a472ef073e250b49c5bd61f3ff96b998452a2215b"
+      }
+    ],
+    "matchedCourtViews": 4,
+    "matchedSurfaceViews": 16,
+    "matchedStoppingViews": 6,
+    "viewports": [
+      [
+        1920,
+        1080
+      ],
+      [
+        2560,
+        1440
+      ]
+    ],
+    "quality": "medium",
+    "dpr": 1,
+    "actuallyInspected": true,
+    "pixelEditing": "Aspect-preserving downscale and captions outside source pixels only.",
+    "sources": {
+      "courtBefore": "e9a3b43 exact git archive",
+      "courtAfter": "d55bbca / ad6f343 surface code; later stopping-only runtime patch leaves court unchanged",
+      "surfaceBefore": "d542f14 exact git archive",
+      "surfaceAfter": "d55bbca / ad6f343",
+      "stopsBefore": "668bbfc exact git archive",
+      "stopsAfter": "072cdcf"
+    }
+  },
+  "preview": {
+    "localDevelopment": [
+      "http://127.0.0.1:5190/basketball?view=third",
+      "http://127.0.0.1:5190/cycling?view=third",
+      "http://127.0.0.1:5190/alpine-ride?view=third"
+    ],
+    "cleanPublicBuildBase": "http://127.0.0.1:5191",
+    "githubPagesDeployed": false
+  },
+  "remaining": [
+    "No 1v1 opponent or defensive AI; free practice only.",
+    "Procedural finishing / cycling constraints on a licensed stock rig; no full mocap or finger-grip animation.",
+    "Original forest far terrain / foliage and alpine aerial resolution remain simplified; not photographic reconstruction of video locations.",
+    "Forest route end remains the original stop boundary; endpoint composition can improve.",
+    "Night switching still has a 111ms peak in the final sample; earlier short samples reached 153ms.",
+    "1440p functional/layout QA passed; no long-run 1440p hardware benchmark, mobile performance or all-driver certification.",
+    "Earlier incomplete automation / performance runs are retained; native-occlusion control does not establish the cause of every intermittent failure."
+  ]
+}

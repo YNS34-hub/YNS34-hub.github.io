@@ -98,7 +98,10 @@ export function alpineRibbon(start: number, end: number, width: number, offset=0
   const positions: number[] = [], uvs: number[] = [], indices: number[] = [], n = Math.ceil((end-start)/2);
   const p = new Vector3(), tangent = new Vector3();
   for (let i=0; i<=n; i++) {
-    const d = start+(end-start)*i/n; sampleAlpine(d,p,tangent); const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);
+    const d = start+(end-start)*i/n; sampleAlpine(d,p,tangent);
+    // 接入段供后方镜头观看，不增加可骑距离，也不改变真实路线的起点。
+    if(d<0)p.addScaledVector(tangent,d);
+    const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);
     for (const side of [-1,1]) { const a=offset+side*width/2; positions.push(p.x+nx/r*a,p.y+lift,p.z+nz/r*a); uvs.push(side<0?0:width/3,d/6); }
     if (i<n) { const a=i*2; indices.push(a,a+1,a+2,a+1,a+3,a+2); }
   }

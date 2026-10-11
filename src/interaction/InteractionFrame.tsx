@@ -6,9 +6,10 @@ import { attentionSample, advanceDwell, type Dwell } from "./attention";
 import { activateFocused, interactives, publishFocus, publishPresence, readInteraction } from "./registry";
 import { nearbyRank } from "../motion/choreography";
 import { isVisibleMesh, isVisibleObject } from "./occlusion";
+import { actorCamera } from "../worlds/presence/state";
 
 export default function InteractionFrame() {
-  const { camera, scene } = useThree();
+  const { camera: renderCamera, scene } = useThree();
   const scratch = useRef({ position: new Vector3(), direction: new Vector3(), delta: new Vector3(), ray: new Raycaster() });
   const dwell = useRef<Dwell>({ id: "", seconds: 0 }), elapsed = useRef(0);
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function InteractionFrame() {
     if (elapsed.current < 0.1) return;
     const step = elapsed.current; elapsed.current = 0;
     const state = usePalaceStore.getState();
+    const camera = actorCamera(renderCamera, state.roomId);
     const enabled = state.started && !state.overlay && !state.focus && !state.pendingDoor && state.mode !== "index" && !document.hidden;
     const { position, direction, delta, ray } = scratch.current;
     camera.getWorldDirection(direction);

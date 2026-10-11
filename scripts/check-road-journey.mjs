@@ -3,24 +3,31 @@ import {chromium} from "playwright";
 import {mkdir,writeFile} from "node:fs/promises";
 import {execFileSync} from "node:child_process";
 import path from "node:path";
+import {Quaternion} from "three";
 import {roadLength,roadStops} from "../src/worlds/road/route.ts";
 const base=process.env.PALACE_URL||"http://127.0.0.1:5190",out=path.resolve(process.env.PALACE_ARTIFACTS||"qa-artifacts/road-journey");
 await mkdir(out,{recursive:true});
-const report={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),scope:"Continuous native keyboard/button ride; no camera or distance injection. One explicitly labelled invalid-state recovery fault follows the journey. Video is functional evidence, not GPU performance measurement.",checks:[],moments:[],samples:[],errors:[]};
-const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:true,args:["--use-angle=d3d11"]});
-const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,recordVideo:{dir:path.join(out,"video"),size:{width:960,height:540}}});
+const recordVideo=process.env.PALACE_RECORD_VIDEO!=="0";
+const report={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),perspective:process.env.PALACE_VIEW==="third"?"third":"first",recordVideo,scope:"Continuous native keyboard/button ride; no camera or distance injection. One explicitly labelled invalid-state recovery fault follows the journey. Video is functional evidence, not GPU performance measurement.",checks:[],moments:[],samples:[],errors:[]};
+report.headed=process.env.PALACE_HEADED==="1";
+// 独立验收窗口可能被桌面工具遮挡；关闭浏览器后台节流，不改变应用的暂停或固定物理步。
+report.browserArgs=["--use-angle=d3d11","--disable-background-timer-throttling","--disable-backgrounding-occluded-windows","--disable-renderer-backgrounding"];
+const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:!report.headed,args:report.browserArgs});
+report.browser=browser.version();
+const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,...(recordVideo?{recordVideo:{dir:path.join(out,"video"),size:{width:960,height:540}}}:{})});
 await context.route("**/personal-media/manifest.json",r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
 await context.addInitScript(()=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality:"medium",tutorialDone:true,roomSoundtracks:false,mute:false},version:0})));
+if(process.env.PALACE_VIEW==="third")await context.addInitScript(()=>localStorage.setItem("memory-palace:perspective:v1",JSON.stringify({basketball:"first",cycling:"third","alpine-ride":"third"})));
 const videoOrigin=Date.now(),page=await context.newPage();page.setDefaultTimeout(90000);let origin=Date.now();
 page.on("pageerror",e=>report.errors.push(e.message));page.on("console",m=>{if(m.type()==="error")report.errors.push(m.text());});
 const flush=()=>writeFile(path.join(out,"journey.json"),JSON.stringify(report,null,2));
-const read=()=>page.evaluate(()=>{const s=document.querySelector(".road-status")?.dataset,d=window.__ROAD_DEBUG__;return{s:s?{...s}:null,model:d?{distance:d.model.distance,speed:d.model.speed,gear:d.model.gear,cadence:d.model.cadence,grade:d.model.grade,steering:d.model.steering,offset:d.model.offset,recovered:d.model.recovered,ended:d.model.ended}:null,audio:d?.audio.debug(),camera:window.__PALACE_DEBUG__?.camera.position.toArray(),quaternion:window.__PALACE_DEBUG__?.camera.quaternion.toArray()};});
+const read=()=>page.evaluate(()=>{const s=document.querySelector(".road-status")?.dataset,d=window.__ROAD_DEBUG__;return{s:s?{...s}:null,model:d?{distance:d.model.distance,speed:d.model.speed,gear:d.model.gear,cadence:d.model.cadence,grade:d.model.grade,steering:d.model.steering,offset:d.model.offset,recovered:d.model.recovered,ended:d.model.ended}:null,audio:d?.audio.debug(),camera:window.__PALACE_DEBUG__?.camera.position.toArray(),quaternion:window.__PALACE_DEBUG__?.camera.quaternion.toArray(),visibility:{hidden:document.hidden,focused:document.hasFocus(),frame:window.__PALACE_DEBUG__?.renderer.info.render.frame}};});
 const mark=async name=>{const value=await read();report.moments.push({name,seconds:(Date.now()-origin)/1000,...value});await page.screenshot({path:path.join(out,name+".png")});await flush();console.log(name);};
 const check=(name,condition=true)=>{assert.ok(condition,name);report.checks.push(name);};
 const options=()=>page.getByRole("button",{name:"Ride options",exact:true}).click();
 const continuous=async()=>{await options();await page.getByRole("button",{name:"Pedal continuously",exact:true}).click();};
 try{
- await page.goto(base+"/worlds/");await page.locator(".world-ready canvas").waitFor();origin=Date.now();report.videoOriginOffsetSeconds=(origin-videoOrigin)/1000;await mark("01-museum-threshold");
+ await page.goto(base+"/worlds/");await page.bringToFront();await page.locator(".world-ready canvas").waitFor();origin=Date.now();report.videoOriginOffsetSeconds=(origin-videoOrigin)/1000;await mark("01-museum-threshold");
  await page.evaluate(()=>window.__PALACE_DEV__.state.getState().enterRoom("cycling"));await page.locator(".road-mount").waitFor();await page.locator(".world-ready canvas").waitFor();await mark("02-nature-threshold");
  check("Enter from the museum on foot",(await read()).s.mounted==="false");
  await page.keyboard.down("w");await page.waitForFunction(()=>!document.querySelector(".road-mount")?.disabled,{},{timeout:10000});await page.keyboard.up("w");await mark("03-approach-road-bike");
@@ -55,11 +62,20 @@ try{
  const end=await read();check("Continuous full route finishes without teleport or infinite loading",end.model.ended);report.journeySeconds=(Date.now()-start)/1000;check("Bounded streaming traverses the full authored geography",visited.size>=18&&Number(end.s.sectors.split(",").length)<=6);await mark("15-last-road-stop");
  // 通过原 Cinema API 验证同次访问原位返回；不会改动 Cinema 数据或导航。
  const before=await read();await page.evaluate(()=>{const lib=window.__PALACE_DEV__.library.getState();window.__PALACE_DEV__.state.getState().openCinema(lib.wallpapers[0]||lib.personal.visuals[0]);});await page.waitForFunction(()=>window.__PALACE_DEBUG__?.roomId==="cinema"&&document.querySelector(".world-ready"));await page.evaluate(()=>window.__PALACE_DEV__.state.getState().exitCinema());await page.locator(".road-status").waitFor({state:"attached"});await page.locator(".world-ready canvas").waitFor();await page.waitForTimeout(600);
- const after=await read();check("Cinema restores road posture, distance, spatial position and head orientation",after.s.mounted==="true"&&Math.abs(after.model.distance-before.model.distance)<.05&&after.camera.every((n,i)=>Math.abs(n-before.camera[i])<.08)&&after.quaternion.every((n,i)=>Math.abs(n-before.quaternion[i])<.001));await mark("16-cinema-return");
+ const after=await read();
+ // q 与 -q 表示同一朝向，逐分量比较会误判跨场景重建；仍严格比较真实旋转角和位置。
+ const angle=new Quaternion(...before.quaternion).normalize().angleTo(new Quaternion(...after.quaternion).normalize());
+ report.cinemaReturn={positionDelta:Math.hypot(...after.camera.map((n,i)=>n-before.camera[i])),angleRadians:angle,distanceDelta:Math.abs(after.model.distance-before.model.distance)};
+ check("Cinema restores road posture, distance, spatial position and head orientation",after.s.mounted==="true"&&report.cinemaReturn.distanceDelta<.05&&after.camera.every((n,i)=>Math.abs(n-before.camera[i])<.08)&&Number.isFinite(angle)&&angle<.002);await mark("16-cinema-return");
  await page.evaluate(()=>window.__ROAD_DEBUG__.model.distance=NaN);await page.waitForTimeout(600);const recovered=await read();check("Explicit invalid-state recovery returns the last safe point stopped",recovered.model.recovered&&recovered.model.speed===0&&Number.isFinite(recovered.model.distance));
  await options();await page.getByRole("button",{name:"Return to the Palace",exact:true}).click();await page.waitForFunction(()=>window.__PALACE_DEBUG__?.roomId==="worlds"&&document.querySelector(".world-ready"));await mark("17-museum-return");
  await page.evaluate(()=>window.__PALACE_DEV__.state.getState().enterRoom("cycling"));await page.locator(".road-mount").waitFor();check("Fresh re-entry restores progress on foot without stale riding controls",(await read()).s.mounted==="false");await mark("18-safe-re-entry");
  assert.deepEqual(report.errors,[]);report.passed=true;
-}catch(e){report.failure=e.stack;report.failureState=await read().catch(()=>null);process.exitCode=1;console.error(e.stack);await page.screenshot({path:path.join(out,"failure.png")}).catch(()=>{});}finally{await context.close();await page.video()?.saveAs(path.join(out,"continuous-native-ride.webm"));await flush();await browser.close();}
+}catch(e){report.failure=e.stack;report.failureState=await read().catch(()=>null);process.exitCode=1;console.error(e.stack);await page.screenshot({path:path.join(out,"failure.png")}).catch(()=>{});}finally{
+ // 浏览器意外退出也必须留下完整失败报告；录屏编码器不应抹掉已经采集的诊断。
+ await flush();await context.close().catch(()=>{});
+ if(recordVideo)await page.video()?.saveAs(path.join(out,"continuous-native-ride.webm")).catch(e=>{report.recordingFailure=e.message;process.exitCode=1;});
+ await flush();await browser.close().catch(()=>{});
+}
 function checkBound(sectors){assert.ok(sectors.split(",").length<=6,"No more than six active route sectors");}
 console.log("Continuous road journey: "+report.checks.length+" checks / "+(report.passed?"PASS":"FAIL"));

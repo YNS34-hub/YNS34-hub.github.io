@@ -9,16 +9,19 @@ import { useRoadTextures,usePineShape,type PineShape } from "./textures";
 import { useWorldTexture } from "../materials";
 import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
+import { applyRoadWear,groundGrassGeometry } from "../surfaceDetail";
+import Delineators from "../Delineators";
+import { createStopApron,insideStopApron,stopGroundHeight } from "./stopApron";
 
 function seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
 function makeTerrain(start:number,end:number){
-  const vertices:number[]=[],uv:number[]=[],colors:number[]=[],zones:number[]=[],indices:number[]=[],n=Math.ceil((end-start)/4),across=28;
+  const vertices:number[]=[],uv:number[]=[],colors:number[]=[],zones:number[]=[],sides:number[]=[],indices:number[]=[],n=Math.ceil((end-start)/4),across=28;
   const p=new Vector3(),tangent=new Vector3();
   for(let i=0;i<=n;i++){
     roadSample(start+(end-start)*i/n,p,tangent);const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);
     for(let j=0;j<=across;j++){
       const offset=(j/across-.5)*170,x=p.x+nx/r*offset,z=p.z+nz/r*offset,y=terrainHeight(x,z);
-      vertices.push(x,y,z);uv.push(x/4,z/4);
+      vertices.push(x,y,z);uv.push(x/4,z/4);sides.push(offset);
       const progress=(start+(end-start)*i/n)/roadLength;
       const enter=Math.max(0,Math.min(1,(progress-.395)/.045)),leave=Math.max(0,Math.min(1,(.63-progress)/.05));zones.push(enter*enter*(3-2*enter)*leave*leave*(3-2*leave));
       const bank=Math.min(1,Math.abs(offset)/7),meadow=roadForestDensity((start+(end-start)*i/n)/roadLength)<.3;
@@ -27,16 +30,25 @@ function makeTerrain(start:number,end:number){
       if(bank<.6){colors[colors.length-3]=.46;colors[colors.length-2]=.42;colors[colors.length-1]=.31;}
     }
   }
-  const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(vertices,3));g.setAttribute("uv",new Float32BufferAttribute(uv,2));g.setAttribute("color",new Float32BufferAttribute(colors,3));g.setAttribute("roadMeadow",new Float32BufferAttribute(zones,1));g.setIndex(indices);g.computeVertexNormals();return g;
+  const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(vertices,3));g.setAttribute("uv",new Float32BufferAttribute(uv,2));g.setAttribute("color",new Float32BufferAttribute(colors,3));g.setAttribute("roadMeadow",new Float32BufferAttribute(zones,1));g.setAttribute("roadOffset",new Float32BufferAttribute(sides,1));g.setIndex(indices);g.computeVertexNormals();return g;
 }
 type Maps=ReturnType<typeof useRoadTextures>;
 function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
   const compile=useMemo(()=>(shader:Parameters<MeshStandardMaterial["onBeforeCompile"]>[0])=>{
     shader.uniforms.roadGrassMap={value:maps.grass};
-    shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nattribute float roadMeadow;varying float roadZone;").replace("#include <begin_vertex>","#include <begin_vertex>\nroadZone=roadMeadow;");
-    shader.fragmentShader=shader.fragmentShader.replace("#include <common>","#include <common>\nuniform sampler2D roadGrassMap;varying float roadZone;").replace("#include <map_fragment>","#ifdef USE_MAP\nvec4 roadSoil=texture2D(map,vMapUv);roadSoil.rgb=mix(roadSoil.rgb,texture2D(roadGrassMap,vMapUv).rgb,roadZone);diffuseColor*=roadSoil;\n#endif");
+    shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nattribute float roadMeadow;attribute float roadOffset;varying float roadZone;varying float roadSide;").replace("#include <begin_vertex>","#include <begin_vertex>\nroadZone=roadMeadow;roadSide=roadOffset;");
+    shader.fragmentShader=shader.fragmentShader.replace("#include <common>",`#include <common>
+      uniform sampler2D roadGrassMap;varying float roadZone;varying float roadSide;
+      float soilNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);vec4 h=fract(sin(vec4(dot(i,vec2(127.1,311.7)),dot(i+vec2(1.,0.),vec2(127.1,311.7)),dot(i+vec2(0.,1.),vec2(127.1,311.7)),dot(i+vec2(1.,1.),vec2(127.1,311.7))))*43758.5453);return mix(mix(h.x,h.y,f.x),mix(h.z,h.w,f.x),f.y);}
+    `).replace("#include <map_fragment>",`#ifdef USE_MAP
+      vec4 roadSoil=texture2D(map,vMapUv);roadSoil.rgb=mix(roadSoil.rgb,texture2D(roadGrassMap,vMapUv).rgb,roadZone);
+      float soilVariation=mix(soilNoise(vMapUv*.09),soilNoise(vMapUv*.57),.28);
+      float shoulder=1.-smoothstep(3.5,6.6,abs(roadSide));
+      vec3 mineral=vec3(dot(roadSoil.rgb,vec3(.2126,.7152,.0722)))*vec3(.90,.91,.87);
+      roadSoil.rgb=mix(roadSoil.rgb,mineral,shoulder*.42)*(.91+.15*soilVariation);diffuseColor*=roadSoil;
+      #endif`);
   },[maps.grass]);
-  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-v1"}/></mesh>;
+  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v2"}/></mesh>;
 }
 function WindField(props:Parameters<typeof Instances>[0]){
   const quiet=useQuietMotion();
@@ -49,10 +61,14 @@ function WindField(props:Parameters<typeof Instances>[0]){
         shader.uniforms.roadTime=wind.current.time;shader.uniforms.roadWind=wind.current.amount;shader.uniforms.roadEye=wind.current.eye;
         shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nuniform float roadTime;uniform float roadWind;uniform vec3 roadEye;")
           .replace("#include <begin_vertex>","#include <begin_vertex>\n#ifdef USE_INSTANCING\nfloat nearby=1.-smoothstep(28.,85.,distance(roadEye,instanceMatrix[3].xyz));transformed.x+=sin(roadTime*1.2+instanceMatrix[3].x*.09+position.y)*roadWind*uv.y*uv.y*nearby;\n#endif");
+        if(!props.map){
+          shader.vertexShader="varying float grassLeafHeight;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ngrassLeafHeight=uv.y;");
+          shader.fragmentShader="varying float grassLeafHeight;\n"+shader.fragmentShader.replace("#include <color_fragment>","#include <color_fragment>\ndiffuseColor.rgb*=.60+.40*smoothstep(.03,.75,grassLeafHeight);");
+        }
       };
-      material.customProgramCacheKey=()=>"road-near-wind-v1";material.needsUpdate=true;
+      material.customProgramCacheKey=()=>props.map?"road-near-wind-v1":"road-rooted-grass-wind-v2";material.needsUpdate=true;
     });
-  },[]);
+  },[props.map]);
   useFrame(({camera},dt)=>{if(!quiet)wind.current.time.value+=Math.min(dt,.06);wind.current.amount.value=quiet?0:.08+Math.min(1,roadView.speed/15.28)*.18;wind.current.eye.value.copy(camera.position);});
   return <group ref={root}><Instances {...props}/></group>;
 }
@@ -67,7 +83,9 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
         for(let j=0;j<38;j++){
           const a=side*(3.65+random()*8),along=(random()-.5)*3,tr=Math.hypot(t.x,t.z),x=p.x+nx/r*a+t.x/tr*along,z=p.z+nz/r*a+t.z/tr*along;
           if(lakeDistance(x,z)<1.02)continue;
-          grass.push({position:[x,terrainHeight(x,z)+.12,z],scale:[.05+random()*.045,.14+random()*.22,1],rotation:[0,random()*Math.PI,(random()-.5)*.3],color:["#64794c","#78824f","#566d43","#858a59"][j%4]});
+          // 保持同样的随机调用次序；只把根部按实际草高埋入地表，不改路线和植被位置。
+          const width=.05+random()*.045,height=.14+random()*.22;
+          grass.push({position:[x,terrainHeight(x,z)+height*.5-.025,z],scale:[width,height,1],rotation:[0,random()*Math.PI,(random()-.5)*.3],color:["#64794c","#78824f","#566d43","#858a59"][j%4]});
         }
         if(Math.floor(d/4)%7===0){const a=side*3.8;markers.push({position:[p.x+nx/r*a,p.y+.31,p.z+nz/r*a],scale:[.10,.62,.10],color:"#c7c6b5"});}
         if(random()>density)continue;
@@ -92,23 +110,15 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
       }
     }
     const stem=new CylinderGeometry(.06,.65,1,12),leaf=new PlaneGeometry(1,1),stone=new DodecahedronGeometry(1,1),cube=new BoxGeometry(1,1,1);
-    const blade=new BufferGeometry(),gp:number[]=[],guv:number[]=[],gi:number[]=[];
-    // 同一低成本草簇中也区分叶高、宽度与弯曲，停稳时不能呈现九片等高的平行条带。
-    const bladeRandom=seeded(617);
-    for(let b=0;b<9;b++){
-      const angle=b*2.4,dx=Math.cos(angle)*(.6+bladeRandom()*1.1),dz=Math.sin(angle)*.055,n=gp.length/3;
-      const height=.55+bladeRandom()*.7,width=.12+bladeRandom()*.16,bend=(bladeRandom()-.5)*1.1;
-      gp.push(dx-width,-.5,dz,dx+width,-.5,dz,dx+bend*.35-width*.55,-.5+height*.58,dz+.03,dx+bend*.35+width*.55,-.5+height*.58,dz+.03,dx+bend,-.5+height,dz+.075);
-      guv.push(0,0,1,0,0,.58,1,.58,.5,1);gi.push(n,n+1,n+2,n+1,n+3,n+2,n+2,n+3,n+4);
-    }
-    blade.setAttribute("position",new Float32BufferAttribute(gp,3));blade.setAttribute("uv",new Float32BufferAttribute(guv,2));blade.setIndex(gi);blade.computeVertexNormals();
-    const road=roadRibbon(start,end,6.4),edges=[roadRibbon(start,end,.1,-2.95,.012),roadRibbon(start,end,.1,2.95,.012)];
-    return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass,markers};
+    const blade=groundGrassGeometry(seeded(617));
+    const roadStart=index===0?-12:start;
+    const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];
+    return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass:grass.filter(item=>!insideStopApron(item.position[0],item.position[2])),markers};
   },[index,quality,pineShape]);
   useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.stone,geometry.cube,geometry.blade].forEach(g=>g.dispose());},[geometry]);
   return <group name={"road-sector:"+index}>
     <TerrainSurface geometry={geometry.terrain} maps={maps}/>
-    <mesh name="authored-paved-road" geometry={geometry.road} receiveShadow><meshStandardMaterial color="#7b8384" map={maps.asphalt} normalMap={maps.normal} normalScale={[.22,.22]} roughness={.91}/></mesh>
+    <mesh name="authored-paved-road" geometry={geometry.road} receiveShadow><meshStandardMaterial color="#7b8384" map={maps.asphalt} normalMap={maps.normal} normalScale={[.22,.22]} roughness={.91} onUpdate={m=>applyRoadWear(m,[2,5],6.4)}/></mesh>
     {geometry.edges.map((g,i)=><mesh key={i} geometry={g}><meshStandardMaterial color="#d5d3bd" roughness={.94}/></mesh>)}
     <Instances geometry={geometry.stem} items={geometry.trunks} color="#9c8e78" map={maps.bark} shadows={shadow}/>
     <Instances geometry={wood} items={geometry.pines} map={maps.bark} shadows={shadow}/>
@@ -118,6 +128,7 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
     <Instances geometry={geometry.stone} items={geometry.rocks} color="#8f9387" roughness={1}/>
     <WindField geometry={geometry.blade} items={geometry.grass} color="#83925f" cutout/>
     <Instances geometry={geometry.cube} items={geometry.markers} color="#bebfae"/>
+    <Delineators items={geometry.markers} stem={geometry.cube}/>
   </group>;
 }
 function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
@@ -196,15 +207,26 @@ function Trailhead(){
     <Label text="A RIDE THROUGH MEMORY" position={[-3,1.99,5.1]} size={.095} color="#bdc9c8" maxWidth={3}/>
   </group>;
 }
-function RoadStops(){
+function GroundedStopApron({distance,side,origin,yaw,maps}:{distance:number;side:-1|1;origin:[number,number,number];yaw:number;maps:Maps}){
+  const [x,y,z]=origin;
+  const geometry=useMemo(()=>{
+    const g=createStopApron(distance,side);g.translate(-x,-y,-z);g.rotateY(-yaw);return g;
+  },[distance,side,x,y,z,yaw]);
+  useEffect(()=>()=>geometry.dispose(),[geometry]);
+  return <mesh name="grounded-scenic-stop-apron" geometry={geometry} receiveShadow><meshStandardMaterial color="#c9c3ad" map={maps.asphalt} normalMap={maps.normal} normalScale={[.12,.12]} roughness={.96}/></mesh>;
+}
+function RoadStops({maps}:{maps:Maps}){
   return <>{roadStops.map((stop,i)=>{
-    const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=Math.sign(nx*(lake.x-p.x)+nz*(lake.z-p.z))||1;
-    return <group key={i} position={[p.x+nx/r*4.7*side,p.y-.08,p.z+nz/r*4.7*side]} rotation={[0,Math.atan2(t.x,t.z),0]}>
-      <Block position={[0,-.22,0]} scale={[4,.42,5]} color="#969990" roughness={1}/>
-      <Block position={[1.05,.49,1.5]} scale={[1.8,.1,.46]} color="#887a5a" roughness={.72}/>
-      {[-.65,.65].map(x=><Block key={x} position={[1.05+x,.24,1.5]} scale={[.07,.49,.40]} color="#596260" metalness={.3}/>)}
-      <Block position={[-1.6,.55,1.9]} scale={[.075,1.1,.075]} color="#626c66"/>
-      <Label text={stop.title} position={[-1.6,1.15,1.92]} size={.13} color="#e4d7bb" maxWidth={2}/>
+    const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=(nx*(lake.x-p.x)+nz*(lake.z-p.z)>=0?1:-1) as -1|1;
+    const x=p.x+nx/r*4.7*side,z=p.z+nz/r*4.7*side,y=stopGroundHeight(x,z,stop.distance)+.045,yaw=Math.atan2(t.x,t.z);
+    const groundAt=(a:number,b:number)=>stopGroundHeight(x+Math.cos(yaw)*a+Math.sin(yaw)*b,z-Math.sin(yaw)*a+Math.cos(yaw)*b,stop.distance)+.045-y;
+    const benchX=-.30*side,feet=[-.65,.65].map(dx=>({x:benchX+dx,y:groundAt(benchX+dx,1.5)})),seatY=Math.max(...feet.map(f=>f.y))+.49,signX=-1.6*side,signY=groundAt(signX,1.9);
+    return <group key={i} name={"road-scenic-stop:"+i} position={[x,y,z]} rotation={[0,yaw,0]}>
+      <GroundedStopApron distance={stop.distance} side={side} origin={[x,y,z]} yaw={yaw} maps={maps}/>
+      <Block position={[benchX,seatY,1.5]} scale={[1.8,.1,.46]} color="#887a5a" roughness={.72}/>
+      {feet.map(foot=>{const height=seatY-.03-foot.y;return <Block key={foot.x} position={[foot.x,foot.y+height*.5,1.5]} scale={[.07,height,.40]} color="#596260" metalness={.3}/>;})}
+      <Block position={[signX,signY+.55,1.9]} scale={[.075,1.1,.075]} color="#626c66"/>
+      <Label text={stop.title} position={[signX,signY+1.15,1.92]} size={.13} color="#e4d7bb" maxWidth={2}/>
     </group>;
   })}</>;
 }
@@ -219,5 +241,5 @@ export default function RoadLandscape(){
   useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
 }

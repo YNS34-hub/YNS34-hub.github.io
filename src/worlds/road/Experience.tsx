@@ -12,11 +12,13 @@ import type {RideMap} from "./mapTypes";
 import { roadView,useRoadRide,readRoadSave,saveRoadRide,rememberRoadCinema,takeRoadCinemaReturn,peekRoadCinemaReturn,type RoadCommand } from "./state";
 import RoadLandscape from "./Landscape";
 import RoadBike from "./RoadBike";
+import { actorCamera, presence } from "../presence/state";
+import SportAvatar from "../presence/Avatar";
 export { primeRoadTextures as preloadRoadAssets } from "./textures";
 
 function RoadRider({map}:{map:RideMap}){
   const {length:roadLength,sample:roadSample,stops:roadStops,chapter:roadChapter,ground:terrainHeight,forest:roadForestDensity}=map;
-  const {camera,gl,scene}=useThree(),quiet=useQuietMotion(),sound=useRoadAudio();
+  const {camera:renderCamera,gl,scene}=useThree(),camera=actorCamera(renderCamera,map.id),quiet=useQuietMotion(),sound=useRoadAudio();
   const model=useMemo(()=>{const saved=peekRoadCinemaReturn(map.id)??readRoadSave(map),b=new RoadPhysics(map);b.distance=saved.distance;b.gear=saved.gear;b.lastSafe=b.distance;return b;},[map]);
   const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false,cinemaResume:peekRoadCinemaReturn(map.id)});
   useLayoutEffect(()=>{
@@ -58,7 +60,7 @@ function RoadRider({map}:{map:RideMap}){
         else if(model.speed<.2){model.speed=0;l.keys.clear();useRoadRide.setState({photo:true,easy:false,controls:false});}
         else{l.photoPending=true;l.brakeLatch=true;useRoadRide.setState({easy:false});acknowledge("Settling into a still view");}
       }
-      if(action==="save"&&s.photo){gl.render(scene,camera);gl.domElement.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=map.id==="cycling"?"the-long-way-home.png":"the-alpine-descent.png";link.click();setTimeout(()=>URL.revokeObjectURL(url),5000);});}
+      if(action==="save"&&s.photo){gl.render(scene,renderCamera);gl.domElement.toBlob(blob=>{if(!blob)return;const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=map.id==="cycling"?"the-long-way-home.png":"the-alpine-descent.png";link.click();setTimeout(()=>URL.revokeObjectURL(url),5000);});}
       if(action==="restart"&&model.speed<.2){model.distance=0;model.lastSafe=0;model.offset=0;model.ended=false;model.stopAt=null;model.atStop=false;roadSample(0,l.point,l.tangent);Object.assign(roadView,{walkX:l.point.x,walkY:l.point.y,walkZ:l.point.z,distance:0,mounted:false,mountProgress:0});camera.position.set(l.point.x+.2,l.point.y+1.65,l.point.z+7.5);useRoadRide.setState({mounted:false,photo:false,easy:false,distance:0});saveRoadRide(0,model.gear,s.comfort,map);}
     };
     const down=(event:KeyboardEvent)=>{
@@ -92,7 +94,7 @@ function RoadRider({map}:{map:RideMap}){
     // 原生测试只能读取这些开发诊断；生产构建没有注入状态入口。
     const debug=window as Window&{__ROAD_DEBUG__?:unknown};if(import.meta.env.DEV)debug.__ROAD_DEBUG__={model,view:roadView,audio:sound};
     return()=>{unsubscribe();window.removeEventListener("palace:road",command);document.removeEventListener("keydown",down);document.removeEventListener("keyup",up);window.removeEventListener("keydown",escape,true);window.removeEventListener("blur",halt);window.removeEventListener("pagehide",halt);delete debug.__ROAD_DEBUG__;};
-  },[camera,gl,scene,model,sound,map,roadStops,roadSample]);
+  },[camera,renderCamera,gl,scene,model,sound,map,roadStops,roadSample]);
   useFrame((_,rawDelta)=>{
     const palace=usePalaceStore.getState(),s=useRoadRide.getState(),l=local.current;
     if(!palace.started||palace.overlay||palace.focus||palace.mode==="index"||useActivity.getState().warming||document.hidden)return;
@@ -119,6 +121,7 @@ function RoadRider({map}:{map:RideMap}){
     if(!l.yawReady){roadView.yaw=yaw;l.yawReady=true;}else roadView.yaw+=Math.atan2(Math.sin(yaw-roadView.yaw),Math.cos(yaw-roadView.yaw))*(1-Math.exp(-dt*8));
     roadView.pitch=Math.atan2(l.tangent.y,Math.hypot(l.tangent.x,l.tangent.z))-.035;roadView.roll=comfort?0:-model.lean*.16;
     Object.assign(roadView,{distance:model.distance,speed:model.speed,offset:model.offset,lean:comfort?0:model.lean,steer:model.steering,brake:model.braking,cadence:model.cadence});
+    presence.speed=model.speed;
     const nx=-l.tangent.z,nz=l.tangent.x,r=Math.hypot(nx,nz),aero=comfort?0:Math.max(0,(model.speed-10)/5)*.025;
     l.target.set(l.point.x+nx/r*model.offset-l.tangent.x*.23,l.point.y+1.47-aero-(comfort?0:model.braking*.013)+ (comfort?0:Math.sin(model.distance*3.4)*.0015*Math.min(1,model.speed/8)),l.point.z+nz/r*model.offset-l.tangent.z*.23);
     if(mounting){l.mountTime+=dt;roadView.mountProgress=Math.min(1,l.mountTime/(comfort?.08:.72));const p=roadView.mountProgress,e=p*p*(3-2*p);camera.position.lerpVectors(l.start,l.target,e);l.look.set(roadView.pitch,roadView.yaw,0,"YXZ");l.targetQ.setFromEuler(l.look);camera.quaternion.slerpQuaternions(l.startQ,l.targetQ,e);}
@@ -129,7 +132,7 @@ function RoadRider({map}:{map:RideMap}){
     sound.update({speed:still?0:model.speed,cadence:still?0:model.cadence,pedaling:pedal&&!brake&&!still,brake:model.braking,nearWater:map.water(l.point.x,l.point.z),forest:roadForestDensity(model.distance/roadLength),stopped:still||model.speed<.2});
     l.publish+=dt;l.save+=dt;if(l.publish>.15){l.publish=0;useRoadRide.setState({speed:model.speed,distance:model.distance,cadence:model.cadence,grade:model.grade,state:mounting?"mounting":model.state,recovery:model.recovered});useActivity.setState({distance:model.distance,speed:model.speed,riding:pedal,stopped:model.speed<.1,scenic:roadChapter(model.distance)});}
     if(l.save>3){l.save=0;saveRoadRide(model.distance,model.gear,s.comfort,map);}
-  });
+  },-3);
   return null;
 }
-export default function RoadExperience({landscape}:{landscape?:ReactNode}){const map=getRideMap(usePalaceStore(s=>s.roomId));return <group name={map.sceneName}>{landscape??<RoadLandscape/>}<RoadRider map={map}/><RoadBike map={map}/></group>;}
+export default function RoadExperience({landscape}:{landscape?:ReactNode}){const room=usePalaceStore(s=>s.roomId),map=getRideMap(room);return <group name={map.sceneName}>{landscape??<RoadLandscape/>}<RoadRider map={map}/><RoadBike map={map}/><SportAvatar roomId={room==="alpine-ride"?"alpine-ride":"cycling"}/></group>;}

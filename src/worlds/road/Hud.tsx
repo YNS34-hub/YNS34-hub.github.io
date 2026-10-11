@@ -5,6 +5,7 @@ import { useMotionCue } from "../../motion/useMotionCue";
 import {getRideMap,isRideScene,rideMaps} from "./maps";
 import { useRoadRide,roadCommand } from "./state";
 import "./road.css";
+import PerspectiveControls from "../presence/Controls";
 
 let returnRoom="worlds";
 export function rememberRoadReturn(previous:string){if(!isRideScene(previous)&&previous!=="cinema")returnRoom=previous==="basketball"?"worlds":previous;}
@@ -42,7 +43,7 @@ export default function RoadHud(){
     {r.place&&r.speed<.5&&<RoadMoment kind="place" title={r.place} key={"place:"+r.place} hidden={r.photo||r.controls}/>}
     {r.controls&&!r.photo&&<aside className="road-options" aria-label="Road cycling options">
       <div className="road-options-heading"><span>{map.title}</span><button aria-label="Close ride options" onClick={()=>useRoadRide.setState({controls:false})}>×</button></div>
-      <p>W / ↑ pedal · release to coast<br/>S / ↓ / Space brake · A / D steer<br/>Q easier · E harder · Shift stronger effort<br/>Drag / lock to look · P photo view<br/>Continuous pedaling selects an easier climbing gear.</p>
+      <p>W / ↑ pedal · release to coast<br/>S / ↓ / Space brake · A / D steer<br/>Q easier · E harder · Shift stronger effort<br/>Drag / lock to look · V first / third person<br/>P photo view · third person allows side views<br/>Continuous pedaling selects an easier climbing gear.</p>
       <div className="road-readouts"><span>{(r.distance/1000).toFixed(2)} KM</span><span>{Math.round(r.grade*100)}% GRADE</span><span>{Math.round(r.cadence)} RPM</span></div>
       {r.mounted&&<><button onClick={()=>{roadCommand("pedal");useRoadRide.setState({controls:false});}}>{r.easy?"Coast freely":"Pedal continuously"}</button><button onClick={()=>{roadCommand("brake");useRoadRide.setState({controls:false});}}>Brake gently</button><button onClick={()=>roadCommand("stop")}>Stop at next viewpoint</button><button onClick={()=>{roadCommand("photo");useRoadRide.setState({controls:false});}}>Photo view · P</button><button disabled={r.speed>.3} onClick={()=>roadCommand("dismount")}>Dismount</button></>}
       <button aria-pressed={r.comfort} onClick={()=>useRoadRide.setState({comfort:!r.comfort})}>Camera motion · {r.comfort?"reduced":"full"}</button>
@@ -54,5 +55,6 @@ export default function RoadHud(){
     {r.photo&&<div className="road-photo-tools"><button onClick={()=>roadCommand("save")}>Save this view</button><button onClick={()=>roadCommand("photo")}>Exit photo view · ESC</button></div>}
     {!r.mounted&&!r.controls&&<div className="ride-entry-maps" aria-label="Choose cycling map">{rideMaps.map(m=><button key={m.id} aria-current={m.id===map.id?"page":undefined} disabled={m.id===map.id} onClick={()=>usePalaceStore.getState().enterRoom(m.id)}>{m.subtitle}</button>)}</div>}
     {!r.mounted&&!r.controls&&<button className="road-entry-return" onClick={returnToPalace}>Return to the Palace</button>}
+    {!r.photo&&!r.controls&&<PerspectiveControls roomId={map.id==="alpine-ride"?"alpine-ride":"cycling"} />}
   </div>;
 }

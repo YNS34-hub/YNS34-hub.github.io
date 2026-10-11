@@ -8,6 +8,8 @@ import {useQuietMotion} from "../../motion/useMotionCue";
 import {roadView,useRoadRide} from "../road/state";
 import {useAlpineTextures,useAlpineGeography} from "./assets";
 import {applyAlpineSunlight} from "./sunlight";
+import {applyRoadWear} from "../surfaceDetail";
+import Delineators from "../Delineators";
 import Geography from "./Geography";
 import {ScanInstances,useAlpineScans} from "./Scans";
 import {AlpineVegetation} from "./Vegetation";
@@ -19,9 +21,9 @@ type Maps=ReturnType<typeof useAlpineTextures>;
 function random(seed:number){return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
 function terrainGeometry(points:number[],indices:number[]){const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(points,3));g.setAttribute("uv",new Float32BufferAttribute(points.flatMap((_,i)=>i%3===0?[points[i]/15,points[i+2]/15]:[]),2));g.setIndex(indices);g.computeVertexNormals();return g;}
 function RoadSurface({maps}:{maps:Maps}){
-  const asphalt=useMemo(()=>{const m=new MeshStandardMaterial({map:maps.asphalt,normalMap:maps.asphaltNormal,roughness:.94,color:"#c8d0d4"});m.normalScale.set(.32,.32);m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\nfloat grey=dot(diffuseColor.rgb,vec3(.2126,.7152,.0722));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(grey),.95);");};m.customProgramCacheKey=()=>"alpine-neutral-asphalt-v1";return m;},[maps]);
+  const asphalt=useMemo(()=>{const m=new MeshStandardMaterial({map:maps.asphalt,normalMap:maps.asphaltNormal,roughness:.94,color:"#c8d0d4"});m.normalScale.set(.32,.32);m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\nfloat grey=dot(diffuseColor.rgb,vec3(.2126,.7152,.0722));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(grey),.95);");};m.customProgramCacheKey=()=>"alpine-neutral-asphalt-v1";applyRoadWear(m,[3,6],6.4);return m;},[maps]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
-  const geometries=useMemo(()=>[alpineRibbon(0,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(0,alpineLength,.11,side*2.99,.017)),alpineRibbon(0,alpineLength,7.6,0,-.025)],[]);
+  const geometries=useMemo(()=>[alpineRibbon(-12,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(-12,alpineLength,.11,side*2.99,.017)),alpineRibbon(-12,alpineLength,7.6,0,-.025)],[]);
   useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);
   return <group name="continuous-alpine-pass-road">
     <mesh geometry={geometries[3]} receiveShadow><meshStandardMaterial map={maps.rock} color="#b8ad96" roughness={1}/></mesh>
@@ -82,6 +84,7 @@ function AlpineSector({index,scans}:{index:number;scans:ReturnType<typeof useAlp
     <mesh geometry={data.rail} castShadow={Math.abs(index-riderSector)<2} receiveShadow><meshStandardMaterial color="#b7beb7" metalness={.48} roughness={.54} side={DoubleSide}/></mesh>
     <Instances geometry={data.post} items={data.posts} color="#939a96" metalness={.7} roughness={.5} shadows={Math.abs(index-riderSector)<2}/>
     <Instances geometry={data.post} items={data.markers} color="#dedbcc" roughness={.85}/>
+    <Delineators items={data.markers} stem={data.post} diamond/>
     <ScanInstances scan={scans[0]} items={data.rocks} shadows={Math.abs(index-riderSector)<2}/><ScanInstances scan={scans[1]} items={data.cliffs} shadows={Math.abs(index-riderSector)<2}/>
     {grassTemplates.map((template,i)=><GrassField key={i} template={template} items={i<3?data.grass[i]:data.farGrass[i-3]} time={data.clock} wind={data.wind} near={i<3} blend={quality!=="low"}/>)}<AlpineVegetation index={index}/>
   </group>;

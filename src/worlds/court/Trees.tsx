@@ -6,6 +6,7 @@ import { useQuietMotion } from "../../motion/useMotionCue";
 import { usePalaceStore } from "../../systems/store";
 import Instances, { type Instance } from "../Instances";
 import { cloneTreeTextures, useTreeShape } from "./assets";
+import { softenCanopyNormals } from "../surfaceDetail";
 
 export default function CourtTrees() {
   const root = useRef<Group>(null);
@@ -34,7 +35,8 @@ export default function CourtTrees() {
       for (const [x, y] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { p.copy(center).addScaledVector(right, x).addScaledVector(up, y); position.push(p.x, p.y, p.z); }
       uv.push(tile[0], tile[1], tile[2], tile[1], tile[2], tile[3], tile[0], tile[3]); indices.push(start, start + 1, start + 2, start, start + 2, start + 3);
     }
-    const g = new BufferGeometry(); g.setAttribute("position", new Float32BufferAttribute(position, 3)); g.setAttribute("uv", new Float32BufferAttribute(uv, 2)); g.setIndex(indices); g.computeVertexNormals(); g.computeBoundingSphere(); return g;
+    const g = new BufferGeometry(); g.setAttribute("position", new Float32BufferAttribute(position, 3)); g.setAttribute("uv", new Float32BufferAttribute(uv, 2)); g.setIndex(indices); g.computeVertexNormals();
+    softenCanopyNormals(g, new Vector3(0, shape.height * .68, 0)); g.computeBoundingSphere(); return g;
   }, [shape, tier]);
   const motion = useMemo(() => ({ time: { value: 0 }, amplitude: { value: 0 } }), []);
   const leaves = useMemo(() => {

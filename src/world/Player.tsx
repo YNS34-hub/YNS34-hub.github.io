@@ -13,6 +13,7 @@ import { worksForRoom } from "../systems/mediaPlacement";
 // 交互扩展开始 player-import
 import { setWorldView } from "../worlds/worldConfig";
 import { applyRoadLook } from "../worlds/road/state";
+import { actorCamera, isAdventureRoom, presence } from "../worlds/presence/state";
 // 交互扩展结束
 
 const EYE = 1.65;
@@ -21,7 +22,8 @@ const upAxis = new Vector3(0, 1, 0);
 export { roomBounds } from "./collision";
 
 export default function Player({ roomId }: { roomId: string }) {
-  const { camera, gl } = useThree();
+  const { camera: renderCamera, gl } = useThree();
+  const camera = actorCamera(renderCamera, roomId);
   const velocity = useRef(new Vector3());
   const desired = useRef(new Vector3());
   const angle = useRef(new Euler(0, 0, 0, "YXZ"));
@@ -92,6 +94,11 @@ export default function Player({ roomId }: { roomId: string }) {
     velocity.current.set(0, 0, 0);
     keys.current.clear();
     clearWalkTarget();
+    // 交互扩展开始 player-presence-init
+    presence.roomId = isAdventureRoom(roomId) ? roomId : "";
+    presence.previous.copy(camera.position); presence.velocity.set(0, 0, 0); presence.speed = 0;
+    presence.sprinting = false; presence.jump = 0; presence.finishLocked = false;
+    // 交互扩展结束
   }, [camera, roomId, travelSequence]);
   useLayoutEffect(() => {
     const view = usePalaceStore.getState().returnView;
@@ -231,9 +238,15 @@ export default function Player({ roomId }: { roomId: string }) {
       state.mode === "index"
     ) {
       velocity.current.set(0, 0, 0);
+      // 交互扩展开始 player-presence-pause
+      if (isAdventureRoom(roomId)) { presence.speed = 0; presence.sprinting = false; presence.velocity.set(0, 0, 0); }
+      // 交互扩展结束
       return;
     }
     camera.quaternion.setFromEuler(angle.current);
+    // 交互扩展开始 player-court-finish
+    if (roomId === "basketball" && presence.finishLocked) { velocity.current.set(0, 0, 0); return; }
+    // 交互扩展结束
     // 交互扩展开始 player-cycle-locomotion
     if (["cycling", "alpine-ride"].includes(roomId) && applyRoadLook(camera, angle.current)) return;
     // 交互扩展结束
@@ -245,7 +258,10 @@ export default function Player({ roomId }: { roomId: string }) {
       (input.has("KeyS") || input.has("ArrowDown") ? 1 : 0) -
       (input.has("KeyW") || input.has("ArrowUp") ? 1 : 0);
     const speed =
-      input.has("ShiftLeft") || input.has("ShiftRight") ? 4.45 : 2.7;
+      input.has("ShiftLeft") || input.has("ShiftRight") ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;
+    // 交互扩展开始 player-presence-sprint
+    if (isAdventureRoom(roomId)) presence.sprinting = (input.has("ShiftLeft") || input.has("ShiftRight")) && !!(x || z);
+    // 交互扩展结束
     if (x || z) {
       clearWalkTarget();
       desired.current
@@ -274,13 +290,16 @@ export default function Player({ roomId }: { roomId: string }) {
     previousPosition.current.copy(camera.position);
     camera.position.addScaledVector(velocity.current, delta);
     keepClear(camera.position, roomId, footprints);
+    // 交互扩展开始 player-presence-speed
+    if (isAdventureRoom(roomId)) { presence.velocity.subVectors(camera.position, previousPosition.current).divideScalar(Math.max(.001, delta)); presence.speed = Math.hypot(presence.velocity.x, presence.velocity.z); }
+    // 交互扩展结束
     if (
       camera.position.distanceToSquared(previousPosition.current) > 0.00001 &&
-      clock.elapsedTime - footstepsAt.current > 0.58
+      clock.elapsedTime - footstepsAt.current > (roomId === "basketball" && presence.speed > 4 ? .33 : .58)
     ) {
       footstepsAt.current = clock.elapsedTime;
       window.dispatchEvent(new Event("palace:footstep"));
     }
-  });
+  }, isAdventureRoom(roomId) ? -4 : 0);
   return null;
 }

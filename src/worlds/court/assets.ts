@@ -30,4 +30,5 @@ export function preloadCourtAssets() {
   for (const prefix of ["aggregate", "paving"]) useTexture.preload(["color", "normal", "rough"].map(c => "/media/court/" + prefix + "-" + c + ".webp"));
   useTexture.preload(["branches-color", "branches-normal", "trunk-color", "trunk-normal", "leaves-color"].map(n => "/media/court/tree/" + n + ".webp"));
   useTexture.preload("/media/court/painting.webp"); useTexture.preload("/media/court/day-sky.webp");
+  useTexture.preload("/media/realism/court-wear.webp");
 }
