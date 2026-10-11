@@ -10,7 +10,9 @@ await mkdir(out,{recursive:true});
 const recordVideo=process.env.PALACE_RECORD_VIDEO!=="0";
 const report={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),perspective:process.env.PALACE_VIEW==="third"?"third":"first",recordVideo,scope:"Continuous native keyboard/button ride; no camera or distance injection. One explicitly labelled invalid-state recovery fault follows the journey. Video is functional evidence, not GPU performance measurement.",checks:[],moments:[],samples:[],errors:[]};
 report.headed=process.env.PALACE_HEADED==="1";
-const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:!report.headed,args:["--use-angle=d3d11"]});
+// 独立验收窗口可能被桌面工具遮挡；关闭浏览器后台节流，不改变应用的暂停或固定物理步。
+report.browserArgs=["--use-angle=d3d11","--disable-background-timer-throttling","--disable-backgrounding-occluded-windows","--disable-renderer-backgrounding"];
+const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:!report.headed,args:report.browserArgs});
 report.browser=browser.version();
 const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,...(recordVideo?{recordVideo:{dir:path.join(out,"video"),size:{width:960,height:540}}}:{})});
 await context.route("**/personal-media/manifest.json",r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
@@ -19,13 +21,13 @@ if(process.env.PALACE_VIEW==="third")await context.addInitScript(()=>localStorag
 const videoOrigin=Date.now(),page=await context.newPage();page.setDefaultTimeout(90000);let origin=Date.now();
 page.on("pageerror",e=>report.errors.push(e.message));page.on("console",m=>{if(m.type()==="error")report.errors.push(m.text());});
 const flush=()=>writeFile(path.join(out,"journey.json"),JSON.stringify(report,null,2));
-const read=()=>page.evaluate(()=>{const s=document.querySelector(".road-status")?.dataset,d=window.__ROAD_DEBUG__;return{s:s?{...s}:null,model:d?{distance:d.model.distance,speed:d.model.speed,gear:d.model.gear,cadence:d.model.cadence,grade:d.model.grade,steering:d.model.steering,offset:d.model.offset,recovered:d.model.recovered,ended:d.model.ended}:null,audio:d?.audio.debug(),camera:window.__PALACE_DEBUG__?.camera.position.toArray(),quaternion:window.__PALACE_DEBUG__?.camera.quaternion.toArray()};});
+const read=()=>page.evaluate(()=>{const s=document.querySelector(".road-status")?.dataset,d=window.__ROAD_DEBUG__;return{s:s?{...s}:null,model:d?{distance:d.model.distance,speed:d.model.speed,gear:d.model.gear,cadence:d.model.cadence,grade:d.model.grade,steering:d.model.steering,offset:d.model.offset,recovered:d.model.recovered,ended:d.model.ended}:null,audio:d?.audio.debug(),camera:window.__PALACE_DEBUG__?.camera.position.toArray(),quaternion:window.__PALACE_DEBUG__?.camera.quaternion.toArray(),visibility:{hidden:document.hidden,focused:document.hasFocus(),frame:window.__PALACE_DEBUG__?.renderer.info.render.frame}};});
 const mark=async name=>{const value=await read();report.moments.push({name,seconds:(Date.now()-origin)/1000,...value});await page.screenshot({path:path.join(out,name+".png")});await flush();console.log(name);};
 const check=(name,condition=true)=>{assert.ok(condition,name);report.checks.push(name);};
 const options=()=>page.getByRole("button",{name:"Ride options",exact:true}).click();
 const continuous=async()=>{await options();await page.getByRole("button",{name:"Pedal continuously",exact:true}).click();};
 try{
- await page.goto(base+"/worlds/");await page.locator(".world-ready canvas").waitFor();origin=Date.now();report.videoOriginOffsetSeconds=(origin-videoOrigin)/1000;await mark("01-museum-threshold");
+ await page.goto(base+"/worlds/");await page.bringToFront();await page.locator(".world-ready canvas").waitFor();origin=Date.now();report.videoOriginOffsetSeconds=(origin-videoOrigin)/1000;await mark("01-museum-threshold");
  await page.evaluate(()=>window.__PALACE_DEV__.state.getState().enterRoom("cycling"));await page.locator(".road-mount").waitFor();await page.locator(".world-ready canvas").waitFor();await mark("02-nature-threshold");
  check("Enter from the museum on foot",(await read()).s.mounted==="false");
  await page.keyboard.down("w");await page.waitForFunction(()=>!document.querySelector(".road-mount")?.disabled,{},{timeout:10000});await page.keyboard.up("w");await mark("03-approach-road-bike");
