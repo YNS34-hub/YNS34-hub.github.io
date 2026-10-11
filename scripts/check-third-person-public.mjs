@@ -16,7 +16,7 @@ try{
   page=await context.newPage();page.setDefaultTimeout(90000);
   page.on("pageerror",e=>report.errors.push(e.message));page.on("console",m=>{if(m.type()==="error")report.errors.push(m.text());});
   page.on("request",r=>{if(r.method()==="POST")report.uploads.push(r.url());});page.on("response",r=>{if(r.status()>=400)report.errors.push(r.status()+" "+r.url());});
-  await page.goto(base+"/basketball?view=third");await page.locator(".court-hud").waitFor();
+  await page.goto(base+"/basketball?view=third");await page.locator(".world-ready canvas").waitFor();await page.locator(".court-hud").waitFor();
   assert.equal(await page.getByRole("button",{name:"Third person · V",exact:true}).getAttribute("aria-pressed"),"true");
   assert.equal(await page.evaluate(()=>!!window.__PALACE_DEV__||!!window.__PRESENCE_DEBUG__||!!window.__ROAD_DEBUG__),false);
   await page.getByRole("button",{name:"R · Recall ball",exact:true}).click();await page.keyboard.press("e");await page.getByRole("button",{name:"F · Layup",exact:true}).waitFor();
@@ -25,10 +25,10 @@ try{
   await page.keyboard.up("w");await page.keyboard.up("Shift");assert.ok(accepted,"Actual native run-up must reach an eligible dunk");
   await page.waitForFunction(()=>document.querySelector(".practice-score strong")?.textContent?.replace(/\s/g,"")==="1/1");
   await page.keyboard.press("v");assert.equal(await page.getByRole("button",{name:"First person",exact:true}).getAttribute("aria-pressed"),"true");
-  await page.keyboard.press("v");await page.reload();await page.locator(".court-hud").waitFor();assert.equal(await page.getByRole("button",{name:"Third person · V",exact:true}).getAttribute("aria-pressed"),"true");
+  await page.keyboard.press("v");await page.reload();await page.locator(".world-ready canvas").waitFor();await page.locator(".court-hud").waitFor();assert.equal(await page.getByRole("button",{name:"Third person · V",exact:true}).getAttribute("aria-pressed"),"true");
   await page.screenshot({path:path.join(out,`${width}-court.png`)});report.checks.push({width,name:"Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"});
   for(const room of["cycling","alpine-ride"]){
-   await page.goto(base+"/"+room+"?view=third");await page.locator(".road-mount").waitFor();
+   await page.goto(base+"/"+room+"?view=third");await page.locator(".world-ready canvas").waitFor();await page.locator(".road-mount").waitFor();
    await page.keyboard.down("w");await page.waitForFunction(()=>document.querySelector(".road-mount")?.disabled===false);await page.keyboard.up("w");await page.keyboard.press("e");
    await page.waitForFunction(()=>document.querySelector(".road-status")?.dataset.mounted==="true");await page.waitForTimeout(800);
    await page.keyboard.down("w");await page.waitForFunction(()=>Number(document.querySelector(".road-status")?.dataset.speed)>.5);await page.keyboard.up("w");
