@@ -56,7 +56,10 @@ export function roadRibbon(start:number,end:number,width:number,offset=0,lift=0)
   const positions:number[]=[],uvs:number[]=[],index:number[]=[],n=Math.ceil((end-start)/2.5);
   const p=new Vector3(),tangent=new Vector3();
   for(let i=0;i<=n;i++) {
-    const d=start+(end-start)*i/n;roadSample(d,p,tangent);const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);
+    const d=start+(end-start)*i/n;roadSample(d,p,tangent);
+    // 仅展面向起点后方延续；路线进度与物理采样仍保持 [0, length] 的原边界。
+    if(d<0)p.addScaledVector(tangent,d);
+    const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);
     for(const side of [-1,1]) {const a=offset+side*width/2;positions.push(p.x+nx/r*a,p.y+lift,p.z+nz/r*a);uvs.push(side<0?0:width/2,d/5);}
     if(i<n){const a=i*2;index.push(a,a+1,a+2,a+1,a+3,a+2);}
   }

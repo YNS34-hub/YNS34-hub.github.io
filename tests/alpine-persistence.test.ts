@@ -22,8 +22,18 @@ describe("two-map preservation",()=>{
     rememberRoadCinema(pose);roadTravel("alpine-ride","cinema");roadTravel("cinema","alpine-ride");expect(peekRoadCinemaReturn("alpine-ride")).toEqual(pose);expect(peekRoadCinemaReturn("cycling")).toBeNull();expect(takeRoadCinemaReturn()).toEqual(pose);
     rememberRoadCinema(pose);roadTravel("alpine-ride","cycling");expect(peekRoadCinemaReturn("alpine-ride")).toBeNull();
   });
-  it("keeps the accepted forest landscape, atmosphere and route byte-for-byte",()=>{
+  it("keeps the accepted forest source apart from the declared 12 m visual approach",()=>{
     const files={"Landscape.tsx":"e3cf62583056b1e456224dd96c8c92b3927d0a801f127e12842536fadd1fdf1d","Environment.tsx":"6b3635d1ee9cb985b02feedb4e5033cc46c707cd6c0fac2944f321f8b1845190","route.ts":"461930b1630198c802e11052692c7f3b4c6d361d3f1395f82fe6dfda0548be53"};
-    for(const [file,digest] of Object.entries(files))expect(createHash("sha256").update(readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n")).digest("hex")).toBe(digest);
+    const adapters={
+      "Landscape.tsx":["    const roadStart=index===0?-12:start;\n    const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];","    const road=roadRibbon(start,end,6.4),edges=[roadRibbon(start,end,.1,-2.95,.012),roadRibbon(start,end,.1,2.95,.012)];"],
+      "route.ts":["    const d=start+(end-start)*i/n;roadSample(d,p,tangent);\n    // 仅展面向起点后方延续；路线进度与物理采样仍保持 [0, length] 的原边界。\n    if(d<0)p.addScaledVector(tangent,d);\n    const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);","    const d=start+(end-start)*i/n;roadSample(d,p,tangent);const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);"]
+    };
+    for(const [file,digest] of Object.entries(files)){
+      let source=readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n");
+      const adapter=adapters[file as keyof typeof adapters];
+      if(adapter){expect(source.split(adapter[0])).toHaveLength(2);source=source.replace(adapter[0],adapter[1]);}
+      // 仍对其余完整源码使用原始摘要，不能刷新摘要来隐藏其他场景改写。
+      expect(createHash("sha256").update(source).digest("hex")).toBe(digest);
+    }
   });
 });

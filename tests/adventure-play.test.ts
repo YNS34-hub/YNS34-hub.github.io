@@ -5,10 +5,23 @@ import { LimbIK } from "../src/worlds/presence/ik";
 import { BallPhysics, HOOPS } from "../src/worlds/basketballPhysics";
 import { FinishMotion, finishEligibility } from "../src/worlds/court/finishing";
 import { followPose, pedalPoint } from "../src/worlds/presence/math";
+import { roadSample, roadRibbon } from "../src/worlds/road/route";
+import { sampleAlpine, alpineRibbon } from "../src/worlds/alpine/route";
 
 afterEach(() => { vi.unstubAllGlobals(); vi.resetModules(); });
 const approach = { held: true, position: { x: -.35, y: 1.65, z: -9.7 }, direction: { x: 0, y: .1, z: -1 }, speed: 5.2, hand: 1 };
 describe("non-destructive outdoor presence", () => {
+  it("extends only visible road ribbons behind the unchanged physical route start", () => {
+    for(const [sample,ribbon] of [[roadSample,roadRibbon],[sampleAlpine,alpineRibbon]] as const){
+      const start=new Vector3(),direction=new Vector3(),clamped=new Vector3();sample(0,start,direction);sample(-12,clamped,new Vector3());
+      expect(clamped.distanceTo(start)).toBeLessThan(.001);
+      const geometry=ribbon(-12,24,6.4),vertices=geometry.getAttribute("position");
+      const centre=new Vector3().fromBufferAttribute(vertices,0).add(new Vector3().fromBufferAttribute(vertices,1)).multiplyScalar(.5);
+      expect(centre.distanceTo(start.clone().addScaledVector(direction,-12))).toBeLessThan(.001);
+      for(let i=0;i<vertices.count;i++)expect(Number.isFinite(vertices.getY(i))).toBe(true);
+      geometry.dispose();
+    }
+  });
   it("changes only perspective preferences and preserves denied-storage usability", async () => {
     const values = new Map([["existing-library", "untouched"]]);
     vi.stubGlobal("localStorage", { getItem: (k: string) => values.get(k) ?? null, setItem: (k: string, v: string) => values.set(k, v) });
@@ -33,6 +46,11 @@ describe("non-destructive outdoor presence", () => {
       expect(Math.hypot(right.y - .29, right.z - .08)).toBeCloseTo(.16);
     }
   });
+  it("responds to third-person look pitch while keeping the athlete at the same physical eye position",()=>{
+    const eye=new Vector3(0,1.65,0),p=new Vector3(),t=new Vector3();
+    followPose(eye,new Vector3(0,0,-1),"third",false,p,t);const levelCamera=p.y,levelTarget=t.y;
+    followPose(eye,new Vector3(0,.4,-1).normalize(),"third",false,p,t);expect(p.y).toBeLessThan(levelCamera);expect(t.y).toBeGreaterThan(levelTarget);expect(eye.y).toBe(1.65);
+  });
   it("solves connected limbs without stretching and safely clamps an unreachable target", () => {
     const top=new Bone(),middle=new Bone(),end=new Bone(),ik=new LimbIK();
     top.add(middle);middle.add(end);middle.position.y=-.42;end.position.y=-.43;top.updateWorldMatrix(true,true);
@@ -56,6 +74,7 @@ describe("physical close-range finishes", () => {
     expect(finishEligibility("dunk", { ...approach, speed: 0 }).allowed).toBe(false);
     expect(finishEligibility("layup", { ...approach, position: { x: 0, y: 1.65, z: 0 } }).allowed).toBe(false);
     expect(finishEligibility("layup", { ...approach, direction: { x: 0, y: 0, z: 1 } }).allowed).toBe(false);
+    for(const z of[-13.5,13.5])expect(finishEligibility("dunk",{...approach,position:{x:0,y:1.65,z},direction:{x:0,y:0,z:-Math.sign(z)}}).reason).toMatch(/court side/);
   });
   for (const kind of ["layup", "dunk"] as const) it(kind + " releases once and scores only after the original ball crosses the rim", () => {
     const motion = new FinishMotion(), ball = new BallPhysics(); ball.pickup();

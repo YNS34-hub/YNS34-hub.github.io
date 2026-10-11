@@ -31,7 +31,7 @@ export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
     const mode = photo ? "first" : view;
     scratch.eye.copy(body.position); if (!comfort && roomId === "basketball") scratch.eye.y += presence.jump * (mode === "first" ? .65 : .3);
     body.getWorldDirection(scratch.direction);
-    if (riding && mode === "third") scratch.direction.set(-Math.sin(roadView.yaw + roadView.headYaw * .55), 0, -Math.cos(roadView.yaw + roadView.headYaw * .55));
+    if (riding && mode === "third") scratch.direction.set(-Math.sin(roadView.yaw + roadView.headYaw * 1.25), Math.sin(roadView.headPitch), -Math.cos(roadView.yaw + roadView.headYaw * 1.25)).normalize();
     followPose(scratch.eye, scratch.direction, mode, riding, scratch.position, scratch.target);
     if (mode === "third") {
       const ground = roomId === "basketball" ? 0 : getRideMap(roomId).ground(scratch.position.x, scratch.position.z);

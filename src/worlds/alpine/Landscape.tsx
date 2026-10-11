@@ -21,7 +21,7 @@ function terrainGeometry(points:number[],indices:number[]){const g=new BufferGeo
 function RoadSurface({maps}:{maps:Maps}){
   const asphalt=useMemo(()=>{const m=new MeshStandardMaterial({map:maps.asphalt,normalMap:maps.asphaltNormal,roughness:.94,color:"#c8d0d4"});m.normalScale.set(.32,.32);m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\nfloat grey=dot(diffuseColor.rgb,vec3(.2126,.7152,.0722));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(grey),.95);");};m.customProgramCacheKey=()=>"alpine-neutral-asphalt-v1";return m;},[maps]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
-  const geometries=useMemo(()=>[alpineRibbon(0,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(0,alpineLength,.11,side*2.99,.017)),alpineRibbon(0,alpineLength,7.6,0,-.025)],[]);
+  const geometries=useMemo(()=>[alpineRibbon(-12,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(-12,alpineLength,.11,side*2.99,.017)),alpineRibbon(-12,alpineLength,7.6,0,-.025)],[]);
   useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);
   return <group name="continuous-alpine-pass-road">
     <mesh geometry={geometries[3]} receiveShadow><meshStandardMaterial map={maps.rock} color="#b8ad96" roughness={1}/></mesh>

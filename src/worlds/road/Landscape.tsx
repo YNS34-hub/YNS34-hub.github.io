@@ -102,7 +102,8 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
       guv.push(0,0,1,0,0,.58,1,.58,.5,1);gi.push(n,n+1,n+2,n+1,n+3,n+2,n+2,n+3,n+4);
     }
     blade.setAttribute("position",new Float32BufferAttribute(gp,3));blade.setAttribute("uv",new Float32BufferAttribute(guv,2));blade.setIndex(gi);blade.computeVertexNormals();
-    const road=roadRibbon(start,end,6.4),edges=[roadRibbon(start,end,.1,-2.95,.012),roadRibbon(start,end,.1,2.95,.012)];
+    const roadStart=index===0?-12:start;
+    const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];
     return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass,markers};
   },[index,quality,pineShape]);
   useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.stone,geometry.cube,geometry.blade].forEach(g=>g.dispose());},[geometry]);

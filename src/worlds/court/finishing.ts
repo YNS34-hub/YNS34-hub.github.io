@@ -8,7 +8,8 @@ export function finishEligibility(kind: FinishKind, input: FinishInput) {
   const hoop = HOOPS.reduce((closest, candidate) => Math.hypot(candidate.x - input.position.x, candidate.z - input.position.z) < Math.hypot(closest.x - input.position.x, closest.z - input.position.z) ? candidate : closest);
   const dx = hoop.x - input.position.x, dz = hoop.z - input.position.z, distance = Math.hypot(dx, dz);
   const facing = (dx * input.direction.x + dz * input.direction.z) / Math.max(.001, distance * Math.hypot(input.direction.x, input.direction.z));
-  const reason = !input.held ? "Pick up the ball first" : distance > (kind === "dunk" ? 2.8 : 3.4) ? "Move closer to the rim" : facing < .55 ? "Face the rim" : kind === "dunk" && input.speed < 2.2 ? "Build a run-up · Shift + W" : "";
+  const behindBoard=input.position.z*Math.sign(hoop.z)>Math.abs(hoop.z)+.15;
+  const reason = !input.held ? "Pick up the ball first" : distance > (kind === "dunk" ? 2.8 : 3.4) ? "Move closer to the rim" : behindBoard ? "Approach from the court side of the backboard" : facing < .55 ? "Face the rim" : kind === "dunk" && input.speed < 2.2 ? "Build a run-up · Shift + W" : "";
   return { allowed: !reason, reason, hoop, distance };
 }
 interface FinishPlan { kind: FinishKind; start: Vec; end: Vec; origin: Vec; velocity: Vec; duration: number; releaseAt: number; jump: number; hand: number }

@@ -16,11 +16,11 @@ function useBikeParts(){
     for(const side of [-1,1]){
       frame.push(tube([[side*.025,.29,.08],[side*.055,.30,.32],[side*.056,.345,.54]],.014),tube([[side*.015,.69,.20],[side*.05,.47,.44],[side*.058,.345,.54]],.010));
       fork.push(tube([[side*.025,.84,-.43],[side*.049,.67,-.51],[side*.051,.345,-.61]],.021));
-      tape.push(tube([[side*.05,.975,-.60],[side*.16,.975,-.60],[side*.205,.98,-.68],[side*.21,.965,-.79],[side*.21,.92,-.84],[side*.21,.83,-.82],[side*.21,.785,-.74],[side*.21,.79,-.61]],.014,32));
-      metal.push(tube([[side*.218,.956,-.832],[side*.218,.925,-.873],[side*.218,.858,-.876],[side*.218,.834,-.857]],.005,16));
-      cables.push(tube([[side*.19,.94,-.79],[side*.12,.86,-.64],[side*.10,.81,-.41],[side*.024,.72,-.28]],.0033,24));
+      tape.push(tube([[side*.05,.975,-.48],[side*.16,.975,-.48],[side*.205,.98,-.56],[side*.21,.965,-.67],[side*.21,.92,-.72],[side*.21,.83,-.70],[side*.21,.785,-.62],[side*.21,.79,-.49]],.014,32));
+      metal.push(tube([[side*.218,.956,-.712],[side*.218,.925,-.753],[side*.218,.858,-.756],[side*.218,.834,-.737]],.005,16));
+      cables.push(tube([[side*.19,.94,-.67],[side*.12,.86,-.57],[side*.10,.81,-.41],[side*.024,.72,-.28]],.0033,24));
     }
-    frame.push(tube([head,[0,.968,-.43],[0,.975,-.60]],.022));
+    const stem=tube([head,[0,.968,-.43],[0,.975,-.48]],.022);
     const rim=new LatheGeometry([new Vector2(.277,-.013),new Vector2(.32,-.014),new Vector2(.331,-.008),new Vector2(.331,.008),new Vector2(.32,.014),new Vector2(.277,.013),new Vector2(.277,-.013)],64);
     const spokes=new BufferGeometry(),vertices:number[]=[];
     for(let i=0;i<24;i++){const a=i/24*Math.PI*2;vertices.push(i%2?.025:-.025,0,0,0,Math.sin(a)*.30,Math.cos(a)*.30);}
@@ -29,9 +29,9 @@ function useBikeParts(){
     const canvas=document.createElement("canvas");canvas.width=64;canvas.height=512;const c=canvas.getContext("2d")!;c.fillStyle="#242b31";c.fillRect(0,0,64,512);
     for(let i=0;i<512;i+=8){c.fillStyle=i%16===0?"#3e484e":"#1c232a";c.fillRect(0,i,64,1);}
     const map=new CanvasTexture(canvas);map.colorSpace=SRGBColorSpace;map.wrapS=map.wrapT=RepeatWrapping;map.repeat.set(1,3);map.anisotropy=4;
-    return{frame,fork,metal,tape,cables,rim,spokes,chain,map,bb,seat,head,rear,front};
+    return{frame,fork,metal,tape,cables,stem,rim,spokes,chain,map,bb,seat,head,rear,front};
   },[]);
-  useEffect(()=>()=>{[...parts.frame,...parts.fork,...parts.metal,...parts.tape,...parts.cables,parts.rim,parts.spokes,parts.chain].forEach(g=>g.dispose());parts.map.dispose();},[parts]);
+  useEffect(()=>()=>{[...parts.frame,...parts.fork,...parts.metal,...parts.tape,...parts.cables,parts.stem,parts.rim,parts.spokes,parts.chain].forEach(g=>g.dispose());parts.map.dispose();},[parts]);
   return parts;
 }
 // 原创公路车尺寸：约 1.15 m 轴距，700C 外径，30 mm 轮胎与 54 mm 深截面轮圈。无商业标识。
@@ -66,8 +66,9 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
       <Wheel center={p.front} wheelRef={frontWheel} />
     </group></group>
     <group ref={cockpit} position={p.head}><group position={[0,-p.head[1],-p.head[2]]}>
+      <mesh geometry={p.stem} material={paint} castShadow />
       {p.tape.map((g,i)=><mesh key={i} geometry={g} castShadow><meshStandardMaterial color="#a0abb0" map={p.map} roughness={.64}/></mesh>)}
-      {[-1,1].map(side=><group key={side} position={[side*.21,.983,-.77]} rotation={[-.20,0,0]}>
+      {[-1,1].map(side=><group key={side} position={[side*.21,.983,-.65]} rotation={[-.20,0,0]}>
         <mesh scale={[.021,.035,.065]}><sphereGeometry args={[1,16,12]}/><meshStandardMaterial color="#1c252c" roughness={.55}/></mesh>
         <mesh position={[0,.029,-.025]} scale={[.018,.026,.025]}><sphereGeometry args={[1,12,8]}/><meshStandardMaterial color="#222b31" roughness={.48}/></mesh>
       </group>)}
