@@ -9,6 +9,7 @@ import { getRideMap } from "../road/maps";
 import { followPose } from "./math";
 import { limitCourtBoom } from "./courtBoom";
 import { presence, usePerspective, type AdventureRoom } from "./state";
+import { useAppearance } from "./appearance";
 
 export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
   const { camera } = useThree(), quiet = useQuietMotion(), view = usePerspective(s => s.views[roomId]);
@@ -34,6 +35,13 @@ export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
     body.getWorldDirection(scratch.direction);
     if (riding && mode === "third") scratch.direction.set(-Math.sin(roadView.yaw + roadView.headYaw * 1.25), Math.sin(roadView.headPitch), -Math.cos(roadView.yaw + roadView.headYaw * 1.25)).normalize();
     followPose(scratch.eye, scratch.direction, mode, riding, scratch.position, scratch.target);
+    const appearance = useAppearance.getState();
+    if (appearance.wardrobe === roomId && mode === "third") {
+      // 只转展示镜头；原逻辑眼位 / 朝向 / 控制 / Cinema 返回快照完全不动。
+      scratch.direction.y = 0; scratch.direction.normalize().applyAxisAngle(scratch.up, appearance.previewAngle);
+      scratch.position.copy(body.position).addScaledVector(scratch.direction, -3.3); scratch.position.y = body.position.y + .28;
+      scratch.target.copy(body.position); scratch.target.y -= .53;
+    }
     if (mode === "third") {
       const ground = roomId === "basketball" ? 0 : getRideMap(roomId).ground(scratch.position.x, scratch.position.z);
       scratch.position.y = Math.max(scratch.position.y, ground + .75);

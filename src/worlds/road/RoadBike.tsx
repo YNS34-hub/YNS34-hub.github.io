@@ -5,6 +5,7 @@ import { roadView,useRoadRide } from "./state";
 import {forestMap} from "./maps";
 import type {RideMap} from "./mapTypes";
 import { usePalaceStore } from "../../systems/store";
+import { outfits, useAppearance } from "../presence/appearance";
 
 type V=[number,number,number];
 function tube(points:V[],radius:number,segments=12){return new TubeGeometry(new CatmullRomCurve3(points.map(p=>new Vector3(...p))),segments,radius,8,false);}
@@ -21,6 +22,8 @@ function useBikeParts(){
       cables.push(tube([[side*.19,.94,-.67],[side*.12,.86,-.57],[side*.10,.81,-.41],[side*.024,.72,-.28]],.0033,24));
     }
     const stem=tube([head,[0,.968,-.43],[0,.975,-.48]],.022);
+    const cityStem=tube([head,[0,1.06,-.40],[0,1.185,-.41]],.022);
+    const cityBar=tube([[-.31,1.185,-.41],[-.265,1.185,-.41],[0,1.16,-.42],[.265,1.185,-.41],[.31,1.185,-.41]],.012,24);
     const rim=new LatheGeometry([new Vector2(.277,-.013),new Vector2(.32,-.014),new Vector2(.331,-.008),new Vector2(.331,.008),new Vector2(.32,.014),new Vector2(.277,.013),new Vector2(.277,-.013)],64);
     const spokes=new BufferGeometry(),vertices:number[]=[];
     for(let i=0;i<24;i++){const a=i/24*Math.PI*2;vertices.push(i%2?.025:-.025,0,0,0,Math.sin(a)*.30,Math.cos(a)*.30);}
@@ -29,18 +32,20 @@ function useBikeParts(){
     const canvas=document.createElement("canvas");canvas.width=64;canvas.height=512;const c=canvas.getContext("2d")!;c.fillStyle="#242b31";c.fillRect(0,0,64,512);
     for(let i=0;i<512;i+=8){c.fillStyle=i%16===0?"#3e484e":"#1c232a";c.fillRect(0,i,64,1);}
     const map=new CanvasTexture(canvas);map.colorSpace=SRGBColorSpace;map.wrapS=map.wrapT=RepeatWrapping;map.repeat.set(1,3);map.anisotropy=4;
-    return{frame,fork,metal,tape,cables,stem,rim,spokes,chain,map,bb,seat,head,rear,front};
+    return{frame,fork,metal,tape,cables,stem,cityStem,cityBar,rim,spokes,chain,map,bb,seat,head,rear,front};
   },[]);
-  useEffect(()=>()=>{[...parts.frame,...parts.fork,...parts.metal,...parts.tape,...parts.cables,parts.stem,parts.rim,parts.spokes,parts.chain].forEach(g=>g.dispose());parts.map.dispose();},[parts]);
+  useEffect(()=>()=>{[...parts.frame,...parts.fork,...parts.metal,...parts.tape,...parts.cables,parts.stem,parts.cityStem,parts.cityBar,parts.rim,parts.spokes,parts.chain].forEach(g=>g.dispose());parts.map.dispose();},[parts]);
   return parts;
 }
 // 原创公路车尺寸：约 1.15 m 轴距，700C 外径，30 mm 轮胎与 54 mm 深截面轮圈。无商业标识。
 export default function RoadBike({map=forestMap}:{map?:RideMap}){
   const {sample:roadSample,ground:terrainHeight}=map;
+  const outfitId=useAppearance(s=>s.selected[map.id==="alpine-ride"?"alpine-ride":"cycling"]),city=outfits[outfitId].bike==="city";
   const p=useBikeParts(),root=useRef<Group>(null),cockpit=useRef<Group>(null),steering=useRef<Group>(null),cranks=useRef<Group>(null),frontWheel=useRef<Group>(null),rearWheel=useRef<Group>(null),pedals=useRef<(Group|null)[]>([]);
   const pose=useMemo(()=>({point:new Vector3(),tangent:new Vector3(),spin:0,pedal:0}),[]);
   const paint=useMemo(()=>new MeshStandardMaterial({color:"#c6dce0",metalness:.28,roughness:.25}),[]);
   useEffect(()=>()=>paint.dispose(),[paint]);
+  useEffect(()=>{paint.color.set(city?"#32b9d0":"#c6dce0");},[city,paint]);
   useFrame((_,delta)=>{
     if(!root.current)return;const s=useRoadRide.getState(),dt=Math.min(delta,.06);
     root.current.visible=!s.photo;
@@ -66,6 +71,14 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
       <Wheel center={p.front} wheelRef={frontWheel} />
     </group></group>
     <group ref={cockpit} position={p.head}><group position={[0,-p.head[1],-p.head[2]]}>
+      {city ? <>
+        <mesh geometry={p.cityStem} material={paint} castShadow/><mesh geometry={p.cityBar} castShadow><meshStandardMaterial color="#687a81" metalness={.75} roughness={.30}/></mesh>
+        {[-1,1].map(side=><group key={side}>
+          <mesh position={[side*.265,1.185,-.41]} rotation={[0,0,Math.PI/2]} castShadow><cylinderGeometry args={[.016,.016,.09,12]}/><meshStandardMaterial color="#2f383c" roughness={.92}/></mesh>
+          <mesh position={[side*.212,1.175,-.448]} rotation={[0,side*-.25,Math.PI/2]}><boxGeometry args={[.009,.082,.018]}/><meshStandardMaterial color="#38474d" metalness={.55} roughness={.4}/></mesh>
+        </group>)}
+        <mesh position={[0,1.195,-.46]} rotation={[-.20,0,0]}><boxGeometry args={[.047,.019,.066]}/><meshStandardMaterial color="#19262d" roughness={.44}/></mesh>
+      </> : <>
       <mesh geometry={p.stem} material={paint} castShadow />
       {p.tape.map((g,i)=><mesh key={i} geometry={g} castShadow><meshStandardMaterial color="#a0abb0" map={p.map} roughness={.64}/></mesh>)}
       {[-1,1].map(side=><group key={side} position={[side*.21,.983,-.65]} rotation={[-.20,0,0]}>
@@ -74,6 +87,7 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
       </group>)}
       {p.metal.map((g,i)=><mesh key={i} geometry={g}><meshStandardMaterial color="#747c83" metalness={.82} roughness={.28}/></mesh>)}
       {p.cables.map((g,i)=><mesh key={"cable"+i} geometry={g}><meshStandardMaterial color="#253139" roughness={.7}/></mesh>)}
+      </>}
     </group></group>
     <mesh position={[0,.982,-.43]}><cylinderGeometry args={[.025,.025,.009,20]}/><meshStandardMaterial color="#65747d" metalness={.7} roughness={.3}/></mesh>
     <mesh position={[0,.992,.29]} scale={[.074,.017,.143]}><sphereGeometry args={[1,24,12]}/><meshStandardMaterial color="#24303a" roughness={.48}/></mesh>

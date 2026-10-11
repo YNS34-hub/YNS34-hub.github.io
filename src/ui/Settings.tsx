@@ -1,7 +1,11 @@
 import { usePalaceStore, type Quality } from "../systems/store";
 import { Dialog } from "./primitives";
+import { useAppearance } from "../worlds/presence/appearance";
+import AthleteWardrobe from "../worlds/presence/Wardrobe";
 export default function Settings() {
   const s = usePalaceStore();
+  const wardrobe = useAppearance(a => a.wardrobe);
+  if (wardrobe) return <AthleteWardrobe />;
   return (
     <Dialog
       label="Experience settings"
