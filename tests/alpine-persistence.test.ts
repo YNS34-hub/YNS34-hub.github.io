@@ -33,7 +33,7 @@ describe("two-map preservation",()=>{
       if(file==="Landscape.tsx"){
         // 显式保存局部材质/草根补丁的前后文本；其余源码仍由原摘要约束，不刷新原摘要。
         const surfaces=JSON.parse(readFileSync("tests/fixtures/forest-surface-adapters.json","utf8")) as {id:number;before:string;after:string}[];
-        expect(surfaces.map(s=>s.id)).toEqual([1,2,3,4,5,6,7,8,9,10,11,12,13]);
+        expect(surfaces.map(s=>s.id)).toEqual([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]);
         for(const patch of surfaces){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
       }
       const adapter=adapters[file as keyof typeof adapters];

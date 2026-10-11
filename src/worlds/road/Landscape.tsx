@@ -11,6 +11,7 @@ import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
 import { applyRoadWear,groundGrassGeometry } from "../surfaceDetail";
 import Delineators from "../Delineators";
+import { createStopApron,insideStopApron,stopGroundHeight } from "./stopApron";
 
 function seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
 function makeTerrain(start:number,end:number){
@@ -112,7 +113,7 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
     const blade=groundGrassGeometry(seeded(617));
     const roadStart=index===0?-12:start;
     const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];
-    return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass,markers};
+    return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass:grass.filter(item=>!insideStopApron(item.position[0],item.position[2])),markers};
   },[index,quality,pineShape]);
   useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.stone,geometry.cube,geometry.blade].forEach(g=>g.dispose());},[geometry]);
   return <group name={"road-sector:"+index}>
@@ -206,15 +207,26 @@ function Trailhead(){
     <Label text="A RIDE THROUGH MEMORY" position={[-3,1.99,5.1]} size={.095} color="#bdc9c8" maxWidth={3}/>
   </group>;
 }
-function RoadStops(){
+function GroundedStopApron({distance,side,origin,yaw,maps}:{distance:number;side:-1|1;origin:[number,number,number];yaw:number;maps:Maps}){
+  const [x,y,z]=origin;
+  const geometry=useMemo(()=>{
+    const g=createStopApron(distance,side);g.translate(-x,-y,-z);g.rotateY(-yaw);return g;
+  },[distance,side,x,y,z,yaw]);
+  useEffect(()=>()=>geometry.dispose(),[geometry]);
+  return <mesh name="grounded-scenic-stop-apron" geometry={geometry} receiveShadow><meshStandardMaterial color="#c9c3ad" map={maps.asphalt} normalMap={maps.normal} normalScale={[.12,.12]} roughness={.96}/></mesh>;
+}
+function RoadStops({maps}:{maps:Maps}){
   return <>{roadStops.map((stop,i)=>{
-    const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=Math.sign(nx*(lake.x-p.x)+nz*(lake.z-p.z))||1;
-    return <group key={i} position={[p.x+nx/r*4.7*side,p.y-.08,p.z+nz/r*4.7*side]} rotation={[0,Math.atan2(t.x,t.z),0]}>
-      <Block position={[0,-.22,0]} scale={[4,.42,5]} color="#969990" roughness={1}/>
-      <Block position={[1.05,.49,1.5]} scale={[1.8,.1,.46]} color="#887a5a" roughness={.72}/>
-      {[-.65,.65].map(x=><Block key={x} position={[1.05+x,.24,1.5]} scale={[.07,.49,.40]} color="#596260" metalness={.3}/>)}
-      <Block position={[-1.6,.55,1.9]} scale={[.075,1.1,.075]} color="#626c66"/>
-      <Label text={stop.title} position={[-1.6,1.15,1.92]} size={.13} color="#e4d7bb" maxWidth={2}/>
+    const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=(nx*(lake.x-p.x)+nz*(lake.z-p.z)>=0?1:-1) as -1|1;
+    const x=p.x+nx/r*4.7*side,z=p.z+nz/r*4.7*side,y=stopGroundHeight(x,z,stop.distance)+.045,yaw=Math.atan2(t.x,t.z);
+    const groundAt=(a:number,b:number)=>stopGroundHeight(x+Math.cos(yaw)*a+Math.sin(yaw)*b,z-Math.sin(yaw)*a+Math.cos(yaw)*b,stop.distance)+.045-y;
+    const benchX=-.30*side,feet=[-.65,.65].map(dx=>({x:benchX+dx,y:groundAt(benchX+dx,1.5)})),seatY=Math.max(...feet.map(f=>f.y))+.49,signX=-1.6*side,signY=groundAt(signX,1.9);
+    return <group key={i} name={"road-scenic-stop:"+i} position={[x,y,z]} rotation={[0,yaw,0]}>
+      <GroundedStopApron distance={stop.distance} side={side} origin={[x,y,z]} yaw={yaw} maps={maps}/>
+      <Block position={[benchX,seatY,1.5]} scale={[1.8,.1,.46]} color="#887a5a" roughness={.72}/>
+      {feet.map(foot=>{const height=seatY-.03-foot.y;return <Block key={foot.x} position={[foot.x,foot.y+height*.5,1.5]} scale={[.07,height,.40]} color="#596260" metalness={.3}/>;})}
+      <Block position={[signX,signY+.55,1.9]} scale={[.075,1.1,.075]} color="#626c66"/>
+      <Label text={stop.title} position={[signX,signY+1.15,1.92]} size={.13} color="#e4d7bb" maxWidth={2}/>
     </group>;
   })}</>;
 }
@@ -229,5 +241,5 @@ export default function RoadLandscape(){
   useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
 }
