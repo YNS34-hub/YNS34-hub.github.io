@@ -30,6 +30,10 @@ describe("two-map preservation",()=>{
     };
     for(const [file,digest] of Object.entries(files)){
       let source=readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n");
+      // 第二轮只撤销获准的道路边缘 diff，再继续第一轮和最初的源码保护；旧摘要与旧补丁不变。
+      const roadside=JSON.parse(readFileSync("tests/fixtures/cycling-road-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+      expect(roadside.baseline).toBe("f9f0346bc3efad98f173854b979281a6496c5414");
+      for(const patch of roadside.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
       // 本轮用户明确授权环境美术修改。先逐段撤销记录的视觉 diff，再沿用旧补丁和原始摘要，不扩大到物理或导航。
       const art=JSON.parse(readFileSync("tests/fixtures/cycling-art-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
       expect(art.baseline).toBe("48303b694e149f18b3d580fbc0d2ce1bc99cf730");
