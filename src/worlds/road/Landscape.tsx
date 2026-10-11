@@ -9,7 +9,8 @@ import { useRoadTextures,usePineShape,type PineShape } from "./textures";
 import { useWorldTexture } from "../materials";
 import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
-import { applyRoadWear,groundGrassGeometry } from "../surfaceDetail";
+import { groundGrassGeometry } from "../surfaceDetail";
+import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
 import Delineators from "../Delineators";
 import { createStopApron,insideStopApron,stopGroundHeight } from "./stopApron";
 
@@ -41,14 +42,20 @@ function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
       uniform sampler2D roadGrassMap;varying float roadZone;varying float roadSide;
       float soilNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);vec4 h=fract(sin(vec4(dot(i,vec2(127.1,311.7)),dot(i+vec2(1.,0.),vec2(127.1,311.7)),dot(i+vec2(0.,1.),vec2(127.1,311.7)),dot(i+vec2(1.,1.),vec2(127.1,311.7))))*43758.5453);return mix(mix(h.x,h.y,f.x),mix(h.z,h.w,f.x),f.y);}
     `).replace("#include <map_fragment>",`#ifdef USE_MAP
-      vec4 roadSoil=texture2D(map,vMapUv);roadSoil.rgb=mix(roadSoil.rgb,texture2D(roadGrassMap,vMapUv).rgb,roadZone);
+      vec4 roadSoil=texture2D(map,vMapUv);
+      // 两个取向的实拍土壤减少棋盘重复，林地局部保留苔草，路肩过渡以米计。
+      roadSoil.rgb=mix(roadSoil.rgb,texture2D(map,mat2(.8,-.6,.6,.8)*vMapUv*.83+vec2(.37,.19)).rgb,.30);
+      float humus=dot(roadSoil.rgb,vec3(.2126,.7152,.0722));
+      roadSoil.rgb=mix(roadSoil.rgb,vec3(humus)*vec3(.88,.96,.83),.36);
+      float groundPatch=soilNoise(vMapUv*.28);
+      roadSoil.rgb=mix(roadSoil.rgb,texture2D(roadGrassMap,vMapUv*.86).rgb,max(roadZone,.12*smoothstep(.32,.7,groundPatch)));
       float soilVariation=mix(soilNoise(vMapUv*.09),soilNoise(vMapUv*.57),.28);
-      float shoulder=1.-smoothstep(3.5,6.6,abs(roadSide));
+      float shoulder=1.-smoothstep(3.3+groundPatch*.4,5.1+groundPatch*1.4,abs(roadSide));
       vec3 mineral=vec3(dot(roadSoil.rgb,vec3(.2126,.7152,.0722)))*vec3(.90,.91,.87);
-      roadSoil.rgb=mix(roadSoil.rgb,mineral,shoulder*.42)*(.91+.15*soilVariation);diffuseColor*=roadSoil;
+      roadSoil.rgb=mix(roadSoil.rgb,mineral,shoulder*.68)*(.91+.15*soilVariation);diffuseColor*=roadSoil;
       #endif`);
   },[maps.grass]);
-  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v2"}/></mesh>;
+  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v3"}/></mesh>;
 }
 function WindField(props:Parameters<typeof Instances>[0]){
   const quiet=useQuietMotion();
@@ -74,6 +81,8 @@ function WindField(props:Parameters<typeof Instances>[0]){
 }
 function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry}){
   const quality=usePalaceStore(s=>s.effectiveQuality);
+  const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.normal,[2,5],6.4),[maps.asphalt,maps.normal]);
+  useEffect(()=>()=>asphalt.dispose(),[asphalt]);
   const geometry=useMemo(()=>{
     const start=index*sectorLength,end=Math.min(roadLength,start+sectorLength),p=new Vector3(),t=new Vector3();
     const random=seeded(index+908),trunks:Instance[]=[],branches:Instance[]=[],pines:Instance[]=[],needles:Instance[]=[],broad:Instance[]=[],rocks:Instance[]=[],grass:Instance[]=[],markers:Instance[]=[];
@@ -118,8 +127,8 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
   useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.stone,geometry.cube,geometry.blade].forEach(g=>g.dispose());},[geometry]);
   return <group name={"road-sector:"+index}>
     <TerrainSurface geometry={geometry.terrain} maps={maps}/>
-    <mesh name="authored-paved-road" geometry={geometry.road} receiveShadow><meshStandardMaterial color="#7b8384" map={maps.asphalt} normalMap={maps.normal} normalScale={[.22,.22]} roughness={.91} onUpdate={m=>applyRoadWear(m,[2,5],6.4)}/></mesh>
-    {geometry.edges.map((g,i)=><mesh key={i} geometry={g}><meshStandardMaterial color="#d5d3bd" roughness={.94}/></mesh>)}
+    <mesh name="authored-paved-road" geometry={geometry.road} receiveShadow material={asphalt}/>
+    {geometry.edges.map((g,i)=><mesh key={i} geometry={g} receiveShadow><meshStandardMaterial color="#c9c6b7" roughness={.96} onUpdate={m=>weatheredEdgePaint(m,[2,5])}/></mesh>)}
     <Instances geometry={geometry.stem} items={geometry.trunks} color="#9c8e78" map={maps.bark} shadows={shadow}/>
     <Instances geometry={wood} items={geometry.pines} map={maps.bark} shadows={shadow}/>
     <Instances geometry={geometry.stem} items={geometry.branches} color="#7a725f" shadows={shadow}/>

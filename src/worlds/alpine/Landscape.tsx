@@ -8,7 +8,7 @@ import {useQuietMotion} from "../../motion/useMotionCue";
 import {roadView,useRoadRide} from "../road/state";
 import {useAlpineTextures,useAlpineGeography} from "./assets";
 import {applyAlpineSunlight} from "./sunlight";
-import {applyRoadWear} from "../surfaceDetail";
+import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
 import Delineators from "../Delineators";
 import Geography from "./Geography";
 import {ScanInstances,useAlpineScans} from "./Scans";
@@ -21,14 +21,14 @@ type Maps=ReturnType<typeof useAlpineTextures>;
 function random(seed:number){return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
 function terrainGeometry(points:number[],indices:number[]){const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(points,3));g.setAttribute("uv",new Float32BufferAttribute(points.flatMap((_,i)=>i%3===0?[points[i]/15,points[i+2]/15]:[]),2));g.setIndex(indices);g.computeVertexNormals();return g;}
 function RoadSurface({maps}:{maps:Maps}){
-  const asphalt=useMemo(()=>{const m=new MeshStandardMaterial({map:maps.asphalt,normalMap:maps.asphaltNormal,roughness:.94,color:"#c8d0d4"});m.normalScale.set(.32,.32);m.onBeforeCompile=s=>{s.fragmentShader=s.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\nfloat grey=dot(diffuseColor.rgb,vec3(.2126,.7152,.0722));diffuseColor.rgb=mix(diffuseColor.rgb,vec3(grey),.95);");};m.customProgramCacheKey=()=>"alpine-neutral-asphalt-v1";applyRoadWear(m,[3,6],6.4);return m;},[maps]);
+  const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.asphaltNormal,[3,6],6.4),[maps.asphalt,maps.asphaltNormal]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
   const geometries=useMemo(()=>[alpineRibbon(-12,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(-12,alpineLength,.11,side*2.99,.017)),alpineRibbon(-12,alpineLength,7.6,0,-.025)],[]);
   useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);
   return <group name="continuous-alpine-pass-road">
     <mesh geometry={geometries[3]} receiveShadow><meshStandardMaterial map={maps.rock} color="#b8ad96" roughness={1}/></mesh>
     <mesh geometry={geometries[0]} receiveShadow material={asphalt}/>
-    {[1,2].map(i=><mesh key={i} geometry={geometries[i]} receiveShadow><meshStandardMaterial color="#e7e2ce" roughness={.95}/></mesh>)}
+    {[1,2].map(i=><mesh key={i} geometry={geometries[i]} receiveShadow><meshStandardMaterial color="#d3cfbe" roughness={.96} onUpdate={m=>weatheredEdgePaint(m,[3,6])}/></mesh>)}
   </group>;
 }
 function guardrail(start:number,end:number,side:number){
