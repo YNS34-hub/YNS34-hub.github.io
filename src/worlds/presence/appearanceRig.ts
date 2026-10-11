@@ -1,4 +1,4 @@
-import { Color, Matrix3, Mesh, MeshStandardMaterial, Vector3, type BufferGeometry } from "three";
+import { Color, Float32BufferAttribute, Matrix3, Mesh, MeshStandardMaterial, SkinnedMesh, Vector3, type BufferGeometry } from "three";
 import { outfits, type OutfitId } from "./appearance";
 import type { AvatarProfile } from "./avatarProfile.mjs";
 
@@ -38,8 +38,18 @@ export function reshapeAthlete(geometry: BufferGeometry, profile: AvatarProfile)
   position.needsUpdate = true; if (normals) normals.needsUpdate = true;
   own.computeBoundingBox(); own.computeBoundingSphere(); return own;
 }
+export function sleeveCoverage(geometry: BufferGeometry, boneNames: string[]) {
+  const indices = geometry.getAttribute("skinIndex"), weights = geometry.getAttribute("skinWeight"), result = new Float32Array(geometry.getAttribute("position").count);
+  if (indices && weights) {
+    const arms = new Set(boneNames.flatMap((name, index) => /_(Clavicle|UpperArm|Forearm)$/.test(name) ? [index] : []));
+    for (let i = 0; i < result.length; i++) for (let component = 0; component < 4; component++) if (arms.has(indices.getComponent(i, component))) result[i] += weights.getComponent(i, component);
+  }
+  return new Float32BufferAttribute(result, 1);
+}
 export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: OutfitId) {
   const outfit = outfits[outfitId];
+  // 同一套骨骼权重跨越拆开的 UV 岛；衣袖覆盖肩、上臂与前臂，保留手 / 手指的原肤色。
+  mesh.geometry.setAttribute("athleteSleeve", sleeveCoverage(mesh.geometry, mesh instanceof SkinnedMesh ? mesh.skeleton.bones.map(bone => bone.name) : []));
   const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
   for (const value of materials) {
     if (!(value instanceof MeshStandardMaterial)) continue;
@@ -47,9 +57,9 @@ export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: Outfi
     value.roughness = head ? .70 : outfit.style === "urban" ? .88 : .78;
     value.onBeforeCompile = shader => {
       Object.assign(shader.uniforms, { athleteSkin: { value: new Color(profile.skin) }, athleteHair: { value: new Color(profile.hair) }, athleteTop: { value: new Color(outfit.top) }, athleteBottom: { value: new Color(outfit.bottom) }, athleteStyle: { value: shirtless ? 1 : outfit.style === "urban" ? 2 : 0 }, athleteDenim: { value: outfit.style === "denim" ? 1 : 0 } });
-      shader.vertexShader = "varying vec3 vAthleteRest;\n" + shader.vertexShader;
-      shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvAthleteRest = position * 0.01;");
-      shader.fragmentShader = "varying vec3 vAthleteRest;\nuniform vec3 athleteSkin, athleteHair, athleteTop, athleteBottom;\nuniform float athleteStyle, athleteDenim;\n" + shader.fragmentShader;
+      shader.vertexShader = "attribute float athleteSleeve;\nvarying float vAthleteSleeve;\nvarying vec3 vAthleteRest;\n" + shader.vertexShader;
+      shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvAthleteRest = position * 0.01;\nvAthleteSleeve = athleteSleeve;");
+      shader.fragmentShader = "varying float vAthleteSleeve;\nvarying vec3 vAthleteRest;\nuniform vec3 athleteSkin, athleteHair, athleteTop, athleteBottom;\nuniform float athleteStyle, athleteDenim;\n" + shader.fragmentShader;
       shader.fragmentShader = shader.fragmentShader.replace("#include <map_fragment>", `#include <map_fragment>
         #ifdef USE_MAP
         vec3 source = diffuseColor.rgb;
@@ -65,8 +75,7 @@ export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: Outfi
           bool jersey = source.b > source.r * 1.18 && source.b > source.g * 1.10;
           bool upperLeg = (vMapUv.x < .31 || vMapUv.x > .69) && vMapUv.y < .194;
           bool trouser = athleteDenim > .5 && vAthleteRest.z < .90 && vAthleteRest.z > .17;
-          // 外套跨越原无袖球衣 / 手臂的 UV 岛；用绑定姿态的手臂位置保持肩部连续，手掌仍保留肤色。
-          bool sleeve = athleteStyle > 1.5 && abs(vAthleteRest.x) > .18 && abs(vAthleteRest.x) < .58 && vAthleteRest.z > 1.23 && vAthleteRest.z < 1.58;
+          bool sleeve = athleteStyle > 1.5 && vAthleteSleeve > .04;
           bool urbanLeg = athleteStyle > 1.5 && vAthleteRest.z < .90 && vAthleteRest.z > .15;
           bool torso = abs(vAthleteRest.x) < .25 && vAthleteRest.z > .98 && vAthleteRest.z < 1.56;
           if ((jersey || torso) && athleteStyle > .5 && athleteStyle < 1.5) {
@@ -91,6 +100,6 @@ export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: Outfi
         #include <normal_fragment_maps>
         #endif`);
     };
-    value.customProgramCacheKey = () => "athlete-wardrobe-v1-" + Number(head); value.needsUpdate = true;
+    value.customProgramCacheKey = () => "athlete-wardrobe-v2-" + Number(head); value.needsUpdate = true;
   }
 }

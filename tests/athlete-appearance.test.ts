@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { validateAvatarProfile } from "../src/worlds/presence/avatarProfile.mjs";
 import { gripPoint, riderPosture } from "../src/worlds/presence/riderPose";
-import { reshapeAthlete, reshapeAthletePoint } from "../src/worlds/presence/appearanceRig";
+import { reshapeAthlete, reshapeAthletePoint, sleeveCoverage } from "../src/worlds/presence/appearanceRig";
 import { BufferGeometry, Float32BufferAttribute, Vector3 } from "three";
 import { mkdtemp, mkdir, readFile, writeFile, readdir, rm } from "node:fs/promises";
 import os from "node:os";
@@ -56,6 +56,14 @@ describe("local avatar and wardrobe", () => {
     expect(own).not.toBe(source); expect(own.getAttribute("position")).not.toBe(source.getAttribute("position"));
     for (let i=0;i<3;i++) { expect(own.getAttribute("normal").getX(i)).toBeCloseTo(.6); expect(own.getAttribute("normal").getY(i)).toBeCloseTo(.8); }
     own.dispose(); expect(source.getAttribute("normal").getY(0)).toBeCloseTo(.8); source.dispose();
+  });
+  it("keeps sleeve coverage across separate UV islands while leaving palms and fingers uncovered", () => {
+    const source = new BufferGeometry(); source.setAttribute("position", new Float32BufferAttribute([0,0,0,1,1,1,2,2,2],3));
+    source.setAttribute("skinIndex", new Float32BufferAttribute([0,1,0,0,2,0,0,0,3,0,0,0],4));
+    source.setAttribute("skinWeight", new Float32BufferAttribute([.6,.4,0,0,1,0,0,0,1,0,0,0],4));
+    const names = ["Bip01_L_Clavicle","Bip01_L_UpperArm","Bip01_L_Hand","Bip01_L_Finger1"], mask=sleeveCoverage(source,names);
+    expect(mask.getX(0)).toBeCloseTo(1); expect(mask.getX(1)).toBe(0); expect(mask.getX(2)).toBe(0);
+    expect(source.getAttribute("skinWeight").getX(0)).toBeCloseTo(.6); source.dispose();
   });
 });
 describe("video-informed cycling posture", () => {
