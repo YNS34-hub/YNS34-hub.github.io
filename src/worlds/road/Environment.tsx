@@ -26,7 +26,7 @@ export default function RoadEnvironment({onReady}:{onReady?:()=>void}){
     if(sun.current){sun.current.position.set(camera.position.x+forestSun[0],camera.position.y+forestSun[1],camera.position.z+forestSun[2]);sun.current.target.position.copy(camera.position);sun.current.target.updateMatrixWorld();}
     if(!sent.current&&scene.getObjectByName("long-way-home-road-world")&&scene.getObjectByName("prepared-world:cycling")?.userData.prepared&&useLibraryStore.getState().ready&&!active&&!textureStatus().pending){sent.current=true;onReady?.();}
   });
-  return <><fog attach="fog" args={["#bdcedb",250,2450]}/>
+  return <><fog attach="fog" args={["#bdcedb",400,3600]}/>
     <hemisphereLight args={["#c2d8eb","#77735c",1.02]}/><directionalLight ref={sun} position={forestSun} color="#ffe3b9" intensity={2.5} castShadow={quality!=="low"} shadow-mapSize={quality==="high"?[2048,2048]:[1024,1024]} shadow-camera-left={-38} shadow-camera-right={38} shadow-camera-top={38} shadow-camera-bottom={-38} shadow-camera-far={170} shadow-normalBias={.035} shadow-bias={-.00012}/>
   </>;
 }

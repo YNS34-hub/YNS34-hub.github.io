@@ -2,6 +2,9 @@ import {describe,it,expect,vi} from "vitest";
 import {BufferGeometry,Float32BufferAttribute,MeshStandardMaterial,Texture} from "three";
 import {dryRoadMaterial,weatheredEdgePaint} from "../src/worlds/scenery/roadFinish";
 import {habitat,terrainSampler} from "../src/worlds/scenery/ecology";
+import {createValleyRidges} from "../src/worlds/scenery/landforms";
+import {closestRoad} from "../src/worlds/road/route";
+import {readFileSync} from "node:fs";
 
 describe("scenic materials retain asset ownership and metre scale",()=>{
   it("rejects zero / non-finite UV scales before creating a broken surface",()=>{
@@ -18,6 +21,21 @@ describe("scenic materials retain asset ownership and metre scale",()=>{
   it("repeated React updates do not wrap the paint shader indefinitely",()=>{
     const material=new MeshStandardMaterial();weatheredEdgePaint(material,[2,5]);const compile=material.onBeforeCompile,key=material.customProgramCacheKey();
     weatheredEdgePaint(material,[2,5]);expect(material.onBeforeCompile).toBe(compile);expect(material.customProgramCacheKey()).toBe(key);
+  });
+});
+
+describe("distant landforms keep the playable route intact",()=>{
+  it("has finite, independently bounded ridges outside the near-road ground and a fixed triangle budget",()=>{
+    const samples=JSON.parse(readFileSync(new URL("../public/media/road/ridge-samples.json",import.meta.url),"utf8"));
+    const ridges=createValleyRidges(samples);let triangles=0;
+    expect(new Set(ridges.map(g=>g.name)).size).toBe(5);
+    for(const g of ridges){
+      const p=g.getAttribute("position"),n=g.getAttribute("normal");triangles+=g.index!.count/3;
+      expect(g.boundingSphere?.radius).toBeGreaterThan(0);
+      for(let i=0;i<p.count;i+=19){expect(Number.isFinite(p.getY(i))).toBe(true);expect(Math.hypot(n.getX(i),n.getY(i),n.getZ(i))).toBeCloseTo(1,4);expect(closestRoad(p.getX(i),p.getZ(i)).distance).toBeGreaterThan(170);}
+      g.dispose();
+    }
+    expect(triangles).toBeLessThan(80000);
   });
 });
 

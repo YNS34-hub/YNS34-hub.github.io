@@ -1,6 +1,6 @@
 # Road-cycling environment textures
 
-These are public-domain CC0 assets from Poly Haven, resized/encoded as 1K WebP for this scene. They remain freely available from the original source. No private media is included.
+The photographed materials are public-domain CC0 assets from Poly Haven, resized/encoded as bounded WebP for this scene. They remain freely available from the original source. Geographic derivatives are separately attributed below. No private media is included.
 
 - `asphalt.webp` and `asphalt-normal.webp`: [Asphalt 02](https://polyhaven.com/a/asphalt_02).
 - `bark.webp` and `pine.webp`: bark and a cropped twig of [Pine Tree 01](https://polyhaven.com/a/pine_tree_01). The supplied twig alpha channel is preserved.
@@ -8,6 +8,8 @@ These are public-domain CC0 assets from Poly Haven, resized/encoded as 1K WebP f
 - `ground.webp`: [Forest Leaves 04](https://polyhaven.com/a/forest_leaves_04).
 - `grass.webp`: [Leafy Grass](https://polyhaven.com/a/leafy_grass).
 - Close grass and stones reuse the existing public CC0 [Grass Medium 01](https://polyhaven.com/a/grass_medium_01) and [Rock 09](https://polyhaven.com/a/rock_09) under `/media/alpine/`. Attribution and bounded LOD conversions are retained in that directory. Clusters are grounded on the actual rendered road-side triangles, with simplified photographed clumps in the distance.
+- `ridge-rock/normal.webp` and `meadow/normal.webp`: 1K derivatives of the existing public [Rock 01](https://polyhaven.com/a/rock_01) and [Aerial Grass Rock](https://polyhaven.com/a/aerial_grass_rock) materials under `/media/alpine/`. `scripts/prepare-cycling-terrain.py` resizes without grading. The original forest lake valley has authored geological silhouettes; these are not measured geography. The Alpine map continues to use its real DEM and projected aerial data.
+- `ridge-samples.json`: five different windows of the existing [swissALTI3D](https://www.swisstopo.admin.ch/en/height-model-swissalti3d) massif DEM, **© swisstopo**, extracted by `scripts/prepare-valley-ridges.py`. The geological forms are compositionally rearranged and scaled outside the original forest road; this does not represent a measured location for that authored valley. Original coordinate windows are retained in the file. Redistribution follows [swisstopo's free-geodata terms](https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices). The Alpine route's measured heights and aerial projection are untouched.
 - `sky-4k.webp`: a 4096 × 2048 display-only derivative of the already licensed [Kloofendal 48d Partly Cloudy Pure Sky](https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky) under `/media/alpine/clear-sky-8k.webp`. `scripts/prepare-cycling-sky.py` only resizes, with no colour grading. Both maps share this image; reflection lighting reuses the original 2K HDR, with a single PMREM per active scene. No new animation, live reflection or postprocessing is introduced.
 
 License: [Poly Haven CC0](https://polyhaven.com/license). Bicycle, road, terrain, architectural and UI geometry is original project code; the pine shape is explicitly attributed above. The site does not use any commercial road-bike logos.

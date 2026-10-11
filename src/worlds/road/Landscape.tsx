@@ -5,12 +5,14 @@ import Instances,{type Instance} from "../Instances";
 import { Block,Label } from "../../world/primitives";
 import { roadLength,sectorLength,sectorCount,roadSample,roadRibbon,terrainHeight,roadForestDensity,activeRoadSectors,lake,lakeDistance,roadStops,closestRoad } from "./route";
 import { roadView,useRoadRide } from "./state";
-import { useRoadTextures,usePineShape,type PineShape } from "./textures";
+import { useRoadTextures,usePineShape,useRidgeSamples,type PineShape } from "./textures";
 import { useWorldTexture } from "../materials";
 import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
 import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
 import {habitat,terrainSampler} from "../scenery/ecology";
+import {createValleyRidges} from "../scenery/landforms";
+import {valleyTerrainMaterial} from "../scenery/terrainFinish";
 import {GrassField,useAlpineGrass} from "../alpine/Grass";
 import {ScanInstances,useAlpineScans} from "../alpine/Scans";
 import Delineators from "../Delineators";
@@ -38,7 +40,7 @@ function makeTerrain(start:number,end:number){
 type Maps=ReturnType<typeof useRoadTextures>;
 function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
   const compile=useMemo(()=>(shader:Parameters<MeshStandardMaterial["onBeforeCompile"]>[0])=>{
-    shader.uniforms.roadGrassMap={value:maps.grass};
+    shader.uniforms.roadGrassMap={value:maps.meadow};
     shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nattribute float roadMeadow;attribute float roadOffset;varying float roadZone;varying float roadSide;").replace("#include <begin_vertex>","#include <begin_vertex>\nroadZone=roadMeadow;roadSide=roadOffset;");
     shader.fragmentShader=shader.fragmentShader.replace("#include <common>",`#include <common>
       uniform sampler2D roadGrassMap;varying float roadZone;varying float roadSide;
@@ -50,14 +52,15 @@ function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
       float humus=dot(roadSoil.rgb,vec3(.2126,.7152,.0722));
       roadSoil.rgb=mix(roadSoil.rgb,vec3(humus)*vec3(.88,.96,.83),.36);
       float groundPatch=soilNoise(vMapUv*.28);
-      roadSoil.rgb=mix(roadSoil.rgb,texture2D(roadGrassMap,vMapUv*.86).rgb,max(roadZone,.12*smoothstep(.32,.7,groundPatch)));
+      float floorGreen=.68+.16*smoothstep(.32,.7,groundPatch);
+      roadSoil.rgb=mix(roadSoil.rgb,texture2D(roadGrassMap,vMapUv*.86).rgb,max(roadZone,floorGreen));
       float soilVariation=mix(soilNoise(vMapUv*.09),soilNoise(vMapUv*.57),.28);
       float shoulder=1.-smoothstep(3.3+groundPatch*.4,5.1+groundPatch*1.4,abs(roadSide));
       vec3 mineral=vec3(dot(roadSoil.rgb,vec3(.2126,.7152,.0722)))*vec3(.90,.91,.87);
       roadSoil.rgb=mix(roadSoil.rgb,mineral,shoulder*.68)*(.91+.15*soilVariation);diffuseColor*=roadSoil;
       #endif`);
-  },[maps.grass]);
-  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v3"}/></mesh>;
+  },[maps.meadow]);
+  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v4"}/></mesh>;
 }
 function WindField(props:Parameters<typeof Instances>[0]){
   const quiet=useQuietMotion();
@@ -150,29 +153,24 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplate
   </group>;
 }
 function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
+  const samples=useRidgeSamples();
+  const groundMaterial=useMemo(()=>valleyTerrainMaterial(maps),[maps]),mountainMaterial=useMemo(()=>valleyTerrainMaterial(maps,true),[maps]);
+  useEffect(()=>()=>{groundMaterial.dispose();mountainMaterial.dispose();},[groundMaterial,mountainMaterial]);
   const shape=useMemo(()=>{
-    const points:number[]=[],uv:number[]=[],indices:number[]=[],n=145;
+    const points:number[]=[],uv:number[]=[],indices:number[]=[],n=145,minX=-1050,minZ=-2200,spanX=3000,spanZ=3000;
     for(let z=0;z<=n;z++)for(let x=0;x<=n;x++){
-      const px=x/n*2400-550,pz=z/n*2500-1920;points.push(px,terrainHeight(px,pz)-2.2,pz);uv.push(px/8,pz/8);
+      const px=x/n*spanX+minX,pz=z/n*spanZ+minZ;points.push(px,terrainHeight(px,pz)-2.2,pz);uv.push(px/8,pz/8);
       if(z<n&&x<n){const a=z*(n+1)+x;indices.push(a,a+n+1,a+1,a+1,a+n+1,a+n+2);}
     }
     const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(points,3));g.setAttribute("uv",new Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();
-    const ridge:number[]=[],ridgeUv:number[]=[],ridgeColors:number[]=[],ix:number[]=[],cols=220,rows=65;
-    for(let z=0;z<=rows;z++)for(let x=0;x<=cols;x++){
-      const wx=(x/cols-.5)*3600,wz=z/rows*1200,peak=150+140*Math.sin(wx*.0033+.8)**2+75*Math.sin(wx*.0097+2)**2;
-      const erosion=(Math.sin(wx*.038+wz*.011)*Math.sin(wz*.041)*24+Math.sin(wx*.097+wz*.089)*8),height=(peak+erosion)*Math.sin(z/rows*Math.PI)**.85+8;
-      ridge.push(wx,height,wz);ridgeUv.push(wx/20,wz/20);const crag=.68+.28*Math.sin(wx*.026+wz*.011)**2;
-      ridgeColors.push(crag*.91,crag*.96,crag*.92);
-      if(x<cols&&z<rows){const a=z*(cols+1)+x;ix.push(a,a+cols+1,a+1,a+1,a+cols+1,a+cols+2);}
-    }
-    const r=new BufferGeometry();r.setAttribute("position",new Float32BufferAttribute(ridge,3));r.setAttribute("uv",new Float32BufferAttribute(ridgeUv,2));r.setAttribute("color",new Float32BufferAttribute(ridgeColors,3));r.setIndex(ix);r.computeVertexNormals();
+    const ridges=createValleyRidges(samples);
     // 远林用同一松针图像离线式合成的透明树冠；不用近处可识别的实体圆锥代替森林。
     const canvas=document.createElement("canvas");canvas.width=512;canvas.height=1024;const ctx=canvas.getContext("2d")!;ctx.fillStyle="#5c6350";ctx.fillRect(250,130,9,894);
     const painter=seeded(991);for(const p of pineShape.crown){const x=256+p[0]*48,y=1024-p[1]/pineShape.height*1010;ctx.save();ctx.translate(x,y);ctx.rotate((painter()-.5)*1.6);ctx.drawImage(maps.pine.image as CanvasImageSource,-15,-36,30,72);ctx.restore();}
     const crown=new CanvasTexture(canvas);crown.colorSpace=SRGBColorSpace;crown.anisotropy=2;
     // 远林必须落在实际粗网格三角形上，不能把精细高度加到下移后的远景表面而悬空。
     const farGround=(x:number,z:number)=>{
-      const gx=(x+550)/2400*n,gz=(z+1920)/2500*n,col=Math.max(0,Math.min(n-1,Math.floor(gx))),row=Math.max(0,Math.min(n-1,Math.floor(gz))),u=gx-col,v=gz-row,a=row*(n+1)+col;
+      const gx=(x-minX)/spanX*n,gz=(z-minZ)/spanZ*n,col=Math.max(0,Math.min(n-1,Math.floor(gx))),row=Math.max(0,Math.min(n-1,Math.floor(gz))),u=gx-col,v=gz-row,a=row*(n+1)+col;
       const h00=points[a*3+1],h10=points[(a+1)*3+1],h01=points[(a+n+1)*3+1],h11=points[(a+n+2)*3+1];
       return u+v<=1?h00+(h10-h00)*u+(h01-h00)*v:h11+(h01-h11)*(1-u)+(h10-h11)*(1-v);
     };
@@ -182,15 +180,12 @@ function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
       const h=terrainHeight(x,z),near=closestRoad(x,z);if(lakeDistance(x,z)<1.13||h<10||near.distance<125||near.distance<200&&roadForestDensity(near.progress)<.25||random()>habitat(x,z)*.92+.05)continue;
       const height=8+random()**.65*14,width=height*(.37+random()*.18),a=random()*Math.PI;for(const angle of [a,a+Math.PI/2])forest.push({position:[x,farGround(x,z)+height/2-.12,z],scale:[width,height,1],rotation:[0,angle,0],color:["#a9b3a0","#b6b69e","#a6b39d"][i%3]});
     }
-    return{g,r,tree,forest,crown};
-  },[maps.pine.image,pineShape]);
-  useEffect(()=>()=>{shape.g.dispose();shape.r.dispose();shape.tree.dispose();shape.crown.dispose();},[shape]);
+    return{g,ridges,tree,forest,crown};
+  },[maps.pine.image,pineShape,samples]);
+  useEffect(()=>()=>{shape.g.dispose();shape.ridges.forEach(g=>g.dispose());shape.tree.dispose();shape.crown.dispose();},[shape]);
   return <group name="continuous-lake-valley-geography">
-    <mesh geometry={shape.g}><meshStandardMaterial color="#b0b29a" map={maps.grass} roughness={1}/></mesh>
-    <mesh geometry={shape.r} position={[550,0,-1400]} rotation={[0,Math.PI,0]}><meshStandardMaterial vertexColors color="#a2b6b3" map={maps.ground} roughness={1}/></mesh>
-    <mesh geometry={shape.r} position={[-650,-40,-750]} rotation={[0,-Math.PI/2,0]} scale={[1,.8,1]}><meshStandardMaterial vertexColors color="#bbc6ba" map={maps.ground} roughness={1}/></mesh>
-    <mesh geometry={shape.r} position={[1750,-35,-800]} rotation={[0,Math.PI/2,0]} scale={[1,.8,1]}><meshStandardMaterial vertexColors color="#bbc6ba" map={maps.ground} roughness={1}/></mesh>
-    <mesh geometry={shape.r} position={[500,-55,600]} scale={[1,.85,1]}><meshStandardMaterial vertexColors color="#c8c3ad" map={maps.ground} roughness={1}/></mesh>
+    <mesh geometry={shape.g} material={groundMaterial} dispose={null}/>
+    {shape.ridges.map(g=><mesh key={g.name} name={g.name} geometry={g} material={mountainMaterial} dispose={null}/>)}
     <WindField geometry={shape.tree} items={shape.forest} map={shape.crown} color="#adb8ab" cutout/>
   </group>;
 }
