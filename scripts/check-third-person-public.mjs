@@ -7,7 +7,7 @@ import path from "node:path";
 const base=process.env.PALACE_URL||"http://127.0.0.1:5191",out=path.resolve(process.env.PALACE_ARTIFACTS||"qa-artifacts/third-person/public");
 await mkdir(out,{recursive:true});
 const report={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),base,checkedAt:new Date().toISOString(),scope:"Actual public build; native keys/buttons and visible DOM only. No debug APIs, camera staging or simulation injection.",checks:[],errors:[],uploads:[]};
-const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:true,args:["--use-angle=d3d11"]});report.browser=browser.version();
+const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:process.env.PALACE_HEADED!=="1",args:["--use-angle=d3d11"]});report.browser=browser.version();report.headed=process.env.PALACE_HEADED==="1";
 let page;
 try{
  for(const width of[1920,2560]){
