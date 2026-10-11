@@ -29,9 +29,9 @@ export default function ActivityHud() {
     return <RoadHud />;
   }
   if (blocked || a.warming || room !== "basketball") return null;
-  return <aside className="activity-hud court-hud" aria-label="Basketball practice controls">
+  return <aside className="activity-hud court-hud" aria-label="Basketball practice controls" data-primary-action={a.primaryAction} data-finish-ready={a.finishReady}>
     <div className="practice-score"><span>PRACTICE / {courtTime.time === "day" ? "PARK COURT" : "AFTER HOURS"}</span><strong ref={score}>{a.made}<small> / {a.shots}</small></strong><span>MADE / ATTEMPTED{a.streak > 1 ? " · STREAK " + a.streak : ""}</span></div>
-    <p className="shot-result" ref={result} role="status">{a.result || "Find your spot."}</p>
+    <p className="shot-result" ref={result} role="status">{a.result || (a.finishReady ? a.primaryAction === "dunk" ? "ENTER + 5 · DUNK IN RANGE" : "5 · LAYUP IN RANGE" : "Find your spot.")}</p>
     {a.mode === "held" && <div className="release-meter" aria-label="Shot release" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(a.charge * 100)}><span className="release-zone" /><i style={{ width: a.charge * 100 + "%" }} /></div>}
     <div className="activity-actions">
       <button onClick={() => courtCommand(a.mode === "held" ? "dribble" : "pickup")}>{a.mode === "held" ? a.dribbling ? "E · Hold ball" : "E · Dribble" : "E · Pick up nearby ball"}</button>
@@ -45,6 +45,6 @@ export default function ActivityHud() {
       <button aria-pressed={courtTime.time === "day"} onClick={() => courtTime.setTime("day")}>Daylight</button>
       <button aria-pressed={courtTime.time === "night"} onClick={() => courtTime.setTime("night")}>Night lights</button>
     </div>
-    <small>WASD move · Shift sprint / fast dribble · F layup · G running dunk<br />Hold Space or locked-view click, release to shoot · V switch view</small>
+    <small>WASD 移动 · Enter / Shift 加速运球 · V 切换视角<br />长按 5 / 小键盘 5，松开投篮 · 近篮 5 上篮 · 助跑 Enter + 5 扣篮<br />Space / 锁定视角点击投篮、F 上篮、G 扣篮仍可用</small>
   </aside>;
 }

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { PerspectiveCamera, Vector3, type Camera } from "three";
+import type { FinishPose } from "../court/finishing";
 
 export type AdventureRoom = "basketball" | "cycling" | "alpine-ride";
 export type ViewMode = "first" | "third";
@@ -22,6 +23,6 @@ export const presence = {
   roomId: "", camera: new PerspectiveCamera(60, 1, .1, 200), previous: new Vector3(), velocity: new Vector3(), speed: 0,
   sprinting: false, jump: 0, finishLocked: false, ball: new Vector3(), held: false, dribbling: false, hand: 1,
   finish: "idle" as "idle" | "layup" | "dunk", shot: 0, charge: 0,
-  releaseHand: new Vector3(),
+  releaseHand: new Vector3(), turboHeld: false, shotJump: 0, finishPose: null as FinishPose | null,
 };
 export function actorCamera(camera: Camera, roomId: string) { return isAdventureRoom(roomId) ? presence.camera : camera; }

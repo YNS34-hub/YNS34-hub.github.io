@@ -13,6 +13,9 @@ import { createHash } from "node:crypto";
 import { decodeLyrics, parseLyrics, embeddedLyrics } from "../src/audio/lyrics.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// 交互扩展开始 media-avatar-import
+import { registerPersonalAvatar } from "./register-personal-avatar.mjs";
+// 交互扩展结束
 const root = process.env.PALACE_MEDIA_ROOT
   ? path.resolve(process.env.PALACE_MEDIA_ROOT)
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -235,3 +238,6 @@ console.log(
   "Registered personal media:",
   Object.fromEntries(Object.entries(result).map(([k, v]) => [k, v.length])),
 );
+// 交互扩展开始 media-avatar-register
+await registerPersonalAvatar(root, output, publicBuild);
+// 交互扩展结束

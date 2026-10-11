@@ -1,0 +1,24 @@
+.palace-app .perspective-controls { flex-wrap:wrap; }
+.palace-app .perspective-controls button { white-space:nowrap; }
+.palace-app .road-ui > .perspective-controls { bottom:66px; right:48px; pointer-events:none; }
+.palace-app .road-ui > .perspective-controls button { pointer-events:auto; padding:4px 0; }
+@media(max-width:700px) { .palace-app .road-ui > .perspective-controls { bottom:94px; right:22px; } }
+.palace-app .dialog-backdrop:has(.athlete-wardrobe) { background:rgba(5,13,18,.08); backdrop-filter:none; justify-content:flex-end; padding-right:4vw; }
+.palace-app .panel.athlete-wardrobe { width:min(430px,43vw); padding:34px 28px 28px; background:rgba(12,23,30,.93); color:#eef2ee; }
+.palace-app .athlete-wardrobe h2 { font-size:28px; padding-right:22px; margin:12px 0 18px; }
+.palace-app .athlete-wardrobe .panel-description { color:#c3cecf; line-height:1.7; font-size:12px; }
+.athlete-wardrobe .eyebrow { color:#a0b8be; }
+.athlete-wardrobe .primary-button { background:#c9dce1; color:#122b38; padding:13px 18px; font-size:12px; }
+.wardrobe-view { display:flex; gap:20px; font-size:11px; margin-top:18px; }
+.athlete-wardrobe fieldset { border:0; margin:28px 0; padding:0; }
+.athlete-wardrobe legend { margin-bottom:12px; font-size:11px; letter-spacing:.14em; opacity:.65; }
+.athlete-profile-choice button { margin:0 18px 8px 0; padding:8px 0; opacity:.58; }
+.athlete-profile-choice button[aria-pressed=true] { opacity:1; text-decoration:underline; text-underline-offset:6px; }
+.athlete-outfits { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.athlete-outfits legend { grid-column:1/-1; }
+.athlete-outfits button { display:flex; gap:14px; padding:15px 12px; text-align:left; align-items:center; background:rgba(116,149,162,.06); }
+.athlete-outfits button[aria-pressed=true] { background:rgba(116,149,162,.17); box-shadow:inset 2px 0 currentColor; }
+.outfit-swatch { display:block; width:24px; height:36px; flex:0 0 24px; border-radius:3px; }
+.athlete-outfits small { display:block; margin-top:6px; font-size:10px; opacity:.56; }
+.athlete-private-note { font-size:11px; line-height:1.8; opacity:.6; margin:20px 0; }
+@media(max-width:700px) { .palace-app .dialog-backdrop:has(.athlete-wardrobe) { padding:20px; } .palace-app .panel.athlete-wardrobe { width:100%; } .athlete-outfits { grid-template-columns:1fr; } }

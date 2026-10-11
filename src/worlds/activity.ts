@@ -7,10 +7,12 @@ export const useActivity = create<{
   speed: number; distance: number; riding: boolean; scenic: string; stopped: boolean; photo: boolean;
   warming: boolean;
   finishing: "idle" | "layup" | "dunk"; sprinting: boolean;
+  primaryAction: "shoot" | "layup" | "dunk"; finishReady: boolean;
 }>(() => ({
   mode: "ground", dribbling: false, charge: 0, shots: 0, made: 0, streak: 0, result: "", assist: true,
   speed: 0, distance: 0, riding: false, scenic: "FOREST ENTRY", stopped: true, photo: false,
   warming: false, finishing: "idle", sprinting: false,
+  primaryAction: "shoot", finishReady: false,
 }));
 export type CourtCommand = "pickup" | "dribble" | "charge" | "release" | "cancel" | "recall" | "layup" | "dunk";
 export function courtCommand(command: CourtCommand) { window.dispatchEvent(new CustomEvent("palace:court", { detail: command })); }

@@ -44,7 +44,8 @@ describe("personal media registration", () => {
     expect(JSON.parse(await readFile(manifestPath, "utf8")).music[0].id).toBe(track.id);
     await run(["--public"]);
     expect(JSON.parse(await readFile(manifestPath, "utf8")).music).toEqual([]);
-    expect(await readdir(path.join(root, "public/personal-media"))).toEqual(["manifest.json"]);
+    expect(await readdir(path.join(root, "public/personal-media"))).toEqual(["avatar.json", "manifest.json"]);
+    expect(JSON.parse(await readFile(path.join(root, "public/personal-media/avatar.json"), "utf8"))).toEqual({ profile: null });
     expect(await readFile(path.join(dir, file))).toEqual(wav);
   });
   it("copies a real website alongside its preview and rejects paths outside the collection", async () => {
@@ -165,6 +166,7 @@ describe("personal media registration", () => {
       ),
     ).toBe(true);
     expect(await readdir(path.join(root, "public/personal-media"))).toEqual([
+      "avatar.json",
       "manifest.json",
     ]);
     expect(await readFile(path.join(dir, "鲸.JPG"))).toEqual(original);

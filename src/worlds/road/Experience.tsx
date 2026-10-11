@@ -14,6 +14,7 @@ import RoadLandscape from "./Landscape";
 import RoadBike from "./RoadBike";
 import { actorCamera, presence } from "../presence/state";
 import SportAvatar from "../presence/Avatar";
+import { outfits, useAppearance } from "../presence/appearance";
 export { primeRoadTextures as preloadRoadAssets } from "./textures";
 
 function RoadRider({map}:{map:RideMap}){
@@ -123,7 +124,8 @@ function RoadRider({map}:{map:RideMap}){
     Object.assign(roadView,{distance:model.distance,speed:model.speed,offset:model.offset,lean:comfort?0:model.lean,steer:model.steering,brake:model.braking,cadence:model.cadence});
     presence.speed=model.speed;
     const nx=-l.tangent.z,nz=l.tangent.x,r=Math.hypot(nx,nz),aero=comfort?0:Math.max(0,(model.speed-10)/5)*.025;
-    l.target.set(l.point.x+nx/r*model.offset-l.tangent.x*.23,l.point.y+1.47-aero-(comfort?0:model.braking*.013)+ (comfort?0:Math.sin(model.distance*3.4)*.0015*Math.min(1,model.speed/8)),l.point.z+nz/r*model.offset-l.tangent.z*.23);
+    const bikeStyle=outfits[useAppearance.getState().selected[map.id==="alpine-ride"?"alpine-ride":"cycling"]].bike;
+    l.target.set(l.point.x+nx/r*model.offset-l.tangent.x*.23,l.point.y+1.47+(bikeStyle==="city"?.085:0)-aero-(comfort?0:model.braking*.013)+ (comfort?0:Math.sin(model.distance*3.4)*.0015*Math.min(1,model.speed/8)),l.point.z+nz/r*model.offset-l.tangent.z*.23);
     if(mounting){l.mountTime+=dt;roadView.mountProgress=Math.min(1,l.mountTime/(comfort?.08:.72));const p=roadView.mountProgress,e=p*p*(3-2*p);camera.position.lerpVectors(l.start,l.target,e);l.look.set(roadView.pitch,roadView.yaw,0,"YXZ");l.targetQ.setFromEuler(l.look);camera.quaternion.slerpQuaternions(l.startQ,l.targetQ,e);}
     else{camera.position.copy(l.target);l.look.set(roadView.pitch+roadView.headPitch,roadView.yaw+roadView.headYaw,roadView.roll,"YXZ");camera.quaternion.setFromEuler(l.look);}
     const fov=60+(comfort?0:Math.max(0,Math.min(3,(model.speed-9)*.6)));

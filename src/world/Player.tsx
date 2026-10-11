@@ -98,6 +98,7 @@ export default function Player({ roomId }: { roomId: string }) {
     presence.roomId = isAdventureRoom(roomId) ? roomId : "";
     presence.previous.copy(camera.position); presence.velocity.set(0, 0, 0); presence.speed = 0;
     presence.sprinting = false; presence.jump = 0; presence.finishLocked = false;
+    presence.turboHeld = false; presence.finishPose = null;
     // 交互扩展结束
   }, [camera, roomId, travelSequence]);
   useLayoutEffect(() => {
@@ -128,6 +129,15 @@ export default function Player({ roomId }: { roomId: string }) {
       )
         return;
       const code = event.code;
+      // 交互扩展开始 player-court-keyboard
+      if (roomId === "basketball" && (code === "Enter" || code === "NumpadEnter")) {
+        const state = usePalaceStore.getState();
+        if (state.started && !state.overlay && !state.focus && state.mode !== "index" &&
+          !(event.target instanceof HTMLElement && event.target.closest("button,a") && !document.pointerLockElement)) {
+          keys.current.add(code); event.preventDefault();
+        }
+      }
+      // 交互扩展结束
       if (
         [
           "KeyW",
@@ -239,7 +249,7 @@ export default function Player({ roomId }: { roomId: string }) {
     ) {
       velocity.current.set(0, 0, 0);
       // 交互扩展开始 player-presence-pause
-      if (isAdventureRoom(roomId)) { presence.speed = 0; presence.sprinting = false; presence.velocity.set(0, 0, 0); }
+      if (isAdventureRoom(roomId)) { presence.speed = 0; presence.sprinting = false; presence.turboHeld = false; presence.velocity.set(0, 0, 0); }
       // 交互扩展结束
       return;
     }
@@ -258,9 +268,12 @@ export default function Player({ roomId }: { roomId: string }) {
       (input.has("KeyS") || input.has("ArrowDown") ? 1 : 0) -
       (input.has("KeyW") || input.has("ArrowUp") ? 1 : 0);
     const speed =
-      input.has("ShiftLeft") || input.has("ShiftRight") ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;
+      input.has("ShiftLeft") || input.has("ShiftRight") || roomId === "basketball" && (input.has("Enter") || input.has("NumpadEnter")) ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;
     // 交互扩展开始 player-presence-sprint
-    if (isAdventureRoom(roomId)) presence.sprinting = (input.has("ShiftLeft") || input.has("ShiftRight")) && !!(x || z);
+    if (isAdventureRoom(roomId)) {
+      presence.turboHeld = input.has("ShiftLeft") || input.has("ShiftRight") || roomId === "basketball" && (input.has("Enter") || input.has("NumpadEnter"));
+      presence.sprinting = presence.turboHeld && !!(x || z);
+    }
     // 交互扩展结束
     if (x || z) {
       clearWalkTarget();
