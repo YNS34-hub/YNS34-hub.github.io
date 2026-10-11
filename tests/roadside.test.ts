@@ -1,7 +1,8 @@
 import {describe,it,expect,vi} from "vitest";
-import {MeshStandardMaterial,Texture,ShaderLib} from "three";
+import {BoxGeometry,Group,InstancedMesh,MeshStandardMaterial,Texture,ShaderLib} from "three";
 import {createShoulders,createVergeGrass,createRoadsideDetails,roadsideDetailMaterials,shoulderMaterial,type RoadsideSite} from "../src/worlds/scenery/roadside";
 import {applyAlpineSunlight} from "../src/worlds/alpine/sunlight";
+import {ownedInstanceBuffers} from "../src/worlds/scenery/ownedInstances";
 import {terrainSampler} from "../src/worlds/scenery/ecology";
 
 const site:RoadsideSite={kind:"forest",sample:(d,p,t)=>{p.set(0,12,-d);t.set(0,0,-1);},ground:()=>11.88,nearest:(x)=>Math.abs(x)};
@@ -58,5 +59,12 @@ describe("bounded roadside surface geometry",()=>{
     expect(shader.uniforms.shoulderSoil.value).toBe(soil);expect(shader.uniforms.alpineSunTexture.value).toBe(sun);
     expect(shader.fragmentShader).toContain("vergeDistance<150.");expect(shader.fragmentShader).toContain("normalScale*vergeNear");expect(shader.fragmentShader).toContain("lights_fragment_end");
     const source=new MeshStandardMaterial({map,normalMap:normal}),detail=roadsideDetailMaterials(source);detail.stone.dispose();detail.drain.dispose();m.dispose();expect(disposed).not.toHaveBeenCalled();expect(source.map).toBe(map);
+  });
+  it("releases detached owned instance buffers once without disposing another sector or shared scan assets",()=>{
+    const geometry=new BoxGeometry(),material=new MeshStandardMaterial(),old=new InstancedMesh(geometry,material,4),live=new InstancedMesh(geometry,material,4),root=new Group(),oldDisposed=vi.fn(),liveDisposed=vi.fn(),sharedDisposed=vi.fn();
+    old.addEventListener("dispose",oldDisposed);live.addEventListener("dispose",liveDisposed);geometry.addEventListener("dispose",sharedDisposed);material.addEventListener("dispose",sharedDisposed);
+    root.add(old);const release=ownedInstanceBuffers(root);root.clear();root.add(live);release();release();
+    expect(oldDisposed).toHaveBeenCalledOnce();expect(liveDisposed).not.toHaveBeenCalled();expect(sharedDisposed).not.toHaveBeenCalled();expect(live.geometry).toBe(geometry);
+    live.dispose();geometry.dispose();material.dispose();
   });
 });
