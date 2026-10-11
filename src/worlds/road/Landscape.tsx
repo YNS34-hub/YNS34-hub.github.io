@@ -10,6 +10,8 @@ import { useWorldTexture } from "../materials";
 import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
 import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
+import {createShoulders,createVergeGrass,createRoadsideDetails,shoulderMaterial,roadsideDetailMaterials} from "../scenery/roadside";
+import RoadsideDetails from "../scenery/RoadsideDetails";
 import {habitat,terrainSampler} from "../scenery/ecology";
 import {createValleyRidges} from "../scenery/landforms";
 import {valleyTerrainMaterial} from "../scenery/terrainFinish";
@@ -93,7 +95,7 @@ function WindField(props:Parameters<typeof Instances>[0]){
   useFrame(({camera},dt)=>{if(!quiet)wind.current.time.value+=Math.min(dt,.06);wind.current.amount.value=quiet?0:.08+Math.min(1,roadView.speed/15.28)*.18;wind.current.eye.value.copy(camera.position);});
   return <group ref={root}><Instances {...props}/></group>;
 }
-function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplates}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>}){
+function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplates,verge,details}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>;verge:MeshStandardMaterial;details:ReturnType<typeof roadsideDetailMaterials>}){
   const quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion();
   const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.normal,[2,5],6.4),[maps.asphalt,maps.normal]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
@@ -137,13 +139,18 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplate
     const stem=new CylinderGeometry(.06,.65,1,12),leaf=new PlaneGeometry(1,1),cube=new BoxGeometry(1,1,1);
     const roadStart=index===0?-12:start;
     const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];
-    return{start,end,terrain,road,edges,stem,leaf,cube,trunks,branches,pines,needles,broad,rocks,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,time:{value:0},wind:{value:quiet?0:.012}};
+    const site={kind:"forest" as const,sample:roadSample,ground,nearest:(x:number,z:number)=>closestRoad(x,z).distance,blocked:insideStopApron};
+    const shoulders=createShoulders(roadStart,end,site),intrusion=createVergeGrass(start,end,site,shoulders),small=createRoadsideDetails(start,end,site,shoulders);
+    intrusion.forEach((items,i)=>grass[i].push(...(quality==="low"?items.filter((_,j)=>j%3===0):items)));
+    return{start,end,terrain,road,edges,shoulders,small,stem,leaf,cube,trunks,branches,pines,needles,broad,rocks,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,time:{value:0},wind:{value:quiet?0:.012}};
   },[index,quality,pineShape,quiet]);
-  useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.cube].forEach(g=>g.dispose());},[geometry]);
+  useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.shoulders,geometry.small.drains,geometry.stem,geometry.leaf,geometry.cube].forEach(g=>g.dispose());},[geometry]);
   useFrame((_,dt)=>{if(!quiet)geometry.time.value+=Math.min(.06,dt);});
   return <group name={"road-sector:"+index}>
     <TerrainSurface geometry={geometry.terrain} maps={maps}/>
     <mesh name="authored-paved-road" geometry={geometry.road} receiveShadow material={asphalt}/>
+    <mesh name="grounded-road-shoulder" geometry={geometry.shoulders} receiveShadow material={verge} dispose={null}/>
+    <RoadsideDetails data={geometry.small} scan={scans[0]} materials={details}/>
     {geometry.edges.map((g,i)=><mesh key={i} geometry={g} receiveShadow><meshStandardMaterial color="#c9c6b7" roughness={.96} onUpdate={m=>weatheredEdgePaint(m,[2,5])}/></mesh>)}
     <Instances geometry={geometry.stem} items={geometry.trunks} color="#9c8e78" map={maps.bark} shadows={shadow}/>
     <Instances geometry={wood} items={geometry.pines} map={maps.bark} shadows={shadow}/>
@@ -221,7 +228,10 @@ function RoadStops({maps}:{maps:Maps}){
 export default function RoadLandscape(){
   const scenery=useRef<Group>(null);
   const maps=useRoadTextures();
+  const verge=useMemo(()=>shoulderMaterial(maps.rock,maps.rockNormal,maps.ground),[maps]);
+  useEffect(()=>()=>verge.dispose(),[verge]);
   const scans=useAlpineScans(),grassTemplates=useAlpineGrass();
+  const details=useMemo(()=>roadsideDetailMaterials(scans[0].material),[scans]);useEffect(()=>()=>{details.stone.dispose();details.drain.dispose();},[details]);
   const pineShape=usePineShape(),wood=useMemo(()=>{const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(pineShape.position,3));g.setAttribute("normal",new Float32BufferAttribute(pineShape.normal,3));g.setAttribute("uv",new Float32BufferAttribute(pineShape.uv,2));g.setIndex(pineShape.index);return g;},[pineShape]);
   useEffect(()=>()=>wood.dispose(),[wood]);
   const leaves=useWorldTexture("leaves");
@@ -230,5 +240,5 @@ export default function RoadLandscape(){
   useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake scans={scans} grassTemplates={grassTemplates}/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} scans={scans} grassTemplates={grassTemplates} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake scans={scans} grassTemplates={grassTemplates}/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} scans={scans} grassTemplates={grassTemplates} verge={verge} details={details} shadow={Math.abs(index-current)<2}/>)}</group>;
 }

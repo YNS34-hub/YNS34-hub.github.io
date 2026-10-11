@@ -1,0 +1,81 @@
+{
+  "sha": "13424848b4b71b57c92729b6cab8142036e028bc",
+  "dirty": true,
+  "at": "2026-10-11T21:26:49.483Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5190",
+  "quality": "medium",
+  "dpr": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "forest-verge",
+      "width": 1920,
+      "progress": 0.093,
+      "yaw": -0.44,
+      "pitch": -0.4,
+      "file": "1920-forest-verge.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          0.4630716390814178,
+          24.357688242816256,
+          -311.7073133895641
+        ],
+        "quaternion": [
+          -0.017861315664866744,
+          -0.08028628977931258,
+          -0.0014388955220038346,
+          0.9966107638671524
+        ],
+        "fov": 60,
+        "distance": 328.2639900110564,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 102,
+        "triangles": 1757743,
+        "textures": 36
+      }
+    },
+    {
+      "name": "alpine-verge",
+      "width": 1920,
+      "progress": 0.10672,
+      "yaw": -0.44,
+      "pitch": -0.4,
+      "file": "1920-alpine-verge.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -942.7018604484018,
+          903.8929724837055,
+          -216.38014646255493
+        ],
+        "quaternion": [
+          -0.032928905921791256,
+          0.7139046461805342,
+          0.03364748178978669,
+          0.6986584933183351
+        ],
+        "fov": 60,
+        "distance": 1083.9222674588175,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 167,
+        "triangles": 2696175,
+        "textures": 40
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

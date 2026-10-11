@@ -1,0 +1,2274 @@
+{
+  "dirty": false,
+  "sha": "fd3fd50b895bf299b594433776c39e54c627767c",
+  "perspective": "first",
+  "recordVideo": false,
+  "scope": "Continuous native keyboard/button ride; no camera or distance injection. One explicitly labelled invalid-state recovery fault follows the journey. Video is functional evidence, not GPU performance measurement.",
+  "checks": [
+    "Enter from the museum on foot",
+    "Native approach and E mount",
+    "Low-speed steering has real authority",
+    "Genuine acceleration and cadence",
+    "Coasting preserves momentum and starts wheel-speed freehub",
+    "Real native Web Audio produces nonzero samples",
+    "Pedaling removes freehub",
+    "Shift easier",
+    "Shift harder",
+    "Progressive braking reaches a stop",
+    "Photo mode creates a local PNG and Escape handles only that layer",
+    "Comfort and sound-off acknowledge their state",
+    "Actual gradual stop at the lake viewpoint",
+    "Climb is a real positive grade and lower-gear effort",
+    "Gravity and wind contribute on descent",
+    "High-speed steering is smaller than low-speed authority",
+    "Continuous full route finishes without teleport or infinite loading",
+    "Bounded streaming traverses the full authored geography",
+    "Cinema restores road posture, distance, spatial position and head orientation",
+    "Explicit invalid-state recovery returns the last safe point stopped",
+    "Fresh re-entry restores progress on foot without stale riding controls"
+  ],
+  "moments": [
+    {
+      "name": "01-museum-threshold",
+      "seconds": 0.01,
+      "s": null,
+      "model": null,
+      "camera": [
+        0,
+        1.65,
+        12.5
+      ],
+      "quaternion": [
+        0.034383333295236,
+        0,
+        0,
+        0.9994087183887824
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 174
+      }
+    },
+    {
+      "name": "02-nature-threshold",
+      "seconds": 7.744,
+      "s": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "0.0000",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "false",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 0,
+        "speed": 0,
+        "gear": 7,
+        "cadence": 0,
+        "grade": 0,
+        "steering": 0,
+        "offset": 0,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": false
+      },
+      "camera": [
+        0.2,
+        19.64268769980582,
+        7.5
+      ],
+      "quaternion": [
+        -0.038690894520345305,
+        -0.1361485653093061,
+        -0.005321358046847582,
+        0.9899183127884696
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 361
+      }
+    },
+    {
+      "name": "03-approach-road-bike",
+      "seconds": 11.743,
+      "s": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "0.0000",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "false",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 0,
+        "speed": 0,
+        "gear": 7,
+        "cadence": 0,
+        "grade": 0,
+        "steering": 0,
+        "offset": 0,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": false
+      },
+      "camera": [
+        2.3797906317888264,
+        19.65,
+        -0.27458658671348035
+      ],
+      "quaternion": [
+        -0.038690894520345305,
+        -0.1361485653093061,
+        -0.005321358046847582,
+        0.9899183127884696
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 745
+      }
+    },
+    {
+      "name": "04-mounting-settled",
+      "seconds": 13.384,
+      "s": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "-0.0000",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 0,
+        "speed": 0,
+        "gear": 7,
+        "cadence": 0,
+        "grade": -0.000036332028330891226,
+        "steering": 0,
+        "offset": 0,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        -0.02300168325136685,
+        19.55212441017993,
+        0.2288469412025753
+      ],
+      "quaternion": [
+        -0.017495301412940076,
+        -0.050058766006058485,
+        -0.0008770274910541653,
+        0.9985926422707114
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 859
+      }
+    },
+    {
+      "name": "05-acceleration-and-gear",
+      "seconds": 24.571,
+      "s": {
+        "state": "accelerating",
+        "speed": "5.990",
+        "distance": "33.95",
+        "grade": "-0.0023",
+        "cadence": "72.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 34.21267228696582,
+        "speed": 6.007148560576682,
+        "gear": 7,
+        "cadence": 71.9999999999979,
+        "grade": -0.002210582375195081,
+        "steering": 4.6192546922469926e-11,
+        "offset": 0.09503060759709415,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.08957546222209663,
+        "tire": 0.044911862771559195,
+        "chain": 0.02519999999999916,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        4.705146156169272,
+        19.4655151741644,
+        -33.65299023847016
+      ],
+      "quaternion": [
+        -0.018582347920306653,
+        -0.06208209469872095,
+        -0.0008214327714472286,
+        0.9978977077395206
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 2069
+      }
+    },
+    {
+      "name": "06-coasting-freehub",
+      "seconds": 48.033,
+      "s": {
+        "state": "coasting",
+        "speed": "7.518",
+        "distance": "206.50",
+        "grade": "0.0156",
+        "cadence": "0.1",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 207.41539841247388,
+        "speed": 7.480019127870753,
+        "gear": 7,
+        "cadence": 0.04808847419514503,
+        "grade": 0.015655606111068077,
+        "steering": 3.6742439044364434e-60,
+        "offset": 2.3183014258543232e-8,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": true,
+        "wind": 0.12953504090240542,
+        "tire": 0.05370725142627294,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        17.11049284777676,
+        22.152883791015483,
+        -199.20020391384392
+      ],
+      "quaternion": [
+        -0.009579229980532481,
+        -0.24545566122384316,
+        -0.0015651232755365886,
+        0.9693592250116975
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 4514
+      }
+    },
+    {
+      "name": "07-braking-settled",
+      "seconds": 57.185,
+      "s": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "230.52",
+        "grade": "0.0181",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 230.51731490010357,
+        "speed": 0,
+        "gear": 7,
+        "cadence": 1.2557250426783461e-8,
+        "grade": 0.018059544469088896,
+        "steering": 1.600156228550365e-78,
+        "offset": 3.2617335056634872e-9,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        26.197101444862735,
+        22.524474672045418,
+        -220.38553800937794
+      ],
+      "quaternion": [
+        -0.00839581042572812,
+        -0.133030853183766,
+        -0.0011269591517130734,
+        0.9910756946023673
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 5491
+      }
+    },
+    {
+      "name": "08-lake-scenic-stop",
+      "seconds": 135.767,
+      "s": {
+        "state": "scenic-stop",
+        "speed": "0.000",
+        "distance": "809.83",
+        "grade": "0.0441",
+        "cadence": "5.1",
+        "gear": "6",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 809.8339579211037,
+        "speed": 0,
+        "gear": 6,
+        "cadence": 4.610465001412472,
+        "grade": 0.04405286376449883,
+        "steering": 2.736580388947446e-234,
+        "offset": 1.677545213575188e-36,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0.0463182250240347,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        327.6874518897647,
+        24.537957689470673,
+        -626.3121305789717
+      ],
+      "quaternion": [
+        0.00390138790749954,
+        -0.502560428338794,
+        0.002266932449600309,
+        0.864530309507765
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 14271
+      }
+    },
+    {
+      "name": "09-scenic-photo-view",
+      "seconds": 136.799,
+      "s": {
+        "state": "scenic-stop",
+        "speed": "0.000",
+        "distance": "809.83",
+        "grade": "0.0441",
+        "cadence": "2.1",
+        "gear": "6",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "true",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 809.8339579211037,
+        "speed": 0,
+        "gear": 6,
+        "cadence": 2.071615463183371,
+        "grade": 0.04405286376449883,
+        "steering": 7.213547587501682e-235,
+        "offset": 1.677545213575188e-36,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0.0463182250240347,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        327.6874518897647,
+        24.537733591710058,
+        -626.3121305789717
+      ],
+      "quaternion": [
+        0.0039010690453853123,
+        -0.5025618681820583,
+        0.0022674809733453927,
+        0.8645294725107399
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 14295
+      }
+    },
+    {
+      "name": "10-real-climb",
+      "seconds": 161.84,
+      "s": {
+        "state": "climbing",
+        "speed": "4.239",
+        "distance": "883.75",
+        "grade": "0.0685",
+        "cadence": "72.0",
+        "gear": "3",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 883.8443112656001,
+        "speed": 4.238361573743927,
+        "gear": 3,
+        "cadence": 71.99999999999979,
+        "grade": 0.06854727899606244,
+        "steering": 5.10399125309752e-286,
+        "offset": 7.664998116423159e-39,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.05063788338810731,
+        "tire": 0.03406101194310815,
+        "chain": 0.025199999999999927,
+        "water": 0.023025870671952886,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        399.8094961036263,
+        28.759259110759675,
+        -639.2945485997565
+      ],
+      "quaternion": [
+        0.01230628124587474,
+        -0.6493458674189974,
+        0.011349702514498216,
+        0.7603089399452039
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 17275
+      }
+    },
+    {
+      "name": "11-crest-reveal",
+      "seconds": 304.289,
+      "s": {
+        "state": "accelerating",
+        "speed": "11.184",
+        "distance": "1712.84",
+        "grade": "-0.0232",
+        "cadence": "104.0",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1714.0825151119845,
+        "speed": 11.206526942947105,
+        "gear": 8,
+        "cadence": 104.1584136417182,
+        "grade": -0.024517954447791087,
+        "steering": 4.4e-323,
+        "offset": -3.655310204127739e-71,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.2513860146095715,
+        "tire": 0.0740707791728041,
+        "chain": 0.035,
+        "water": 0.0018614556358361887,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        794.2745247821623,
+        56.37829438342779,
+        -658.9283914722652
+      ],
+      "quaternion": [
+        0.008828528623225772,
+        -0.8916515396835333,
+        -0.02895942590673043,
+        -0.4517089112619831
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 34800
+      }
+    },
+    {
+      "name": "12-crest-coast",
+      "seconds": 309.805,
+      "s": {
+        "state": "descending",
+        "speed": "12.783",
+        "distance": "1766.72",
+        "grade": "-0.0615",
+        "cadence": "0.2",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "9,10,11,12,13,14",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1767.4281472089278,
+        "speed": 12.79481334901667,
+        "gear": 8,
+        "cadence": 0.1735039278559745,
+        "grade": -0.061316446606594605,
+        "steering": 4.4e-323,
+        "offset": 7.51134979458279e-74,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": true,
+        "wind": 0.3131786819445927,
+        "tire": 0.08239981264757183,
+        "chain": 0,
+        "water": 0.006701717746038758,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        807.5722475137006,
+        53.20094457420057,
+        -620.4267160352921
+      ],
+      "quaternion": [
+        -0.026975785459780195,
+        -0.8677536487261068,
+        -0.03997492831106373,
+        0.4946492870993363
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 35426
+      }
+    },
+    {
+      "name": "13-gravity-descent",
+      "seconds": 322.29,
+      "s": {
+        "state": "descending",
+        "speed": "15.278",
+        "distance": "1924.29",
+        "grade": "-0.0752",
+        "cadence": "0.0",
+        "gear": "11",
+        "mounted": "true",
+        "sectors": "10,11,12,13,14,15",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1926.3257245016277,
+        "speed": 15.277777777777777,
+        "gear": 11,
+        "cadence": 0.003145678866115466,
+        "grade": -0.07510244178869833,
+        "steering": 4.4e-323,
+        "offset": -4.348303512915414e-80,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": true,
+        "wind": 0.41989921942347164,
+        "tire": 0.09498894690148951,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        956.6014343286882,
+        42.43032017419658,
+        -568.6943034882107
+      ],
+      "quaternion": [
+        -0.032255603368751676,
+        -0.7828291330573649,
+        -0.04454810643386749,
+        0.6198012509677027
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 36981
+      }
+    },
+    {
+      "name": "14-fast-cornering",
+      "seconds": 325.483,
+      "s": {
+        "state": "cornering",
+        "speed": "15.278",
+        "distance": "1957.05",
+        "grade": "-0.0701",
+        "cadence": "106.4",
+        "gear": "11",
+        "mounted": "true",
+        "sectors": "10,11,12,13,14,15",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1959.2522266490462,
+        "speed": 15.277777777777777,
+        "gear": 11,
+        "cadence": 106.66393886085133,
+        "grade": -0.06900098438430799,
+        "steering": 0.013224386546461174,
+        "offset": 0.3041291485141866,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.41989921942347164,
+        "tire": 0.09498894690148951,
+        "chain": 0.035,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        987.6139911176766,
+        40.030045510772645,
+        -558.1258254928338
+      ],
+      "quaternion": [
+        -0.019328044051381416,
+        -0.844974573261684,
+        -0.04914714170501365,
+        0.5321925926923543
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 37329
+      }
+    },
+    {
+      "name": "15-last-road-stop",
+      "seconds": 458.923,
+      "s": {
+        "state": "scenic-stop",
+        "speed": "0.000",
+        "distance": "3529.72",
+        "grade": "0.0000",
+        "cadence": "27.7",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "20,21,22",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 3529.720322699531,
+        "speed": 0,
+        "gear": 8,
+        "cadence": 18.550835451942977,
+        "grade": 0,
+        "steering": 1.3754955883487613e-288,
+        "offset": 3.506589247851895e-74,
+        "recovered": false,
+        "ended": true
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        0.1028726631728299,
+        19.543015061658014,
+        191.79428851473062
+      ],
+      "quaternion": [
+        0.00401560142087129,
+        -0.9730918511774128,
+        -0.01703213771356212,
+        -0.22975210641526422
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 53305
+      }
+    },
+    {
+      "name": "16-cinema-return",
+      "seconds": 465.335,
+      "s": {
+        "state": "scenic-stop",
+        "speed": "0.000",
+        "distance": "3529.72",
+        "grade": "0.0000",
+        "cadence": "0.0",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "20,21,22",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 3529.720322699531,
+        "speed": 0,
+        "gear": 8,
+        "cadence": 0,
+        "grade": 0,
+        "steering": 0,
+        "offset": 3.506589247851895e-74,
+        "recovered": false,
+        "ended": true
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": false
+      },
+      "camera": [
+        0.1028726631728299,
+        19.542504064701813,
+        191.79428851473062
+      ],
+      "quaternion": [
+        0.0040210312303659715,
+        -0.9730924059780336,
+        -0.01703085570663241,
+        -0.2297497566693517
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 53537
+      }
+    },
+    {
+      "name": "17-museum-return",
+      "seconds": 467.86,
+      "s": null,
+      "model": null,
+      "camera": [
+        0,
+        1.65,
+        12.5
+      ],
+      "quaternion": [
+        0.034383333295236,
+        0,
+        0,
+        0.9994087183887824
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 53824
+      }
+    },
+    {
+      "name": "18-safe-re-entry",
+      "seconds": 471.237,
+      "s": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "3529.71",
+        "grade": "0.0000",
+        "cadence": "0.0",
+        "gear": "8",
+        "mounted": "false",
+        "sectors": "20,21,22",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 3529.710322699531,
+        "speed": 0,
+        "gear": 8,
+        "cadence": 0,
+        "grade": 0,
+        "steering": 0,
+        "offset": 0,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0,
+        "tire": 0,
+        "chain": 0,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": false
+      },
+      "camera": [
+        0.1028726631728299,
+        19.65,
+        191.79428851473062
+      ],
+      "quaternion": [
+        -0.004021031215053863,
+        0.973092406184597,
+        0.017030855710247643,
+        0.22974975579446333
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 53896
+      }
+    }
+  ],
+  "samples": [
+    {
+      "seconds": 1.019,
+      "s": {
+        "state": "starting",
+        "speed": "0.496",
+        "distance": "230.74",
+        "grade": "0.0181",
+        "cadence": "68.9",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 230.73511703722826,
+        "speed": 0.4962180313605714,
+        "gear": 7,
+        "cadence": 68.86279340163232,
+        "grade": 0.018090190948583065,
+        "steering": 1.542511761704892e-81,
+        "offset": 3.2154213217896794e-9,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.0012782521992470318,
+        "tire": 0.005721870619674515,
+        "chain": 0.023858872522742408,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        26.254896223814107,
+        22.54067588895189,
+        -220.59525270589756
+      ],
+      "quaternion": [
+        -0.00838308386406664,
+        -0.1316219698910622,
+        -0.0011034736335202749,
+        0.9912639221180525
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 6246
+      }
+    },
+    {
+      "seconds": 16.249,
+      "s": {
+        "state": "accelerating",
+        "speed": "5.964",
+        "distance": "289.03",
+        "grade": "0.0216",
+        "cadence": "75.7",
+        "gear": "5",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 289.6981957139102,
+        "speed": 5.9870905626298825,
+        "gear": 5,
+        "cadence": 76.0103912389744,
+        "grade": 0.0214521514563112,
+        "steering": 1.5200149504984854e-114,
+        "offset": 3.9083555191405974e-11,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.0893897257909958,
+        "tire": 0.044866686822776475,
+        "chain": 0.026582370994053858,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        10.316710889005535,
+        23.860642978855694,
+        -275.3120130842358
+      ],
+      "quaternion": [
+        -0.006671719689215114,
+        0.2570606795057328,
+        0.0013045491648255559,
+        0.966371353755851
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 7994
+      }
+    },
+    {
+      "seconds": 31.51,
+      "s": {
+        "state": "accelerating",
+        "speed": "10.183",
+        "distance": "409.21",
+        "grade": "-0.0210",
+        "cadence": "94.3",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4,5",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 409.21432754322353,
+        "speed": 10.1828560592523,
+        "gear": 8,
+        "cadence": 94.31118433495146,
+        "grade": -0.020995059532728077,
+        "steering": 3.260256969412627e-147,
+        "offset": 7.163172247631019e-16,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.21489371429252832,
+        "tire": 0.0686467996107681,
+        "chain": 0.03299908907637306,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        39.32849267423054,
+        23.156152229037964,
+        -381.71491945563275
+      ],
+      "quaternion": [
+        -0.025960493466475297,
+        -0.34067981113664586,
+        -0.010530102915480085,
+        0.9397619038860141
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 9681
+      }
+    },
+    {
+      "seconds": 46.749,
+      "s": {
+        "state": "cruising",
+        "speed": "11.520",
+        "distance": "582.20",
+        "grade": "0.0138",
+        "cadence": "101.3",
+        "gear": "9",
+        "mounted": "true",
+        "sectors": "1,2,3,4,5,6",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 583.4779089105599,
+        "speed": 11.499827407231109,
+        "gear": 9,
+        "cadence": 101.19143135250926,
+        "grade": 0.01397259100231237,
+        "steering": 5.599457071954317e-180,
+        "offset": 1.4406735511273461e-24,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.26285366182465003,
+        "tire": 0.0756902332246669,
+        "chain": 0.035,
+        "water": 0.013641890100780278,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        189.48685323193953,
+        20.6664924424774,
+        -456.92138296777193
+      ],
+      "quaternion": [
+        -0.010239622428190015,
+        -0.655774647909913,
+        -0.0042313133911933525,
+        0.7548753918880543
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 11437
+      }
+    },
+    {
+      "seconds": 62.017,
+      "s": {
+        "state": "cruising",
+        "speed": "9.959",
+        "distance": "742.49",
+        "grade": "0.0168",
+        "cadence": "93.3",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "2,3,4,5,6,7",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 743.0445920641974,
+        "speed": 9.95379930802648,
+        "gear": 8,
+        "cadence": 93.29859407021972,
+        "grade": 0.016936404298577602,
+        "steering": 1.0166406673489069e-212,
+        "offset": 1.3372567549786197e-34,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.20710868097422674,
+        "tire": 0.06742957139441046,
+        "chain": 0.03265763067946702,
+        "water": 0.021950496952253554,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        286.6641204433919,
+        22.73987381401794,
+        -574.661485454495
+      ],
+      "quaternion": [
+        -0.00858858842929447,
+        -0.24330588051240892,
+        -0.0028474480842013154,
+        0.9699074062488033
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 13269
+      }
+    },
+    {
+      "seconds": 77.927,
+      "s": {
+        "state": "climbing",
+        "speed": "1.161",
+        "distance": "811.23",
+        "grade": "0.0448",
+        "cadence": "72.0",
+        "gear": "5",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 811.3483857042589,
+        "speed": 1.2098336652425241,
+        "gear": 5,
+        "cadence": 71.99353622340494,
+        "grade": 0.044896446466161435,
+        "steering": 6.148934043701506e-242,
+        "offset": 1.51696913446649e-36,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.006256420418440764,
+        "tire": 0.012357840327447326,
+        "chain": 0.025197499747730175,
+        "water": 0.018538433589654117,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        329.0088765914044,
+        24.61799421653889,
+        -627.0488423811782
+      ],
+      "quaternion": [
+        0.004275445099892775,
+        -0.5126994198592891,
+        0.002469418577670989,
+        0.858553974667309
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 14736
+      }
+    },
+    {
+      "seconds": 93.167,
+      "s": {
+        "state": "climbing",
+        "speed": "4.260",
+        "distance": "861.29",
+        "grade": "0.0608",
+        "cadence": "72.0",
+        "gear": "3",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 861.9565108460527,
+        "speed": 4.265023522042522,
+        "gear": 3,
+        "cadence": 71.99999999999979,
+        "grade": 0.06098439277332311,
+        "steering": 6.405406279335799e-275,
+        "offset": 3.902487091955092e-38,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.05111887571495126,
+        "tire": 0.03421749503359522,
+        "chain": 0.025199999999999927,
+        "water": 0.02158935869248843,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        378.0692673928657,
+        27.34896685497298,
+        -637.2756361154129
+      ],
+      "quaternion": [
+        0.009442296177339295,
+        -0.6847070655381104,
+        0.008878366641312713,
+        0.7287031302601024
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 16622
+      }
+    },
+    {
+      "seconds": 108.322,
+      "s": {
+        "state": "climbing",
+        "speed": "3.606",
+        "distance": "921.04",
+        "grade": "0.0905",
+        "cadence": "72.3",
+        "gear": "1",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 921.1194907955506,
+        "speed": 3.603731767800303,
+        "gear": 1,
+        "cadence": 72.27932865700362,
+        "grade": 0.09056365012009833,
+        "steering": 1.673735618360169e-306,
+        "offset": 4.935965377851125e-40,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.03876841592020362,
+        "tire": 0.029923772215177936,
+        "chain": 0.025304504863689462,
+        "water": 0.021715220987659278,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        433.3338238763842,
+        31.667170543810442,
+        -654.3945785140104
+      ],
+      "quaternion": [
+        0.02449150213261152,
+        -0.45144461904717303,
+        0.01286484064692858,
+        0.8918701800888795
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 18417
+      }
+    },
+    {
+      "seconds": 123.607,
+      "s": {
+        "state": "climbing",
+        "speed": "4.166",
+        "distance": "975.00",
+        "grade": "0.0552",
+        "cadence": "72.3",
+        "gear": "3",
+        "mounted": "true",
+        "sectors": "4,5,6,7,8,9",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 975.0021085637612,
+        "speed": 4.165695692211403,
+        "gear": 3,
+        "cadence": 72.27868639436839,
+        "grade": 0.055238847872611685,
+        "steering": 4.4e-323,
+        "offset": 9.957495222350037e-42,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.04919604599053214,
+        "tire": 0.033587289284765676,
+        "chain": 0.02529754023802894,
+        "water": 0.013518365495625158,
+        "activeVoices": 1,
+        "unlocked": true
+      },
+      "camera": [
+        470.03918139428214,
+        35.788363906482736,
+        -693.30393629759
+      ],
+      "quaternion": [
+        0.009555676897551862,
+        -0.287136598036505,
+        0.003220344556016114,
+        0.9578365687777811
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 20404
+      }
+    },
+    {
+      "seconds": 138.903,
+      "s": {
+        "state": "climbing",
+        "speed": "5.496",
+        "distance": "1050.23",
+        "grade": "0.0508",
+        "cadence": "86.6",
+        "gear": "3",
+        "mounted": "true",
+        "sectors": "4,5,6,7,8,9",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1050.6614576652064,
+        "speed": 5.495930263443373,
+        "gear": 3,
+        "cadence": 86.65333021234208,
+        "grade": 0.05089258997532081,
+        "steering": 4.4e-323,
+        "offset": 3.071103911875239e-44,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.07771728431891316,
+        "tire": 0.0419237153368714,
+        "chain": 0.0303278016672281,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        509.83761323788883,
+        39.394500490902296,
+        -757.4454137403543
+      ],
+      "quaternion": [
+        0.007735584353652266,
+        -0.33628393575914206,
+        0.0019287015096171112,
+        0.9417269006434592
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 22286
+      }
+    },
+    {
+      "seconds": 154.214,
+      "s": {
+        "state": "climbing",
+        "speed": "5.582",
+        "distance": "1133.85",
+        "grade": "0.0519",
+        "cadence": "88.1",
+        "gear": "3",
+        "mounted": "true",
+        "sectors": "5,6,7,8,9,10",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1134.6520735948225,
+        "speed": 5.578340414127583,
+        "gear": 3,
+        "cadence": 88.08735857596788,
+        "grade": 0.052083677562908166,
+        "steering": 4.4e-323,
+        "offset": 4.2802785326955512e-47,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.07968522113345645,
+        "tire": 0.042435106676466425,
+        "chain": 0.030838115908285155,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        573.7350851740653,
+        43.539067097521,
+        -811.5193493681378
+      ],
+      "quaternion": [
+        0.007569269114406213,
+        -0.4360634401535917,
+        0.003928149621873147,
+        0.8998755202621287
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 23947
+      }
+    },
+    {
+      "seconds": 169.489,
+      "s": {
+        "state": "climbing",
+        "speed": "4.198",
+        "distance": "1210.46",
+        "grade": "0.0821",
+        "cadence": "84.0",
+        "gear": "1",
+        "mounted": "true",
+        "sectors": "5,6,7,8,9,10",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1210.6889565899733,
+        "speed": 4.1924584955445745,
+        "gear": 1,
+        "cadence": 83.9324185174945,
+        "grade": 0.0821351965462824,
+        "steering": 4.4e-323,
+        "offset": 1.2424286236173762e-49,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.0497606566181525,
+        "tire": 0.033773635906668875,
+        "chain": 0.029391769082564148,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        620.8492393567095,
+        48.583931727748464,
+        -869.6672390533598
+      ],
+      "quaternion": [
+        0.02294577329839555,
+        -0.2040473391958179,
+        0.004971794032032646,
+        0.9786794450273025
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 25794
+      }
+    },
+    {
+      "seconds": 184.768,
+      "s": {
+        "state": "climbing",
+        "speed": "3.950",
+        "distance": "1268.47",
+        "grade": "0.0623",
+        "cadence": "72.6",
+        "gear": "2",
+        "mounted": "true",
+        "sectors": "5,6,7,8,9,10",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1268.9073051421271,
+        "speed": 3.960453405659496,
+        "gear": 2,
+        "cadence": 72.44713425836237,
+        "grade": 0.061638194908855325,
+        "steering": 4.4e-323,
+        "offset": 1.7504015547383092e-51,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.04517901398291683,
+        "tire": 0.03222839934734696,
+        "chain": 0.025378818283214997,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        648.3004368661359,
+        53.19379716802747,
+        -920.2716207028396
+      ],
+      "quaternion": [
+        0.01232669955928809,
+        -0.4048015853963161,
+        0.004882346112216802,
+        0.9143084225987665
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 27735
+      }
+    },
+    {
+      "seconds": 200.019,
+      "s": {
+        "state": "accelerating",
+        "speed": "6.345",
+        "distance": "1346.34",
+        "grade": "0.0226",
+        "cadence": "80.8",
+        "gear": "5",
+        "mounted": "true",
+        "sectors": "6,7,8,9,10,11",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1347.258721851514,
+        "speed": 6.369855344006156,
+        "gear": 5,
+        "cadence": 81.1264544902772,
+        "grade": 0.022170181695319032,
+        "steering": 4.4e-323,
+        "offset": 4.124014163530922e-54,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.09899557973891603,
+        "tire": 0.04714291794944221,
+        "chain": 0.02836920281939083,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        719.2422280483299,
+        55.98072846626243,
+        -939.4503836882141
+      ],
+      "quaternion": [
+        -0.0019956163101579666,
+        -0.838726409180602,
+        -0.00637253435803003,
+        0.5445120924868534
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 29690
+      }
+    },
+    {
+      "seconds": 215.286,
+      "s": {
+        "state": "cruising",
+        "speed": "8.718",
+        "distance": "1462.34",
+        "grade": "0.0025",
+        "cadence": "81.0",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "7,8,9,10,11,12",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1463.0140788143817,
+        "speed": 8.729116171203788,
+        "gear": 8,
+        "cadence": 81.11483981481999,
+        "grade": 0.002380081353726124,
+        "steering": 4.4e-323,
+        "offset": 1.626088917895826e-58,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.166429959728048,
+        "tire": 0.060646521018174894,
+        "chain": 0.02835818522968671,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        806.9490798600985,
+        57.25458435257621,
+        -864.7605799143654
+      ],
+      "quaternion": [
+        -0.005684201137601172,
+        -0.9279139882785336,
+        -0.015301791128656029,
+        0.37243680726092016
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 31598
+      }
+    },
+    {
+      "seconds": 230.568,
+      "s": {
+        "state": "cruising",
+        "speed": "10.208",
+        "distance": "1606.21",
+        "grade": "0.0014",
+        "cadence": "95.3",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1606.3246292165768,
+        "speed": 10.208385037185916,
+        "gear": 8,
+        "cadence": 95.27944813278873,
+        "grade": 0.0014296910783730915,
+        "steering": 4.4e-323,
+        "offset": 3.0483043532409274e-65,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.2158861968580739,
+        "tire": 0.06880033544976628,
+        "chain": 0.03334780684647606,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        859.006846024157,
+        57.274630901977396,
+        -737.7063488397653
+      ],
+      "quaternion": [
+        0.003432279699587263,
+        -0.9978581140035336,
+        -0.016607908727101224,
+        -0.06317896122196688
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 33527
+      }
+    },
+    {
+      "seconds": 247.552,
+      "s": {
+        "state": "accelerating",
+        "speed": "12.181",
+        "distance": "1739.73",
+        "grade": "-0.0736",
+        "cadence": "108.0",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1739.7340918584362,
+        "speed": 12.180702057928464,
+        "gear": 8,
+        "cadence": 107.95345206934184,
+        "grade": -0.07357887677395217,
+        "steering": 4.4e-323,
+        "offset": -1.3458911760074954e-72,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.28763342941961695,
+        "tire": 0.07906962868363517,
+        "chain": 0.035,
+        "water": 0.00678749821732479,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        786.342537873863,
+        55.03014399758744,
+        -637.7634147941186
+      ],
+      "quaternion": [
+        -0.0249075258726138,
+        -0.9677562707726638,
+        -0.049554832925768975,
+        0.24570660159790386
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 35091
+      }
+    },
+    {
+      "seconds": 262.652,
+      "s": {
+        "state": "accelerating",
+        "speed": "15.278",
+        "distance": "1947.71",
+        "grade": "-0.0727",
+        "cadence": "103.0",
+        "gear": "11",
+        "mounted": "true",
+        "sectors": "10,11,12,13,14,15",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 1947.88436647695,
+        "speed": 15.277777777777777,
+        "gear": 11,
+        "cadence": 103.13755690388376,
+        "grade": -0.07270813955839081,
+        "steering": 4.4e-323,
+        "offset": -5.907830854111525e-81,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.41989921942347164,
+        "tire": 0.09498894690148951,
+        "chain": 0.035,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        977.2278193086759,
+        40.83608619960375,
+        -562.6682687058424
+      ],
+      "quaternion": [
+        -0.02668783570818802,
+        -0.8144064562018242,
+        -0.046967827276812965,
+        0.5777749620076095
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 37229
+      }
+    },
+    {
+      "seconds": 277.89,
+      "s": {
+        "state": "accelerating",
+        "speed": "15.278",
+        "distance": "2192.14",
+        "grade": "-0.0635",
+        "cadence": "107.1",
+        "gear": "11",
+        "mounted": "true",
+        "sectors": "11,12,13,14,15,16",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 2193.672288881349,
+        "speed": 15.277777777777777,
+        "gear": 11,
+        "cadence": 107.08722741433,
+        "grade": -0.05986084306018178,
+        "steering": 6.329039186477257e-36,
+        "offset": 2.954490101523073e-9,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.41989921942347164,
+        "tire": 0.09498894690148951,
+        "chain": 0.035,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        1010.3002240443731,
+        22.78238822148367,
+        -397.9115273380366
+      ],
+      "quaternion": [
+        0.04560999708984403,
+        -0.5683746195720819,
+        -0.017018952194755847,
+        -0.8213284210703706
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 39359
+      }
+    },
+    {
+      "seconds": 293.277,
+      "s": {
+        "state": "cruising",
+        "speed": "14.117",
+        "distance": "2414.39",
+        "grade": "-0.0109",
+        "cadence": "99.3",
+        "gear": "11",
+        "mounted": "true",
+        "sectors": "13,14,15,16,17,18",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 2416.2722173898824,
+        "speed": 14.099065378512362,
+        "gear": 11,
+        "cadence": 99.14419227162824,
+        "grade": -0.010687413055139747,
+        "steering": 1.4350572537389122e-68,
+        "offset": 1.69592302348952e-18,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.3681864146347394,
+        "tire": 0.08912493514624728,
+        "chain": 0.03472240720259414,
+        "water": 0.01379479799348589,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        839.9660905829895,
+        17.506946622916775,
+        -394.2437423372655
+      ],
+      "quaternion": [
+        0.008239457769821481,
+        -0.9403398580177053,
+        -0.021301193704555344,
+        -0.3394691766650724
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 40919
+      }
+    },
+    {
+      "seconds": 308.655,
+      "s": {
+        "state": "cruising",
+        "speed": "11.471",
+        "distance": "2608.27",
+        "grade": "0.0127",
+        "cadence": "94.2",
+        "gear": "10",
+        "mounted": "true",
+        "sectors": "14,15,16,17,18,19",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 2609.666269898277,
+        "speed": 11.451592762181138,
+        "gear": 10,
+        "cadence": 94.08412737237174,
+        "grade": 0.012864812470476251,
+        "steering": 2.4646957474506568e-101,
+        "offset": 8.765125661111979e-27,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.261230829185207,
+        "tire": 0.07546330013077653,
+        "chain": 0.03294950160863512,
+        "water": 0.01993743505030112,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        691.3681993136379,
+        18.16427512499988,
+        -272.9194576448308
+      ],
+      "quaternion": [
+        0.008824122334133827,
+        -0.8170804967455206,
+        -0.007311579325240525,
+        -0.5764096958855707
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 42553
+      }
+    },
+    {
+      "seconds": 324.006,
+      "s": {
+        "state": "cruising",
+        "speed": "9.980",
+        "distance": "2769.05",
+        "grade": "0.0099",
+        "cadence": "93.3",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "15,16,17,18,19,20",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 2769.162804567777,
+        "speed": 9.97940769957239,
+        "gear": 8,
+        "cadence": 93.34006295264322,
+        "grade": 0.009914276767347081,
+        "steering": 2.5674982859092633e-134,
+        "offset": -9.415329800066099e-35,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.20800498285023955,
+        "tire": 0.06757089968941468,
+        "chain": 0.032674200634895983,
+        "water": 0.013242766758042222,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        550.0420645672976,
+        20.289485075229027,
+        -207.44019458814904
+      ],
+      "quaternion": [
+        0.009808539669499893,
+        -0.8787786412314224,
+        -0.008949404545624231,
+        -0.4770448620657029
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 44318
+      }
+    },
+    {
+      "seconds": 339.283,
+      "s": {
+        "state": "cruising",
+        "speed": "10.381",
+        "distance": "2918.65",
+        "grade": "-0.0069",
+        "cadence": "96.7",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "16,17,18,19,20,21",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 2920.033857815602,
+        "speed": 10.395971540220723,
+        "gear": 8,
+        "cadence": 96.81614262705865,
+        "grade": -0.007011282804352429,
+        "steering": 4.171351416540196e-167,
+        "offset": -2.0602481417951257e-42,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.22247086379548467,
+        "tire": 0.0698098954241265,
+        "chain": 0.03388564991947053,
+        "water": 0.0031738981178141158,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        404.914749423948,
+        20.996439236311634,
+        -180.33554023967494
+      ],
+      "quaternion": [
+        0.017021897540431402,
+        -0.6241517367863831,
+        -0.012354493271460527,
+        -0.7810199939608908
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 46128
+      }
+    },
+    {
+      "seconds": 354.546,
+      "s": {
+        "state": "cruising",
+        "speed": "11.336",
+        "distance": "3086.23",
+        "grade": "-0.0057",
+        "cadence": "105.9",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "17,18,19,20,21,22",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 3087.49175210885,
+        "speed": 11.337334203047918,
+        "gear": 8,
+        "cadence": 105.9153886983002,
+        "grade": -0.005657440924199915,
+        "steering": 3.888379839849565e-200,
+        "offset": -3.1880610047346114e-51,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.25667358234042226,
+        "tire": 0.0748221135996747,
+        "chain": 0.035,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        260.34351515618255,
+        19.686538659631623,
+        -129.66608253287532
+      ],
+      "quaternion": [
+        0.009934808118980884,
+        -0.9158320086620713,
+        -0.01783702262430507,
+        -0.4010422323416011
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 47983
+      }
+    },
+    {
+      "seconds": 369.856,
+      "s": {
+        "state": "cruising",
+        "speed": "10.997",
+        "distance": "3257.70",
+        "grade": "0.0000",
+        "cadence": "102.8",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "18,19,20,21,22",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 3258.0667562752706,
+        "speed": 10.99631297548751,
+        "gear": 8,
+        "cadence": 102.81267935512,
+        "grade": 0,
+        "steering": 2.9023561373698085e-233,
+        "offset": -6.33789971409009e-60,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.24408009363496727,
+        "tire": 0.07301912246284159,
+        "chain": 0.035,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        116.5515524411626,
+        19.550274093042578,
+        -53.54792613764628
+      ],
+      "quaternion": [
+        0.002683777842085925,
+        -0.9662996086022688,
+        -0.017393348272238214,
+        -0.2568177080878125
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 49895
+      }
+    },
+    {
+      "seconds": 385.145,
+      "s": {
+        "state": "cruising",
+        "speed": "10.887",
+        "distance": "3423.95",
+        "grade": "0.0000",
+        "cadence": "101.8",
+        "gear": "8",
+        "mounted": "true",
+        "sectors": "19,20,21,22",
+        "photo": "false",
+        "map": "cycling"
+      },
+      "model": {
+        "distance": 3424.9174879679845,
+        "speed": 10.886467467667128,
+        "gear": 8,
+        "cadence": 101.7535861778641,
+        "grade": 0,
+        "steering": 2.0492986317501452e-266,
+        "offset": -1.0716222917350202e-68,
+        "recovered": false,
+        "ended": false
+      },
+      "audio": {
+        "freehub": false,
+        "wind": 0.24006229936831222,
+        "tire": 0.07243385971595502,
+        "chain": 0.035,
+        "water": 0,
+        "activeVoices": 0,
+        "unlocked": true
+      },
+      "camera": [
+        46.534734356213185,
+        19.55194555353751,
+        97.84823736571576
+      ],
+      "quaternion": [
+        0.00408713896893809,
+        -0.9778113738557275,
+        -0.017020888182060632,
+        -0.20875464502357063
+      ],
+      "visibility": {
+        "hidden": false,
+        "focused": true,
+        "frame": 52000
+      }
+    }
+  ],
+  "errors": [],
+  "headed": true,
+  "browserArgs": [
+    "--use-angle=d3d11",
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding"
+  ],
+  "browser": "148.0.3967.70",
+  "videoOriginOffsetSeconds": 3.112,
+  "nativePedalPerformance": {
+    "fps": 107.81159449252416,
+    "p95Ms": 14,
+    "maxMs": 291.70000000000437,
+    "renderedFrames": 2158,
+    "duplicates": 0,
+    "hidden": 0,
+    "unfocused": 0,
+    "peak": {
+      "calls": 121,
+      "triangles": 2101215,
+      "textures": 40
+    },
+    "quality": "medium",
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "endDistance": 187.53451186610118,
+    "endSpeed": 8.289471005260161,
+    "scope": "20-second native held-W forest pedalling; rendered frames only; no concurrent screenshots or recording; main-pass counts exclude shadow/offscreen passes; not GPU timer or thermal benchmark"
+  },
+  "audioStartSeconds": 45.515,
+  "realAudioRms": 0.002991756088787835,
+  "journeySeconds": 395.369,
+  "cinemaReturn": {
+    "positionDelta": 0.00019202397759698897,
+    "angleRadians": 0.0000033523307629868976,
+    "distanceDelta": 0
+  },
+  "passed": true
+}

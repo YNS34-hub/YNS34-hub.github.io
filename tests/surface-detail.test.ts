@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Matrix4, MeshStandardMaterial, NoColorSpace, PlaneGeometry, ShaderLib, Texture, Vector3, type WebGLProgramParametersWithUniforms, type WebGLRenderer } from "three";
 import { applyRoadWear, cloneWearTexture, groundGrassGeometry, softenCanopyNormals } from "../src/worlds/surfaceDetail";
 import { applyAlpineSunlight } from "../src/worlds/alpine/sunlight";
+import {dryRoadMaterial} from "../src/worlds/scenery/roadFinish";
 
 describe("bounded surface detail", () => {
   it("owns linear mask samplers without mutating or disposing a shared image", () => {
@@ -35,6 +36,20 @@ describe("bounded surface detail", () => {
     expect(s.uniforms.alpineSunTexture.value).toBe(sun);expect(s.uniforms.roadWearMetres.value.toArray()).toEqual([3,6]);
     expect(s.fragmentShader).toContain("directLight.color*=mix(.04,1.");expect(s.fragmentShader).toContain("wheelPolish");
     expect(material.customProgramCacheKey()).toContain(":metre-scale-dry-wear-v1:alpine-measured-sun-v1");material.dispose();sun.dispose();
+  });
+  it("keeps measured sunlight and shared assets when the layered pavement is composed beneath it",()=>{
+    const map=new Texture(),normal=new Texture(),sun=new Texture(),dispose=vi.fn();
+    for(const texture of [map,normal,sun])texture.addEventListener("dispose",dispose);
+    const material=dryRoadMaterial(map,normal,[3,6],6.4),identity=material.uuid;
+    applyAlpineSunlight(material,sun,{x0:-100,z0:-200,step:5,width:64,height:64,direction:[0,1,0],rayDistance:2000});
+    const shader={vertexShader:ShaderLib.standard.vertexShader,fragmentShader:ShaderLib.standard.fragmentShader,uniforms:{}} as WebGLProgramParametersWithUniforms;
+    material.onBeforeCompile(shader,{} as WebGLRenderer);
+    expect(material.uuid).toBe(identity);expect(shader.uniforms.alpineSunTexture.value).toBe(sun);
+    expect(shader.uniforms.roadWearMetres.value.toArray()).toEqual([3,6]);expect(shader.uniforms.roadWearWidth.value).toBe(6.4);
+    expect(shader.fragmentShader).toContain("directLight.color*=mix(.04,1.");
+    expect(shader.fragmentShader).toContain("#include <fog_fragment>");expect(shader.fragmentShader).toContain("#include <lights_fragment_end>");
+    expect(shader.uniforms).not.toHaveProperty("time");expect(material.transparent).toBe(false);
+    material.dispose();expect(dispose).not.toHaveBeenCalled();expect(map.repeat.toArray()).toEqual([1,1]);
   });
   it("keeps grass roots below the ground for the complete placement height and tilt range", () => {
     let seed=617;const rand=()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};

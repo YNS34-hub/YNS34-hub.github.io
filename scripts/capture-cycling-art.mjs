@@ -16,6 +16,8 @@ const views=[
   ['alpine-valley','alpine-ride',.43,0,0],
   ['alpine-surface','alpine-ride',.61,0,-.30],
   ['alpine-forest','alpine-ride',.89,0,0],
+  ['forest-verge','cycling',.093,-.44,-.40],
+  ['alpine-verge','alpine-ride',.10672,-.44,-.40],
 ].filter(v=>!process.env.PALACE_VIEWS||process.env.PALACE_VIEWS.split(',').includes(v[0]));
 await mkdir(out,{recursive:true});
 const probe=await chromium.launch({channel:'msedge',headless:false,args:['--enable-automation']});let defaults;

@@ -9,6 +9,8 @@ import {roadView,useRoadRide} from "../road/state";
 import {useAlpineTextures,useAlpineGeography} from "./assets";
 import {applyAlpineSunlight} from "./sunlight";
 import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
+import {createShoulders,createVergeGrass,createRoadsideDetails,shoulderMaterial,roadsideDetailMaterials} from "../scenery/roadside";
+import RoadsideDetails from "../scenery/RoadsideDetails";
 import Delineators from "../Delineators";
 import Geography from "./Geography";
 import {ScanInstances,useAlpineScans} from "./Scans";
@@ -23,10 +25,9 @@ function terrainGeometry(points:number[],indices:number[]){const g=new BufferGeo
 function RoadSurface({maps}:{maps:Maps}){
   const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.asphaltNormal,[3,6],6.4),[maps.asphalt,maps.asphaltNormal]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
-  const geometries=useMemo(()=>[alpineRibbon(-12,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(-12,alpineLength,.11,side*2.99,.017)),alpineRibbon(-12,alpineLength,7.6,0,-.025)],[]);
+  const geometries=useMemo(()=>[alpineRibbon(-12,alpineLength,6.4,0,.01),...[-1,1].map(side=>alpineRibbon(-12,alpineLength,.11,side*2.99,.017))],[]);
   useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);
   return <group name="continuous-alpine-pass-road">
-    <mesh geometry={geometries[3]} receiveShadow><meshStandardMaterial map={maps.rock} color="#b8ad96" roughness={1}/></mesh>
     <mesh geometry={geometries[0]} receiveShadow material={asphalt}/>
     {[1,2].map(i=><mesh key={i} geometry={geometries[i]} receiveShadow><meshStandardMaterial color="#d3cfbe" roughness={.96} onUpdate={m=>weatheredEdgePaint(m,[3,6])}/></mesh>)}
   </group>;
@@ -44,7 +45,7 @@ function guardrail(start:number,end:number,side:number){
   }
   return terrainGeometry(p,idx);
 }
-function AlpineSector({index,scans}:{index:number;scans:ReturnType<typeof useAlpineScans>}){
+function AlpineSector({index,scans,verge,details}:{index:number;scans:ReturnType<typeof useAlpineScans>;verge:MeshStandardMaterial;details:ReturnType<typeof roadsideDetailMaterials>}){
   const quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion(),grassTemplates=useAlpineGrass(),riderSector=useRoadRide(s=>Math.floor(s.distance/alpineSectorLength));
   const data=useMemo(()=>{
     const rand=random(1732+index*91),start=index*alpineSectorLength,end=Math.min(alpineLength,start+alpineSectorLength),p=new Vector3(),t=new Vector3();
@@ -76,11 +77,16 @@ function AlpineSector({index,scans}:{index:number;scans:ReturnType<typeof useAlp
       }
     }
 
-    return {posts,rocks,cliffs,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,rail:guardrail(start,end,side),post:new CylinderGeometry(.7,.7,1,4),clock:{value:0},wind:{value:quiet?0:.012}};
+    const site={kind:"alpine" as const,sample:sampleAlpine,ground:alpineGround,nearest:(x:number,z:number)=>nearestAlpine(x,z).distance};
+    const shoulders=createShoulders(start,end,site),intrusion=createVergeGrass(start,end,site,shoulders),small=createRoadsideDetails(start,end,site,shoulders);
+    intrusion.forEach((items,i)=>grass[i].push(...(quality==="low"?items.filter((_,j)=>j%3===0):items)));
+    return {posts,rocks,cliffs,grass,shoulders,small,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,rail:guardrail(start,end,side),post:new CylinderGeometry(.7,.7,1,4),clock:{value:0},wind:{value:quiet?0:.012}};
   },[index,quality,quiet]);
-  useEffect(()=>()=>[data.rail,data.post].forEach(g=>g.dispose()),[data]);
+  useEffect(()=>()=>[data.rail,data.post,data.shoulders,data.small.drains].forEach(g=>g.dispose()),[data]);
   useFrame((_,dt)=>{if(!quiet)data.clock.value+=Math.min(.06,dt);});
   return <group name={"alpine-sector:"+index}>
+    <mesh name="grounded-alpine-shoulder" geometry={data.shoulders} material={verge} receiveShadow dispose={null}/>
+    <RoadsideDetails data={data.small} scan={scans[0]} materials={details}/>
     <mesh geometry={data.rail} castShadow={Math.abs(index-riderSector)<2} receiveShadow><meshStandardMaterial color="#b7beb7" metalness={.48} roughness={.54} side={DoubleSide}/></mesh>
     <Instances geometry={data.post} items={data.posts} color="#939a96" metalness={.7} roughness={.5} shadows={Math.abs(index-riderSector)<2}/>
     <Instances geometry={data.post} items={data.markers} color="#dedbcc" roughness={.85}/>
@@ -106,10 +112,12 @@ function Viewpoints(){
 }
 export default function AlpineLandscape(){
   const maps=useAlpineTextures(),meta=useAlpineGeography(),scans=useAlpineScans(),root=useRef<Group>(null),[sectors,setSectors]=useState(()=>alpineSectors(roadView.distance)),last=useRef(-1),clock=useRef(0),quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion();
+  const verge=useMemo(()=>shoulderMaterial(maps.rock,maps.rockNormal,maps.meadow),[maps]);useEffect(()=>()=>verge.dispose(),[verge]);
+  const details=useMemo(()=>roadsideDetailMaterials(scans[0].material),[scans]);useEffect(()=>()=>{details.stone.dispose();details.drain.dispose();},[details]);
   useFrame((_,dt)=>{clock.current+=dt;if(clock.current<.25)return;clock.current=0;const current=Math.floor(roadView.distance/alpineSectorLength);if(current!==last.current){last.current=current;setSectors(alpineSectors(roadView.distance));}});
   useLayoutEffect(()=>{root.current?.traverse(object=>{
     if(object instanceof Mesh)for(const m of Array.isArray(object.material)?object.material:[object.material])if(m instanceof MeshStandardMaterial)applyAlpineSunlight(m,maps.sun,meta.sun);
     if(object instanceof InstancedMesh||object instanceof Group)return;object.raycast=()=>{};
   });},[sectors,maps,meta,quality,quiet]);
-  return <group ref={root} name="alpine-geographic-landscape"><Geography maps={maps}/><RoadSurface maps={maps}/><Viewpoints/>{sectors.map(index=><AlpineSector key={index} index={index} scans={scans}/>)}<group position={[0,alpineMap.ground(0,0),8]}><Block position={[-3.9,.6,0]} scale={[.07,1.2,.07]} color="#646d59"/><Label text="THE ALPINE DESCENT" position={[-3.9,1.35,.04]} size={.16} color="#f0e3c3" maxWidth={3}/></group></group>;
+  return <group ref={root} name="alpine-geographic-landscape"><Geography maps={maps}/><RoadSurface maps={maps}/><Viewpoints/>{sectors.map(index=><AlpineSector key={index} index={index} scans={scans} verge={verge} details={details}/>)}<group position={[0,alpineMap.ground(0,0),8]}><Block position={[-3.9,.6,0]} scale={[.07,1.2,.07]} color="#646d59"/><Label text="THE ALPINE DESCENT" position={[-3.9,1.35,.04]} size={.16} color="#f0e3c3" maxWidth={3}/></group></group>;
 }

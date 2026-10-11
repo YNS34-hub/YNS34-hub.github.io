@@ -22,6 +22,13 @@ describe("scenic materials retain asset ownership and metre scale",()=>{
     const material=new MeshStandardMaterial();weatheredEdgePaint(material,[2,5]);const compile=material.onBeforeCompile,key=material.customProgramCacheKey();
     weatheredEdgePaint(material,[2,5]);expect(material.onBeforeCompile).toBe(compile);expect(material.customProgramCacheKey()).toBe(key);
   });
+  it("does not share paint programs between routes with different metre UV scales",()=>{
+    const forest=new MeshStandardMaterial(),alpine=new MeshStandardMaterial();
+    weatheredEdgePaint(forest,[2,5]);weatheredEdgePaint(alpine,[3,6]);
+    expect(forest.customProgramCacheKey()).not.toBe(alpine.customProgramCacheKey());
+    expect(forest.transparent).toBe(false);expect(alpine.transparent).toBe(false);
+    forest.dispose();alpine.dispose();
+  });
 });
 
 describe("distant landforms keep the playable route intact",()=>{
