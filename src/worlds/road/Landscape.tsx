@@ -1,6 +1,6 @@
 import { useMemo,useEffect,useLayoutEffect,useRef,useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry,Float32BufferAttribute,Vector3,CylinderGeometry,PlaneGeometry,BoxGeometry,DodecahedronGeometry,MeshStandardMaterial,CanvasTexture,SRGBColorSpace,Group,Mesh,InstancedMesh,Texture } from "three";
+import { BufferGeometry,Float32BufferAttribute,Vector3,CylinderGeometry,PlaneGeometry,BoxGeometry,MeshStandardMaterial,CanvasTexture,SRGBColorSpace,Group,Mesh,InstancedMesh,Texture } from "three";
 import Instances,{type Instance} from "../Instances";
 import { Block,Label } from "../../world/primitives";
 import { roadLength,sectorLength,sectorCount,roadSample,roadRibbon,terrainHeight,roadForestDensity,activeRoadSectors,lake,lakeDistance,roadStops,closestRoad } from "./route";
@@ -9,8 +9,10 @@ import { useRoadTextures,usePineShape,type PineShape } from "./textures";
 import { useWorldTexture } from "../materials";
 import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
-import { groundGrassGeometry } from "../surfaceDetail";
 import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
+import {habitat,terrainSampler} from "../scenery/ecology";
+import {GrassField,useAlpineGrass} from "../alpine/Grass";
+import {ScanInstances,useAlpineScans} from "../alpine/Scans";
 import Delineators from "../Delineators";
 import { createStopApron,insideStopApron,stopGroundHeight } from "./stopApron";
 
@@ -64,67 +66,74 @@ function WindField(props:Parameters<typeof Instances>[0]){
     root.current?.traverse(object=>{
       if(!(object instanceof Mesh)||!(object.material instanceof MeshStandardMaterial))return;
       const material=object.material;
+      if(props.map){material.alphaToCoverage=true;material.forceSinglePass=true;}
       material.onBeforeCompile=shader=>{
         shader.uniforms.roadTime=wind.current.time;shader.uniforms.roadWind=wind.current.amount;shader.uniforms.roadEye=wind.current.eye;
         shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nuniform float roadTime;uniform float roadWind;uniform vec3 roadEye;")
           .replace("#include <begin_vertex>","#include <begin_vertex>\n#ifdef USE_INSTANCING\nfloat nearby=1.-smoothstep(28.,85.,distance(roadEye,instanceMatrix[3].xyz));transformed.x+=sin(roadTime*1.2+instanceMatrix[3].x*.09+position.y)*roadWind*uv.y*uv.y*nearby;\n#endif");
+        if(props.map){
+          // 少量朝向天空的冠层法线保持树叶暗部层次，双面卡片不再形成一片纯黑剪纸。
+          shader.fragmentShader=shader.fragmentShader.replace("#include <normal_fragment_maps>","#include <normal_fragment_maps>\nnormal=normalize(mix(normal,(viewMatrix*vec4(0.,1.,0.,0.)).xyz,.42));").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.09;\n#include <opaque_fragment>");
+        }
         if(!props.map){
           shader.vertexShader="varying float grassLeafHeight;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ngrassLeafHeight=uv.y;");
           shader.fragmentShader="varying float grassLeafHeight;\n"+shader.fragmentShader.replace("#include <color_fragment>","#include <color_fragment>\ndiffuseColor.rgb*=.60+.40*smoothstep(.03,.75,grassLeafHeight);");
         }
       };
-      material.customProgramCacheKey=()=>props.map?"road-near-wind-v1":"road-rooted-grass-wind-v2";material.needsUpdate=true;
+      material.customProgramCacheKey=()=>props.map?"road-readable-canopy-wind-v2":"road-rooted-grass-wind-v2";material.needsUpdate=true;
     });
   },[props.map]);
   useFrame(({camera},dt)=>{if(!quiet)wind.current.time.value+=Math.min(dt,.06);wind.current.amount.value=quiet?0:.08+Math.min(1,roadView.speed/15.28)*.18;wind.current.eye.value.copy(camera.position);});
   return <group ref={root}><Instances {...props}/></group>;
 }
-function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry}){
-  const quality=usePalaceStore(s=>s.effectiveQuality);
+function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplates}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>}){
+  const quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion();
   const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.normal,[2,5],6.4),[maps.asphalt,maps.normal]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
   const geometry=useMemo(()=>{
     const start=index*sectorLength,end=Math.min(roadLength,start+sectorLength),p=new Vector3(),t=new Vector3();
-    const random=seeded(index+908),trunks:Instance[]=[],branches:Instance[]=[],pines:Instance[]=[],needles:Instance[]=[],broad:Instance[]=[],rocks:Instance[]=[],grass:Instance[]=[],markers:Instance[]=[];
+    const random=seeded(index+908),terrain=makeTerrain(start,end),ground=terrainSampler(terrain,terrainHeight);
+    const trunks:Instance[]=[],branches:Instance[]=[],pines:Instance[]=[],needles:Instance[]=[],broad:Instance[]=[],rocks:Instance[]=[],grass:Instance[][]=Array.from({length:6},()=>[]),markers:Instance[]=[];
     for(let d=start;d<end;d+=4){
       roadSample(d,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),density=roadForestDensity(d/roadLength);
       for(const side of [-1,1]){
-        for(let j=0;j<38;j++){
-          const a=side*(3.65+random()*8),along=(random()-.5)*3,tr=Math.hypot(t.x,t.z),x=p.x+nx/r*a+t.x/tr*along,z=p.z+nz/r*a+t.z/tr*along;
-          if(lakeDistance(x,z)<1.02)continue;
-          // 保持同样的随机调用次序；只把根部按实际草高埋入地表，不改路线和植被位置。
-          const width=.05+random()*.045,height=.14+random()*.22;
-          grass.push({position:[x,terrainHeight(x,z)+height*.5-.025,z],scale:[width,height,1],rotation:[0,random()*Math.PI,(random()-.5)*.3],color:["#64794c","#78824f","#566d43","#858a59"][j%4]});
+        const herbs=seeded(index*1793+Math.round(d)*17+(side+1)*433);
+        for(let j=0;j<23;j++){
+          const a=side*(3.7+herbs()**1.5*17),along=(herbs()-.5)*5,tr=Math.hypot(t.x,t.z),x=p.x+nx/r*a+t.x/tr*along,z=p.z+nz/r*a+t.z/tr*along;
+          if(lakeDistance(x,z)<1.035||insideStopApron(x,z)||closestRoad(x,z).distance<3.6||herbs()> .30+.68*habitat(x,z))continue;
+          const height=.30+herbs()*.38,width=.42+herbs()*.37,detailed=j<9&&Math.abs(a)<13&&quality!=="low";
+          grass[(detailed?0:3)+j%3].push({position:[x,ground(x,z)-.018,z],scale:[width,height,width],rotation:[0,herbs()*6.28,0]});
         }
         if(Math.floor(d/4)%7===0){const a=side*3.8;markers.push({position:[p.x+nx/r*a,p.y+.31,p.z+nz/r*a],scale:[.10,.62,.10],color:"#c7c6b5"});}
-        if(random()>density)continue;
-        const off=side*(6+random()*26),x=p.x+nx/r*off,z=p.z+nz/r*off;if(lakeDistance(x,z)<1.05||d<25&&x>-5&&x<7)continue;
-        const birch=random()>.82,y=terrainHeight(x,z),h=birch?10+random()*5:16+random()*8,lean=(random()-.5)*.03,wide=birch?3.2+random()*1.4:2.1+random()*1.8;
+        const off=side*(5.8+random()**2.15*35),along=(random()-.5)*7,tr=Math.hypot(t.x,t.z),x=p.x+nx/r*off+t.x/tr*along,z=p.z+nz/r*off+t.z/tr*along;
+        if(random()>density*(.75+habitat(x,z)*.65)||lakeDistance(x,z)<1.09||closestRoad(x,z).distance<5.5||d<25&&x>-5&&x<7)continue;
+        const birch=random()>.80,y=ground(x,z),juvenile=random()<.14,h=birch?11+random()*6:juvenile?7.5+random()*5:15+random()*10,lean=(random()-.5)*.03,wide=birch?2.8+random()*1.7:2.1+random()*1.8;
+        const crownRandom=seeded(Math.round(x*31+z*53)+1781);
         if(!birch){
-          const size=h/pineShape.height,angle=random()*Math.PI*2,cs=Math.cos(angle),sn=Math.sin(angle),stride=quality==="low"?3:1;
-          pines.push({position:[x,y,z],scale:[size,size,size],rotation:[0,angle,0],color:"#a29c80"});
-          for(let k=0;k<pineShape.crown.length;k+=stride){const p=pineShape.crown[k],a=.85+random()*.35;
-            needles.push({position:[x+(p[0]*cs+p[2]*sn)*size,y+p[1]*size,z+(-p[0]*sn+p[2]*cs)*size],scale:[.68*a*size,1.6*a*size,1],rotation:[(random()-.5)*1.5,random()*6.28,(random()-.5)*1.9],color:k%5===0?"#c9d0ae":"#b1c0a3"});
-          }continue;
+          const size=h/pineShape.height,sx=size*(.93+random()*.42),sz=size*(.91+random()*.40),angle=random()*Math.PI*2,cs=Math.cos(angle),sn=Math.sin(angle),stride=quality==="low"?5:2;
+          pines.push({position:[x,y-.035,z],scale:[sx,size,sz],rotation:[0,angle,0],color:"#a59d84"});
+          for(let k=0;k<pineShape.crown.length;k+=stride){const a=pineShape.crown[k],w=.95+crownRandom()*.30;
+            needles.push({position:[x+a[0]*sx*cs+a[2]*sz*sn,y+a[1]*size,z-a[0]*sx*sn+a[2]*sz*cs],scale:[.82*w*size,1.95*w*size,1],rotation:[(crownRandom()-.5)*1.4,crownRandom()*6.28,(crownRandom()-.5)*1.6],color:k%7===0?"#c2c4a4":"#aeb99b"});
+          }
+        }else{
+          trunks.push({position:[x,y+h*.5-.03,z],scale:[.19+random()*.14,h,.19+random()*.14],rotation:[lean,random()*6.28,lean],color:"#c3b9a2"});
+          const count=quality==="low"?70:190;
+          for(let k=0;k<count;k++){
+            const angle=k*2.4+crownRandom()*.5,radius=Math.sqrt(crownRandom())*wide,level=crownRandom(),spread=wide*(1-level*.65),height=h*(.40+level*.58);
+            broad.push({position:[x+Math.cos(angle)*radius,y+h*.71+(crownRandom()-.5)*wide*1.65,z+Math.sin(angle)*radius],scale:[1.3+crownRandom()*.65,1.3+crownRandom()*.65,1],rotation:[(crownRandom()-.5)*1.6,angle,(crownRandom()-.5)],color:["#a8b398","#c1b387","#b8c19d","#b5aa85"][k%4]});
+            if(k%22===0)branches.push({position:[x+Math.cos(angle)*spread*.25,y+height-.25,z+Math.sin(angle)*spread*.25],scale:[.035,spread*.7,.035],rotation:[Math.cos(angle)*1.0,0,Math.sin(angle)*1.0],color:"#9a8e76"});
+          }
         }
-        trunks.push({position:[x,y+h*.5,z],scale:[.23+random()*.15,h,.23+random()*.15],rotation:[lean,random()*6.28,lean],color:"#b7aa91"});
-        const count=quality==="low"?80:210;
-        for(let k=0;k<count;k++){
-          const level=k/count,angle=k*2.4+random()*.5,spread=wide*(1-level*.65),height=h*(.40+level*.58),a=.8+random()*.5;
-          if(birch){const radius=Math.sqrt(random())*wide;broad.push({position:[x+Math.cos(angle)*radius,y+h*.72+(random()-.5)*wide*1.8,z+Math.sin(angle)*radius],scale:[1.4+random()*.8,1.4+random()*.8,1],rotation:[(random()-.5)*1.8,angle,(random()-.5)],color:["#a7b792","#b9b07e","#b8c299","#baa978"][k%4]});}
-          else needles.push({position:[x+Math.cos(angle)*spread*.72,y+height,z+Math.sin(angle)*spread*.72],scale:[.45*a,1.08*a,1],rotation:[-.35+(random()-.5)*.45,angle,(random()-.5)*1.6],color:level>.80?"#c2cbb0":side>0?"#9daa92":"#b1bda0"});
-          if(k%20===0)branches.push({position:[x+Math.cos(angle)*spread*.25,y+height-.25,z+Math.sin(angle)*spread*.25],scale:[.035,spread*.7,.035],rotation:[Math.cos(angle)*1.0,0,Math.sin(angle)*1.0],color:"#9a8e76"});
-        }
-        if(random()>.6&&d>25){const a=side*(5.2+random()*8),rx=p.x+nx/r*a,rz=p.z+nz/r*a;rocks.push({position:[rx,terrainHeight(rx,rz)+.10,rz],scale:[.3+random()*.7,.2+random()*.3,.35+random()*.6],rotation:[random(),random()*6,random()],color:"#899088"});}
+        if(random()>.68&&d>25){const a=side*(4.6+random()*14),rx=p.x+nx/r*a,rz=p.z+nz/r*a,size=.5+random()*1.8;if(closestRoad(rx,rz).distance>4.1&&!insideStopApron(rx,rz))rocks.push({position:[rx,ground(rx,rz)-size*.12,rz],scale:[size*1.3,size*.65,size],rotation:[0,random()*6,0]});}
       }
     }
-    const stem=new CylinderGeometry(.06,.65,1,12),leaf=new PlaneGeometry(1,1),stone=new DodecahedronGeometry(1,1),cube=new BoxGeometry(1,1,1);
-    const blade=groundGrassGeometry(seeded(617));
+    const stem=new CylinderGeometry(.06,.65,1,12),leaf=new PlaneGeometry(1,1),cube=new BoxGeometry(1,1,1);
     const roadStart=index===0?-12:start;
     const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];
-    return{start,end,terrain:makeTerrain(start,end),road,edges,stem,leaf,stone,cube,blade,trunks,branches,pines,needles,broad,rocks,grass:grass.filter(item=>!insideStopApron(item.position[0],item.position[2])),markers};
-  },[index,quality,pineShape]);
-  useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.stone,geometry.cube,geometry.blade].forEach(g=>g.dispose());},[geometry]);
+    return{start,end,terrain,road,edges,stem,leaf,cube,trunks,branches,pines,needles,broad,rocks,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,time:{value:0},wind:{value:quiet?0:.012}};
+  },[index,quality,pineShape,quiet]);
+  useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.stem,geometry.leaf,geometry.cube].forEach(g=>g.dispose());},[geometry]);
+  useFrame((_,dt)=>{if(!quiet)geometry.time.value+=Math.min(.06,dt);});
   return <group name={"road-sector:"+index}>
     <TerrainSurface geometry={geometry.terrain} maps={maps}/>
     <mesh name="authored-paved-road" geometry={geometry.road} receiveShadow material={asphalt}/>
@@ -134,8 +143,8 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood}:{index:number;shad
     <Instances geometry={geometry.stem} items={geometry.branches} color="#7a725f" shadows={shadow}/>
     <WindField geometry={geometry.leaf} items={geometry.needles} map={maps.pine} cutout shadows={shadow}/>
     <WindField geometry={geometry.leaf} items={geometry.broad} map={leaves} cutout shadows={shadow}/>
-    <Instances geometry={geometry.stone} items={geometry.rocks} color="#8f9387" roughness={1}/>
-    <WindField geometry={geometry.blade} items={geometry.grass} color="#83925f" cutout/>
+    <ScanInstances scan={scans[0]} items={geometry.rocks} shadows={shadow}/>
+    {grassTemplates.map((template,i)=><GrassField key={i} template={template} items={i<3?geometry.grass[i]:geometry.farGrass[i-3]} time={geometry.time} wind={geometry.wind} near={i<3} blend={quality!=="low"}/>)}
     <Instances geometry={geometry.cube} items={geometry.markers} color="#bebfae"/>
     <Delineators items={geometry.markers} stem={geometry.cube}/>
   </group>;
@@ -170,8 +179,8 @@ function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
     const tree=new PlaneGeometry(1,1),forest:Instance[]=[],random=seeded(417);
     for(let i=0;i<4000;i++){
       const x=-300+random()*2000,z=-1520+random()*1750;
-      const h=terrainHeight(x,z),near=closestRoad(x,z);if(lakeDistance(x,z)<1.10||h<10||near.distance<90||near.distance<180&&roadForestDensity(near.progress)<.25)continue;
-      const height=13+random()*7,width=height*.50,a=random()*Math.PI;for(const angle of [a,a+Math.PI/2])forest.push({position:[x,farGround(x,z)+height/2,z],scale:[width,height,1],rotation:[0,angle,0],color:["#a5b3a5","#b3bba6","#8faca0"][i%3]});
+      const h=terrainHeight(x,z),near=closestRoad(x,z);if(lakeDistance(x,z)<1.13||h<10||near.distance<125||near.distance<200&&roadForestDensity(near.progress)<.25||random()>habitat(x,z)*.92+.05)continue;
+      const height=8+random()**.65*14,width=height*(.37+random()*.18),a=random()*Math.PI;for(const angle of [a,a+Math.PI/2])forest.push({position:[x,farGround(x,z)+height/2-.12,z],scale:[width,height,1],rotation:[0,angle,0],color:["#a9b3a0","#b6b69e","#a6b39d"][i%3]});
     }
     return{g,r,tree,forest,crown};
   },[maps.pine.image,pineShape]);
@@ -182,7 +191,7 @@ function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
     <mesh geometry={shape.r} position={[-650,-40,-750]} rotation={[0,-Math.PI/2,0]} scale={[1,.8,1]}><meshStandardMaterial vertexColors color="#bbc6ba" map={maps.ground} roughness={1}/></mesh>
     <mesh geometry={shape.r} position={[1750,-35,-800]} rotation={[0,Math.PI/2,0]} scale={[1,.8,1]}><meshStandardMaterial vertexColors color="#bbc6ba" map={maps.ground} roughness={1}/></mesh>
     <mesh geometry={shape.r} position={[500,-55,600]} scale={[1,.85,1]}><meshStandardMaterial vertexColors color="#c8c3ad" map={maps.ground} roughness={1}/></mesh>
-    <Instances geometry={shape.tree} items={shape.forest} map={shape.crown} color="#adb8ab" cutout/>
+    <WindField geometry={shape.tree} items={shape.forest} map={shape.crown} color="#adb8ab" cutout/>
   </group>;
 }
 function RoadLake(){
@@ -242,6 +251,7 @@ function RoadStops({maps}:{maps:Maps}){
 export default function RoadLandscape(){
   const scenery=useRef<Group>(null);
   const maps=useRoadTextures();
+  const scans=useAlpineScans(),grassTemplates=useAlpineGrass();
   const pineShape=usePineShape(),wood=useMemo(()=>{const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(pineShape.position,3));g.setAttribute("normal",new Float32BufferAttribute(pineShape.normal,3));g.setAttribute("uv",new Float32BufferAttribute(pineShape.uv,2));g.setIndex(pineShape.index);return g;},[pineShape]);
   useEffect(()=>()=>wood.dispose(),[wood]);
   const leaves=useWorldTexture("leaves");
@@ -250,5 +260,5 @@ export default function RoadLandscape(){
   useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} scans={scans} grassTemplates={grassTemplates} shadow={Math.abs(index-current)<2}/>)}</group>;
 }

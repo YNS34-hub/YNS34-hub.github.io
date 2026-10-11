@@ -38,13 +38,13 @@ export function GrassField({template,items,time,wind,near=false,blend=false}:{te
   const {camera}=useThree();
   const material=useMemo(()=>{
     const m=template.material.clone();m.side=DoubleSide;m.transparent=false;m.alphaTest=.42;m.alphaToCoverage=true;m.forceSinglePass=true;
-    m.normalScale.set(.3,.3);m.map!.anisotropy=8;m.color.set("#c3dd94");
+    m.normalScale.set(.3,.3);m.map!.anisotropy=8;m.color.set("#c5c8ae");
     m.onBeforeCompile=shader=>{
       shader.uniforms.alpineGrassTime=time;shader.uniforms.alpineGrassWind=wind;
-      shader.vertexShader="varying vec3 alpineGrassPosition;uniform float alpineGrassTime;uniform float alpineGrassWind;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ntransformed.x+=sin(alpineGrassTime*.7+instanceMatrix[3].x*.23)*alpineGrassWind*position.y*position.y;alpineGrassPosition=(modelMatrix*instanceMatrix*vec4(transformed,1.)).xyz;");
+      shader.vertexShader="varying vec3 alpineGrassPosition;varying float grassRootHeight;uniform float alpineGrassTime;uniform float alpineGrassWind;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ntransformed.x+=sin(alpineGrassTime*.7+instanceMatrix[3].x*.23)*alpineGrassWind*position.y*position.y;alpineGrassPosition=(modelMatrix*instanceMatrix*vec4(transformed,1.)).xyz;grassRootHeight=position.y;");
       // 薄叶片保留少量透光；根部仍有暗部，不把背光的整簇草压成黑色。
-      shader.fragmentShader="varying vec3 alpineGrassPosition;\n"+shader.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\ndiffuseColor.rgb*=vec3(1.6,1.9,1.25);").replace("#include <alphatest_fragment>",(blend?"diffuseColor.a*="+(near?"1.-":"")+"smoothstep(60.,85.,distance(cameraPosition,alpineGrassPosition));\n":"")+"#include <alphatest_fragment>").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.30;\n#include <opaque_fragment>");
-    };m.customProgramCacheKey=()=>"alpine-photographed-grass-v2:"+near+":"+blend;return m;
+      shader.fragmentShader="varying vec3 alpineGrassPosition;varying float grassRootHeight;\n"+shader.fragmentShader.replace("#include <map_fragment>","#include <map_fragment>\ndiffuseColor.rgb*=vec3(1.10,1.04,.93)*(.74+.26*smoothstep(.04,.65,grassRootHeight));").replace("#include <alphatest_fragment>",(blend?"diffuseColor.a*="+(near?"1.-":"")+"smoothstep(60.,85.,distance(cameraPosition,alpineGrassPosition));\n":"")+"#include <alphatest_fragment>").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.065;\n#include <opaque_fragment>");
+    };m.customProgramCacheKey=()=>"scenic-rooted-photographed-grass-v3:"+near+":"+blend;return m;
   },[template,time,wind,near,blend]);
   useEffect(()=>()=>material.dispose(),[material]);
   const update=useMemo(()=>{const p=new Object3D();let lastX=Infinity,lastZ=Infinity;
