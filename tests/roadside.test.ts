@@ -1,6 +1,6 @@
 import {describe,it,expect,vi} from "vitest";
 import {Texture} from "three";
-import {createShoulders,createVergeGrass,shoulderMaterial,type RoadsideSite} from "../src/worlds/scenery/roadside";
+import {createShoulders,createVergeGrass,createRoadsideDetails,shoulderMaterial,type RoadsideSite} from "../src/worlds/scenery/roadside";
 import {terrainSampler} from "../src/worlds/scenery/ecology";
 
 const site:RoadsideSite={kind:"forest",sample:(d,p,t)=>{p.set(0,12,-d);t.set(0,0,-1);},ground:()=>11.88,nearest:(x)=>Math.abs(x)};
@@ -35,5 +35,18 @@ describe("bounded roadside surface geometry",()=>{
       const [x,y,z]=item.position;expect(Math.abs(x)).toBeGreaterThan(3.4);expect(y).toBeCloseTo(ground(x,z)-.02,6);expect(item.scale[1]).toBeLessThan(.26);
     }
     expect(createVergeGrass(0,160,{...site,blocked:()=>true},g).flat()).toEqual([]);g.dispose();
+  });
+  it("keeps small stones and drainage stable, bounded and outside the rideable road",()=>{
+    const g=createShoulders(0,320,site),a=createRoadsideDetails(0,160,site,g),b=createRoadsideDetails(160,320,site,g),again=createRoadsideDetails(0,160,site,g);
+    expect(a.stones).toEqual(again.stones);expect(a.stones.length).toBeGreaterThan(0);expect(a.stones.length).toBeLessThan(50);
+    expect(a.drainCount+b.drainCount).toBe(1);expect(a.drains.index!.count/3).toBeLessThan(250);
+    const ground=terrainSampler(g,site.ground);
+    for(const item of [...a.stones,...b.stones]){
+      const [x,y,z]=item.position;expect(Math.abs(x)-item.scale[0]/2).toBeGreaterThan(3.2);
+      expect(y).toBeCloseTo(ground(x,z)-item.scale[1]*.15,5);expect(Math.max(...item.scale)).toBeLessThan(.15);
+    }
+    const p=a.drains.getAttribute("position");for(let i=0;i<p.count;i++)expect(Math.abs(p.getX(i))).toBeGreaterThan(3.2);
+    const blocked=createRoadsideDetails(0,320,{...site,blocked:()=>true},g);expect(blocked.stones).toEqual([]);expect(blocked.drainCount).toBe(0);
+    for(const d of[a,b,again,blocked])d.drains.dispose();g.dispose();
   });
 });
