@@ -112,16 +112,19 @@ export function shoulderMaterial(map:Texture,normalMap:Texture,soil:Texture){
     shader.fragmentShader=`varying float roadsideEdge;uniform sampler2D shoulderSoil;
       float vergeNoise(vec2 p){vec3 p3=fract(vec3(p.xyx)*.1031);p3+=dot(p3,p3.yzx+33.33);return fract((p3.x+p3.y)*p3.z);}
     `+shader.fragmentShader.replace("#include <map_fragment>",`
+      float vergeDistance=length(vViewPosition),vergeMiddle=1.-smoothstep(100.,150.,vergeDistance);
       vec2 vergeUv=vMapUv/vec2(.46,.53);
-      vec3 gravel=texture2D(map,vergeUv).rgb,soil=texture2D(shoulderSoil,vMapUv/4.).rgb;
+      // 150 米外仅保留低频路肩色，20–30 米平滑退去集料法线；不新增贴图、RTT 或逐帧状态。
+      vec3 gravel=vec3(.24),soil=vec3(.21);
+      if(vergeDistance<150.){gravel=mix(gravel,texture2D(map,vergeUv).rgb,vergeMiddle);soil=mix(soil,texture2D(shoulderSoil,vMapUv/4.).rgb,vergeMiddle);}
       float gravelGrey=dot(gravel,vec3(.2126,.7152,.0722)),soilGrey=dot(soil,vec3(.2126,.7152,.0722));
       gravel=mix(gravel,vec3(gravelGrey)*vec3(1.03,1.,.91),.70);
       soil=mix(soil,vec3(soilGrey)*vec3(.96,.91,.77),.80);
       diffuseColor.rgb*=mix(gravel*.88,soil,smoothstep(.30,.94,roadsideEdge)*.78);
       float edgeNoise=vergeNoise(floor(vec2(vMapUv.x*23.,mod(vMapUv.y,29.)*13.)));
       diffuseColor.a*=1.-smoothstep(.78+edgeNoise*.11,1.,roadsideEdge);
-    `).replace("#include <normal_fragment_maps>",`if(length(vViewPosition)<30.){
-      ${ShaderChunk.normal_fragment_maps.replaceAll("vNormalMapUv","vNormalMapUv/vec2(.46,.53)")}
+    `).replace("#include <normal_fragment_maps>",`float vergeNear=1.-smoothstep(20.,30.,vergeDistance);if(vergeNear>0.){
+      ${ShaderChunk.normal_fragment_maps.replaceAll("vNormalMapUv","vNormalMapUv/vec2(.46,.53)").replace("mapN.xy *= normalScale;","mapN.xy *= normalScale*vergeNear;")}
     }`);
-  };m.customProgramCacheKey=()=>"metre-grounded-gravel-shoulder-v1";return m;
+  };m.customProgramCacheKey=()=>"metre-grounded-gravel-shoulder-v2";return m;
 }

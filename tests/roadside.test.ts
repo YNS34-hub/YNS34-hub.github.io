@@ -1,6 +1,7 @@
 import {describe,it,expect,vi} from "vitest";
-import {Texture} from "three";
-import {createShoulders,createVergeGrass,createRoadsideDetails,shoulderMaterial,type RoadsideSite} from "../src/worlds/scenery/roadside";
+import {MeshStandardMaterial,Texture,ShaderLib} from "three";
+import {createShoulders,createVergeGrass,createRoadsideDetails,roadsideDetailMaterials,shoulderMaterial,type RoadsideSite} from "../src/worlds/scenery/roadside";
+import {applyAlpineSunlight} from "../src/worlds/alpine/sunlight";
 import {terrainSampler} from "../src/worlds/scenery/ecology";
 
 const site:RoadsideSite={kind:"forest",sample:(d,p,t)=>{p.set(0,12,-d);t.set(0,0,-1);},ground:()=>11.88,nearest:(x)=>Math.abs(x)};
@@ -48,5 +49,14 @@ describe("bounded roadside surface geometry",()=>{
     const p=a.drains.getAttribute("position");for(let i=0;i<p.count;i++)expect(Math.abs(p.getX(i))).toBeGreaterThan(3.2);
     const blocked=createRoadsideDetails(0,320,{...site,blocked:()=>true},g);expect(blocked.stones).toEqual([]);expect(blocked.drainCount).toBe(0);
     for(const d of[a,b,again,blocked])d.drains.dispose();g.dispose();
+  });
+  it("composes the roadside LOD with measured alpine sunlight and preserves shared resources",()=>{
+    const map=new Texture(),normal=new Texture(),soil=new Texture(),sun=new Texture(),disposed=vi.fn();for(const t of[map,normal,soil,sun])t.addEventListener("dispose",disposed);
+    const m=shoulderMaterial(map,normal,soil);applyAlpineSunlight(m,sun,{x0:-100,z0:-200,step:5,width:64,height:64,direction:[0,1,0],rayDistance:2000});
+    const shader={vertexShader:ShaderLib.standard.vertexShader,fragmentShader:ShaderLib.standard.fragmentShader,uniforms:{}} as Parameters<typeof m.onBeforeCompile>[0];
+    m.onBeforeCompile(shader,{} as Parameters<typeof m.onBeforeCompile>[1]);
+    expect(shader.uniforms.shoulderSoil.value).toBe(soil);expect(shader.uniforms.alpineSunTexture.value).toBe(sun);
+    expect(shader.fragmentShader).toContain("vergeDistance<150.");expect(shader.fragmentShader).toContain("normalScale*vergeNear");expect(shader.fragmentShader).toContain("lights_fragment_end");
+    const source=new MeshStandardMaterial({map,normalMap:normal}),detail=roadsideDetailMaterials(source);detail.stone.dispose();detail.drain.dispose();m.dispose();expect(disposed).not.toHaveBeenCalled();expect(source.map).toBe(map);
   });
 });
