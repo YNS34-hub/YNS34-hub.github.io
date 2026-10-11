@@ -7,9 +7,10 @@ import {Quaternion} from "three";
 import {roadLength,roadStops} from "../src/worlds/road/route.ts";
 const base=process.env.PALACE_URL||"http://127.0.0.1:5190",out=path.resolve(process.env.PALACE_ARTIFACTS||"qa-artifacts/road-journey");
 await mkdir(out,{recursive:true});
-const report={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),perspective:process.env.PALACE_VIEW==="third"?"third":"first",scope:"Continuous native keyboard/button ride; no camera or distance injection. One explicitly labelled invalid-state recovery fault follows the journey. Video is functional evidence, not GPU performance measurement.",checks:[],moments:[],samples:[],errors:[]};
+const recordVideo=process.env.PALACE_RECORD_VIDEO!=="0";
+const report={sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),perspective:process.env.PALACE_VIEW==="third"?"third":"first",recordVideo,scope:"Continuous native keyboard/button ride; no camera or distance injection. One explicitly labelled invalid-state recovery fault follows the journey. Video is functional evidence, not GPU performance measurement.",checks:[],moments:[],samples:[],errors:[]};
 const browser=await chromium.launch({executablePath:"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",headless:true,args:["--use-angle=d3d11"]});
-const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,recordVideo:{dir:path.join(out,"video"),size:{width:960,height:540}}});
+const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,...(recordVideo?{recordVideo:{dir:path.join(out,"video"),size:{width:960,height:540}}}:{})});
 await context.route("**/personal-media/manifest.json",r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
 await context.addInitScript(()=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality:"medium",tutorialDone:true,roomSoundtracks:false,mute:false},version:0})));
 if(process.env.PALACE_VIEW==="third")await context.addInitScript(()=>localStorage.setItem("memory-palace:perspective:v1",JSON.stringify({basketball:"first",cycling:"third","alpine-ride":"third"})));
@@ -66,6 +67,11 @@ try{
  await options();await page.getByRole("button",{name:"Return to the Palace",exact:true}).click();await page.waitForFunction(()=>window.__PALACE_DEBUG__?.roomId==="worlds"&&document.querySelector(".world-ready"));await mark("17-museum-return");
  await page.evaluate(()=>window.__PALACE_DEV__.state.getState().enterRoom("cycling"));await page.locator(".road-mount").waitFor();check("Fresh re-entry restores progress on foot without stale riding controls",(await read()).s.mounted==="false");await mark("18-safe-re-entry");
  assert.deepEqual(report.errors,[]);report.passed=true;
-}catch(e){report.failure=e.stack;report.failureState=await read().catch(()=>null);process.exitCode=1;console.error(e.stack);await page.screenshot({path:path.join(out,"failure.png")}).catch(()=>{});}finally{await context.close();await page.video()?.saveAs(path.join(out,"continuous-native-ride.webm"));await flush();await browser.close();}
+}catch(e){report.failure=e.stack;report.failureState=await read().catch(()=>null);process.exitCode=1;console.error(e.stack);await page.screenshot({path:path.join(out,"failure.png")}).catch(()=>{});}finally{
+ // 浏览器意外退出也必须留下完整失败报告；录屏编码器不应抹掉已经采集的诊断。
+ await flush();await context.close().catch(()=>{});
+ if(recordVideo)await page.video()?.saveAs(path.join(out,"continuous-native-ride.webm")).catch(e=>{report.recordingFailure=e.message;process.exitCode=1;});
+ await flush();await browser.close().catch(()=>{});
+}
 function checkBound(sectors){assert.ok(sectors.split(",").length<=6,"No more than six active route sectors");}
 console.log("Continuous road journey: "+report.checks.length+" checks / "+(report.passed?"PASS":"FAIL"));
