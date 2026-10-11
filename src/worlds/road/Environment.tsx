@@ -7,7 +7,11 @@ import { usePalaceStore } from "../../systems/store";
 import { useLibraryStore } from "../../systems/library";
 import { textureStatus } from "../../world/textureCache";
 import { scenicHDR,scenicSky,forestSun,forestSkyRotation } from "../scenery/lighting";
+import ScenicPreparation from "../scenery/ScenicPreparation";
 export default function RoadEnvironment({onReady}:{onReady?:()=>void}){
+  return <ScenicPreparation><PreparedRoadEnvironment onReady={onReady}/></ScenicPreparation>;
+}
+function PreparedRoadEnvironment({onReady}:{onReady?:()=>void}){
   const {camera,gl,scene}=useThree(),quality=usePalaceStore(s=>s.effectiveQuality),{active}=useProgress();
   const hdr=useLoader(RGBELoader,scenicHDR),source=useTexture(scenicSky);
   const background=useMemo(()=>{const t=source.clone();t.mapping=EquirectangularReflectionMapping;t.colorSpace=SRGBColorSpace;t.needsUpdate=true;return t;},[source]);

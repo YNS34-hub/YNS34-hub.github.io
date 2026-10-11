@@ -8,8 +8,12 @@ import {useLibraryStore} from "../../systems/library";
 import {textureStatus} from "../../world/textureCache";
 import {alpineSky,useAlpineGeography} from "./assets";
 import {scenicSky} from "../scenery/lighting";
+import ScenicPreparation from "../scenery/ScenicPreparation";
 
 export default function AlpineEnvironment({onReady}:{onReady?:()=>void}){
+  return <ScenicPreparation><PreparedAlpineEnvironment onReady={onReady}/></ScenicPreparation>;
+}
+function PreparedAlpineEnvironment({onReady}:{onReady?:()=>void}){
   const {camera,gl,scene}=useThree(),hdr=useLoader(RGBELoader,alpineSky),backgroundSource=useTexture(scenicSky),sun=useRef<DirectionalLight>(null),sent=useRef(false),{active}=useProgress();
   const background=useMemo(()=>{const texture=backgroundSource.clone();texture.mapping=EquirectangularReflectionMapping;texture.colorSpace=SRGBColorSpace;texture.needsUpdate=true;return texture;},[backgroundSource]);
   useEffect(()=>()=>background.dispose(),[background]);
