@@ -1,0 +1,852 @@
+{
+  "sha": "8b8accea2fb8ed27617dc1c8a4d031c417c2630d",
+  "dirty": false,
+  "base": "http://127.0.0.1:5190",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "personal": false,
+  "quality": "medium",
+  "dpr": "per frame; see drawingBuffer",
+  "scope": "Only physical camera starting poses are staged through the existing dev return-view adapter. All playing, movement, wardrobe selection, pause and view controls are native. Personal captures remain local / ignored.",
+  "checks": [
+    "2560: wardrobe preview / six skins / original settings gate / ESC / no movement or shot while open",
+    "2560: native timed jump shot / exactly one release / recovery",
+    "2560: native 5 near rim / layup steps / physical score",
+    "2560: native Enter run-up + 5 / physical dunk score / landing",
+    "2560: cycling native mount / true cadence / coast / brake",
+    "2560: alpine-ride native mount / true cadence / coast / brake"
+  ],
+  "frames": [
+    {
+      "file": "2560-court-rest.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 108,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-front.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 110,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-训练.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 110,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-日常.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 113,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-林间.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 115,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-黑白街球.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 110,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-公路.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 110,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-wardrobe-冰蓝球场.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 110,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-jump-set.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0.8577857142899717,
+        "jump": 0.12932468287257384,
+        "held": true,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 108,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-jump-release.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": -0.06313078097849824,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 1,
+        "made": 0,
+        "result": "LATE RELEASE",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 108,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-jump-settled.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          0,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          0.003311203820591908,
+          0,
+          0,
+          0.9999945179496028
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 1,
+        "made": 0,
+        "result": "LATE RELEASE",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 107,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-layup-steps.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          -0.3254247355327578,
+          1.65,
+          -10.942598319810392
+        ],
+        "quaternion": [
+          0.24594097964463033,
+          -0.06604532764854455,
+          0.016799550398497842,
+          0.9668861485891938
+        ],
+        "charge": 0,
+        "jump": 0.6550969459740997,
+        "held": true,
+        "speed": 0,
+        "finishing": "layup",
+        "phase": "rise",
+        "elapsed": 0.6681000000089408,
+        "shots": 1,
+        "made": 0,
+        "result": "LAYUP · SOFT TOUCH",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 104,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-layup-rise.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          -0.3200967022887733,
+          1.65,
+          -11.244520203636181
+        ],
+        "quaternion": [
+          0.24594097964463033,
+          -0.06604532764854455,
+          0.016799550398497842,
+          0.9668861485891938
+        ],
+        "charge": 0,
+        "jump": -0.04637352120229724,
+        "held": false,
+        "speed": 0,
+        "finishing": "layup",
+        "phase": "land",
+        "elapsed": 1.3317999999970198,
+        "shots": 2,
+        "made": 1,
+        "result": "MADE · 1 IN A ROW",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 104,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-dunk-takeoff.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          -0.19941845299815186,
+          1.65,
+          -11.74594884966486
+        ],
+        "quaternion": [
+          0.14970337039873025,
+          -0.03836309842484589,
+          0.005813019697920267,
+          0.9879693225867379
+        ],
+        "charge": 0,
+        "jump": 0.7804212549373979,
+        "held": false,
+        "speed": 5.961801449644241,
+        "finishing": "dunk",
+        "phase": "release",
+        "elapsed": 0.8987000000029804,
+        "shots": 3,
+        "made": 2,
+        "result": "MADE · 2 IN A ROW",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 104,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-dunk-landed.png",
+      "width": 2560,
+      "state": {
+        "room": "basketball",
+        "body": [
+          -0.2,
+          1.65,
+          -11.87
+        ],
+        "quaternion": [
+          0.14970337039873025,
+          -0.03836309842484589,
+          0.005813019697920267,
+          0.9879693225867379
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 3,
+        "made": 2,
+        "result": "MADE · 2 IN A ROW",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 104,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-cycling-entry.png",
+      "width": 2560,
+      "state": {
+        "room": "cycling",
+        "body": [
+          0.2,
+          19.64268769980582,
+          7.5
+        ],
+        "quaternion": [
+          -0.038690894520345305,
+          -0.1361485653093061,
+          -0.005321358046847582,
+          0.9899183127884696
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 192,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-cycling-pedal.png",
+      "width": 2560,
+      "state": {
+        "room": "cycling",
+        "body": [
+          -0.01886514236710963,
+          19.554632255034324,
+          0.18730493161954587
+        ],
+        "quaternion": [
+          -0.017498592936602442,
+          -0.05008839333013617,
+          -0.0008783754667746948,
+          0.9985910977749521
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0.22147543947359424,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": true,
+          "speed": 0.1909304662372326,
+          "cadence": 53.02100605566767,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 173,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-cycling-stopped.png",
+      "width": 2560,
+      "state": {
+        "room": "cycling",
+        "body": [
+          -0.01547821371565112,
+          19.553107802975106,
+          0.15335008582593984
+        ],
+        "quaternion": [
+          -0.01750130966075846,
+          -0.050143154823600496,
+          -0.000878891752036733,
+          0.9985883014204517
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": true,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 173,
+        "dpr": 1,
+        "drawingBuffer": [
+          2560,
+          1440
+        ]
+      }
+    },
+    {
+      "file": "2560-alpine-ride-entry.png",
+      "width": 2560,
+      "state": {
+        "room": "alpine-ride",
+        "body": [
+          0.2,
+          930.3361072317466,
+          7.5
+        ],
+        "quaternion": [
+          -0.03869089452034561,
+          -0.13614856530930614,
+          -0.005321358046847628,
+          0.9899183127884696
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": false,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 125,
+        "dpr": 1.275775907699572,
+        "drawingBuffer": [
+          3265,
+          1837
+        ]
+      }
+    },
+    {
+      "file": "2560-alpine-ride-pedal.png",
+      "width": 2560,
+      "state": {
+        "room": "alpine-ride",
+        "body": [
+          0.11553325531729432,
+          930.1667622475893,
+          -0.1262541145492479
+        ],
+        "quaternion": [
+          -0.006271682055144658,
+          0.9318197493943737,
+          0.016123265791840848,
+          0.362508842572166
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0.26956630719798574,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": true,
+          "speed": 0.19199798028548232,
+          "cadence": 54.827096122490225,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 197,
+        "dpr": 1.275775907699572,
+        "drawingBuffer": [
+          3265,
+          1837
+        ]
+      }
+    },
+    {
+      "file": "2560-alpine-ride-stopped.png",
+      "width": 2560,
+      "state": {
+        "room": "alpine-ride",
+        "body": [
+          0.0879589070450619,
+          930.1654823623883,
+          -0.09634911229470916
+        ],
+        "quaternion": [
+          -0.006271201473386819,
+          0.9318445605713791,
+          0.01612345270468534,
+          0.3624450596138582
+        ],
+        "charge": 0,
+        "jump": 0,
+        "held": false,
+        "speed": 0,
+        "finishing": "idle",
+        "shots": 0,
+        "made": 0,
+        "result": "",
+        "ride": {
+          "mounted": true,
+          "speed": 0,
+          "cadence": 0,
+          "photo": false
+        },
+        "modelVisible": true,
+        "calls": 197,
+        "dpr": 1.275775907699572,
+        "drawingBuffer": [
+          3265,
+          1837
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

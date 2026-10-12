@@ -56,6 +56,13 @@ const additions: Record<string, string[]> = {
   "scripts/register-personal-media.mjs": ["media-avatar-import", "media-avatar-register"],
 };
 function withoutAdditions(file: string, source: string) {
+  // 仅撤销本轮明确要求的运动键位和像素配置，再继续所有入口 / 旧架构与固定摘要检查。
+  if(["src/world/Player.tsx","src/world/World.tsx"].includes(file)){
+    const sport=JSON.parse(readFileSync("tests/fixtures/sport-detail-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+    expect(sport.baseline).toBe("12671dfb211a3059c870dc7d00bf9d5ed6a8b3df");
+    expect(Object.keys(sport.files).every(name=>["src/world/Player.tsx","src/world/World.tsx"].includes(name))).toBe(true);
+    source=source.replace(/\r\n/g,"\n");for(const patch of sport.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
+  }
   // 本轮用户明确授权中庭美术与面板呈现：逐段撤销局部 diff 后，仍校验所有旧固定摘要。
   // 不把播放器、导航、素材库或其他房间加入白名单，也不重写任何原摘要。
   if (["src/rooms/Atrium.tsx", "src/ui/primitives.tsx", "src/world/artDirection.ts", "src/world/World.tsx"].includes(file)) {

@@ -1,0 +1,1000 @@
+{
+  "sha": "95ceb429734116deb4ec6294828f093b9f789cc7",
+  "dirty": false,
+  "checks": [
+    "Space neither charges nor shoots; original 2K maps and true 2400×1350 medium drawing buffer",
+    {
+      "name": "Actual Shift is ordinary pace, both Enter positions accelerate",
+      "speeds": {
+        "Shift": 2.683027285043922,
+        "Enter": 6.154441164844393,
+        "NumpadEnter": 6.1618355455357
+      }
+    },
+    {
+      "name": "Separated release / catch hand response and native X crossover",
+      "dribble": [
+        {
+          "phase": 0.08960644005982807,
+          "ball": 0.9415985919297927,
+          "wrist": 1.0165985919297926
+        },
+        {
+          "phase": 0.14299105544902843,
+          "ball": 0.8492817650721791,
+          "wrist": 0.9355707937520084
+        },
+        {
+          "phase": 0.18837567083364382,
+          "ball": 0.761509580613082,
+          "wrist": 0.9294398619645429
+        },
+        {
+          "phase": 0.22976028622742914,
+          "ball": 0.674031579879363,
+          "wrist": 0.9231706845080603
+        },
+        {
+          "phase": 0.2659141323812753,
+          "ball": 0.5918007961393861,
+          "wrist": 0.9175043774462927
+        },
+        {
+          "phase": 0.3002218246843827,
+          "ball": 0.5087593584550021,
+          "wrist": 0.9122414439086454
+        },
+        {
+          "phase": 0.33406797853053655,
+          "ball": 0.42205465714587986,
+          "wrist": 0.907400196096797
+        },
+        {
+          "phase": 0.37345259390598207,
+          "ball": 0.3151848770299863,
+          "wrist": 0.9024950368917642
+        },
+        {
+          "phase": 0.41006797851678173,
+          "ball": 0.21006247171956605,
+          "wrist": 0.8988860822078493
+        },
+        {
+          "phase": 0.44329874776130584,
+          "ball": 0.12940181169714515,
+          "wrist": 0.8965698444994585
+        },
+        {
+          "phase": 0.4797602862274293,
+          "ball": 0.23031705504101496,
+          "wrist": 0.8952018799149947
+        },
+        {
+          "phase": 0.5200679785167817,
+          "ball": 0.33546466728744084,
+          "wrist": 0.8951984730428638
+        },
+        {
+          "phase": 0.5674525939197369,
+          "ball": 0.4504620927923866,
+          "wrist": 0.8972118547410373
+        },
+        {
+          "phase": 0.6191449016028746,
+          "ball": 0.5653001944369636,
+          "wrist": 0.9016841004202347
+        },
+        {
+          "phase": 0.6649910554444435,
+          "ball": 0.6578835390437576,
+          "wrist": 0.9072727552773342
+        },
+        {
+          "phase": 0.6988372092905972,
+          "ball": 0.7206439212304271,
+          "wrist": 0.9121010716951018
+        },
+        {
+          "phase": 0.7311449015982895,
+          "ball": 0.7761223437722479,
+          "wrist": 0.91704517131867
+        },
+        {
+          "phase": 0.7703756708290587,
+          "ball": 0.8376728959658876,
+          "wrist": 0.9231918669785218
+        },
+        {
+          "phase": 0.8096064400598278,
+          "ball": 0.8928444956595272,
+          "wrist": 0.9678444956595271
+        },
+        {
+          "phase": 0.8534525939059818,
+          "ball": 0.9469580767877129,
+          "wrist": 1.021958076787713
+        },
+        {
+          "phase": 0.906683363150506,
+          "ball": 1.0019449727121665,
+          "wrist": 1.0769449727121665
+        },
+        {
+          "phase": 0.9511449015982895,
+          "ball": 1.0388719229855998,
+          "wrist": 1.1138719229855998
+        },
+        {
+          "phase": 0.9806833631413361,
+          "ball": 1.0588748409695177,
+          "wrist": 1.1338748409695176
+        },
+        {
+          "phase": 0.015298747756720549,
+          "ball": 1.0504335753723508,
+          "wrist": 1.1254335753723508
+        }
+      ]
+    },
+    "Native 5 shot rises above the face and produces exactly one physical release",
+    {
+      "name": "cycling standing maintains both soles / wrists across actual pedal phases",
+      "contacts": [
+        {
+          "leftWristError": 4.712153615694547e-8,
+          "leftSoleError": 2.7213218598901964e-8,
+          "rightWristError": 3.390056998405457e-8,
+          "rightSoleError": 2.0759090482121575e-8
+        },
+        {
+          "leftWristError": 4.887973851155457e-8,
+          "leftSoleError": 4.153935228403477e-8,
+          "rightWristError": 3.3696886916569684e-8,
+          "rightSoleError": 1.0358607631190522e-8
+        },
+        {
+          "leftWristError": 4.921994915230414e-8,
+          "leftSoleError": 4.3093847853516875e-8,
+          "rightWristError": 3.343496952591121e-8,
+          "rightSoleError": 9.767080348317249e-9
+        },
+        {
+          "leftWristError": 4.72513110410941e-8,
+          "leftSoleError": 3.212403186216385e-8,
+          "rightWristError": 3.3903496116349215e-8,
+          "rightSoleError": 2.030695546703867e-8
+        },
+        {
+          "leftWristError": 4.6505677086327e-8,
+          "leftSoleError": 2.4184287557973612e-8,
+          "rightWristError": 3.382805849874446e-8,
+          "rightSoleError": 2.1196992375800396e-8
+        },
+        {
+          "leftWristError": 4.739769036691532e-8,
+          "leftSoleError": 2.257790407935068e-8,
+          "rightWristError": 3.348299585228665e-8,
+          "rightSoleError": 2.1443994848643886e-8
+        },
+        {
+          "leftWristError": 4.816097362028194e-8,
+          "leftSoleError": 4.0325891070111824e-8,
+          "rightWristError": 3.375995572166889e-8,
+          "rightSoleError": 1.5728139424847035e-8
+        },
+        {
+          "leftWristError": 4.928271615521178e-8,
+          "leftSoleError": 4.21731661235895e-8,
+          "rightWristError": 3.3470704636779286e-8,
+          "rightSoleError": 6.874053778038356e-9
+        },
+        {
+          "leftWristError": 4.815478257763383e-8,
+          "leftSoleError": 4.0551439185407824e-8,
+          "rightWristError": 3.359626301291815e-8,
+          "rightSoleError": 1.6190917095658573e-8
+        },
+        {
+          "leftWristError": 4.6911463256919335e-8,
+          "leftSoleError": 2.2727829647333014e-8,
+          "rightWristError": 3.371287070670517e-8,
+          "rightSoleError": 2.294060581673439e-8
+        }
+      ]
+    },
+    "cycling native corner / brake / low-motion camera / standing Cinema return / seated return / dismount / Palace return",
+    {
+      "name": "alpine-ride standing maintains both soles / wrists across actual pedal phases",
+      "contacts": [
+        {
+          "leftWristError": 4.389333357817361e-8,
+          "leftSoleError": 2.2684619717225914e-8,
+          "rightWristError": 6.266758419134075e-8,
+          "rightSoleError": 1.1515078402866483e-8
+        },
+        {
+          "leftWristError": 4.4248298832132376e-8,
+          "leftSoleError": 1.5423326295522433e-8,
+          "rightWristError": 5.969241502204165e-8,
+          "rightSoleError": 1.3938527159275824e-8
+        },
+        {
+          "leftWristError": 4.213075166425714e-8,
+          "leftSoleError": 4.579202868924949e-8,
+          "rightWristError": 5.8749560927384344e-8,
+          "rightSoleError": 1.061002828600605e-8
+        },
+        {
+          "leftWristError": 4.066313984035761e-8,
+          "leftSoleError": 5.140123773451152e-8,
+          "rightWristError": 5.794245572584661e-8,
+          "rightSoleError": 6.152705714489315e-9
+        },
+        {
+          "leftWristError": 4.182346522834304e-8,
+          "leftSoleError": 5.297306839942599e-8,
+          "rightWristError": 5.819295279612544e-8,
+          "rightSoleError": 8.473333245301811e-9
+        },
+        {
+          "leftWristError": 4.3320823220692066e-8,
+          "leftSoleError": 3.735730742651092e-8,
+          "rightWristError": 6.233645114698312e-8,
+          "rightSoleError": 1.3047575335673576e-8
+        },
+        {
+          "leftWristError": 4.434339859727064e-8,
+          "leftSoleError": 7.491357099779252e-9,
+          "rightWristError": 6.24030598909782e-8,
+          "rightSoleError": 1.281392185175932e-8
+        },
+        {
+          "leftWristError": 4.347228360602676e-8,
+          "leftSoleError": 3.1473424154657684e-8,
+          "rightWristError": 5.923167591618865e-8,
+          "rightSoleError": 1.3866691054548859e-8
+        },
+        {
+          "leftWristError": 4.1262712776484266e-8,
+          "leftSoleError": 4.968033143614502e-8,
+          "rightWristError": 5.8406141197496904e-8,
+          "rightSoleError": 6.6823882259147195e-9
+        },
+        {
+          "leftWristError": 4.075196130506028e-8,
+          "leftSoleError": 5.156811455887669e-8,
+          "rightWristError": 5.773696888285583e-8,
+          "rightSoleError": 7.152501091501169e-9
+        }
+      ]
+    },
+    "alpine-ride native corner / brake / low-motion camera / standing Cinema return / seated return / dismount / Palace return"
+  ],
+  "poses": [
+    {
+      "name": "01-dribble",
+      "room": "basketball",
+      "speed": 0,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        0,
+        1.65,
+        3
+      ],
+      "hand": 1,
+      "dribbling": true,
+      "ball": [
+        0.31,
+        0.7220151123028505,
+        2.6
+      ],
+      "palm": [
+        0.31,
+        0.9122158042678069,
+        2.6
+      ],
+      "contacts": {},
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "02-crossover",
+      "room": "basketball",
+      "speed": 0,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        0,
+        1.65,
+        3
+      ],
+      "hand": -1,
+      "dribbling": true,
+      "ball": [
+        -0.3099999979310732,
+        0.8809135022573259,
+        2.6
+      ],
+      "palm": [
+        -0.3099999979310732,
+        0.9559135022573259,
+        2.6
+      ],
+      "contacts": {},
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "03-shot-set",
+      "room": "basketball",
+      "speed": 0,
+      "charge": 1,
+      "shots": 0,
+      "body": [
+        0,
+        1.65,
+        3
+      ],
+      "hand": -1,
+      "dribbling": false,
+      "ball": [
+        -0.13,
+        2.0300000000000002,
+        2.73
+      ],
+      "palm": [
+        -0.3099999984436707,
+        0.9335088848832841,
+        2.6
+      ],
+      "contacts": {},
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "04-shot-release",
+      "room": "basketball",
+      "speed": 0,
+      "charge": 0,
+      "shots": 1,
+      "body": [
+        0,
+        1.65,
+        3
+      ],
+      "hand": -1,
+      "dribbling": false,
+      "ball": [
+        1.269556724422392,
+        7.616427673685298,
+        -6.425124183647501
+      ],
+      "palm": [
+        -0.3099999984436707,
+        0.9335088848832841,
+        2.6
+      ],
+      "contacts": {},
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "cycling-seated",
+      "room": "cycling",
+      "speed": 1.0612070230521062,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        0.04911458957024162,
+        19.555044602260477,
+        -0.48691621739894697
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0,
+      "phase": 7.713590004263885,
+      "cadence": 70.72450698068654,
+      "distance": 0.719359153401178,
+      "lean": 0.000363474737919934,
+      "rock": 0,
+      "roll": -0.00005815595806718944,
+      "contacts": {
+        "leftWristError": 4.0757327281060686e-8,
+        "leftSoleError": 2.794166051523922e-8,
+        "rightWristError": 4.121233052622036e-8,
+        "rightSoleError": 1.9661921620718246e-8
+      },
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "cycling-standing",
+      "room": "cycling",
+      "speed": 2.4103805013353545,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        0.3705327394347495,
+        19.627889812651947,
+        -3.447495161713616
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.99976607265914,
+      "phase": 20.582323744248153,
+      "cadence": 71.99247858164412,
+      "distance": 3.697363346434114,
+      "lean": 0.0019075719949492346,
+      "rock": 0.020987190507688276,
+      "roll": -0.00030521151919187754,
+      "contacts": {
+        "leftWristError": 4.674617712608743e-8,
+        "leftSoleError": 2.579641346968572e-8,
+        "rightWristError": 3.374847999618529e-8,
+        "rightSoleError": 2.0233614320907763e-8
+      },
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "cycling-corner",
+      "room": "cycling",
+      "speed": 4.738757182102573,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        2.8728523059823243,
+        19.590546869242033,
+        -17.64666684623625
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.9999999999992544,
+      "phase": 50.08388044565667,
+      "cadence": 71.9999999376187,
+      "distance": 18.11209001278545,
+      "lean": 0.1820591928602598,
+      "rock": -0.003841970950799931,
+      "roll": -0.029129470857641566,
+      "contacts": {
+        "leftWristError": 3.914346556740281e-8,
+        "leftSoleError": 3.9316828224809736e-8,
+        "rightWristError": 3.214410007986058e-8,
+        "rightSoleError": 2.1460413180231648e-8
+      },
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "cycling-bike-detail",
+      "room": "cycling",
+      "speed": 0,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        3.6895848256864197,
+        19.575636422589856,
+        -22.08492238425102
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.9999999999999998,
+      "phase": 53.14987231887027,
+      "cadence": 0,
+      "distance": 22.622876007606155,
+      "lean": 1.8592615497089387e-10,
+      "rock": 0,
+      "roll": 0,
+      "contacts": {
+        "leftWristError": 4.6949287336559517e-8,
+        "leftSoleError": 2.792028223490132e-8,
+        "rightWristError": 3.3491855429091476e-8,
+        "rightSoleError": 2.0754766175579866e-8
+      },
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "cycling-returned-seated",
+      "room": "cycling",
+      "speed": 0,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        3.6895848256864197,
+        19.5006390283994,
+        -22.08492238425102
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.00003474412725818511,
+      "phase": 53.14987231887027,
+      "cadence": 0,
+      "distance": 22.622876007606155,
+      "lean": 0,
+      "rock": 0,
+      "roll": 0,
+      "contacts": {
+        "leftWristError": 5.780147880783437e-8,
+        "leftSoleError": 4.183665099819651e-8,
+        "rightWristError": 3.5287580282260644e-8,
+        "rightSoleError": 1.8346798898279033e-8
+      },
+      "dpr": 1.25,
+      "drawing": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "alpine-ride-seated",
+      "room": "alpine-ride",
+      "speed": 1.8442662022979717,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        -1075.5489678733438,
+        894.1954545867288,
+        -238.7446847157425
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0,
+      "phase": 6.6668964204229155,
+      "cadence": 70.03269198379492,
+      "distance": 1221.1043740208577,
+      "lean": -0.0000934662251958427,
+      "rock": 0,
+      "roll": 0.000014954596031334833,
+      "contacts": {
+        "leftWristError": 3.715551707257873e-8,
+        "leftSoleError": 5.2638799186752274e-8,
+        "rightWristError": 4.166385042502175e-8,
+        "rightSoleError": 1.308429611371352e-8
+      },
+      "dpr": 1.5,
+      "drawing": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "alpine-ride-standing",
+      "room": "alpine-ride",
+      "speed": 4.193736975947595,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        -1080.0334343843965,
+        893.8744706243357,
+        -240.8947188464628
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.9996560450952662,
+      "phase": 18.81537736722021,
+      "cadence": 71.9848537234218,
+      "distance": 1226.0933630304892,
+      "lean": -0.00004812550776995808,
+      "rock": -0.0007265266164609707,
+      "roll": 0.000007700081243193294,
+      "contacts": {
+        "leftWristError": 4.249852589795466e-8,
+        "leftSoleError": 4.958878856647614e-8,
+        "rightWristError": 5.883370621131595e-8,
+        "rightSoleError": 1.0446251540809732e-8
+      },
+      "dpr": 1.5,
+      "drawing": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "alpine-ride-corner",
+      "room": "alpine-ride",
+      "speed": 7.377927519452585,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        -1094.18981115029,
+        892.5938113135264,
+        -248.35030134803748
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.9999999996698585,
+      "phase": 39.76373793460545,
+      "cadence": 74.6129936287948,
+      "distance": 1242.132282811355,
+      "lean": 0.251308086772932,
+      "rock": 0.019410929916562493,
+      "roll": -0.04020929388366912,
+      "contacts": {
+        "leftWristError": 4.0782895999499015e-8,
+        "leftSoleError": 1.258965997206035e-8,
+        "rightWristError": 6.443708399702649e-8,
+        "rightSoleError": 1.3518055278846884e-8
+      },
+      "dpr": 1.5,
+      "drawing": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "alpine-ride-bike-detail",
+      "room": "alpine-ride",
+      "speed": 0,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        -1105.5835326141346,
+        891.5720710817657,
+        -253.74384858645766
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.9999999999999997,
+      "phase": 43.9818134617352,
+      "cadence": 0,
+      "distance": 1254.7800478679062,
+      "lean": 5.5693417862889346e-11,
+      "rock": 0,
+      "roll": 0,
+      "contacts": {
+        "leftWristError": 3.487024888681058e-8,
+        "leftSoleError": 4.9272517112733384e-8,
+        "rightWristError": 6.168506512718814e-8,
+        "rightSoleError": 1.0651187518300225e-8
+      },
+      "dpr": 1.5,
+      "drawing": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "name": "alpine-ride-returned-seated",
+      "room": "alpine-ride",
+      "speed": 0,
+      "charge": 0,
+      "shots": 0,
+      "body": [
+        -1105.5835326141346,
+        891.4970845285957,
+        -253.74384858645766
+      ],
+      "hand": 1,
+      "dribbling": false,
+      "ball": [
+        0,
+        0,
+        0
+      ],
+      "palm": [
+        0,
+        0,
+        0
+      ],
+      "standing": 0.00017929106702463217,
+      "phase": 43.9818134617352,
+      "cadence": 0,
+      "distance": 1254.7800478679062,
+      "lean": 0,
+      "rock": 0,
+      "roll": 0,
+      "contacts": {
+        "leftWristError": 0.0026860932667824165,
+        "leftSoleError": 5.2274922982789874e-8,
+        "rightWristError": 2.4682586911287252e-8,
+        "rightSoleError": 1.4786892287849187e-8
+      },
+      "dpr": 1.5,
+      "drawing": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

@@ -34,6 +34,7 @@ if __name__ == '__main__':
         list(pool.map(lambda j: fetch(*j), jobs))
     for file in CACHE.glob('m026_*.tga'):
         image = Image.open(file).convert('RGB')
-        image.thumbnail((1024, 1024))
-        image.save(OUTPUT / (file.stem.replace('m026_', '').replace('_', '-') + '.webp'), quality=92)
+        # 保留授权源的完整 2K 像素；法线无损，颜色保留细节，不从旧 1K 人工放大。
+        image.thumbnail((2048, 2048))
+        image.save(OUTPUT / (file.stem.replace('m026_', '').replace('_', '-') + '.webp'), quality=96, lossless='normal' in file.stem)
     print('MIT sports avatar and walking/running sources ready', REVISION)

@@ -3,15 +3,20 @@ import { Vector3, type Quaternion } from "three";
 export type BikeStyle = "city" | "road";
 export function gripPoint(style: BikeStyle, side: number, steer: number, result: Vector3) {
   result.set(side * (style === "city" ? .265 : .21), style === "city" ? .285 : .09, style === "city" ? -.02 : -.28);
-  const x = result.x, z = result.z, angle = steer * .5;
+  const x = result.x, z = result.z, angle = steer;
   result.x = x * Math.cos(angle) + z * Math.sin(angle); result.z = z * Math.cos(angle) - x * Math.sin(angle);
   result.y += .90; result.z -= .39; return result;
 }
-export function riderPosture(style: BikeStyle, effort: number, brake: number, phase: number, comfort: boolean) {
+export function riderPosture(style: BikeStyle, effort: number, brake: number, phase: number, comfort: boolean, standing=0) {
   const active = Math.max(0, Math.min(1, effort)), braking = Math.max(0, Math.min(1, brake));
-  return { spine: (style === "city" ? -.38 : -1.11) - active * .025 + braking * .035,
-    spine1: style === "city" ? -.045 : -.085, head: (style === "city" ? .37 : 1.05) + active * .018,
-    hipShift: comfort ? 0 : Math.sin(phase) * .006 * active,
+  const stand=Math.max(0,Math.min(1,standing));
+  // 站姿的髋部离开鞍座并移至曲柄上方；节奏来自同一实际踏频，滑行不会凭空摇车。
+  return { spine: (style === "city" ? -.50-stand*.09 : -1.14+stand*.13) - active * .025 + braking * .035,
+    spine1: style === "city" ? -.045 : -.085, head: (style === "city" ? .49+stand*.09 : 1.08-stand*.13) + active * .018,
+    // 完整踏圈的最低点暴露左腿 2.9 cm 的不可达间隙；降低骨盆基准 1.5 cm，保留真实腿长。
+    hipBase:.05,hipRise:stand*.105+(comfort?0:stand*active*Math.sin(phase*2)*.006),hipForward:.21-stand*.19,
+    rock:comfort?0:Math.sin(phase)*.026*active*stand,
+    hipShift: comfort ? 0 : Math.sin(phase) * (.006+stand*.008) * active,
     ankle: comfort ? 0 : Math.sin(phase - .25) * .055 * active,
     eyeOffset: style === "city" ? .085 : 0 };
 }

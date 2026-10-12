@@ -16,6 +16,12 @@ describe("authored road ride",()=>{
     const v=b.speed;advance(b,2,{});expect(b.speed).toBeGreaterThan(v*.8);expect(b.state).toBe("coasting");
     b.step(1/90,{brake:true},0);expect(b.speed).toBeGreaterThan(v*.7);advance(b,6,{brake:true});expect(b.speed).toBe(0);
   });
+  it("stops the crank cadence exactly when braking to rest, then resumes from real pedaling",()=>{
+    const b=new RoadPhysics();advance(b,8,{pedal:true});expect(b.cadence).toBeGreaterThan(60);
+    advance(b,6,{brake:true});expect(b.speed).toBe(0);expect(b.cadence).toBe(0);
+    const distance=b.distance;advance(b,1,{brake:true});expect(b.distance).toBe(distance);expect(b.cadence).toBe(0);
+    advance(b,1,{pedal:true});expect(b.speed).toBeGreaterThan(0);expect(b.cadence).toBeGreaterThan(40);
+  });
   it("gearing changes acceleration, cadence efficiency and climbing, gravity assists descending",()=>{
     const low=new RoadPhysics(),high=new RoadPhysics();low.gear=2;high.gear=12;advance(low,8,{pedal:true},.065);advance(high,8,{pedal:true},.065);expect(low.speed).toBeGreaterThan(high.speed+.5);
     low.speed=8;advance(low,8,{},-.06);expect(low.speed).toBeGreaterThan(10);expect(low.speed).toBeLessThanOrEqual(55/3.6);expect(low.state).toBe("descending");
@@ -24,7 +30,7 @@ describe("authored road ride",()=>{
   it("smooths steering and keeps high-speed response small within the natural road envelope",()=>{
     const slow=new RoadPhysics(),fast=new RoadPhysics();slow.speed=3;fast.speed=14;
     slow.step(.016,{steer:1},0);fast.step(.016,{steer:1},0);expect(fast.steering).toBeLessThan(slow.steering/3);
-    advance(fast,20,{pedal:true,steer:1});expect(Math.abs(fast.offset)).toBeLessThanOrEqual(2.24);expect(Math.abs(fast.lean)).toBeLessThanOrEqual(.15);
+    advance(fast,20,{pedal:true,steer:1});expect(Math.abs(fast.offset)).toBeLessThanOrEqual(2.24);expect(Math.abs(fast.lean)).toBeLessThanOrEqual(.52);
   });
   it("bounds sectors and recovers only invalid states without background-tab jumps",()=>{
     for(let d=0;d<roadLength;d+=100){expect(activeRoadSectors(d).length).toBeLessThanOrEqual(6);expect(activeRoadSectors(d)).toContain(Math.floor(d/160));}

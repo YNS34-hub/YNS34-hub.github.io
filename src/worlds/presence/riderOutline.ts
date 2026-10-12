@@ -1,6 +1,6 @@
 import { BackSide, Color, ShaderMaterial, SkinnedMesh, UniformsLib, UniformsUtils, Vector2, type WebGLRenderer } from "three";
 
-export function createRiderOutline() {
+export function createRiderOutline(pixels=1.1) {
   const resolution=new Vector2(1,1), shells:{source:SkinnedMesh;shell:SkinnedMesh}[]=[];
   const material=new ShaderMaterial({side:BackSide,depthWrite:true,fog:true,toneMapped:false,
     uniforms:UniformsUtils.merge([UniformsLib.fog,{resolution:{value:resolution},pixels:{value:1.1},ink:{value:new Color("#17262c")}}]),
@@ -46,7 +46,7 @@ export function createRiderOutline() {
     activate(){released=false;for(const {source,shell} of shells)if(shell.parent!==source)source.add(shell);},
     update(renderer:WebGLRenderer,visible:boolean){
       renderer.getDrawingBufferSize(material.uniforms.resolution.value);
-      material.uniforms.pixels.value=1.1*renderer.getPixelRatio();
+      material.uniforms.pixels.value=pixels*renderer.getPixelRatio();
       for(const {shell} of shells)shell.visible=visible;
     },
     dispose(){if(released)return;released=true;for(const {shell} of shells)shell.removeFromParent();material.dispose();},

@@ -8,6 +8,7 @@ import {roadTravel} from "./road/state";
 import {isRideScene} from "./road/maps";
 import { useCourtTime } from "./court/state";
 import PerspectiveControls from "./presence/Controls";
+import {isPrimaryShotKey} from "./court/controls";
 
 export default function ActivityHud() {
   const room = usePalaceStore(s => s.roomId), blocked = usePalaceStore(s => !!s.overlay || !!s.focus || s.mode === "index" || !s.started);
@@ -35,16 +36,16 @@ export default function ActivityHud() {
     {a.mode === "held" && <div className="release-meter" aria-label="Shot release" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(a.charge * 100)}><span className="release-zone" /><i style={{ width: a.charge * 100 + "%" }} /></div>}
     <div className="activity-actions">
       <button onClick={() => courtCommand(a.mode === "held" ? "dribble" : "pickup")}>{a.mode === "held" ? a.dribbling ? "E · Hold ball" : "E · Dribble" : "E · Pick up nearby ball"}</button>
-      {a.mode === "held" && <button onPointerDown={event => { event.currentTarget.setPointerCapture(event.pointerId); courtCommand("charge"); }} onPointerUp={() => courtCommand("release")} onPointerCancel={() => courtCommand("cancel")} onBlur={() => courtCommand("cancel")} onKeyDown={event => { if (event.code === "Space" && !event.repeat) { event.preventDefault(); courtCommand("charge"); } }} onKeyUp={event => { if (event.code === "Space") { event.preventDefault(); courtCommand("release"); } }}>Hold / release · Shoot</button>}
+      {a.mode === "held" && <button onPointerDown={event => { event.currentTarget.setPointerCapture(event.pointerId); courtCommand("charge"); }} onPointerUp={() => courtCommand("release")} onPointerCancel={() => courtCommand("cancel")} onBlur={() => courtCommand("cancel")} onKeyDown={event => { if (isPrimaryShotKey(event.code) && !event.repeat) { event.preventDefault(); courtCommand("charge"); } }} onKeyUp={event => { if (isPrimaryShotKey(event.code)) { event.preventDefault(); courtCommand("release"); } }}>Hold / release · Shoot</button>}
       <button onClick={() => courtCommand("recall")}>R · Recall ball</button>
       <button aria-pressed={a.assist} onClick={() => useActivity.setState({ assist: !a.assist })}>Arc assist {a.assist ? "on" : "off"}</button>
-      {a.mode === "held" && <><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("layup")}>F · Layup</button><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("dunk")}>G · Dunk</button></>}
+      {a.mode === "held" && <><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("layup")}>5 · Layup</button><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("dunk")}>Enter + 5 · Dunk</button></>}
     </div>
     <PerspectiveControls roomId="basketball" />
     <div className="court-time" role="group" aria-label="Court lighting">
       <button aria-pressed={courtTime.time === "day"} onClick={() => courtTime.setTime("day")}>Daylight</button>
       <button aria-pressed={courtTime.time === "night"} onClick={() => courtTime.setTime("night")}>Night lights</button>
     </div>
-    <small>WASD 移动 · Enter / Shift 加速运球 · V 切换视角<br />长按 5 / 小键盘 5，松开投篮 · 近篮 5 上篮 · 助跑 Enter + 5 扣篮<br />Space / 锁定视角点击投篮、F 上篮、G 扣篮仍可用</small>
+    <small>WASD 移动 · Enter 加速运球 · V 切换视角<br />长按 5 / 小键盘 5，松开投篮 · 近篮 5 上篮 · 助跑 Enter + 5 扣篮<br />E 拾球 / 运球 · X 换手 · R 找回球</small>
   </aside>;
 }
