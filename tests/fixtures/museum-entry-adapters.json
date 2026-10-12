@@ -1,0 +1,16 @@
+{
+  "baseline": "4dfaab7044b71286afa6a15cb959949cfdf6271c",
+  "scope": "Only the user-authorized atrium visual insertions and existing Dialog presentation wrapper; all original data, audio, movement, URLs and privacy checks remain.",
+  "files": {
+    "src/ui/primitives.tsx": [
+      {
+        "before": "import { X, ArrowUpRight } from \"lucide-react\";\nimport { useEffect, useRef, type ReactNode } from \"react\";\nexport function PalaceMark() {\n  return (\n    <span className=\"brand-symbol\" aria-hidden=\"true\">\n",
+        "after": "import { X, ArrowUpRight } from \"lucide-react\";\nimport { useEffect, useRef, type ReactNode } from \"react\";\nimport { MuseumPanel } from \"../design-system/components\";\nexport function PalaceMark() {\n  return (\n    <span className=\"brand-symbol\" aria-hidden=\"true\">\n"
+      },
+      {
+        "before": "        if (e.target === e.currentTarget) onClose();\n      }}\n    >\n      <div\n        ref={ref}\n        role=\"dialog\"\n        aria-modal=\"true\"\n        aria-label={label}\n        className={`panel ${className}`}\n      >\n        <CloseButton onClick={onClose} />\n        {children}\n      </div>\n    </div>\n  );\n}\n",
+        "after": "        if (e.target === e.currentTarget) onClose();\n      }}\n    >\n      <MuseumPanel\n        ref={ref}\n        role=\"dialog\"\n        aria-modal=\"true\"\n        aria-label={label}\n        className={className}\n      >\n        <CloseButton onClick={onClose} />\n        {children}\n      </MuseumPanel>\n    </div>\n  );\n}\n"
+      }
+    ]
+  }
+}

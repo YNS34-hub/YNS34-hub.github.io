@@ -56,6 +56,15 @@ const additions: Record<string, string[]> = {
   "scripts/register-personal-media.mjs": ["media-avatar-import", "media-avatar-register"],
 };
 function withoutAdditions(file: string, source: string) {
+  // 本轮用户明确授权中庭美术与面板呈现：逐段撤销局部 diff 后，仍校验所有旧固定摘要。
+  // 不把播放器、导航、素材库或其他房间加入白名单，也不重写任何原摘要。
+  if (["src/rooms/Atrium.tsx", "src/ui/primitives.tsx"].includes(file)) {
+    const entry = JSON.parse(readFileSync("tests/fixtures/museum-entry-adapters.json", "utf8")) as { baseline: string; files: Record<string, { before: string; after: string }[]> };
+    expect(entry.baseline).toBe("4dfaab7044b71286afa6a15cb959949cfdf6271c");
+    expect(Object.keys(entry.files).every(name => ["src/rooms/Atrium.tsx", "src/ui/primitives.tsx"].includes(name))).toBe(true);
+    source = source.replace(/\r\n/g, "\n");
+    for (const patch of entry.files[file] ?? []) { expect(source.split(patch.after)).toHaveLength(2); source = source.replace(patch.after, patch.before); }
+  }
   if(file==="src/world/World.tsx"){
     // 仅撤销用户本轮授权的高山 DPR 配置；随后继续原 6380557 插入点和固定摘要保护。
     const fixture=JSON.parse(readFileSync("tests/fixtures/alpine-clarity-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};

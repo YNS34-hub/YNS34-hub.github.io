@@ -1,0 +1,48 @@
+.museum-navigation { --navigation-ink: #263746; }
+.museum-navigation[data-tone="light"] { --navigation-ink: #e9f2f8; }
+.hud .museum-navigation { left: 4.5vw; right: 4.5vw; top: 5.2vh; align-items: center; }
+.museum-navigation .wordmark { font-size: 12px; font-weight: 500; letter-spacing: .19em; line-height: 1.2; gap: 18px; }
+.museum-navigation .wordmark small { font-weight: 400; letter-spacing: .19em; font-size: 8px; margin-top: 8px; }
+.museum-navigation .brand-symbol { opacity: .82; }
+.museum-navigation .hud-header-actions { color: var(--navigation-ink); background: transparent; backdrop-filter: none; padding: 0; gap: 32px; }
+.museum-navigation .guide-button, .museum-navigation .sound-button { font-size: 10px; font-weight: 400; letter-spacing: .16em; min-height: 36px; opacity: .74; }
+.museum-navigation .guide-button small { font-family: var(--type-ui); font-size: 10px; font-weight: 400; padding: 7px 9px; border-color: currentColor; border-radius: 3px; opacity: .7; margin-left: 14px; }
+.palace-app .welcome-caption { left: 8vw; top: 32%; bottom: auto; max-width: 42vw; }
+.palace-app .welcome-caption .museum-title { color: #f2f5f8; font-family: var(--type-display); font-size: clamp(76px,8.3vw,168px); font-weight: 300; font-style: italic; letter-spacing: -.035em; line-height: .85; margin: 0; }
+.palace-app .welcome-caption .museum-title span { display: block; letter-spacing: inherit; white-space: nowrap; }
+.palace-app .welcome-caption .museum-label { font-family: var(--type-metadata); color: #e9f2f8; margin: 32px 0 0; letter-spacing: .35em; font-size: 9px; font-weight: 400; opacity: .6; }
+.welcome-caption .museum-label::before { content: ""; display: inline-block; width: 30px; height: 1px; background: currentColor; margin-right: 20px; vertical-align: middle; }
+.palace-app .welcome-actions { margin-top: 28px; gap: 20px 26px; }
+.museum-glass-button { display: inline-flex; align-items: center; justify-content: space-between; gap: 28px; border-radius: 999px; border: 1px solid rgba(238,245,255,.4); background: rgba(239,247,255,.07); color: #edf4f9; min-height: 48px; padding: 0 32px; font-size: 11px; font-weight: 400; letter-spacing: .15em; backdrop-filter: blur(12px); }
+.museum-glass-button.enter-button { min-width: 290px; }
+.museum-glass-button:hover { background: rgba(239,247,255,.12); border-color: rgba(238,245,255,.7); }
+.museum-glass-button:disabled { cursor: progress; opacity: .5; }
+.palace-app .enter-button:hover { color: #fff; background: rgba(239,247,255,.12); }
+.palace-app .index-entry, .palace-app .continue-button { color: #d6e4ee; font-weight: 400; font-size: 9px; opacity: .7; letter-spacing: .16em; }
+.palace-app .welcome-location { left: 4.5vw; right: 4.5vw; bottom: 4vh; color: #9bb4c6; font-size: 8px; opacity: .7; }
+.palace-app .museum-panel { background: rgba(237,244,248,.92); border: 1px solid rgba(255,255,255,.45); box-shadow: 0 20px 90px rgba(5,14,24,.14); backdrop-filter: blur(14px); color: var(--museum-ink); border-radius: 3px; }
+.dialog-backdrop { background: rgba(7,17,28,.22); }
+.palace-app .primary-button, .palace-app .import-primary { border-radius: 999px; font-weight: 400; }
+.palace-app .real-loading { background: #101c2a; color: #c4dcea; }
+button:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 5px; }
+@media (max-width: 800px) {
+  .hud .museum-navigation { left: 24px; right: 24px; top: 26px; }
+  .museum-navigation .wordmark { font-size: 10px; gap: 12px; letter-spacing: .11em; }
+  .museum-navigation .wordmark small { font-size: 6px; letter-spacing: .12em; }
+  .museum-navigation .hud-header-actions { gap: 16px; }
+  .museum-navigation .hud-header-actions button > span, .museum-navigation .guide-button small { display: none; }
+  .museum-navigation .hud-header-actions svg { width: 18px; height: 18px; }
+  .palace-app .welcome-caption { left: 7vw; top: 34%; max-width: 90vw; }
+  .palace-app .welcome-caption .museum-title { font-size: clamp(65px,12vw,92px); }
+  .palace-app .welcome-caption .museum-label { margin-top: 26px; font-size: 8px; }
+  .palace-app .welcome-actions { margin-top: 22px; gap: 18px; }
+  .museum-glass-button.enter-button { min-width: 245px; font-size: 10px; padding: 0 26px; }
+  .palace-app .welcome-location { left: 24px; bottom: 24px; }
+  .palace-app .museum-panel { backdrop-filter: blur(8px); }
+}
+@media (max-height: 650px) and (min-width: 801px) {
+  .palace-app .welcome-caption { top: 25%; }
+  .palace-app .welcome-caption .museum-title { font-size: min(7vw,95px); }
+  .palace-app .welcome-caption .museum-label { margin-top: 20px; }
+  .palace-app .welcome-actions { margin-top: 20px; }
+}

@@ -16,6 +16,8 @@ export function useQuietMotion() {
 const cues = {
   identity: { duration: motionTime.copy, frames: [{ opacity: 0.82 }, { opacity: 1 }] },
   hero: { duration: motionTime.hero, frames: [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }] },
+  // 展览标题只在入馆时作两秒显影；仍沿用原取消、后台与减少动态的门控。
+  exhibition: { duration: 2000, frames: [{ opacity: 0, filter: "blur(8px)", transform: "translateY(24px)" }, { opacity: 1, filter: "blur(0)", transform: "none" }] },
   copy: { duration: motionTime.copy, frames: [{ opacity: 0.55, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }] },
   threshold: { duration: motionTime.threshold, frames: [{ opacity: 0.45, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }] },
 } satisfies Record<string, { duration: number; frames: Keyframe[] }>;
