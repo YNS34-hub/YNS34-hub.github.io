@@ -25,7 +25,7 @@ try{
   // 每秒只读取诊断；切换骑姿用真实 C 键，路线与动力全部由现有控制器推进。
   while(Date.now()-started<600000){
    await page.waitForTimeout(1000);const value=await page.evaluate(()=>{const d=window.__ROAD_DEBUG__,a=window.__PALACE_DEBUG__.scene.getObjectByName('visitor-athlete');return{distance:d.model.distance,speed:d.model.speed,cadence:d.model.cadence,ended:d.model.ended,recovered:d.model.recovered,standing:d.view.standing,phase:d.view.pedalAngle,sectors:document.querySelector('.road-status').dataset.sectors.split(','),contacts:{...a.userData}};});
-   assert.ok(Number.isFinite(value.distance)&&Number.isFinite(value.phase));assert.equal(value.recovered,false);assert.ok(value.sectors.length<=6);
+   route.lastSample=value;assert.ok(Number.isFinite(value.distance)&&Number.isFinite(value.phase));assert.equal(value.recovered,false);assert.ok(value.sectors.length<=6);
    for(const sector of value.sectors)if(!route.sectors.includes(sector))route.sectors.push(sector);
    for(const [key,error]of Object.entries(value.contacts)){route.contactMax[key]=Math.max(route.contactMax[key]||0,error);assert.ok(error<.025,room+' '+key+' must stay within 2.5 cm');}
    if(Date.now()-lastPrint>30000||value.ended){lastPrint=Date.now();route.seconds=(Date.now()-started)/1000;route.samples.push({seconds:route.seconds,...value});await page.screenshot({path:path.join(out,room+'-'+route.samples.length+'.png')});await flush();console.log(room+': '+value.distance.toFixed(0)+' m / '+(value.speed*3.6).toFixed(0)+' km/h / '+(value.standing>.5?'standing':'seated'));}

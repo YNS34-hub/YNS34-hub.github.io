@@ -115,7 +115,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       root.current.rotation.set(Math.atan2(rig.tangent.y, normal)*e,yaw,-(roadView.lean+roadView.rock)*e,"YXZ");
       rig.effort += (Math.min(1, roadView.cadence / 88) - rig.effort) * (1 - Math.exp(-dt * 5));
       const posture = riderPosture(outfit.bike, rig.effort, roadView.brake, roadView.pedalAngle, palace.reducedMotion || ride.comfort,roadView.standing);
-      rig.object.position.set(posture.hipShift, .065+posture.hipRise, posture.hipForward); rig.object.rotation.y = Math.PI;
+      rig.object.position.set(posture.hipShift, posture.hipBase+posture.hipRise, posture.hipForward); rig.object.rotation.y = Math.PI;
       // 躯干前倾、手握刹车罩，脚踝追随同一真实曲柄相位；不用独立的假踏频。
       root.current.updateWorldMatrix(true, true);
       for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.getWorldPosition(hip.position);thigh.getWorldQuaternion(hip.quaternion);}
