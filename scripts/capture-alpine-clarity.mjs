@@ -50,7 +50,7 @@ for(const width of(process.env.PALACE_CAPTURE_WIDTH?[Number(process.env.PALACE_C
   await page.waitForFunction(()=>window.__ROAD_DEBUG__.view.mountProgress===1&&window.__ROAD_DEBUG__.model.speed===0);
   if(name.includes('rider'))await page.getByRole('button',{name:'Third person · V',exact:true}).click();
   await page.evaluate(({yaw,pitch})=>{const v=window.__ROAD_DEBUG__.view,c=window.__PALACE_DEBUG__.camera;if(yaw==='lake'){const x=520-c.position.x,z=-452-c.position.z;v.headYaw=Math.atan2(Math.sin(Math.atan2(-x,-z)-v.yaw),Math.cos(Math.atan2(-x,-z)-v.yaw));}else v.headYaw=yaw;v.headPitch=pitch;}, {yaw,pitch});
-  
+
   if(name.includes('rider-side')){await page.mouse.move(width*.55,400);await page.mouse.down();await page.mouse.move(width*.55-470,410,{steps:24});await page.mouse.up();}
   await page.waitForTimeout(900);await page.bringToFront();
   await page.waitForFunction(()=>!document.hidden&&document.hasFocus());
@@ -65,8 +65,3 @@ for(const width of(process.env.PALACE_CAPTURE_WIDTH?[Number(process.env.PALACE_C
 }
 assert.deepEqual(report.errors,[]);assert.deepEqual(report.uploads,[]);report.passed=true;
 }catch(e){report.failure=e.stack;process.exitCode=1;console.error(e.stack);}finally{await flush();await browser.close();}
-
-
-
-
-

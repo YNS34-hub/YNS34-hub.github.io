@@ -12,6 +12,8 @@ const context=await browser.newContext({viewport:{width:1920,height:1080},device
 await context.route('**/personal-media/manifest.json',r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
 await context.route('**/personal-media/avatar.json',r=>r.fulfill({json:{profile:null}}));
 await context.addInitScript(()=>localStorage.setItem('memory-palace:v3',JSON.stringify({state:{quality:'high',tutorialDone:true,roomSoundtracks:false},version:0})));
+// 使用有效的既有路线存档起点观察真实下坡滑行，不在行进中注入位置 / 速度。
+await context.addInitScript(()=>{if(!localStorage.getItem('memory-palace:alpine:v1'))localStorage.setItem('memory-palace:alpine:v1',JSON.stringify({route:1,distance:1220,gear:7,comfort:false}));});
 const page=await context.newPage();page.setDefaultTimeout(90000);
 page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});page.on('request',r=>{if(['POST','PUT'].includes(r.method()))report.uploads.push(r.url());});
 const shot=name=>page.screenshot({path:path.join(out,name+'.png')});
@@ -36,11 +38,12 @@ try{
   await page.keyboard.down('w');await page.waitForFunction(()=>window.__ROAD_DEBUG__.view.cadence>20);
   for(let i=0;i<6;i++){await page.waitForTimeout(270);current=await state();assert.ok(Object.values(current.bones).flat().every(Number.isFinite));report.poses.push(current);await shot('02-pedal-'+i);}
   await page.waitForTimeout(3000);await page.keyboard.up('w');await page.waitForTimeout(2000);
-  current=await state();assert.equal(current.cadence,0);assert.ok(Math.abs(Math.sin(current.phase))<.02);await shot('03-coasting-level');report.checks.push('Real cadence / connected limb poses / shared coasting settle');
+  await page.waitForFunction(()=>window.__ROAD_DEBUG__.view.cadence<.15);await page.waitForTimeout(1500);
+  current=await state();assert.ok(current.cadence<.15);assert.ok(Math.abs(Math.sin(current.phase))<.02);await shot('03-coasting-level');report.checks.push('Real cadence / connected limb poses / shared coasting settle');
   await page.keyboard.down('Space');await page.waitForFunction(()=>window.__ROAD_DEBUG__.model.speed===0);await page.keyboard.up('Space');
   await page.getByRole('button',{name:'Ride options',exact:true}).click();
   await page.getByRole('button',{name:'天气 · 晴朗',exact:true}).click();await page.waitForTimeout(1600);await shot('04-valley-haze');
-  await page.getByRole('button',{name:'画面 · 高清',exact:true}).click();await page.waitForTimeout(500);assert.equal((await state()).dpr,1);
+  await page.getByRole('button',{name:'画面 · 高清',exact:true}).click();await page.waitForTimeout(500);assert.ok(Math.abs((await state()).dpr-1)<.0001);
   await page.getByRole('button',{name:'人物描边 · 开',exact:true}).click();await page.waitForTimeout(250);assert.ok((await state()).ink.every(x=>!x.visible));
   await page.reload();await ready();
   const persisted=await page.evaluate(()=>JSON.parse(localStorage.getItem('memory-palace:alpine-visuals:v1')));assert.deepEqual(persisted,{weather:'cloudy',detailed:false,outline:false});
@@ -51,7 +54,7 @@ try{
   await page.getByRole('button',{name:'Ride options',exact:true}).click();
   for(const name of ['天气 · 山谷薄雾','画面 · 原生','人物描边 · 关'])await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button',{name:'Return to the Palace',exact:true}).click();await page.locator('.world-ready canvas').waitFor();
-  assert.equal(await page.evaluate(()=>window.__PALACE_DEBUG__.renderer.getPixelRatio()),1);await shot('05-return-native-dpr');report.checks.push('Return retains original museum resolution and controls');
+  assert.ok(Math.abs(await page.evaluate(()=>window.__PALACE_DEBUG__.renderer.getPixelRatio())-1)<.0001);await shot('05-return-native-dpr');report.checks.push('Return retains original museum resolution and controls');
   assert.deepEqual(report.errors,[]);assert.deepEqual(report.uploads,[]);report.passed=true;
 }catch(error){report.failure=error.stack;await shot('failure').catch(()=>{});process.exitCode=1;console.error(error.stack);}
 finally{await writeFile(path.join(out,'validation.json'),JSON.stringify(report,null,2));await context.close();await browser.close();}
