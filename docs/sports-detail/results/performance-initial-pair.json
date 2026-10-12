@@ -1,0 +1,415 @@
+{
+  "baseline": "12671dfb211a3059c870dc7d00bf9d5ed6a8b3df",
+  "sha": "7e15161bbf7f87eab8a641b6faefd141ce9c3774",
+  "dirty": false,
+  "date": "2026-10-12T12:44:30.669Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "headed": true,
+  "viewport": [
+    1920,
+    1080
+  ],
+  "quality": "medium",
+  "dpr": "per scene, see drawingBuffer",
+  "scope": "Actual visible native Edge. Only its window-occlusion detector is disabled in the isolated test. Rendered-frame RAF wall intervals; duplicate RAF ticks excluded. Main-pass calls/triangles; sampled texture estimates are not total VRAM. Native pedaling / no speed injection. No other QA browser or build during measurement. Short samples, not a thermal or whole-route benchmark.",
+  "samples": [
+    {
+      "label": "before / court daylight",
+      "dpr": 1.0000000149011612,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 112.01048851388961,
+      "renderedFrames": 786,
+      "duplicateTicks": 0,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 34.70000000000073,
+      "peak": {
+        "calls": 118,
+        "triangles": 1138283,
+        "textures": 63
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 242.49414062500023,
+      "programs": 164,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "before / court night",
+      "dpr": 1.0000000149011612,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 111.09528557185587,
+      "renderedFrames": 780,
+      "duplicateTicks": 0,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 187.59999999999854,
+      "peak": {
+        "calls": 118,
+        "triangles": 1138283,
+        "textures": 64
+      },
+      "activeLights": 3,
+      "shadowLights": 1,
+      "materialMiB": 242.49414062500023,
+      "programs": 192,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "before / cycling still",
+      "dpr": 1.0000000149011612,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 100.92145677934916,
+      "renderedFrames": 506,
+      "duplicateTicks": 0,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 48.5,
+      "peak": {
+        "calls": 178,
+        "triangles": 1874357,
+        "textures": 50
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 100.79947916666663,
+      "programs": 63,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "before / cycling pedaling",
+      "dpr": 1.0000000149011612,
+      "drawingBuffer": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 104.21864530004822,
+      "renderedFrames": 731,
+      "duplicateTicks": 0,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 48.60000000000218,
+      "peak": {
+        "calls": 178,
+        "triangles": 1882929,
+        "textures": 50
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 100.79947916666663,
+      "programs": 63,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 4.662168480942832
+    },
+    {
+      "label": "before / alpine-ride still",
+      "dpr": 1.5,
+      "drawingBuffer": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 89.75049362760826,
+      "renderedFrames": 450,
+      "duplicateTicks": 0,
+      "medianMs": 13.700000000000728,
+      "p95Ms": 14.100000000002183,
+      "maxMs": 76.20000000000073,
+      "peak": {
+        "calls": 199,
+        "triangles": 2317190,
+        "textures": 54
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 203.4356384277345,
+      "programs": 59,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "before / alpine-ride pedaling",
+      "dpr": 1.5,
+      "drawingBuffer": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 87.46064982981649,
+      "renderedFrames": 614,
+      "duplicateTicks": 0,
+      "medianMs": 13.700000000004366,
+      "p95Ms": 14.30000000000291,
+      "maxMs": 83.10000000000218,
+      "peak": {
+        "calls": 204,
+        "triangles": 2375242,
+        "textures": 54
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 203.4356384277345,
+      "programs": 59,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 4.412591604679129
+    },
+    {
+      "label": "after / court daylight",
+      "dpr": 1.25,
+      "drawingBuffer": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 115.63657077755626,
+      "renderedFrames": 812,
+      "duplicateTicks": 0,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 41.70000000000073,
+      "peak": {
+        "calls": 112,
+        "triangles": 1140743,
+        "textures": 63
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 306.49414062500017,
+      "programs": 172,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "after / court night",
+      "dpr": 1.25,
+      "drawingBuffer": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 110.28468838158949,
+      "renderedFrames": 774,
+      "duplicateTicks": 0,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 41.79999999999927,
+      "peak": {
+        "calls": 112,
+        "triangles": 1140743,
+        "textures": 64
+      },
+      "activeLights": 3,
+      "shadowLights": 1,
+      "materialMiB": 306.49414062500017,
+      "programs": 200,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "after / cycling still",
+      "dpr": 1.25,
+      "drawingBuffer": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 89.02786353033706,
+      "renderedFrames": 447,
+      "duplicateTicks": 0,
+      "medianMs": 13.799999999999272,
+      "p95Ms": 14,
+      "maxMs": 62.600000000000364,
+      "peak": {
+        "calls": 173,
+        "triangles": 1877071,
+        "textures": 50
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 164.79947916666666,
+      "programs": 61,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "after / cycling pedaling",
+      "dpr": 1.25,
+      "drawingBuffer": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 87.71180407233376,
+      "renderedFrames": 616,
+      "duplicateTicks": 0,
+      "medianMs": 13.799999999999272,
+      "p95Ms": 14.099999999998545,
+      "maxMs": 62.5,
+      "peak": {
+        "calls": 173,
+        "triangles": 1883471,
+        "textures": 50
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 164.79947916666666,
+      "programs": 61,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 4.534141003013755
+    },
+    {
+      "label": "after / cycling standing pedaling",
+      "dpr": 1.25,
+      "drawingBuffer": [
+        2400,
+        1350
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 84.69259723954072,
+      "renderedFrames": 594,
+      "duplicateTicks": 0,
+      "medianMs": 13.80000000000291,
+      "p95Ms": 14.099999999998545,
+      "maxMs": 62.5,
+      "peak": {
+        "calls": 173,
+        "triangles": 1909371,
+        "textures": 50
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 164.79947916666666,
+      "programs": 61,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 7.341306693605593
+    },
+    {
+      "label": "after / alpine-ride still",
+      "dpr": 1.5,
+      "drawingBuffer": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 90.01636661205775,
+      "renderedFrames": 451,
+      "duplicateTicks": 0,
+      "medianMs": 13.69999999999709,
+      "p95Ms": 14.200000000000728,
+      "maxMs": 97.20000000000073,
+      "peak": {
+        "calls": 197,
+        "triangles": 2315050,
+        "textures": 54
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 267.4356384277345,
+      "programs": 59,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 0
+    },
+    {
+      "label": "after / alpine-ride pedaling",
+      "dpr": 1.5,
+      "drawingBuffer": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 91.93112281201081,
+      "renderedFrames": 646,
+      "duplicateTicks": 0,
+      "medianMs": 7.400000000001455,
+      "p95Ms": 14.099999999998545,
+      "maxMs": 76.39999999999782,
+      "peak": {
+        "calls": 199,
+        "triangles": 2390512,
+        "textures": 54
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 267.4356384277345,
+      "programs": 59,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 4.485667797630064
+    },
+    {
+      "label": "after / alpine-ride standing pedaling",
+      "dpr": 1.5,
+      "drawingBuffer": [
+        2880,
+        1620
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "fps": 85.67966355406658,
+      "renderedFrames": 601,
+      "duplicateTicks": 0,
+      "medianMs": 13.799999999995634,
+      "p95Ms": 20.400000000001455,
+      "maxMs": 69.90000000000146,
+      "peak": {
+        "calls": 227,
+        "triangles": 2543318,
+        "textures": 54
+      },
+      "activeLights": 2,
+      "shadowLights": 1,
+      "materialMiB": 267.4356384277345,
+      "programs": 61,
+      "hidden": 0,
+      "unfocused": 0,
+      "quality": "medium",
+      "ride": 7.499103980513329
+    }
+  ],
+  "errors": [],
+  "passed": true
+}
