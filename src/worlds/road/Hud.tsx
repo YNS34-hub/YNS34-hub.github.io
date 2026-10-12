@@ -6,6 +6,7 @@ import {getRideMap,isRideScene,rideMaps} from "./maps";
 import { useRoadRide,roadCommand } from "./state";
 import "./road.css";
 import PerspectiveControls from "../presence/Controls";
+import AlpineVisualOptions from "../alpine/VisualOptions";
 
 let returnRoom="worlds";
 export function rememberRoadReturn(previous:string){if(!isRideScene(previous)&&previous!=="cinema")returnRoom=previous==="basketball"?"worlds":previous;}
@@ -49,7 +50,7 @@ export default function RoadHud(){
       <button aria-pressed={r.comfort} onClick={()=>useRoadRide.setState({comfort:!r.comfort})}>Camera motion · {r.comfort?"reduced":"full"}</button>
       <button aria-pressed={!muted} onClick={()=>usePalaceStore.getState().update({mute:!muted})}>Sound {muted?"off":"on"}</button>
       <button onClick={()=>usePalaceStore.getState().setOverlay("player")}>My listening library</button>
-      {map.id==="alpine-ride"&&<p className="alpine-attribution">Terrain / imagery © swisstopo<br/><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Road © OpenStreetMap contributors</a> · <a href="/media/alpine/SOURCES.md" target="_blank" rel="noopener noreferrer">Sources</a></p>}
+      {map.id==="alpine-ride"&&<><AlpineVisualOptions/><p className="alpine-attribution">Terrain / imagery © swisstopo<br/><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Road © OpenStreetMap contributors</a> · <a href="/media/alpine/SOURCES.md" target="_blank" rel="noopener noreferrer">Sources</a></p></>}
       <div className="ride-map-choices" aria-label="Choose cycling map"><small>{r.speed>.3?"先制动停稳，再切换地图。":"地图各自保留骑行进度。"}</small>{rideMaps.map(m=><button key={m.id} disabled={r.speed>.3||m.id===map.id} aria-current={m.id===map.id?"page":undefined} onClick={()=>usePalaceStore.getState().enterRoom(m.id)}>{m.subtitle}</button>)}</div><button disabled={r.speed>.2} onClick={()=>roadCommand("restart")}>Return to trailhead</button><button onClick={returnToPalace}>Return to the Palace</button>
     </aside>}
     {r.photo&&<div className="road-photo-tools"><button onClick={()=>roadCommand("save")}>Save this view</button><button onClick={()=>roadCommand("photo")}>Exit photo view · ESC</button></div>}

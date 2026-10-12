@@ -30,6 +30,10 @@ describe("two-map preservation",()=>{
     };
     for(const [file,digest] of Object.entries(files)){
       let source=readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n");
+      // 本轮明确授权高山设置和曲柄视觉相位；只撤销局部接入，原摘要和路线保护继续运行。
+      const sunlight=JSON.parse(readFileSync("tests/fixtures/alpine-clarity-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+      expect(sunlight.baseline).toBe("8a66c0083483f5dd9bf33df1903f060401f04cea");
+      for(const patch of sunlight.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
       // 第二轮只撤销获准的道路边缘 diff，再继续第一轮和最初的源码保护；旧摘要与旧补丁不变。
       const roadside=JSON.parse(readFileSync("tests/fixtures/cycling-road-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
       expect(roadside.baseline).toBe("f9f0346bc3efad98f173854b979281a6496c5414");

@@ -14,7 +14,9 @@ import { LimbIK } from "./ik";
 import { prepareShot, shotRecovery } from "./shotPose";
 import { outfits, neutralProfile, useAppearance } from "./appearance";
 import { dressAthlete, reshapeAthlete } from "./appearanceRig";
-import { gripPoint, riderPosture } from "./riderPose";
+import { ankleFromContact, gripPoint, riderAnkle, riderPosture } from "./riderPose";
+import {createRiderOutline} from "./riderOutline";
+import {useAlpineVisuals} from "../alpine/visualPreferences";
 
 export default function SportPresence({roomId}:{roomId:AdventureRoom}) {
   const head = useAppearance(s => s.personal ? s.head : null);
@@ -44,22 +46,29 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
         materials.push(child.material); child.castShadow = true; child.receiveShadow = true; child.raycast = () => {};
       }
     });
+    const outline=roomId!=="basketball"?createRiderOutline():null,skinned:SkinnedMesh[]=[];
+    object.traverse(child=>{if(child instanceof SkinnedMesh)skinned.push(child);});
+    // 先收集再添加壳体，避免 traverse 把新壳体再次当作主体而无限递归。
+    if(outline)for(const mesh of skinned)outline.attach(mesh);
     const mixer = new AnimationMixer(object);
     const actions = gltf.animations.map(clip => mixer.clipAction(clip).play().setEffectiveWeight(clip.name === "idle" ? 1 : 0));
     mixer.setTime(.1); object.rotation.y=Math.PI; object.updateWorldMatrix(true,true);
     const seatedBase=new Map([...bones].map(([name,bone])=>[name,{position:bone.position.clone(),quaternion:bone.quaternion.clone()}]));
     const animatedBase=new Map([...bones].map(([name,bone])=>[name,{position:bone.position.clone(),quaternion:bone.quaternion.clone()}]));
     const feet=new Map([-1,1].map(side=>[side,bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldQuaternion(new Quaternion())]));
+    const soles=new Map([-1,1].map(side=>[side,new Vector3(0,-.112,-.064).applyQuaternion(feet.get(side)!.clone().invert())]));
     const hips=new Map([-1,1].map(side=>[side,{position:new Vector3(),quaternion:new Quaternion()}]));
     const headBase=bones.get("Bip01_Head")!.getWorldQuaternion(new Quaternion()).invert();
     const spineBase = bones.get("Bip01_Spine2")!.getWorldQuaternion(new Quaternion()).invert();
-    return { object, bones, materials, geometries, mixer, actions, seatedBase, animatedBase, feet, hips, headBase, spineBase, helmetOffset:new Vector3(), yaw: 0, effort: 0, ik: new LimbIK(), target: new Vector3(), pole: new Vector3(), point: new Vector3(), tangent: new Vector3(), direction: new Vector3(), head: new Vector3(), tilt: new Quaternion(), world: new Quaternion(), parent: new Quaternion(), axis: new Vector3(1, 0, 0), palm: new Vector3(), fingers: new Vector3(), width: new Vector3(), handMatrix: new Matrix4() };
-  }, [gltf, profile, outfitId, headMap]);
+    return { object, bones, materials, geometries, mixer, actions, seatedBase, animatedBase, feet, soles, outline, footWorld:new Quaternion(), contact:new Vector3(), hips, headBase, spineBase, helmetOffset:new Vector3(), yaw: 0, effort: 0, ik: new LimbIK(), target: new Vector3(), pole: new Vector3(), point: new Vector3(), tangent: new Vector3(), direction: new Vector3(), head: new Vector3(), tilt: new Quaternion(), world: new Quaternion(), parent: new Quaternion(), axis: new Vector3(1, 0, 0), palm: new Vector3(), fingers: new Vector3(), width: new Vector3(), handMatrix: new Matrix4() };
+  }, [gltf, profile, outfitId, headMap,roomId]);
   useEffect(() => {
     // StrictMode 会重播 effect；清理后的同一实例必须重新激活动作，不能留下静止绑定姿态。
+    rig.outline?.activate();
     rig.actions=gltf.animations.map(clip=>rig.mixer.clipAction(clip).reset().play().setEffectiveWeight(clip.name==="idle"?1:0));
     return () => {
       rig.mixer.stopAllAction(); rig.mixer.uncacheRoot(rig.object);
+      rig.outline?.dispose();
       rig.materials.flat().forEach(m => m.dispose());
       rig.geometries.forEach(g => g.dispose());
       rig.object.traverse(child => { if (child instanceof SkinnedMesh) child.skeleton.dispose(); });
@@ -71,6 +80,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     const palace = usePalaceStore.getState(), ride = useRoadRide.getState(), third = usePerspective.getState().views[roomId] === "third";
     root.current.visible = third && !(roomId !== "basketball" && ride.photo);
     if (!root.current.visible) return;
+    rig.outline?.update(_.gl,roomId!=="alpine-ride"||useAlpineVisuals.getState().outline);
     const riding = roomId !== "basketball" && ride.mounted;
     const blocked = !palace.started || !!palace.overlay || !!palace.focus || palace.mode === "index" || useActivity.getState().warming || document.hidden;
     // 换装使用原 settings 门控暂停物理；允许以零时间恢复新网格的当前 IK，避免换装时出现 T-pose。
@@ -99,7 +109,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       root.current.rotation.set(Math.atan2(rig.tangent.y, normal)*e,yaw,-roadView.lean*e,"YXZ");
       rig.effort += (Math.min(1, roadView.cadence / 88) - rig.effort) * (1 - Math.exp(-dt * 5));
       const posture = riderPosture(outfit.bike, rig.effort, roadView.brake, roadView.pedalAngle, palace.reducedMotion || ride.comfort);
-      rig.object.position.set(posture.hipShift, .065, .19); rig.object.rotation.y = Math.PI;
+      rig.object.position.set(posture.hipShift, .065, .25); rig.object.rotation.y = Math.PI;
       // 躯干前倾、手握刹车罩，脚踝追随同一真实曲柄相位；不用独立的假踏频。
       root.current.updateWorldMatrix(true, true);
       for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.getWorldPosition(hip.position);thigh.getWorldQuaternion(hip.quaternion);}
@@ -116,14 +126,19 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       root.current.updateWorldMatrix(true, true);
       for (const side of [-1, 1] as const) {
         gripPoint(outfit.bike, side, roadView.steer, rig.target); root.current.localToWorld(rig.target);
+        // IK 终点是腕骨，刹车罩接触点是掌心；保留 gripPoint 的真实把位，补腕到掌的距离。
+        if(outfit.bike==="road"){rig.point.set(0,.025,.035).transformDirection(root.current.matrixWorld).multiplyScalar(Math.hypot(.025,.035));rig.target.add(rig.point);}
         rig.pole.set(side * .42, outfit.bike === "city" ? 1.12 : 1.10, -.25); root.current.localToWorld(rig.pole);
         limb(side, "arm");
-        pedalPoint(side, roadView.pedalAngle, rig.target); rig.target.y += .118; root.current.localToWorld(rig.target);
+        const ankle=riderAnkle(side,roadView.pedalAngle,rig.effort,palace.reducedMotion||ride.comfort);
+        root.current.getWorldQuaternion(rig.footWorld);rig.footWorld.multiply(rig.feet.get(side)!);
+        rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);rig.footWorld.premultiply(rig.tilt.setFromAxisAngle(rig.axis,ankle));
+        pedalPoint(side, roadView.pedalAngle, rig.contact);root.current.localToWorld(rig.contact);
+        ankleFromContact(rig.contact,rig.soles.get(side)!,rig.footWorld,rig.target);
         rig.pole.set(side * .21, .6, -.42); root.current.localToWorld(rig.pole); limb(side, "leg");
         const foot=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!;
-        root.current.getWorldQuaternion(rig.world);rig.world.multiply(rig.feet.get(side)!);foot.parent!.getWorldQuaternion(rig.parent);
-        foot.quaternion.copy(rig.parent.invert().multiply(rig.world));foot.updateWorldMatrix(true,true);
-        rotateBody(foot.name, posture.ankle * side, 1, 0, 0);
+        foot.parent!.getWorldQuaternion(rig.parent);
+        foot.quaternion.copy(rig.parent.invert().multiply(rig.footWorld));foot.updateWorldMatrix(true,true);
       }
     } else {
       presence.camera.getWorldDirection(rig.direction);

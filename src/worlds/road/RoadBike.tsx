@@ -1,11 +1,12 @@
 import { useEffect,useMemo,useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry,Float32BufferAttribute,CatmullRomCurve3,TubeGeometry,Vector3,LatheGeometry,Vector2,Group,MeshStandardMaterial,CanvasTexture,RepeatWrapping,SRGBColorSpace } from "three";
+import { BufferGeometry,Float32BufferAttribute,CatmullRomCurve3,TubeGeometry,Vector3,LatheGeometry,Vector2,Group,MeshStandardMaterial,ShaderMaterial,CanvasTexture,RepeatWrapping,SRGBColorSpace } from "three";
 import { roadView,useRoadRide } from "./state";
 import {forestMap} from "./maps";
 import type {RideMap} from "./mapTypes";
 import { usePalaceStore } from "../../systems/store";
 import { outfits, useAppearance } from "../presence/appearance";
+import {settleCranks} from "../presence/riderPose";
 
 type V=[number,number,number];
 function tube(points:V[],radius:number,segments=12){return new TubeGeometry(new CatmullRomCurve3(points.map(p=>new Vector3(...p))),segments,radius,8,false);}
@@ -44,6 +45,12 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
   const p=useBikeParts(),root=useRef<Group>(null),cockpit=useRef<Group>(null),steering=useRef<Group>(null),cranks=useRef<Group>(null),frontWheel=useRef<Group>(null),rearWheel=useRef<Group>(null),pedals=useRef<(Group|null)[]>([]);
   const pose=useMemo(()=>({point:new Vector3(),tangent:new Vector3(),spin:0,pedal:0}),[]);
   const paint=useMemo(()=>new MeshStandardMaterial({color:"#c6dce0",metalness:.28,roughness:.25}),[]);
+  // 轮胎接地点的窄遮蔽补足阴影贴图分辨率；不替代真实主光阴影、不增加离屏通道。
+  const contact=useMemo(()=>new ShaderMaterial({transparent:true,depthWrite:false,toneMapped:false,
+    vertexShader:"varying vec2 contactUV;void main(){contactUV=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+    fragmentShader:"varying vec2 contactUV;void main(){vec2 p=(contactUV-.5)*2.;float a=.25*(1.-smoothstep(.05,1.,dot(p,p)));gl_FragColor=vec4(.014,.024,.027,a);}",
+  }),[]);
+  useEffect(()=>()=>contact.dispose(),[contact]);
   useEffect(()=>()=>paint.dispose(),[paint]);
   useEffect(()=>{paint.color.set(city?"#32b9d0":"#c6dce0");},[city,paint]);
   useFrame((_,delta)=>{
@@ -55,7 +62,7 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
       const yaw=-.95+Math.atan2(Math.sin(roadView.yaw+.95),Math.cos(roadView.yaw+.95))*e;root.current.rotation.set(Math.atan2(pose.tangent.y,horizontal)*e,yaw,-roadView.lean*e,"YXZ");}
     else{root.current.position.set(px,py,pz);root.current.rotation.set(0,-.95,.025);}
     const palacePaused=usePalaceStore.getState().overlay||usePalaceStore.getState().focus||s.controls||s.photo||document.hidden;
-    if(!palacePaused){pose.spin-=roadView.speed*dt/.345;pose.pedal+=roadView.cadence/60*Math.PI*2*dt;}
+    if(!palacePaused){pose.spin-=roadView.speed*dt/.345;pose.pedal+=roadView.cadence/60*Math.PI*2*dt;pose.pedal=settleCranks(pose.pedal,roadView.cadence,roadView.speed,dt);}
     roadView.pedalAngle=pose.pedal;
     if(frontWheel.current)frontWheel.current.rotation.x=pose.spin;if(rearWheel.current)rearWheel.current.rotation.x=pose.spin;
     if(cranks.current)cranks.current.rotation.x=-pose.pedal;
@@ -65,6 +72,7 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
   },-2.4);
   function sOffset(){return roadView.offset;}
   return <group ref={root} name="original-performance-road-bike" onClick={event=>{if(event.delta<5&&!useRoadRide.getState().mounted){event.stopPropagation();window.dispatchEvent(new CustomEvent("palace:road",{detail:"mount"}));}}}>
+    {[-.61,.54].map(z=><mesh key={"contact"+z} name="bike-wheel-contact" position={[0,.002,z]} rotation={[-Math.PI/2,0,0]} material={contact} raycast={()=>{}}><planeGeometry args={[.14,.24]}/></mesh>)}
     {p.frame.map((g,i)=><mesh key={"frame"+i} geometry={g} material={paint} castShadow />)}
     <group ref={steering} position={p.head}><group position={[0,-p.head[1],-p.head[2]]}>
       {p.fork.map((g,i)=><mesh key={"fork"+i} geometry={g} material={paint} castShadow />)}
