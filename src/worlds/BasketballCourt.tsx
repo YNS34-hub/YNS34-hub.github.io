@@ -180,7 +180,7 @@ function PracticeBall() {
       local.pickup = Math.max(0, local.pickup - dt);
     } else { ball.current.position.set(p.x, p.y, p.z); local.pickup = 0; }
     const shell = ball.current.children[0] as Mesh;
-    const shape = local.dribble ? dribblePresentation(local.dribbleTime / dribblePeriod, quiet) : { y: 1 - (quiet ? 0 : local.contact * .035), xz: 1 + (quiet ? 0 : local.contact * .0175) };
+    const shape = local.dribble ? dribblePresentation(local.dribbleTime / dribblePeriod-.44, quiet) : { y: 1 - (quiet ? 0 : local.contact * .035), xz: 1 + (quiet ? 0 : local.contact * .0175) };
     shell.scale.set(shape.xz, shape.y, shape.xz);
     local.contact *= Math.exp(-dt * 28);
     if (local.contact < .001) local.contact = 0;

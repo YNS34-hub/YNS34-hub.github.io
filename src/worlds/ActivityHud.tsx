@@ -39,7 +39,7 @@ export default function ActivityHud() {
       {a.mode === "held" && <button onPointerDown={event => { event.currentTarget.setPointerCapture(event.pointerId); courtCommand("charge"); }} onPointerUp={() => courtCommand("release")} onPointerCancel={() => courtCommand("cancel")} onBlur={() => courtCommand("cancel")} onKeyDown={event => { if (isPrimaryShotKey(event.code) && !event.repeat) { event.preventDefault(); courtCommand("charge"); } }} onKeyUp={event => { if (isPrimaryShotKey(event.code)) { event.preventDefault(); courtCommand("release"); } }}>Hold / release · Shoot</button>}
       <button onClick={() => courtCommand("recall")}>R · Recall ball</button>
       <button aria-pressed={a.assist} onClick={() => useActivity.setState({ assist: !a.assist })}>Arc assist {a.assist ? "on" : "off"}</button>
-      {a.mode === "held" && <><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("layup")}>F · Layup</button><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("dunk")}>G · Dunk</button></>}
+      {a.mode === "held" && <><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("layup")}>5 · Layup</button><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("dunk")}>Enter + 5 · Dunk</button></>}
     </div>
     <PerspectiveControls roomId="basketball" />
     <div className="court-time" role="group" aria-label="Court lighting">

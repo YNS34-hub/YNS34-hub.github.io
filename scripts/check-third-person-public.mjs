@@ -22,7 +22,7 @@ try{
   await page.goto(base+"/basketball?view=third");await page.locator(".world-ready canvas").waitFor();await page.locator(".court-hud").waitFor();
   assert.equal(await page.getByRole("button",{name:"Third person · V",exact:true}).getAttribute("aria-pressed"),"true");
   assert.equal(await page.evaluate(()=>!!window.__PALACE_DEV__||!!window.__PRESENCE_DEBUG__||!!window.__ROAD_DEBUG__),false);
-  await page.getByRole("button",{name:"R · Recall ball",exact:true}).click();await page.keyboard.press("e");await page.getByRole("button",{name:"F · Layup",exact:true}).waitFor();
+  await page.getByRole("button",{name:"R · Recall ball",exact:true}).click();await page.keyboard.press("e");await page.getByRole("button",{name:"5 · Layup",exact:true}).waitFor();
   await page.locator("canvas").click({position:{x:width*.62,y:150}});
   await page.bringToFront();await page.waitForFunction(()=>!document.hidden&&document.hasFocus());
   const trace=await page.evaluateHandle(()=>{

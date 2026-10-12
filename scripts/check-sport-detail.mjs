@@ -7,7 +7,7 @@ import path from 'node:path';
 const out=path.resolve(process.env.PALACE_ARTIFACTS||'qa-artifacts/sports-detail/detail');await mkdir(out,{recursive:true});
 const report={sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),dirty:!!execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim(),checks:[],poses:[],errors:[],uploads:[]};
 // 保留当前 Playwright 的默认功能开关，只追加验收窗口遮挡例外，避免覆盖 Edge 的默认登录 / 启动防护。
-const probe=await chromium.launch({channel:'msedge',headless:true});let features;
+const probe=await chromium.launch({channel:'msedge',headless:true,args:['--enable-automation']});let features;
 try{const cdp=await probe.newBrowserCDPSession();features=(await cdp.send('Browser.getBrowserCommandLine')).arguments.find(a=>a.startsWith('--disable-features='));await cdp.detach();}finally{await probe.close();}
 const browser=await chromium.launch({channel:'msedge',headless:process.env.PALACE_HEADED!=='1',args:['--use-angle=d3d11',(features||'--disable-features=')+',CalculateNativeWinOcclusion']});
 const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1,...(process.env.PALACE_VIDEO==='1'?{recordVideo:{dir:path.join(out,'video'),size:{width:1280,height:720}}}:{})});
