@@ -25,7 +25,9 @@ async function measure(page,label,seconds=7){
  console.log(`${label}: ${sample.fps.toFixed(1)} rendered FPS / p95 ${sample.p95Ms.toFixed(1)}ms / calls ${sample.peak.calls}`);
 }
 try{
- for(const[label,url]of[["after",process.env.PALACE_URL||"http://127.0.0.1:5190"]]){
+ // 可选固定提交的隔离导出用于同机比较；绝不切换或覆盖使用中的开发分支。
+ for(const[label,url]of[...(process.env.PALACE_BASELINE_URL?[["before",process.env.PALACE_BASELINE_URL]]:[]),["after",process.env.PALACE_URL||"http://127.0.0.1:5190"]]){
+  if(label==="before"){const marker=await(await fetch(url+"/qa-baseline.json")).json();assert.equal(marker.sha,report.baseline);}
   const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1});
   await context.route("**/personal-media/manifest.json",r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
   await context.route("**/personal-media/avatar.json",r=>r.fulfill({json:{profile:null}}));
@@ -36,7 +38,9 @@ try{
   await page.getByRole("button",{name:"Night lights",exact:true}).click();await page.waitForTimeout(2200);await measure(page,label+" / court night");
   for(const room of["cycling","alpine-ride"]){
    await page.goto(url+"/"+room+"?view=third");await ready(room);await page.keyboard.down("w");await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.ride.getState().nearBike);await page.keyboard.up("w");await page.getByRole("button",{name:"Mount / ride · E",exact:true}).click();await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.ride.getState().mounted&&window.__ROAD_DEBUG__.view.mountProgress===1);await page.waitForTimeout(500);await measure(page,label+" / "+room+" still",5);
-   await page.keyboard.down("w");await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.ride.getState().cadence>20);await measure(page,label+" / "+room+" pedaling");await page.keyboard.press("c");await page.waitForTimeout(850);await measure(page,label+" / "+room+" standing pedaling");await page.keyboard.up("w");
+   await page.keyboard.down("w");await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.ride.getState().cadence>20);await measure(page,label+" / "+room+" pedaling");
+   if(label==="after"){await page.keyboard.press("c");await page.waitForTimeout(850);await measure(page,label+" / "+room+" standing pedaling");}
+   await page.keyboard.up("w");
   }
   await context.close();
  }
