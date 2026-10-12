@@ -1,0 +1,18 @@
+@font-face { font-family: "Cormorant Garamond"; src: url("/assets/fonts/CormorantGaramond-variable.woff2") format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Cormorant Garamond"; src: url("/assets/fonts/CormorantGaramond-Italic-variable.woff2") format("woff2"); font-style: italic; font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Manrope"; src: url("/assets/fonts/Manrope-variable.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("/assets/fonts/JetBrainsMono-variable.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+:root {
+  --type-ui: "Manrope", "Microsoft YaHei", sans-serif;
+  --type-display: "Cormorant Garamond", Georgia, "Noto Serif SC", serif;
+  --type-editorial: var(--type-display);
+  --type-metadata: "JetBrains Mono", "Microsoft YaHei", monospace;
+  font-family: var(--type-ui);
+}
+body, button, input, textarea, select { font-family: var(--type-ui); }
+.museum-title { font-family: var(--type-display); font-weight: 300; letter-spacing: -.03em; line-height: .85; }
+.museum-label, .welcome-location, .room-caption-number, .cinema-index, .work-tags, .record-year { font-family: var(--type-metadata); font-weight: 400; letter-spacing: .18em; }
+.museum-label { font-size: 10px; opacity: .6; }
+.palace-app .panel h2, .palace-app .index-hero h1 { font-family: var(--type-display); font-weight: 400; letter-spacing: -.035em; }
+.palace-app .panel h2 { font-size: clamp(34px, 3.4vw, 52px); }
+.mini-artist { font-family: var(--type-ui); }

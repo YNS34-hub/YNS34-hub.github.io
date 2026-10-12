@@ -21,6 +21,7 @@ import { PalaceMark } from "./primitives";
 import { useIdentityTone } from "../systems/identityTone";
 import { useMotionCue } from "../motion/useMotionCue";
 import NowPlayingSignal from "../motion/NowPlayingSignal";
+import { GlassButton, MuseumLabel, MuseumNavigation, MuseumTitle } from "../design-system/components";
 export default function Hud({ ready }: { ready: boolean }) {
   const s = usePalaceStore();
   const audio = useAudioStore(
@@ -32,14 +33,14 @@ export default function Hud({ ready }: { ready: boolean }) {
   );
   const tracks = useLibraryStore((l) => l.music);
   const lightIdentity = useIdentityTone((tone) => tone.light);
+  const entranceInk = !s.started || lightIdentity;
   const room = roomInfo(s.roomId);
   const plan = resolveRoomPlan(s.roomId);
   const track = tracks.find((t) => t.id === audio.currentId);
   const identityCue = useMotionCue<HTMLButtonElement>("museum-identity", "identity");
   const welcomeEnabled = ready && !s.started;
   const eyebrowCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled);
-  const heroCue = useMotionCue<HTMLHeadingElement>("welcome", "hero", welcomeEnabled, 60);
-  const subtitleCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled, 360);
+  const heroCue = useMotionCue<HTMLHeadingElement>("welcome", "exhibition", welcomeEnabled, 60);
   const entryCue = useMotionCue<HTMLDivElement>("welcome", "copy", welcomeEnabled, 440);
   const memoryCue = useMotionCue<HTMLElement>(String(s.memoryReveal), "copy", s.coreNear && !s.overlay && !s.focus);
   const trackCue = useMotionCue<HTMLSpanElement>(`${audio.currentId}:${track?.title}`, "copy", !!track && s.started);
@@ -62,10 +63,10 @@ export default function Hud({ ready }: { ready: boolean }) {
   return (
     <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`} data-threshold={s.pendingDoor ? "approach" : ready ? "arrived" : "loading"}>
       {s.started && s.roomId !== "cinema" && <div key={s.roomId} className="threshold-continuity" aria-hidden="true"><i /><i /></div>}
-      <header className="hud-header">
+      <MuseumNavigation className="hud-header" data-tone={entranceInk ? "light" : "dark"}>
         <button
           ref={identityCue}
-          className={`wordmark ${lightIdentity ? "identity-is-light" : ""}`}
+          className={`wordmark ${entranceInk ? "identity-is-light" : ""}`}
           onClick={() => s.setOverlay("about")}
           aria-label="About The Memory Palace"
         >
@@ -85,6 +86,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           </button>
           <button
             className="guide-button"
+            aria-label="GUIDE"
             onClick={() => s.setOverlay("guide")}
           >
             <Map size={17} />
@@ -92,31 +94,20 @@ export default function Hud({ ready }: { ready: boolean }) {
             <small>M</small>
           </button>
         </div>
-      </header>
+      </MuseumNavigation>
       {!s.started && (
         <div className="welcome-caption">
-          <p className="eyebrow" ref={eyebrowCue}>
-            <span className="status-dot" /> A DIGITAL MUSEUM BY JIE TIAN
-          </p>
-          <h1 ref={heroCue}>
-            <span className="hero-word hero-word-the">THE</span>{" "}<span className="hero-word hero-word-memory">MEMORY</span>
-            <br />
-            <span className="hero-word hero-word-palace">PALACE</span>
-            <sup className="hero-infinity">∞</sup>
-          </h1>
-          <p className="welcome-subtitle" ref={subtitleCue}>
-            An infinite gallery of projects, research,
-            <br className="desktop-break" /> music, images and experiments.
-          </p>
+          <MuseumTitle ref={heroCue} />
+          <MuseumLabel ref={eyebrowCue}>ARCHIVE</MuseumLabel>
           <div className="welcome-actions" ref={entryCue}>
-            <button
+            <GlassButton
               className="enter-button"
               disabled={!ready}
               onClick={() => start()}
             >
               {ready ? "ENTER THE PALACE" : "ARCHIVE INITIALIZING"}
               <ArrowRight size={22} />
-            </button>
+            </GlassButton>
             {s.lastRoom !== "atrium" && (
               <button className="continue-button" onClick={() => start(true)}>
                 CONTINUE EXPLORING ↗
@@ -210,8 +201,7 @@ export default function Hud({ ready }: { ready: boolean }) {
       )}
       {!s.started && (
         <div className="welcome-location">
-          <span>01 / THE ATRIUM</span>
-          <span>THIS PLACE CONTINUES TO GROW WITH ME.</span>
+          <span>01 / ATRIUM</span>
         </div>
       )}
       {s.pointerLocked && !s.overlay && !s.focus && (

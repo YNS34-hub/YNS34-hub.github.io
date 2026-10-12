@@ -29,13 +29,13 @@ export function roomLighting(plan: RoomPlan, roomId: string) {
     }
   > = {
     atrium: {
-      background: "#b7d9ec",
-      sky: "#e2f4ff",
-      ground: "#304965",
-      key: "#f1f8ff",
-      keyIntensity: 1.75,
-      environment: 0.65,
-      hemisphere: 0.68,
+      background: "#86b2d8",
+      sky: "#d9ebfb",
+      ground: "#789cb6",
+      key: "#fff0df",
+      keyIntensity: 2.4,
+      environment: 0.72,
+      hemisphere: 0.5,
       dark: false,
     },
     corridor: {

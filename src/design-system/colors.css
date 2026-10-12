@@ -1,0 +1,12 @@
+:root {
+  --museum-navy: #0b1d31;
+  --museum-graphite: #101c2a;
+  --museum-ice: #86bce3;
+  --museum-pearl: #e9f2f8;
+  --museum-amber: #d8ba98;
+  --museum-ink: #263746;
+  --museum-caption: #688092;
+  --paper: #edf3f6;
+  --ink: var(--museum-ink);
+  --line: #cddae3;
+}

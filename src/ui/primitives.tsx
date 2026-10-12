@@ -1,5 +1,6 @@
 import { X, ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
+import { MuseumPanel } from "../design-system/components";
 export function PalaceMark() {
   return (
     <span className="brand-symbol" aria-hidden="true">
@@ -101,16 +102,16 @@ export function Dialog({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
+      <MuseumPanel
         ref={ref}
         role="dialog"
         aria-modal="true"
         aria-label={label}
-        className={`panel ${className}`}
+        className={className}
       >
         <CloseButton onClick={onClose} />
         {children}
-      </div>
+      </MuseumPanel>
     </div>
   );
 }
