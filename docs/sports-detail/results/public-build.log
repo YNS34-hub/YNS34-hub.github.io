@@ -1,0 +1,39 @@
+
+> the-memory-palace@3.0.0 build:public
+> node scripts/register-personal-media.mjs --public && tsc -b && vite build && node scripts/postbuild.mjs
+
+Registered personal media: { wallpapers: 0, visuals: 0, music: 0, projects: 0, research: 0 }
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 2473 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                2.85 kB │ gzip:   1.12 kB
+dist/assets/ActivityHud-I6lyxO2b.css           8.88 kB │ gzip:   2.40 kB
+dist/assets/index-BISXJ_AW.css                61.18 kB │ gzip:  13.97 kB
+dist/assets/AbstractID3Parser-DH7ZwY1k.js      1.00 kB │ gzip:   0.49 kB
+dist/assets/DsfParser-BTwnBzDn.js              2.54 kB │ gzip:   1.03 kB
+dist/assets/WavPackParser-BqsrrV_k.js          3.47 kB │ gzip:   1.54 kB
+dist/assets/AiffParser-_teH1ZH0.js             3.59 kB │ gzip:   1.54 kB
+dist/assets/DsdiffParser-Cc3ScccB.js           4.08 kB │ gzip:   1.28 kB
+dist/assets/MusepackParser-bBbD0cJ_.js         5.54 kB │ gzip:   1.93 kB
+dist/assets/WaveParser-B3I0Wwam.js             6.61 kB │ gzip:   2.39 kB
+dist/assets/FlacParser-DOeGuQHF.js             6.94 kB │ gzip:   2.60 kB
+dist/assets/OggParser-DODiqsCm.js              7.91 kB │ gzip:   2.79 kB
+dist/assets/ActivityHud-D5twQTGv.js           10.70 kB │ gzip:   3.93 kB
+dist/assets/ID3v2Parser-BT-zF7E6.js           10.87 kB │ gzip:   3.99 kB
+dist/assets/MatroskaParser-BDPIStSO.js        12.37 kB │ gzip:   4.03 kB
+dist/assets/MpegParser-Db6eLJe2.js            12.73 kB │ gzip:   4.21 kB
+dist/assets/AsfParser-DJO1meaq.js             14.98 kB │ gzip:   5.14 kB
+dist/assets/Experience-C0tOudUz.js            19.59 kB │ gzip:   8.24 kB
+dist/assets/MP4Parser-Cp8Y49au.js             20.67 kB │ gzip:   6.18 kB
+dist/assets/Avatar-D44-3JMP.js                32.53 kB │ gzip:  11.15 kB
+dist/assets/BasketballCourt-EFOAgYSV.js       33.12 kB │ gzip:  11.93 kB
+dist/assets/controls-C5NgQrjQ.js              41.97 kB │ gzip:  19.57 kB
+dist/assets/Experience-BeZAkZsh.js            77.35 kB │ gzip:  27.87 kB
+dist/assets/core-CtSNq_xZ.js                 118.69 kB │ gzip:  36.16 kB
+dist/assets/index-BKQSDR4F.js                141.91 kB │ gzip:  46.49 kB
+dist/assets/World-CavtatrG.js                401.46 kB │ gzip: 155.41 kB
+dist/assets/three-2-I2TH78.js              1,185.42 kB │ gzip: 331.70 kB
+✓ built in 12.10s
+Static collection, 66 shareable routes (52 indexed), sitemap and GitHub Pages fallback generated. Legacy routes preserved.

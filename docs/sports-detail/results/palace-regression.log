@@ -1,0 +1,12 @@
+PASS v1 IndexedDB records retain blob, favorite and ID after placement migration
+PASS all main rooms enter, return, load real works and retain WASD control
+PASS memory revelation uses a real collection image, stays in place and is interruptible
+PASS batch import targets Portraits, persists, renders its stable ID, and isolates failure
+PASS Cinema restores exact view from every source; ESC first closes metadata; Back returns
+PASS modal suspends WASD; project viewing retains the room; exactly one web preview mounts on demand
+PASS kept website references appear in My Collection and disappear when unkept
+PASS stateful corridor door changes after a real visit, with five bounded resident segments
+PASS observatory bridge rails and Unfinished exit match their physical walking boundaries
+PASS actual local audio drives measured frequency bands and settles after pause
+PASS local audio placement and room soundtrack metadata survive refresh
+PASS accessible index Cinema returns to index without discarding navigation
