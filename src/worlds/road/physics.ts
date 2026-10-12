@@ -7,7 +7,7 @@ export const sprockets=[34,30,27,24,22,20,18,16,15,14,12,11];
 export const wheelCircumference=2.14;
 export interface RoadInput { pedal?:boolean; strong?:boolean; brake?:boolean; steer?:number; blocked?:boolean; effort?:number }
 export class RoadPhysics {
-  distance=0;speed=0;gear=7;cadence=0;grade=0;offset=0;steering=0;heading=0;lean=0;braking=0;
+  distance=0;speed=0;gear=7;cadence=0;grade=0;offset=0;steering=0;curvature=0;heading=0;lean=0;braking=0;
   state:RidingState="stopped"; stopAt:number|null=null; atStop=false; ended=false; recovered=false; lastSafe=0;
   private point=new Vector3();private tangent=new Vector3();private nextPoint=new Vector3();private nextTangent=new Vector3();
   // 默认值逐字沿用旧路线；新地图只注入采样器和终点，动力、档位与刹车规则保持共用。
@@ -48,6 +48,7 @@ export class RoadPhysics {
     roadSample(Math.min(roadLength,this.distance+2),this.nextPoint,this.nextTangent);
     const yaw=Math.atan2(-this.tangent.x,-this.tangent.z),nextYaw=Math.atan2(-this.nextTangent.x,-this.nextTangent.z);
     const curvature=-Math.atan2(Math.sin(nextYaw-yaw),Math.cos(nextYaw-yaw))/2;
+    this.curvature=curvature;
     // 曲线本身也产生侧倾；头部只保留其中很小一部分，不能把转弯全部转嫁给镜头。
     this.lean+=(balancedLean(this.speed,curvature+Math.tan(this.steering)/1.01)-this.lean)*(1-Math.exp(-dt*5));
     this.distance=Math.min(roadLength,this.distance+this.speed*Math.cos(this.heading)*dt);

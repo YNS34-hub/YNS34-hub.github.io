@@ -7,6 +7,7 @@ import { acknowledge } from "../../interaction/registry";
 import { useActivity } from "../activity";
 import { useRoadAudio } from "./audio";
 import { RoadPhysics } from "./physics";
+import {visualSteering} from "./balance";
 import {getRideMap} from "./maps";
 import type {RideMap} from "./mapTypes";
 import { roadView,useRoadRide,readRoadSave,saveRoadRide,rememberRoadCinema,takeRoadCinemaReturn,peekRoadCinemaReturn,type RoadCommand } from "./state";
@@ -90,7 +91,7 @@ function RoadRider({map}:{map:RideMap}){
       else if(!document.pointerLockElement){local.current.brakeLatch=true;useRoadRide.setState({easy:false,controls:true});}
     };
     const unsubscribe=usePalaceStore.subscribe((s,p)=>{
-      if(p.roomId===map.id&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({mapId:map.id,distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort,standing:r.standing});}
+      if(p.roomId===map.id&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({mapId:map.id,distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort,standing:r.standing,pedalAngle:roadView.pedalAngle});}
       if((s.overlay&&!p.overlay)||(s.focus&&!p.focus)||s.mode==="index"&&p.mode!=="index")halt();
     });
     window.addEventListener("palace:road",command);document.addEventListener("keydown",down);document.addEventListener("keyup",up);window.addEventListener("keydown",escape,true);window.addEventListener("blur",halt);window.addEventListener("pagehide",halt);
@@ -124,7 +125,7 @@ function RoadRider({map}:{map:RideMap}){
     if(!l.yawReady){roadView.yaw=yaw;l.yawReady=true;}else roadView.yaw+=Math.atan2(Math.sin(yaw-roadView.yaw),Math.cos(yaw-roadView.yaw))*(1-Math.exp(-dt*8));
     roadView.pitch=Math.atan2(l.tangent.y,Math.hypot(l.tangent.x,l.tangent.z))-.035;roadView.roll=comfort?0:-model.lean*.16;
     // 舒适模式只稳定眼位；车和身体仍按真实曲率保持平衡，不能变成直立滑着过弯。
-    Object.assign(roadView,{distance:model.distance,speed:model.speed,offset:model.offset,lean:model.lean,steer:model.steering,brake:model.braking,cadence:model.cadence});
+    Object.assign(roadView,{distance:model.distance,speed:model.speed,offset:model.offset,lean:model.lean,steer:visualSteering(model.curvature,model.steering),brake:model.braking,cadence:model.cadence});
     if(!s.photo&&!s.controls)roadView.standing+=(Number(s.standing)-roadView.standing)*(1-Math.exp(-dt*5));
     presence.speed=model.speed;
     const nx=-l.tangent.z,nz=l.tangent.x,r=Math.hypot(nx,nz),aero=comfort?0:Math.max(0,(model.speed-10)/5)*.025;

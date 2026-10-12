@@ -29,7 +29,7 @@ function PracticeBall() {
   const sound = useSceneAudio("court");
   const quiet = useQuietMotion();
   const scratch = useRef({ aim: new Vector3(), hand: new Vector3(), forward: new Vector3(), up: new Vector3(0, 1, 0),dribble:dribblePose(0,0) });
-  const state = useRef({ charging: false, charge: 0, dribble: false, dribbleTime: 0, dribblePeriod: .65, handSide:1, publish: 0, contact: 0, pickup: 0 });
+  const state = useRef({ charging: false, charge: 0, dribble: false, dribbleTime: 0, dribblePeriod: .65, handSide:presence.hand, finishElapsed:0,finishJump:0,publish: 0, contact: 0, pickup: 0 });
   const texture = useWorldTexture("ball");
   const publish = () => {
     camera.getWorldDirection(scratch.current.aim);
@@ -47,7 +47,7 @@ function PracticeBall() {
     sound.unlock();
     if (simulation.mode !== "held" && distance() < 3.3) {
       simulation.pickup(); state.current.dribble = false; state.current.pickup = .24; publish(); acknowledge("Ball in hand · hold 5, release to shoot · near rim: 5 layup, Enter + 5 dunk");
-    } else if (simulation.mode === "held") { state.current.dribble = !state.current.dribble; if(state.current.dribble)state.current.dribbleTime=0; publish(); }
+    } else if (simulation.mode === "held") { state.current.dribble = !state.current.dribble; if(state.current.dribble){state.current.dribbleTime=0;state.current.handSide=presence.hand;} publish(); }
   };
   useInteractable(ball, { title: "THE PRACTICE BALL", hint: "Pick up / dribble", radius: 5, activate: pickup });
   useEffect(() => {
@@ -58,6 +58,7 @@ function PracticeBall() {
       const result = finish.start(kind, { position: camera.position, direction: scratch.current.aim, held: simulation.mode === "held", speed: presence.speed, hand: presence.hand, ball: simulation.position, feet:presence.leftFoot.y>0?{left:presence.leftFoot,right:presence.rightFoot}:undefined });
       if (!result.allowed) { useActivity.setState({ result: result.reason }); acknowledge(result.reason); return; }
       sound.unlock(); state.current.charging = false; state.current.charge = 0; state.current.dribble = false;
+      state.current.finishElapsed=0;state.current.finishJump=0;
       presence.finishLocked = true; presence.finish = kind; useActivity.setState({ result: kind === "dunk" ? "ATTACK THE RIM" : "LAYUP · SOFT TOUCH" }); publish();
     };
     const release = () => {
@@ -122,6 +123,11 @@ function PracticeBall() {
     const dt = Math.min(rawDelta, .06), local = state.current;
     const movement = finish.advance(dt, false);
     if (movement) {
+      // 真正落脚 / 落地时补足既有程序音效，暂停不会重复发声，也不加入版权音频。
+      if(local.finishElapsed<.27&&movement.elapsed>=.27)sound.sound("step",.68);
+      if(local.finishElapsed<.40&&movement.elapsed>=.40)sound.sound("step",.85);
+      if(movement.elapsed>.9&&local.finishJump>0&&movement.jump<=0)sound.sound("step",1);
+      local.finishElapsed=movement.elapsed;local.finishJump=movement.jump;
       presence.finishPose = movement;
       camera.position.set(movement.position.x, movement.position.y, movement.position.z); presence.jump = movement.jump;
       if (simulation.mode === "held") Object.assign(simulation.position, movement.ball);
@@ -145,7 +151,7 @@ function PracticeBall() {
         const before=old/dribblePeriod,t=local.dribbleTime/dribblePeriod;
         if(before<.44&&t>=.44)sound.sound("bounce");
         local.handSide+=(presence.hand-local.handSide)*(1-Math.exp(-dt*13));
-        const pose=dribblePose(t,presence.speed,local.handSide,scratch.current.dribble);
+        const pose=dribblePose(t,presence.speed,local.handSide,scratch.current.dribble,dribblePeriod);
         hand.set(pose.ball.x,pose.ball.y-1.65,pose.ball.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
         presence.dribblePalm.set(pose.palm.x,pose.palm.y-1.65,pose.palm.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
         presence.dribblePhase=t;presence.crossover=Math.min(1,Math.abs(local.handSide-presence.hand));

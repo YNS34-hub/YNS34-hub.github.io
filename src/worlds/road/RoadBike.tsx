@@ -1,7 +1,7 @@
 import { useEffect,useMemo,useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { BufferGeometry,Float32BufferAttribute,CatmullRomCurve3,TubeGeometry,Vector3,LatheGeometry,Vector2,Group,MeshStandardMaterial,ShaderMaterial,CanvasTexture,RepeatWrapping,SRGBColorSpace } from "three";
-import { roadView,useRoadRide } from "./state";
+import { peekRoadCinemaReturn,roadView,useRoadRide } from "./state";
 import {forestMap} from "./maps";
 import type {RideMap} from "./mapTypes";
 import { usePalaceStore } from "../../systems/store";
@@ -14,7 +14,8 @@ function useBikeParts(){
   const parts=useMemo(()=>{
     const frame:BufferGeometry[]=[],fork:BufferGeometry[]=[],metal:BufferGeometry[]=[],tape:BufferGeometry[]=[],cables:BufferGeometry[]=[];
     const bb:V=[0,.29,.08],seat:V=[0,.82,.24],head:V=[0,.90,-.39],rear:V=[0,.345,.54],front:V=[0,.345,-.61];
-    frame.push(tube([bb,[0,.46,-.13],head],.039),tube([seat,[0,.865,-.05],head],.024),tube([bb,seat],.029),tube([seat,[0,.94,.27]],.018));
+    frame.push(tube([bb,[0,.46,-.13],head],.039),tube([seat,[0,.865,-.05],head],.024),tube([bb,seat],.029));
+    const cityPost=tube([seat,[0,.867,.257]],.018),roadPost=tube([seat,[0,.918,.268]],.018);
     for(const side of [-1,1]){
       frame.push(tube([[side*.025,.29,.08],[side*.055,.30,.32],[side*.056,.345,.54]],.014),tube([[side*.015,.69,.20],[side*.05,.47,.44],[side*.058,.345,.54]],.010));
       fork.push(tube([[side*.025,.84,-.43],[side*.049,.67,-.51],[side*.051,.345,-.61]],.021));
@@ -34,9 +35,9 @@ function useBikeParts(){
     const canvas=document.createElement("canvas");canvas.width=64;canvas.height=512;const c=canvas.getContext("2d")!;c.fillStyle="#242b31";c.fillRect(0,0,64,512);
     for(let i=0;i<512;i+=8){c.fillStyle=i%16===0?"#3e484e":"#1c232a";c.fillRect(0,i,64,1);}
     const map=new CanvasTexture(canvas);map.colorSpace=SRGBColorSpace;map.wrapS=map.wrapT=RepeatWrapping;map.repeat.set(1,3);map.anisotropy=4;
-    return{frame,fork,metal,tape,cables,stem,cityStem,cityBar,rim,spokes,chain,map,bb,seat,head,rear,front};
+    return{frame,fork,metal,tape,cables,stem,cityStem,cityBar,cityPost,roadPost,rim,spokes,chain,map,bb,seat,head,rear,front};
   },[]);
-  useEffect(()=>()=>{[...parts.frame,...parts.fork,...parts.metal,...parts.tape,...parts.cables,parts.stem,parts.cityStem,parts.cityBar,parts.rim,parts.spokes,parts.chain].forEach(g=>g.dispose());parts.map.dispose();},[parts]);
+  useEffect(()=>()=>{[...parts.frame,...parts.fork,...parts.metal,...parts.tape,...parts.cables,parts.stem,parts.cityStem,parts.cityBar,parts.cityPost,parts.roadPost,parts.rim,parts.spokes,parts.chain].forEach(g=>g.dispose());parts.map.dispose();},[parts]);
   return parts;
 }
 // 原创公路车尺寸：约 1.15 m 轴距，700C 外径，30 mm 轮胎与 54 mm 深截面轮圈。无商业标识。
@@ -44,7 +45,8 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
   const {sample:roadSample,ground:terrainHeight}=map;
   const outfitId=useAppearance(s=>s.selected[map.id==="alpine-ride"?"alpine-ride":"cycling"]),city=outfits[outfitId].bike==="city";
   const p=useBikeParts(),root=useRef<Group>(null),cockpit=useRef<Group>(null),steering=useRef<Group>(null),cranks=useRef<Group>(null),frontWheel=useRef<Group>(null),rearWheel=useRef<Group>(null),pedals=useRef<(Group|null)[]>([]);
-  const pose=useMemo(()=>({point:new Vector3(),tangent:new Vector3(),spin:0,pedal:0}),[]);
+  // 骑行实例的 layout effect 消费快照前先取原曲柄相位，返回 Cinema 不交换左右脚姿态。
+  const pose=useMemo(()=>({point:new Vector3(),tangent:new Vector3(),spin:0,pedal:peekRoadCinemaReturn(map.id)?.pedalAngle??0}),[map.id]);
   const paint=useMemo(()=>new MeshStandardMaterial({color:"#c6dce0",metalness:.28,roughness:.25}),[]);
   // 轮胎接地点的窄遮蔽补足阴影贴图分辨率；不替代真实主光阴影、不增加离屏通道。
   const contact=useMemo(()=>new ShaderMaterial({transparent:true,depthWrite:false,toneMapped:false,
@@ -69,8 +71,8 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
     if(s.mounted)root.current.rotation.z=-(roadView.lean+roadView.rock)*e;
     if(frontWheel.current)frontWheel.current.rotation.x=pose.spin;if(rearWheel.current)rearWheel.current.rotation.x=pose.spin;
     if(cranks.current)cranks.current.rotation.x=-pose.pedal;
-    if(cockpit.current)cockpit.current.rotation.y=roadView.steer*.5;
-    if(steering.current)steering.current.rotation.y=roadView.steer*.5;
+    if(cockpit.current)cockpit.current.rotation.y=roadView.steer;
+    if(steering.current)steering.current.rotation.y=roadView.steer;
     pedals.current.forEach(pedal=>{if(pedal)pedal.rotation.x=pose.pedal;});
   },-2.4);
   function sOffset(){return roadView.offset;}
@@ -101,8 +103,12 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
       </>}
     </group></group>
     <mesh position={[0,.982,-.43]}><cylinderGeometry args={[.025,.025,.009,20]}/><meshStandardMaterial color="#65747d" metalness={.7} roughness={.3}/></mesh>
-    <mesh position={[0,.992,.29]} scale={[.074,.017,.143]}><sphereGeometry args={[1,24,12]}/><meshStandardMaterial color="#24303a" roughness={.48}/></mesh>
-    <mesh position={[0,.994,.15]} scale={[.034,.011,.075]}><sphereGeometry args={[1,16,8]}/><meshStandardMaterial color="#25313a" roughness={.5}/></mesh>
+    {/* 鞍座与座管按车种贴合实际骨长，不让角色陷进过高鞍座或让座管露出坐垫。 */}
+    <mesh geometry={city?p.cityPost:p.roadPost} material={paint} castShadow/>
+    <group position={[0,city?-.10:-.055,0]}>
+      <mesh position={[0,.992,.29]} scale={[.074,.017,.143]}><sphereGeometry args={[1,24,12]}/><meshStandardMaterial color="#24303a" roughness={.48}/></mesh>
+      <mesh position={[0,.994,.15]} scale={[.034,.011,.075]}><sphereGeometry args={[1,16,8]}/><meshStandardMaterial color="#25313a" roughness={.5}/></mesh>
+    </group>
     <Wheel center={p.rear} wheelRef={rearWheel} />
     <group position={[0,.56,-.115]} rotation={[.51,0,0]}>
       <mesh><cylinderGeometry args={[.032,.034,.175,16]}/><meshStandardMaterial color="#ecede4" roughness={.46}/></mesh>

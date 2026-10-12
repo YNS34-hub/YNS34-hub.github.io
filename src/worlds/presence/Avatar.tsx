@@ -127,18 +127,22 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
           bone.parent.getWorldQuaternion(rig.parent); bone.quaternion.copy(rig.parent.invert().multiply(rig.world)); bone.updateWorldMatrix(true,true);
         }
       }
+      // 看向路侧时头颈分担真实视线输入；不转动车身、不给默认骑姿叠加无关摇头循环。
+      const glance=Math.max(-.8,Math.min(.8,roadView.headYaw));
+      rotateBody("Bip01_Neck",glance*.28,0,1,0);rotateBody("Bip01_Head",glance*.50,0,1,0);
       // Rocketbox 的大腿挂在 Spine 下；腰部前倾时保留髋关节世界位置，随后只解算真实腿长。
       for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.position.copy(thigh.parent!.worldToLocal(hip.position));thigh.parent!.getWorldQuaternion(rig.parent);thigh.quaternion.copy(rig.parent.invert().multiply(hip.quaternion));thigh.updateWorldMatrix(true,true);}
       root.current.updateWorldMatrix(true, true);
       for (const side of [-1, 1] as const) {
         gripPoint(outfit.bike, side, roadView.steer, rig.target); root.current.localToWorld(rig.target);
         // IK 终点是腕骨，刹车罩接触点是掌心；保留 gripPoint 的真实把位，补腕到掌的距离。
-        if(outfit.bike==="road"){rig.point.set(0,.025,.035).transformDirection(root.current.matrixWorld).multiplyScalar(Math.hypot(.025,.035));rig.target.add(rig.point);}
+        if(outfit.bike==="road"){rig.point.set(0,.025,.035).applyAxisAngle(rig.axis.set(0,1,0),roadView.steer).transformDirection(root.current.matrixWorld).multiplyScalar(Math.hypot(.025,.035));rig.target.add(rig.point);}
         rig.pole.set(side * .42, outfit.bike === "city" ? 1.12 : 1.10, -.25); root.current.localToWorld(rig.pole);
         limb(side, "arm");
+        if(import.meta.env.DEV){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.point);root.current.userData[side===1?"rightWristError":"leftWristError"]=rig.point.distanceTo(rig.target);}
         // 手掌沿把位旋转，而不是保持站立动作的默认腕部朝向。
         rig.palm.set(0,-side,0).transformDirection(root.current.matrixWorld);
-        rig.fingers.set(0,outfit.bike==="city"?-.10:-.28,-1).applyAxisAngle(rig.axis.set(0,1,0),roadView.steer*.5).transformDirection(root.current.matrixWorld);
+        rig.fingers.set(0,outfit.bike==="city"?-.10:-.28,-1).applyAxisAngle(rig.axis.set(0,1,0),roadView.steer).transformDirection(root.current.matrixWorld);
         orientHand(side);
         const ankle=riderAnkle(side,roadView.pedalAngle,rig.effort,palace.reducedMotion||ride.comfort);
         root.current.getWorldQuaternion(rig.footWorld);rig.footWorld.multiply(rig.feet.get(side)!);
@@ -149,10 +153,12 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
         const foot=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!;
         foot.parent!.getWorldQuaternion(rig.parent);
         foot.quaternion.copy(rig.parent.invert().multiply(rig.footWorld));foot.updateWorldMatrix(true,true);
+        if(import.meta.env.DEV){foot.getWorldPosition(rig.point);rig.head.copy(rig.soles.get(side)!).applyQuaternion(rig.footWorld);rig.point.add(rig.head);root.current.userData[side===1?"rightSoleError":"leftSoleError"]=rig.point.distanceTo(rig.contact);}
       }
     } else {
       presence.camera.getWorldDirection(rig.direction);
-      root.current.position.set(presence.camera.position.x, presence.camera.position.y - 1.65 + presence.jump, presence.camera.position.z);
+      // 路线上步行眼高为 1.77 m；不能套用球场的 1.65 m，否则人物脚底悬空 12 cm。
+      root.current.position.set(presence.camera.position.x, presence.camera.position.y - (roomId==="basketball"?1.65:1.77) + presence.jump, presence.camera.position.z);
       const facing = Math.atan2(-rig.direction.x, -rig.direction.z);
       const moving = speed > .3 && !authoredAction ? Math.atan2(-presence.velocity.x, -presence.velocity.z) : facing;
       const heading = facing + Math.max(-.65, Math.min(.65, Math.atan2(Math.sin(moving - facing), Math.cos(moving - facing))));

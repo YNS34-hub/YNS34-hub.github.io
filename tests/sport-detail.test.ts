@@ -1,7 +1,7 @@
 import {describe,it,expect} from 'vitest';
 import {courtMovementSpeed,isCourtTurboKey,isPrimaryShotKey} from '../src/worlds/court/controls';
 import {dribblePose} from '../src/worlds/presence/dribblePose';
-import {balancedLean} from '../src/worlds/road/balance';
+import {balancedLean,visualSteering} from '../src/worlds/road/balance';
 import {riderPosture} from '../src/worlds/presence/riderPose';
 import {sportPixelRatio} from '../src/worlds/presence/clarity';
 import {FinishMotion} from '../src/worlds/court/finishing';
@@ -15,6 +15,10 @@ describe('requested court preset',()=>{
  });
 });
 describe('coupled dribble',()=>{
+ it('uses gravity in both airborne portions rather than speeding up the ball with arbitrary sine motion',()=>{
+  const period=.65,dp=.0001;
+  for(const p of [.20,.72]){const y=(at:number)=>dribblePose(at,0).ball.y;expect((y(p+dp)-2*y(p)+y(p-dp))/(dp*period)**2).toBeCloseTo(-9.81,4);}
+ });
  it('has a continuous top / real floor contact, without forcing the wrist down to the floor',()=>{
   const top=dribblePose(0,0),end=dribblePose(1,0),bounce=dribblePose(.44,0);
   expect(top.ball.y).toBeCloseTo(end.ball.y);expect(bounce.ball.y).toBeCloseTo(.12);
@@ -27,6 +31,10 @@ describe('coupled dribble',()=>{
  });
 });
 describe('cycling balance and standing posture',()=>{
+ it('turns the -Z-facing front wheel toward the real path, including automatic route curves',()=>{
+  expect(visualSteering(.03,0)).toBeLessThan(0);expect(visualSteering(0,.10)).toBeCloseTo(-.1);
+  expect(visualSteering(-.03,0)).toBeGreaterThan(0);expect(visualSteering(0,0)).toBe(0);
+ });
  it('uses lateral acceleration for visible lean while remaining bounded',()=>{
   expect(balancedLean(0,.2)).toBe(0);expect(balancedLean(12,0)).toBe(0);
   expect(balancedLean(10,.03)).toBeCloseTo(Math.atan(3/9.81));
