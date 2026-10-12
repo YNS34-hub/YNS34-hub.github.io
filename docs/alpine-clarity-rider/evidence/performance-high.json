@@ -1,0 +1,337 @@
+{
+  "sha": "3f40ce828b4eef16f2f7a2b458c5c9a5bac01769",
+  "dirty": false,
+  "at": "2026-10-12T04:00:00.102Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5190",
+  "quality": "high",
+  "deviceDpr": 1,
+  "scope": "Visible native Edge, high quality, neutral public avatar and empty private catalog. Saved route distances; native approach, mount, perspective button and side-view mouse drag. Actual drawing resolution is recorded per frame. No speed / physics / cadence injection.",
+  "frames": [
+    {
+      "name": "alpine-pass",
+      "width": 1920,
+      "progress": 0.12,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-pass.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1073.4814546617997,
+          894.3778629698539,
+          -237.75081224909417
+        ],
+        "quaternion": [
+          -0.04808993226702262,
+          0.5315838486178996,
+          0.030249540050165474,
+          0.8450981810593895
+        ],
+        "fov": 60,
+        "distance": 1218.8031493165115,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.5,
+        "drawing": "2880x1620",
+        "pedalAngle": 0,
+        "bones": {
+          "Bip01": [
+            -3.4946238088622157e-26,
+            0.9399231336577154,
+            2.8535768935952055e-10
+          ],
+          "Bip01_Spine": [
+            -1.732760057695868e-7,
+            1.0665649570068199,
+            0.0017148043149140257
+          ],
+          "Bip01_Head": [
+            -9.695170602147204e-7,
+            1.668515051623145,
+            -0.00857503480316437
+          ],
+          "Bip01_R_Thigh": [
+            0.09305838467239347,
+            0.9399232894153067,
+            -1.6612006186584281e-7
+          ],
+          "Bip01_R_Calf": [
+            0.11529265127536657,
+            0.5206500905658838,
+            -0.017162292442061234
+          ],
+          "Bip01_R_Foot": [
+            0.12317699592420248,
+            0.10424634985032588,
+            0.015306136743992154
+          ],
+          "Bip01_L_Thigh": [
+            -0.09305838634545861,
+            0.9399230312642834,
+            9.002280333832678e-8
+          ],
+          "Bip01_L_Calf": [
+            -0.11529146272560263,
+            0.5206497705322203,
+            -0.017161971746674335
+          ],
+          "Bip01_L_Foot": [
+            -0.12317449243712485,
+            0.10424596005329179,
+            0.015306479995947319
+          ],
+          "Bip01_R_Hand": [
+            0.6188321814840502,
+            1.098291964230872,
+            -0.08518100613255644
+          ],
+          "Bip01_L_Hand": [
+            -0.6188329800223638,
+            1.0982901417027515,
+            -0.08517928575877573
+          ]
+        },
+        "calls": 126,
+        "triangles": 2561999,
+        "textures": 38
+      },
+      "performance": {
+        "fps": 80.78714398089069,
+        "renderedFrames": 647,
+        "duplicateTicks": 0,
+        "p95Ms": 14.099999999998545,
+        "maxMs": 97.29999999999927,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 126,
+          "triangles": 2561999,
+          "textures": 38
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "alpine-valley",
+      "width": 1920,
+      "progress": 0.43,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-valley.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1522.6426489436535,
+          627.5320975043168,
+          -23.70269114978529
+        ],
+        "quaternion": [
+          -0.03267595025169192,
+          -0.7187852158076466,
+          -0.03386059133865284,
+          0.6936379143081068
+        ],
+        "fov": 60,
+        "distance": 4367.3779517175,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.5,
+        "drawing": "2880x1620",
+        "pedalAngle": 0,
+        "bones": {
+          "Bip01": [
+            -3.4946238088622157e-26,
+            0.9399231336577154,
+            2.8535768935952055e-10
+          ],
+          "Bip01_Spine": [
+            -1.732760057695868e-7,
+            1.0665649570068199,
+            0.0017148043149140257
+          ],
+          "Bip01_Head": [
+            -9.695170602147204e-7,
+            1.668515051623145,
+            -0.00857503480316437
+          ],
+          "Bip01_R_Thigh": [
+            0.09305838467239347,
+            0.9399232894153067,
+            -1.6612006186584281e-7
+          ],
+          "Bip01_R_Calf": [
+            0.11529265127536657,
+            0.5206500905658838,
+            -0.017162292442061234
+          ],
+          "Bip01_R_Foot": [
+            0.12317699592420248,
+            0.10424634985032588,
+            0.015306136743992154
+          ],
+          "Bip01_L_Thigh": [
+            -0.09305838634545861,
+            0.9399230312642834,
+            9.002280333832678e-8
+          ],
+          "Bip01_L_Calf": [
+            -0.11529146272560263,
+            0.5206497705322203,
+            -0.017161971746674335
+          ],
+          "Bip01_L_Foot": [
+            -0.12317449243712485,
+            0.10424596005329179,
+            0.015306479995947319
+          ],
+          "Bip01_R_Hand": [
+            0.6188321814840502,
+            1.098291964230872,
+            -0.08518100613255644
+          ],
+          "Bip01_L_Hand": [
+            -0.6188329800223638,
+            1.0982901417027515,
+            -0.08517928575877573
+          ]
+        },
+        "calls": 77,
+        "triangles": 2165836,
+        "textures": 41
+      },
+      "performance": {
+        "fps": 81.7697214836203,
+        "renderedFrames": 655,
+        "duplicateTicks": 0,
+        "p95Ms": 14.100000000002183,
+        "maxMs": 83.20000000000073,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 77,
+          "triangles": 2165836,
+          "textures": 41
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "alpine-rider-side",
+      "width": 1920,
+      "progress": 0.12,
+      "yaw": 1.25,
+      "pitch": -0.06,
+      "file": "1920-alpine-rider-side.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1069.415710975634,
+          895.8964504360334,
+          -239.43299187041987
+        ],
+        "quaternion": [
+          -0.05648042099013076,
+          0.8270537014802527,
+          0.08449230745139162,
+          0.5528591022079045
+        ],
+        "fov": 60,
+        "distance": 1218.8031493165115,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.5,
+        "drawing": "2880x1620",
+        "pedalAngle": 0,
+        "bones": {
+          "Bip01": [
+            2.8421709430404e-14,
+            1.004923133657712,
+            0.2500000002853539
+          ],
+          "Bip01_Spine": [
+            0.006886453233420296,
+            1.13137758249195,
+            0.2517149655733419
+          ],
+          "Bip01_Head": [
+            0.00547476573930794,
+            1.3724267076975136,
+            -0.29834285568790614
+          ],
+          "Bip01_R_Thigh": [
+            0.0953433294988599,
+            1.001480851883002,
+            0.2499348755385426
+          ],
+          "Bip01_R_Calf": [
+            0.14572726155876123,
+            0.6750746457539661,
+            -0.009871522294019995
+          ],
+          "Bip01_R_Foot": [
+            0.10799999860842033,
+            0.40199998891830535,
+            0.30400000817621725
+          ],
+          "Bip01_L_Thigh": [
+            -0.09065349821983658,
+            1.0081502645628004,
+            0.2503240638361603
+          ],
+          "Bip01_L_Calf": [
+            -0.15638658440360584,
+            0.8056773821822387,
+            -0.11197802886420047
+          ],
+          "Bip01_L_Foot": [
+            -0.10799999136915514,
+            0.40199994842464537,
+            -0.01599998987717299
+          ],
+          "Bip01_R_Hand": [
+            0.21070573746115423,
+            1.0229754092678147,
+            -0.6220960379926054
+          ],
+          "Bip01_L_Hand": [
+            -0.21031826334555598,
+            1.0285117359629792,
+            -0.6126721436778552
+          ]
+        },
+        "calls": 233,
+        "triangles": 2671527,
+        "textures": 51
+      },
+      "performance": {
+        "fps": 86.69294481591886,
+        "renderedFrames": 695,
+        "duplicateTicks": 0,
+        "p95Ms": 14.099999999998545,
+        "maxMs": 97.20000000000073,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 233,
+          "triangles": 2671527,
+          "textures": 51
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

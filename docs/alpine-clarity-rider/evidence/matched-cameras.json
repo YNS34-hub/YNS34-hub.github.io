@@ -1,0 +1,34 @@
+{
+  "beforeSha": "8a66c0083483f5dd9bf33df1903f060401f04cea",
+  "afterSha": "3f40ce828b4eef16f2f7a2b458c5c9a5bac01769",
+  "pairs": [
+    {
+      "view": "alpine-pass",
+      "positionDifferenceMetres": 0.0,
+      "absoluteQuaternionDot": 1.0,
+      "fov": 60,
+      "viewport": "1920x1080",
+      "beforeDpr": 1.0000000149011612,
+      "afterDpr": 1.5
+    },
+    {
+      "view": "alpine-valley",
+      "positionDifferenceMetres": 0.0,
+      "absoluteQuaternionDot": 1.0,
+      "fov": 60,
+      "viewport": "1920x1080",
+      "beforeDpr": 1.0000000149011612,
+      "afterDpr": 1.5
+    },
+    {
+      "view": "alpine-rider",
+      "positionDifferenceMetres": 0.0,
+      "absoluteQuaternionDot": 0.9999999999999999,
+      "fov": 60,
+      "viewport": "1920x1080",
+      "beforeDpr": 1.0000000149011612,
+      "afterDpr": 1.5
+    }
+  ],
+  "scope": "Same neutral content, saved route distance, original cameras and high setting. Daylight and drawing resolution intentionally differ. No matched baseline for the true native side view or 1440p."
+}

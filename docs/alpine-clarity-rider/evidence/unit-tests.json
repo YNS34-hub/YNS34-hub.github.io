@@ -1,0 +1,16 @@
+{
+  "runtimeSha": "3f40ce828b4eef16f2f7a2b458c5c9a5bac01769",
+  "filesPassed": 38,
+  "testsPassed": 207,
+  "source": "Actual vitest output saved in ignored qa-artifacts/alpine-sun-rider/unit-accepted.log",
+  "commands": [
+    "npm test",
+    "npx tsc -b",
+    "npm run lint",
+    "npm run build:public"
+  ],
+  "buildModules": 2456,
+  "shareableRoutes": 66,
+  "indexedRoutes": 52,
+  "scope": "The unit log predates the final QA-only script commit; runtime source is identical. Existing unit and preservation checks retained."
+}

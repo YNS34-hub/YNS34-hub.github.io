@@ -1,0 +1,557 @@
+{
+  "sha": "3f40ce828b4eef16f2f7a2b458c5c9a5bac01769",
+  "dirty": false,
+  "base": "http://127.0.0.1:5190",
+  "checks": [
+    "Native walk / mount",
+    "High resolution and exact skinned outline",
+    "Real cadence / connected limb poses / shared coasting settle",
+    "Weather / native resolution / outline choices persist without altering ride save",
+    "Return retains original museum resolution and controls"
+  ],
+  "errors": [],
+  "uploads": [],
+  "poses": [
+    {
+      "room": "alpine-ride",
+      "distance": 1220.0152717653916,
+      "speed": 0.1580761838113907,
+      "cadence": 51.02496783839008,
+      "phase": 1.3313197686496399,
+      "bones": {
+        "Bip01_R_Thigh": [
+          0.09756483118459866,
+          1.0014808518834568,
+          0.24993487553786048
+        ],
+        "Bip01_R_Calf": [
+          0.16098328592809705,
+          0.8280962173242867,
+          -0.1275499380487872
+        ],
+        "Bip01_R_Foot": [
+          0.10799999891955278,
+          0.5557761116451728,
+          0.18476877875184525
+        ],
+        "Bip01_L_Thigh": [
+          -0.08843199653409782,
+          1.0081502645632552,
+          0.25032406383570555
+        ],
+        "Bip01_L_Calf": [
+          -0.1275722732528379,
+          0.6574832690538414,
+          0.022114488843612886
+        ],
+        "Bip01_L_Foot": [
+          -0.10799999521321976,
+          0.2481519080905627,
+          0.10319013282139619
+        ],
+        "Bip01_R_Hand": [
+          0.21004412598253447,
+          1.015435439496059,
+          -0.6342716182573439
+        ],
+        "Bip01_L_Hand": [
+          -0.21011186048582425,
+          1.0210740110843515,
+          -0.6246419679412155
+        ]
+      },
+      "ink": [
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        }
+      ],
+      "dpr": 1.5,
+      "width": 2880,
+      "height": 1620,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "room": "alpine-ride",
+      "distance": 1220.320248364462,
+      "speed": 0.9426593764611245,
+      "cadence": 68.16820720759765,
+      "phase": 5.141493403795641,
+      "bones": {
+        "Bip01_R_Thigh": [
+          0.09140023681473508,
+          1.0014808518833433,
+          0.24993487553797422
+        ],
+        "Bip01_R_Calf": [
+          0.13195905792858298,
+          0.6418759877234379,
+          0.03635060628494102
+        ],
+        "Bip01_R_Foot": [
+          0.10799999748928713,
+          0.260006456889073,
+          0.2040111919610581
+        ],
+        "Bip01_L_Thigh": [
+          -0.09459659090387618,
+          1.008150264563028,
+          0.250324063835933
+        ],
+        "Bip01_L_Calf": [
+          -0.16781421257536522,
+          0.8876444005443318,
+          -0.14552493476935524
+        ],
+        "Bip01_L_Foot": [
+          -0.10799999525886506,
+          0.5436215390499228,
+          0.08377627666470744
+        ],
+        "Bip01_R_Hand": [
+          0.20999999486392085,
+          1.01499998776967,
+          -0.6350000183884958
+        ],
+        "Bip01_L_Hand": [
+          -0.21014302099888482,
+          1.0186018969526458,
+          -0.6287819445659579
+        ]
+      },
+      "ink": [
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        }
+      ],
+      "dpr": 1.5,
+      "width": 2880,
+      "height": 1620,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "room": "alpine-ride",
+      "distance": 1221.1277962810955,
+      "speed": 1.8381413465404204,
+      "cadence": 71.32294349629237,
+      "phase": 9.417379700200406,
+      "bones": {
+        "Bip01_R_Thigh": [
+          0.09537885025073933,
+          1.0014808518828886,
+          0.2499348755382016
+        ],
+        "Bip01_R_Calf": [
+          0.15939279128662065,
+          0.8036210586170682,
+          -0.11521253845808133
+        ],
+        "Bip01_R_Foot": [
+          0.10799999573148966,
+          0.4017224164175559,
+          -0.013503572563877242
+        ],
+        "Bip01_L_Thigh": [
+          -0.09061797746807088,
+          1.0081502645629143,
+          0.25032406383604666
+        ],
+        "Bip01_L_Calf": [
+          -0.14366010681058583,
+          0.680805106733942,
+          -0.007766217391235841
+        ],
+        "Bip01_L_Foot": [
+          -0.10799999703019125,
+          0.4022213568597408,
+          0.30147150685388624
+        ],
+        "Bip01_R_Hand": [
+          0.20999999420487825,
+          1.0149999882494285,
+          -0.6350000190681158
+        ],
+        "Bip01_L_Hand": [
+          -0.2100846321551728,
+          1.0181855772829067,
+          -0.6294901468303351
+        ]
+      },
+      "ink": [
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        }
+      ],
+      "dpr": 1.5,
+      "width": 2880,
+      "height": 1620,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "room": "alpine-ride",
+      "distance": 1222.2750919126402,
+      "speed": 2.6335396962351547,
+      "cadence": 71.8538809941867,
+      "phase": 13.301961554072564,
+      "bones": {
+        "Bip01_R_Thigh": [
+          0.09862169028303924,
+          1.001480851883457,
+          0.24993487553831528
+        ],
+        "Bip01_R_Calf": [
+          0.15441181372847268,
+          0.7430541836364455,
+          -0.07668728483906762
+        ],
+        "Bip01_R_Foot": [
+          0.10799999910057068,
+          0.5077625905573768,
+          0.26535402914521455
+        ],
+        "Bip01_L_Thigh": [
+          -0.08737513743560044,
+          1.0081502645628007,
+          0.25032406383604666
+        ],
+        "Bip01_L_Calf": [
+          -0.13596453790972873,
+          0.7082491323800468,
+          -0.03998145487514648
+        ],
+        "Bip01_L_Foot": [
+          -0.1079999933841691,
+          0.2961701337976592,
+          0.02260757821363768
+        ],
+        "Bip01_R_Hand": [
+          0.2099999940880366,
+          1.0149999882439715,
+          -0.6350000193406231
+        ],
+        "Bip01_L_Hand": [
+          -0.21004918093859715,
+          1.0181275266952525,
+          -0.6295895458342784
+        ]
+      },
+      "ink": [
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        }
+      ],
+      "dpr": 1.5,
+      "width": 2880,
+      "height": 1620,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "room": "alpine-ride",
+      "distance": 1223.9761064763563,
+      "speed": 3.4559810321374114,
+      "cadence": 71.972401684691,
+      "phase": 17.52094577770312,
+      "bones": {
+        "Bip01_R_Thigh": [
+          0.0905818961429361,
+          1.0014808518832297,
+          0.2499348755380879
+        ],
+        "Bip01_R_Calf": [
+          0.13038656236139445,
+          0.6431956343682259,
+          0.03400384990686689
+        ],
+        "Bip01_R_Foot": [
+          0.10799999738193833,
+          0.2505908165483106,
+          0.1749603855978421
+        ],
+        "Bip01_L_Thigh": [
+          -0.09541493157558989,
+          1.0081502645631417,
+          0.25032406383604666
+        ],
+        "Bip01_L_Calf": [
+          -0.16587021813376168,
+          0.8781136862992298,
+          -0.14300207818769195
+        ],
+        "Bip01_L_Foot": [
+          -0.10799999614974354,
+          0.5529358798622752,
+          0.11276919755118797
+        ],
+        "Bip01_R_Hand": [
+          0.20999999413746195,
+          1.0149999884849876,
+          -0.6350000188006106
+        ],
+        "Bip01_L_Hand": [
+          -0.2101325271428891,
+          1.0181056592314235,
+          -0.6296248616538378
+        ]
+      },
+      "ink": [
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        }
+      ],
+      "dpr": 1.5,
+      "width": 2880,
+      "height": 1620,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    },
+    {
+      "room": "alpine-ride",
+      "distance": 1226.0604024087654,
+      "speed": 4.174430196848667,
+      "cadence": 71.9946106682481,
+      "phase": 21.77941539153333,
+      "bones": {
+        "Bip01_R_Thigh": [
+          0.09637481870950634,
+          1.0014808518834568,
+          0.2499348755384289
+        ],
+        "Bip01_R_Calf": [
+          0.1646302753536872,
+          0.8297638230824302,
+          -0.12746858369723665
+        ],
+        "Bip01_R_Foot": [
+          0.10799999572591898,
+          0.43332620295893765,
+          -0.008562413965933045
+        ],
+        "Bip01_L_Thigh": [
+          -0.0896220090091333,
+          1.0081502645631415,
+          0.2503240638361603
+        ],
+        "Bip01_L_Calf": [
+          -0.14098801460127672,
+          0.6696290606669207,
+          0.006718150347523986
+        ],
+        "Bip01_L_Foot": [
+          -0.10799999661415424,
+          0.3705376644289799,
+          0.2964846865629624
+        ],
+        "Bip01_R_Hand": [
+          0.20999999407740683,
+          1.0149999883300322,
+          -0.63500001920886
+        ],
+        "Bip01_L_Hand": [
+          -0.21007216858342298,
+          1.0181027346227436,
+          -0.6296313766398497
+        ]
+      },
+      "ink": [
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        },
+        {
+          "visible": true,
+          "shared": true,
+          "skeleton": true
+        }
+      ],
+      "dpr": 1.5,
+      "width": 2880,
+      "height": 1620,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+    }
+  ],
+  "passed": true
+}
