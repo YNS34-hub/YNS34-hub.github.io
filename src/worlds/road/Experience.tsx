@@ -8,6 +8,7 @@ import { useActivity } from "../activity";
 import { useRoadAudio } from "./audio";
 import { RoadPhysics } from "./physics";
 import {visualSteering} from "./balance";
+import {walkingSurface} from "./walkingSurface";
 import {getRideMap} from "./maps";
 import type {RideMap} from "./mapTypes";
 import { roadView,useRoadRide,readRoadSave,saveRoadRide,rememberRoadCinema,takeRoadCinemaReturn,peekRoadCinemaReturn,type RoadCommand } from "./state";
@@ -19,7 +20,7 @@ import { outfits, useAppearance } from "../presence/appearance";
 export { primeRoadTextures as preloadRoadAssets } from "./textures";
 
 function RoadRider({map}:{map:RideMap}){
-  const {length:roadLength,sample:roadSample,stops:roadStops,chapter:roadChapter,ground:terrainHeight,forest:roadForestDensity}=map;
+  const {length:roadLength,sample:roadSample,stops:roadStops,chapter:roadChapter,forest:roadForestDensity}=map;
   const {camera:renderCamera,gl,scene}=useThree(),camera=actorCamera(renderCamera,map.id),quiet=useQuietMotion(),sound=useRoadAudio();
   const model=useMemo(()=>{const saved=peekRoadCinemaReturn(map.id)??readRoadSave(map),b=new RoadPhysics(map);b.distance=saved.distance;b.gear=saved.gear;b.lastSafe=b.distance;return b;},[map]);
   const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false,cinemaResume:peekRoadCinemaReturn(map.id)});
@@ -104,7 +105,7 @@ function RoadRider({map}:{map:RideMap}){
     if(!palace.started||palace.overlay||palace.focus||palace.mode==="index"||useActivity.getState().warming||document.hidden)return;
     const dt=Math.min(.06,rawDelta),comfort=quiet||s.comfort;
     if(!s.mounted){
-      camera.position.y=terrainHeight(camera.position.x,camera.position.z)+1.77;
+      camera.position.y=walkingSurface(map,camera.position.x,camera.position.z)+1.77;
       const near=camera.position.distanceToSquared(l.target.set(roadView.walkX+3.2,roadView.walkY+.7,roadView.walkZ-3.2))<10.5;
       if(near!==s.nearBike)useRoadRide.setState({nearBike:near});roadView.speed=0;roadView.cadence=0;
       sound.update({speed:0,cadence:0,pedaling:false,brake:0,nearWater:map.water(camera.position.x,camera.position.z),forest:map.id==="cycling"?1:map.forest(model.distance/map.length),stopped:true});return;
