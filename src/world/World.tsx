@@ -230,8 +230,8 @@ function Scene({
   const baseRoom = roomId.split("-page-")[0];
   useEffect(() => {
     gl.transmissionResolutionScale =
-      tier === "high" ? 0.8 : tier === "medium" ? 0.6 : 0.35;
-  }, [gl, tier]);
+      roomId === "atrium" && tier !== "low" ? 1 : tier === "high" ? 0.8 : tier === "medium" ? 0.6 : 0.35;
+  }, [gl, tier, roomId]);
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     const debug = window as Window & { __PALACE_DEBUG__?: unknown };

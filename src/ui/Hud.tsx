@@ -33,6 +33,7 @@ export default function Hud({ ready }: { ready: boolean }) {
   );
   const tracks = useLibraryStore((l) => l.music);
   const lightIdentity = useIdentityTone((tone) => tone.light);
+  const entranceInk = !s.started || lightIdentity;
   const room = roomInfo(s.roomId);
   const plan = resolveRoomPlan(s.roomId);
   const track = tracks.find((t) => t.id === audio.currentId);
@@ -62,10 +63,10 @@ export default function Hud({ ready }: { ready: boolean }) {
   return (
     <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`} data-threshold={s.pendingDoor ? "approach" : ready ? "arrived" : "loading"}>
       {s.started && s.roomId !== "cinema" && <div key={s.roomId} className="threshold-continuity" aria-hidden="true"><i /><i /></div>}
-      <MuseumNavigation className="hud-header" data-tone={lightIdentity ? "light" : "dark"}>
+      <MuseumNavigation className="hud-header" data-tone={entranceInk ? "light" : "dark"}>
         <button
           ref={identityCue}
-          className={`wordmark ${lightIdentity ? "identity-is-light" : ""}`}
+          className={`wordmark ${entranceInk ? "identity-is-light" : ""}`}
           onClick={() => s.setOverlay("about")}
           aria-label="About The Memory Palace"
         >

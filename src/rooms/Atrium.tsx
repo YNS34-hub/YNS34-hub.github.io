@@ -2,10 +2,8 @@ import { Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Group, Vector3, MeshBasicMaterial } from "three";
 import {
-  Block,
   ContactShadow,
   Door,
-  Floor,
   Label,
   Picture,
   useImageTexture,
@@ -15,6 +13,11 @@ import { usePalaceStore } from "../systems/store";
 import { useLibraryStore } from "../systems/library";
 import { projects } from "../content/catalog";
 import { VisualWall } from "./PersonalRooms";
+import { AtriumSurfaces, EntryBlock as Block } from "./atrium/surfaces";
+import AtriumAtmosphere from "./atrium/environment";
+import EntryFloor from "./atrium/EntryFloor";
+import { EntryCameraReveal, OpticalCore } from "./atrium/optics";
+import { entryScreens } from "./atrium/exhibits";
 
 function MemoryReveal() {
   const library = useLibraryStore();
@@ -128,7 +131,7 @@ function Core() {
         }}
       >
         <Suspense fallback={null}>
-          <GlassSculpture radius={2.7} />
+          <OpticalCore><GlassSculpture radius={2.7} /></OpticalCore>
         </Suspense>
       </group>
       <MemoryReveal />
@@ -140,15 +143,17 @@ export default function Atrium() {
   const images = useLibraryStore((s) => s.wallpapers);
   const hero = projects.find((x) => x.id === "giannis-fansite");
   return (
-    <group>
-      <Floor width={42} depth={54} color="#bfced5" />
+    <AtriumSurfaces><group>
+      <AtriumAtmosphere />
+      <EntryCameraReveal />
+      <EntryFloor />
       <Block position={[0, -0.22, 0]} scale={[42, 0.38, 54]} color="#b1c7d1" />
       {[-1, 1].map((side) => (
         <group key={side}>
           <Block
             position={[side * 7.3, 2.8, 21]}
             scale={[7.4, 5.6, 12]}
-            color="#1d344c"
+            color="#0b1d31"
             castShadow
           />
           <Block
@@ -195,7 +200,7 @@ export default function Atrium() {
       <Block
         position={[0, 5.5, 21]}
         scale={[21.5, 0.6, 12]}
-        color="#233b54"
+        color="#101e30"
         castShadow
       />
       <Block
@@ -208,7 +213,7 @@ export default function Atrium() {
       <Block
         position={[0, 7.3, -25.5]}
         scale={[42, 14.6, 0.8]}
-        color="#2a4864"
+        color="#19314c"
       />
       <Block
         position={[-9, 5.4, -24.92]}
@@ -234,14 +239,14 @@ export default function Atrium() {
           key={side}
           position={[side * 4.5, 5.3, -24.5]}
           scale={[1, 10.6, 2.2]}
-          color="#bdd8e8"
+            color="#e6f0f7"
           castShadow
         />
       ))}
       <Block
         position={[0, 10.55, -24.5]}
         scale={[10, 0.8, 2.2]}
-        color="#bdd8e8"
+        color="#e6f0f7"
       />
       <group position={[0, 0, -25]}>
         {Array.from({ length: 5 }, (_, i) => (
@@ -277,7 +282,9 @@ export default function Atrium() {
           <Block
             position={[i % 2 ? -2 : 2, 14, -8 + z]}
             scale={[26, 0.55, 5]}
-            color="#b7d1df"
+            color="#d9e8f1"
+            emissive="#c6dff2"
+            emissiveIntensity={0.12}
             castShadow
           />
           <Block
@@ -290,6 +297,9 @@ export default function Atrium() {
         </group>
       ))}
       <Core />
+      {entryScreens.map(screen=><group key={`screen-support-${screen.x}`} position={[screen.x,0,screen.z]} rotation={[0,screen.yaw,0]}>
+        {[-2.6,2.6].map(offset=><Block key={offset} position={[offset,screen.height/2,0]} scale={[.22,screen.height,.33]} color="#8797a2" roughness={.24} metalness={.75} castShadow />)}
+      </group>)}
       {hero && (
         <group
           position={[-12.2, 4.8, -8.5]}
@@ -389,6 +399,6 @@ export default function Atrium() {
           color="#8aa8bc"
         />
       ))}
-    </group>
+    </group></AtriumSurfaces>
   );
 }

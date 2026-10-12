@@ -3,6 +3,7 @@ import type { Footprint } from "../world/collision";
 import { roadView, readRoadSave } from "./road/state";
 import {getRideMap,isRideScene} from "./road/maps";
 import { Vector3 } from "three";
+import { entrySupportFootprints } from "../rooms/atrium/exhibits";
 
 export const isWorldScene = (id: string) => id === "worlds" || id === "basketball" || isRideScene(id);
 export function worldBounds(id: string): [number, number, number, number] | undefined {
@@ -11,6 +12,7 @@ export function worldBounds(id: string): [number, number, number, number] | unde
   if (isRideScene(id)) return [roadView.walkX-4.4,roadView.walkX+4.4,roadView.walkZ-9,roadView.walkZ+10.5];
 }
 export function worldFootprints(id: string): Footprint[] | undefined {
+  if (id === "atrium") return [{x:0,z:0,radius:3.8},...entrySupportFootprints()];
   if (id === "basketball") return [
     ...[-1, 1].map(side => ({ x: 0, z: side * 14.8, halfWidth: .55, halfDepth: 1.6 })),
     ...[-1, 1].flatMap(side => [-5, 5].map(z => ({ x: side * 10.2, z, halfWidth: .85, halfDepth: 2.1 }))),
