@@ -54,6 +54,8 @@ export class RoadPhysics {
     this.distance=Math.min(roadLength,this.distance+this.speed*Math.cos(this.heading)*dt);
     if((remaining<4&&this.speed<.1)||this.distance>=roadLength){this.speed=0;this.stopAt=null;this.atStop=true;this.ended=this.distance>=roadLength;}
     this.cadence+=(pedal&&!brake?Math.min(108,Math.max(72,wheelCadence))-this.cadence:-this.cadence)*(1-Math.exp(-dt*3));
+    // 刹停后脚踏应真正静止，不能把指数衰减的残余踏频带进 Cinema 返回姿态；主动起步仍保留踏频。
+    if(this.speed===0&&(!pedal||brake))this.cadence=0;
     this.state=this.atStop?"scenic-stop":this.speed===0?"stopped":brake?"braking":pedal&&this.grade>.025?"climbing":!pedal&&this.grade<-.02?"descending":Math.abs(this.steering)>.008?"cornering":!pedal?"coasting":this.speed<2.8?"starting":acceleration>.15?"accelerating":"cruising";
     this.lastSafe=this.distance;
   }
