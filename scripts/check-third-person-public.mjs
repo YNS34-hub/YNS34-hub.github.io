@@ -56,13 +56,15 @@ try{
    await page.keyboard.down("w");await page.waitForFunction(()=>document.querySelector(".road-mount")?.disabled===false);await page.keyboard.up("w");await page.keyboard.press("e");
    await page.waitForFunction(()=>document.querySelector(".road-status")?.dataset.mounted==="true");await page.waitForTimeout(800);
    await page.keyboard.down("w");await page.waitForFunction(()=>Number(document.querySelector(".road-status")?.dataset.speed)>.5);await page.keyboard.up("w");
+   // 公开包也用真实 C 键验证站姿，不能只依赖开发诊断或更换按钮文字。
+   if(personalControls){await page.keyboard.press("c");assert.equal(await page.getByRole("button",{name:"Seated · C",exact:true}).getAttribute("aria-pressed"),"true");await page.waitForTimeout(850);await page.screenshot({path:path.join(out,`${width}-${room}-standing.png`)});await page.keyboard.press("c");assert.equal(await page.getByRole("button",{name:"Stand · C",exact:true}).getAttribute("aria-pressed"),"false");}
    await page.keyboard.press("v");assert.equal(await page.getByRole("button",{name:"First person",exact:true}).getAttribute("aria-pressed"),"true");await page.keyboard.press("v");
    await page.keyboard.down("s");await page.waitForFunction(()=>Number(document.querySelector(".road-status")?.dataset.speed)<.01);await page.keyboard.up("s");
    await page.keyboard.press("p");await page.locator(".road-photo-tools").waitFor();await page.keyboard.press("Escape");await page.locator(".road-photo-tools").waitFor({state:"hidden"});
    await page.screenshot({path:path.join(out,`${width}-${room}.png`)});
    await page.getByRole("button",{name:"Ride options",exact:true}).click();await page.getByRole("button",{name:"Return to the Palace",exact:true}).click();
    await page.locator(".room-caption").filter({hasText:"WORLDS BEYOND"}).waitFor();
-   report.checks.push({width,name:room+": public third-person native mount/ride/brake, views, photo/ESC, Palace return"});
+   report.checks.push({width,name:room+": public third-person native mount/ride/brake, "+(personalControls?"standing / seated C, ":"")+"views, photo/ESC, Palace return"});
   }
   await context.close();
  }
