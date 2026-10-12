@@ -3,6 +3,7 @@ import {chromium} from "playwright";
 import {mkdir,writeFile} from "node:fs/promises";
 import {execFileSync} from "node:child_process";
 const out=process.env.PALACE_ARTIFACTS||"qa-artifacts/personal-athlete/performance";
+const quality=process.env.PALACE_QUALITY||"medium",personal=process.env.PALACE_PERSONAL==="1";assert.ok(["medium","high"].includes(quality));
 await mkdir(out,{recursive:true});
 const probe=await chromium.launch({channel:"msedge",headless:false,args:["--enable-automation"]});
 let defaults;
@@ -11,6 +12,7 @@ const args=["--use-angle=d3d11",(defaults||"--disable-features=")+",CalculateNat
 const browser=await chromium.launch({channel:"msedge",headless:false,args});
 const report={baseline:"12671dfb211a3059c870dc7d00bf9d5ed6a8b3df",sha:execFileSync("git",["rev-parse","HEAD"],{encoding:"utf8"}).trim(),dirty:!!execFileSync("git",["status","--porcelain"],{encoding:"utf8"}).trim(),date:new Date().toISOString(),browser:browser.version(),args,headed:true,viewport:[1920,1080],quality:"medium",dpr:"per scene, see drawingBuffer",scope:"Actual visible native Edge. Only its window-occlusion detector is disabled in the isolated test. Rendered-frame RAF wall intervals; duplicate RAF ticks excluded. Main-pass calls/triangles; sampled texture estimates are not total VRAM. Native pedaling / no speed injection. No other QA browser or build during measurement. Short samples, not a thermal or whole-route benchmark.",samples:[],errors:[]};
 const flush=()=>writeFile(out+"/performance.json",JSON.stringify(report,null,2));
+report.quality=quality;report.personalAvatar=personal;
 async function measure(page,label,seconds=7){
  await page.bringToFront();await page.waitForFunction(()=>!document.hidden&&document.hasFocus());
  const sample=await page.evaluate(async seconds=>{
@@ -30,8 +32,9 @@ try{
   if(label==="before"){const marker=await(await fetch(url+"/qa-baseline.json")).json();assert.equal(marker.sha,report.baseline);}
   const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1});
   await context.route("**/personal-media/manifest.json",r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
-  await context.route("**/personal-media/avatar.json",r=>r.fulfill({json:{profile:null}}));
-  await context.addInitScript(()=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality:"medium",tutorialDone:true,roomSoundtracks:false},version:0})));
+  if(!personal)await context.route("**/personal-media/avatar.json",r=>r.fulfill({json:{profile:null}}));
+  // 只改变隔离测试上下文的画质选择；本机人物只从既有本地注册读取，报告不写私人参数或文件列表。
+  await context.addInitScript(quality=>localStorage.setItem("memory-palace:v3",JSON.stringify({state:{quality,tutorialDone:true,roomSoundtracks:false},version:0})),quality);
   const page=await context.newPage();page.setDefaultTimeout(90000);page.on("pageerror",e=>report.errors.push(e.message));
   const ready=async room=>{await page.bringToFront();await page.waitForFunction(room=>window.__PALACE_DEBUG__?.roomId===room&&window.__PRESENCE_DEBUG__&&!window.__PRESENCE_DEBUG__.activity.getState().warming&&document.querySelector(".world-ready"),room);await page.waitForTimeout(2000);};
   await page.goto(url+"/basketball?view=third");await ready("basketball");await measure(page,label+" / court daylight");
