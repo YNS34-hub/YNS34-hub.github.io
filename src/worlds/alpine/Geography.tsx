@@ -32,7 +32,7 @@ export default function Geography({maps}:{maps:Maps}){
         vec3 aw=alpinePosition,an=normalize(alpineNormal),weights=pow(abs(an),vec3(4.));weights/=max(.001,weights.x+weights.y+weights.z);
         float eyeDistance=distance(cameraPosition,aw),macro=alpineNoise(aw.xz*.010),steep=1.-abs(an.y);
         vec2 grassUV=aw.xz/3.5;
-        vec3 grass=mix(texture2D(map,grassUV).rgb,texture2D(map,mat2(.8,-.6,.6,.8)*grassUV*.93+vec2(.31,.73)).rgb,macro)*vec3(.72,.73,.61);
+        vec3 grass=mix(texture2D(map,grassUV).rgb,texture2D(map,mat2(.8,-.6,.6,.8)*grassUV*.93+vec2(.31,.73)).rgb,macro)*vec3(.80,.96,.72);
         vec3 rock=alpineTri(alpineRock,aw,weights,2.8);
         float rockMask=smoothstep(.28,.62,steep+(alpineNoise(aw.xz*.027)-.5)*.10);
         vec2 aerialUV=alpineUV(alpineAtlas,alpineProjectionCurve.xy,aw),nearUV=alpineUV(alpineNearAtlas,alpineProjectionCurve.zw,aw);
@@ -46,8 +46,9 @@ export default function Geography({maps}:{maps:Maps}){
         float vegetation=smoothstep(.010,.070,aerial.g-aerial.b-max(0.,aerial.r-aerial.g)*2.)*smoothstep(.12,.30,saturation)*(1.-rockMask);
         // 实测影像的位置和地貌保持不动；减弱二次绿色染色，岩壁保留真实扫描材料的灰层。
         float aerialGrey=dot(aerial,vec3(.2126,.7152,.0722));
-        aerial=mix(aerial,vec3(aerialGrey)*vec3(1.,1.01,.91),vegetation*.48);
-        aerial*=mix(vec3(.66,.68,.69),vec3(.65,.64,.52),vegetation);
+        // 航拍仍决定真实分布；不再整体去绿、压暗两次，灰岩与草甸由原坡度遮罩分工。
+        aerial=mix(aerial,vec3(aerialGrey)*vec3(.87,1.02,.79),vegetation*.12);
+        aerial*=mix(vec3(.80,.85,.83),vec3(.75,.92,.72),vegetation);
         vec3 surface=mix(grass,rock,rockMask);
         float aerialWeight=mix(.28,.94,smoothstep(20.,240.,eyeDistance))*(1.-rockMask*.32);
         surface=mix(surface,aerial,aerialWeight);
@@ -62,7 +63,7 @@ export default function Geography({maps}:{maps:Maps}){
         normal=normalize((viewMatrix*vec4(normalize(an+detail*normalStrength),0.)).xyz);
       `);
     };
-    m.customProgramCacheKey=()=>"alpine-measured-ortho-triplanar-v4";return m;
+    m.customProgramCacheKey=()=>"alpine-measured-ortho-triplanar-v5-sunny";return m;
   },[maps,meta]);
   useEffect(()=>()=>geometries.forEach(g=>g.dispose()),[geometries]);useEffect(()=>()=>material.dispose(),[material]);
   return <group name="real-elevation-alpine-massif">{geometries.map(g=><mesh key={g.name} name={"alpine-terrain-tile:"+g.name} geometry={g} material={material} castShadow receiveShadow dispose={null}/>)}</group>;

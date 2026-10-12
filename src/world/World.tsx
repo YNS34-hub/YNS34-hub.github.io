@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
   Canvas,
   events as pointerEvents,
@@ -41,6 +41,8 @@ import WorldsBoundary, { MuseumWorldsEntry } from "../worlds/WorldsBoundary";
 import WorldsEnvironment from "../worlds/OutdoorEnvironment";
 import AdventureCamera from "../worlds/presence/CameraRig";
 import { isAdventureRoom } from "../worlds/presence/state";
+import {alpinePixelRatio} from "../worlds/alpine/daylight";
+import {useAlpineVisuals} from "../worlds/alpine/visualPreferences";
 // 交互扩展结束
 
 function Environment({
@@ -326,16 +328,25 @@ export default function World({ onReady }: { onReady?: () => void }) {
   const effective = usePalaceStore((s) => s.effectiveQuality);
   const tier = quality === "auto" ? effective : quality;
   const coarse = matchMedia("(pointer: coarse)").matches;
+  const detailed=useAlpineVisuals(s=>s.detailed);
+  const [dimensions,setDimensions]=useState(()=>({width:window.innerWidth,height:window.innerHeight}));
+  useEffect(()=>{
+    const resize=()=>setDimensions({width:window.innerWidth,height:window.innerHeight});
+    window.addEventListener("resize",resize);return()=>window.removeEventListener("resize",resize);
+  },[]);
   useEffect(() => {
     const chosen = coarse ? "low" : quality === "auto" ? effective : quality;
     if (effective !== chosen)
       usePalaceStore.getState().update({ effectiveQuality: chosen });
   }, [quality, effective, coarse]);
   const renderTier = coarse ? "low" : tier;
-  const dpr = Math.min(
+  const nativeDpr = Math.min(
     window.devicePixelRatio || 1,
     coarse ? 0.8 : tier === "high" ? 1.6 : tier === "medium" ? 1.25 : 0.85,
   );
+  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。
+  const dpr=roomId==="alpine-ride"&&detailed&&!coarse&&renderTier!=="low"
+    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true):nativeDpr;
   return (
     <Canvas
       className="world-canvas"

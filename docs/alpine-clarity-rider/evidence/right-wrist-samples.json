@@ -1,0 +1,19 @@
+{
+  "sha": "3f40ce828b4eef16f2f7a2b458c5c9a5bac01769",
+  "samples": 6,
+  "rightWristTargetInBikeSpace": [
+    0.21,
+    1.015,
+    -0.635
+  ],
+  "errorsMetres": [
+    0.000849761507775886,
+    2.2673708488531048e-08,
+    2.3135522529932405e-08,
+    2.339263166593603e-08,
+    2.2812887143493037e-08,
+    2.3243182988476362e-08
+  ],
+  "maxErrorMetres": 0.000849761507775886,
+  "scope": "Six actual pedaling samples of the neutral avatar. This is not a guarantee for every body profile, stationary pose, or extreme steering angle."
+}

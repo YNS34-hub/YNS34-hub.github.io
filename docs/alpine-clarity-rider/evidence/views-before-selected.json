@@ -1,0 +1,293 @@
+{
+  "sha": "8a66c0083483f5dd9bf33df1903f060401f04cea",
+  "dirty": false,
+  "at": "2026-10-12T01:50:58.421Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5190",
+  "quality": "high",
+  "dpr": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "alpine-pass",
+      "width": 1920,
+      "progress": 0.12,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-pass.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1073.4814546617997,
+          894.3778629698539,
+          -237.75081224909417
+        ],
+        "quaternion": [
+          -0.04808993226702262,
+          0.5315838486178996,
+          0.030249540050165474,
+          0.8450981810593895
+        ],
+        "fov": 60,
+        "distance": 1218.8031493165115,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.0000000149011612,
+        "drawing": "1920x1080",
+        "pedalAngle": 0,
+        "bones": {
+          "Bip01": [
+            -3.4946238088622157e-26,
+            0.9399231336577154,
+            2.8535768935952055e-10
+          ],
+          "Bip01_Spine": [
+            -1.732760057695868e-07,
+            1.0665649570068199,
+            0.0017148043149140257
+          ],
+          "Bip01_Head": [
+            -9.695170602147204e-07,
+            1.668515051623145,
+            -0.00857503480316437
+          ],
+          "Bip01_R_Thigh": [
+            0.09305838467239347,
+            0.9399232894153067,
+            -1.6612006186584281e-07
+          ],
+          "Bip01_R_Calf": [
+            0.11529265127536657,
+            0.5206500905658838,
+            -0.017162292442061234
+          ],
+          "Bip01_R_Foot": [
+            0.12317699592420248,
+            0.10424634985032588,
+            0.015306136743992154
+          ],
+          "Bip01_L_Thigh": [
+            -0.09305838634545861,
+            0.9399230312642834,
+            9.002280333832678e-08
+          ],
+          "Bip01_L_Calf": [
+            -0.11529146272560263,
+            0.5206497705322203,
+            -0.017161971746674335
+          ],
+          "Bip01_L_Foot": [
+            -0.12317449243712485,
+            0.10424596005329179,
+            0.015306479995947319
+          ],
+          "Bip01_R_Hand": [
+            0.6188321814840502,
+            1.098291964230872,
+            -0.08518100613255644
+          ],
+          "Bip01_L_Hand": [
+            -0.6188329800223638,
+            1.0982901417027515,
+            -0.08517928575877573
+          ]
+        },
+        "calls": 125,
+        "triangles": 2561987,
+        "textures": 38
+      }
+    },
+    {
+      "name": "alpine-valley",
+      "width": 1920,
+      "progress": 0.43,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-valley.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1522.6426489436535,
+          627.5320975043168,
+          -23.70269114978529
+        ],
+        "quaternion": [
+          -0.03267595025169192,
+          -0.7187852158076466,
+          -0.03386059133865284,
+          0.6936379143081068
+        ],
+        "fov": 60,
+        "distance": 4367.3779517175,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.0000000149011612,
+        "drawing": "1920x1080",
+        "pedalAngle": 0,
+        "bones": {
+          "Bip01": [
+            -3.4946238088622157e-26,
+            0.9399231336577154,
+            2.8535768935952055e-10
+          ],
+          "Bip01_Spine": [
+            -1.732760057695868e-07,
+            1.0665649570068199,
+            0.0017148043149140257
+          ],
+          "Bip01_Head": [
+            -9.695170602147204e-07,
+            1.668515051623145,
+            -0.00857503480316437
+          ],
+          "Bip01_R_Thigh": [
+            0.09305838467239347,
+            0.9399232894153067,
+            -1.6612006186584281e-07
+          ],
+          "Bip01_R_Calf": [
+            0.11529265127536657,
+            0.5206500905658838,
+            -0.017162292442061234
+          ],
+          "Bip01_R_Foot": [
+            0.12317699592420248,
+            0.10424634985032588,
+            0.015306136743992154
+          ],
+          "Bip01_L_Thigh": [
+            -0.09305838634545861,
+            0.9399230312642834,
+            9.002280333832678e-08
+          ],
+          "Bip01_L_Calf": [
+            -0.11529146272560263,
+            0.5206497705322203,
+            -0.017161971746674335
+          ],
+          "Bip01_L_Foot": [
+            -0.12317449243712485,
+            0.10424596005329179,
+            0.015306479995947319
+          ],
+          "Bip01_R_Hand": [
+            0.6188321814840502,
+            1.098291964230872,
+            -0.08518100613255644
+          ],
+          "Bip01_L_Hand": [
+            -0.6188329800223638,
+            1.0982901417027515,
+            -0.08517928575877573
+          ]
+        },
+        "calls": 76,
+        "triangles": 2165824,
+        "textures": 41
+      }
+    },
+    {
+      "name": "alpine-rider",
+      "width": 1920,
+      "progress": 0.12,
+      "yaw": 0,
+      "pitch": -0.06,
+      "file": "1920-alpine-rider.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1069.5153365332587,
+          895.8778629698539,
+          -235.84558076959922
+        ],
+        "quaternion": [
+          -0.08437240458408975,
+          0.5297922149450862,
+          0.05307194897725745,
+          0.8422498884298136
+        ],
+        "fov": 60,
+        "distance": 1218.8031493165115,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "dpr": 1.0000000149011612,
+        "drawing": "1920x1080",
+        "pedalAngle": 0,
+        "bones": {
+          "Bip01": [
+            -2.8421709430404e-14,
+            1.0049231336575983,
+            0.19000000028552216
+          ],
+          "Bip01_Spine": [
+            0.006886453233391874,
+            1.1313775824920638,
+            0.19171496557339646
+          ],
+          "Bip01_Head": [
+            0.005474765741524833,
+            1.550686903821315,
+            -0.2382245424275879
+          ],
+          "Bip01_R_Thigh": [
+            0.09534332949894517,
+            1.0014808518831158,
+            0.1899348755383698
+          ],
+          "Bip01_R_Calf": [
+            0.15027001064547105,
+            0.679608036555578,
+            -0.07456440002783891
+          ],
+          "Bip01_R_Foot": [
+            0.10799999852883954,
+            0.40799998724014575,
+            0.24000000653779802
+          ],
+          "Bip01_L_Thigh": [
+            -0.09065349821975131,
+            1.0081502645626867,
+            0.1903240638359875
+          ],
+          "Bip01_L_Calf": [
+            -0.16563565919901177,
+            0.811118061523757,
+            -0.17317958066507796
+          ],
+          "Bip01_L_Foot": [
+            -0.1079999895917467,
+            0.4079999523924015,
+            -0.07999998490356573
+          ],
+          "Bip01_R_Hand": [
+            0.21546653196665483,
+            1.0879178639337395,
+            -0.5463011041609888
+          ],
+          "Bip01_L_Hand": [
+            -0.2111857255909228,
+            1.0904570156296811,
+            -0.5394313432431089
+          ]
+        },
+        "calls": 184,
+        "triangles": 2566403,
+        "textures": 49
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true,
+  "selectionNote": "Only verified paired first-person / rear views. The old staged side label was not a true side view and is excluded."
+}

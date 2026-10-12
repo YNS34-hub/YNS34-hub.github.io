@@ -1,4 +1,4 @@
-import { Vector3 } from "three";
+import { Vector3, type Quaternion } from "three";
 
 export type BikeStyle = "city" | "road";
 export function gripPoint(style: BikeStyle, side: number, steer: number, result: Vector3) {
@@ -9,9 +9,25 @@ export function gripPoint(style: BikeStyle, side: number, steer: number, result:
 }
 export function riderPosture(style: BikeStyle, effort: number, brake: number, phase: number, comfort: boolean) {
   const active = Math.max(0, Math.min(1, effort)), braking = Math.max(0, Math.min(1, brake));
-  return { spine: (style === "city" ? -.38 : -.75) - active * .025 + braking * .035,
-    spine1: style === "city" ? -.045 : -.085, head: (style === "city" ? .37 : .69) + active * .018,
+  return { spine: (style === "city" ? -.38 : -1.11) - active * .025 + braking * .035,
+    spine1: style === "city" ? -.045 : -.085, head: (style === "city" ? .37 : 1.05) + active * .018,
     hipShift: comfort ? 0 : Math.sin(phase) * .006 * active,
     ankle: comfort ? 0 : Math.sin(phase - .25) * .055 * active,
     eyeOffset: style === "city" ? .085 : 0 };
+}
+
+export function riderAnkle(side:number,phase:number,effort:number,comfort:boolean){
+  return comfort?0:Math.sin(phase+(side<0?Math.PI:0)-.35)*.08*Math.max(0,Math.min(1,effort));
+}
+// 以鞋底接触点反求踝关节，脚踝俯仰后鞋底仍在真实脚踏上；支持输入与输出共用向量。
+export function ankleFromContact(contact:Vector3,soleOffset:Vector3,orientation:Quaternion,output:Vector3){
+  const x=contact.x,y=contact.y,z=contact.z;
+  output.copy(soleOffset).applyQuaternion(orientation);return output.set(x-output.x,y-output.y,z-output.z);
+}
+
+// 滑行时仅把原视觉曲柄缓慢摆回水平；有真实踏频时完全沿用原相位，不修改骑行物理。
+export function settleCranks(phase:number,cadence:number,speed:number,delta:number){
+  if(cadence>1||speed<.2)return phase;
+  const level=Math.round(phase/Math.PI)*Math.PI;
+  return phase+(level-phase)*(1-Math.exp(-Math.max(0,Math.min(.06,delta))*4.5));
 }
