@@ -24,7 +24,7 @@ describe("authored road ride",()=>{
   it("smooths steering and keeps high-speed response small within the natural road envelope",()=>{
     const slow=new RoadPhysics(),fast=new RoadPhysics();slow.speed=3;fast.speed=14;
     slow.step(.016,{steer:1},0);fast.step(.016,{steer:1},0);expect(fast.steering).toBeLessThan(slow.steering/3);
-    advance(fast,20,{pedal:true,steer:1});expect(Math.abs(fast.offset)).toBeLessThanOrEqual(2.24);expect(Math.abs(fast.lean)).toBeLessThanOrEqual(.15);
+    advance(fast,20,{pedal:true,steer:1});expect(Math.abs(fast.offset)).toBeLessThanOrEqual(2.24);expect(Math.abs(fast.lean)).toBeLessThanOrEqual(.52);
   });
   it("bounds sectors and recovers only invalid states without background-tab jumps",()=>{
     for(let d=0;d<roadLength;d+=100){expect(activeRoadSectors(d).length).toBeLessThanOrEqual(6);expect(activeRoadSectors(d)).toContain(Math.floor(d/160));}

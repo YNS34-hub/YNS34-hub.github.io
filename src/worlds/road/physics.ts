@@ -1,5 +1,6 @@
 import { Vector3 } from "three";
 import { roadLength, roadSample } from "./route";
+import {balancedLean} from "./balance";
 
 export type RidingState="stopped"|"mounting"|"starting"|"accelerating"|"cruising"|"coasting"|"climbing"|"braking"|"cornering"|"descending"|"scenic-stop"|"dismounting";
 export const sprockets=[34,30,27,24,22,20,18,16,15,14,12,11];
@@ -48,8 +49,7 @@ export class RoadPhysics {
     const yaw=Math.atan2(-this.tangent.x,-this.tangent.z),nextYaw=Math.atan2(-this.nextTangent.x,-this.nextTangent.z);
     const curvature=-Math.atan2(Math.sin(nextYaw-yaw),Math.cos(nextYaw-yaw))/2;
     // 曲线本身也产生侧倾；头部只保留其中很小一部分，不能把转弯全部转嫁给镜头。
-    this.lean+=(Math.atan(this.speed*this.speed*(curvature+this.steering/1.01)/9.81)*.42-this.lean)*(1-Math.exp(-dt*5));
-    this.lean=Math.max(-.15,Math.min(.15,this.lean));
+    this.lean+=(balancedLean(this.speed,curvature+Math.tan(this.steering)/1.01)-this.lean)*(1-Math.exp(-dt*5));
     this.distance=Math.min(roadLength,this.distance+this.speed*Math.cos(this.heading)*dt);
     if((remaining<4&&this.speed<.1)||this.distance>=roadLength){this.speed=0;this.stopAt=null;this.atStop=true;this.ended=this.distance>=roadLength;}
     this.cadence+=(pedal&&!brake?Math.min(108,Math.max(72,wheelCadence))-this.cadence:-this.cadence)*(1-Math.exp(-dt*3));

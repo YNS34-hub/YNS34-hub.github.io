@@ -1,0 +1,26 @@
+{
+  "baseline": "12671dfb211a3059c870dc7d00bf9d5ed6a8b3df",
+  "scope": "Only requested athlete input and outdoor clarity insertion points; old fixed digests remain unchanged.",
+  "files": {
+    "src/world/Player.tsx": [
+      {
+        "before": "import { setWorldView } from \"../worlds/worldConfig\";\nimport { applyRoadLook } from \"../worlds/road/state\";\nimport { actorCamera, isAdventureRoom, presence } from \"../worlds/presence/state\";\n// 交互扩展结束\n\nconst EYE = 1.65;\n",
+        "after": "import { setWorldView } from \"../worlds/worldConfig\";\nimport { applyRoadLook } from \"../worlds/road/state\";\nimport { actorCamera, isAdventureRoom, presence } from \"../worlds/presence/state\";\nimport { courtMovementSpeed } from \"../worlds/court/controls\";\n// 交互扩展结束\n\nconst EYE = 1.65;\n"
+      },
+      {
+        "before": "      (input.has(\"KeyS\") || input.has(\"ArrowDown\") ? 1 : 0) -\n      (input.has(\"KeyW\") || input.has(\"ArrowUp\") ? 1 : 0);\n    const speed =\n      input.has(\"ShiftLeft\") || input.has(\"ShiftRight\") || roomId === \"basketball\" && (input.has(\"Enter\") || input.has(\"NumpadEnter\")) ? roomId === \"basketball\" ? 6.2 : 4.45 : 2.7;\n    // 交互扩展开始 player-presence-sprint\n    if (isAdventureRoom(roomId)) {\n      presence.turboHeld = input.has(\"ShiftLeft\") || input.has(\"ShiftRight\") || roomId === \"basketball\" && (input.has(\"Enter\") || input.has(\"NumpadEnter\"));\n      presence.sprinting = presence.turboHeld && !!(x || z);\n    }\n    // 交互扩展结束\n",
+        "after": "      (input.has(\"KeyS\") || input.has(\"ArrowDown\") ? 1 : 0) -\n      (input.has(\"KeyW\") || input.has(\"ArrowUp\") ? 1 : 0);\n    const speed =\n      courtMovementSpeed(roomId, input);\n    // 交互扩展开始 player-presence-sprint\n    if (isAdventureRoom(roomId)) {\n      presence.turboHeld = roomId === \"basketball\" ? input.has(\"Enter\") || input.has(\"NumpadEnter\") : input.has(\"ShiftLeft\") || input.has(\"ShiftRight\");\n      presence.sprinting = presence.turboHeld && !!(x || z);\n    }\n    // 交互扩展结束\n"
+      }
+    ],
+    "src/world/World.tsx": [
+      {
+        "before": "import AdventureCamera from \"../worlds/presence/CameraRig\";\nimport { isAdventureRoom } from \"../worlds/presence/state\";\nimport {alpinePixelRatio} from \"../worlds/alpine/daylight\";\nimport {useAlpineVisuals} from \"../worlds/alpine/visualPreferences\";\n// 交互扩展结束\n\n",
+        "after": "import AdventureCamera from \"../worlds/presence/CameraRig\";\nimport { isAdventureRoom } from \"../worlds/presence/state\";\nimport {alpinePixelRatio} from \"../worlds/alpine/daylight\";\nimport {sportPixelRatio} from \"../worlds/presence/clarity\";\nimport {useAlpineVisuals} from \"../worlds/alpine/visualPreferences\";\n// 交互扩展结束\n\n"
+      },
+      {
+        "before": "  );\n  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。\n  const dpr=roomId===\"alpine-ride\"&&detailed&&!coarse&&renderTier!==\"low\"\n    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true):nativeDpr;\n  return (\n    <Canvas\n      className=\"world-canvas\"\n",
+        "after": "  );\n  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。\n  const dpr=roomId===\"alpine-ride\"&&detailed&&!coarse&&renderTier!==\"low\"\n    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true)\n    :[\"basketball\",\"cycling\"].includes(roomId)&&!coarse?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;\n  return (\n    <Canvas\n      className=\"world-canvas\"\n"
+      }
+    ]
+  }
+}

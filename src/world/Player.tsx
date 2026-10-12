@@ -14,6 +14,7 @@ import { worksForRoom } from "../systems/mediaPlacement";
 import { setWorldView } from "../worlds/worldConfig";
 import { applyRoadLook } from "../worlds/road/state";
 import { actorCamera, isAdventureRoom, presence } from "../worlds/presence/state";
+import { courtMovementSpeed } from "../worlds/court/controls";
 // 交互扩展结束
 
 const EYE = 1.65;
@@ -268,10 +269,10 @@ export default function Player({ roomId }: { roomId: string }) {
       (input.has("KeyS") || input.has("ArrowDown") ? 1 : 0) -
       (input.has("KeyW") || input.has("ArrowUp") ? 1 : 0);
     const speed =
-      input.has("ShiftLeft") || input.has("ShiftRight") || roomId === "basketball" && (input.has("Enter") || input.has("NumpadEnter")) ? roomId === "basketball" ? 6.2 : 4.45 : 2.7;
+      courtMovementSpeed(roomId, input);
     // 交互扩展开始 player-presence-sprint
     if (isAdventureRoom(roomId)) {
-      presence.turboHeld = input.has("ShiftLeft") || input.has("ShiftRight") || roomId === "basketball" && (input.has("Enter") || input.has("NumpadEnter"));
+      presence.turboHeld = roomId === "basketball" ? input.has("Enter") || input.has("NumpadEnter") : input.has("ShiftLeft") || input.has("ShiftRight");
       presence.sprinting = presence.turboHeld && !!(x || z);
     }
     // 交互扩展结束

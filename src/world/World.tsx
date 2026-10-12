@@ -42,6 +42,7 @@ import WorldsEnvironment from "../worlds/OutdoorEnvironment";
 import AdventureCamera from "../worlds/presence/CameraRig";
 import { isAdventureRoom } from "../worlds/presence/state";
 import {alpinePixelRatio} from "../worlds/alpine/daylight";
+import {sportPixelRatio} from "../worlds/presence/clarity";
 import {useAlpineVisuals} from "../worlds/alpine/visualPreferences";
 // 交互扩展结束
 
@@ -346,7 +347,8 @@ export default function World({ onReady }: { onReady?: () => void }) {
   );
   // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。
   const dpr=roomId==="alpine-ride"&&detailed&&!coarse&&renderTier!=="low"
-    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true):nativeDpr;
+    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true)
+    :["basketball","cycling"].includes(roomId)&&!coarse?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;
   return (
     <Canvas
       className="world-canvas"

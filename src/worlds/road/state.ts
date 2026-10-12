@@ -7,12 +7,12 @@ import type { RidingState } from "./physics";
 
 export const useRoadRide=create<{
   mounted:boolean; state:RidingState; nearBike:boolean;speed:number;distance:number;cadence:number;gear:number;grade:number;
-  photo:boolean; controls:boolean; easy:boolean; comfort:boolean; place:string;gearSequence:number;recovery:boolean;
-}>(()=>({mounted:false,state:"stopped",nearBike:false,speed:0,distance:0,cadence:0,gear:7,grade:0,photo:false,controls:false,easy:false,comfort:false,place:"",gearSequence:0,recovery:false}));
-export type RoadCommand="mount"|"dismount"|"pedal"|"brake"|"stop"|"photo"|"save"|"easier"|"harder"|"restart";
+  photo:boolean; controls:boolean; easy:boolean; comfort:boolean; standing:boolean;place:string;gearSequence:number;recovery:boolean;
+}>(()=>({mounted:false,state:"stopped",nearBike:false,speed:0,distance:0,cadence:0,gear:7,grade:0,photo:false,controls:false,easy:false,comfort:false,standing:false,place:"",gearSequence:0,recovery:false}));
+export type RoadCommand="mount"|"dismount"|"pedal"|"brake"|"stop"|"photo"|"save"|"easier"|"harder"|"restart"|"stance";
 export function roadCommand(detail:RoadCommand){window.dispatchEvent(new CustomEvent("palace:road",{detail}));}
-export const roadView={active:false,mounted:false,yaw:0,pitch:0,roll:0,baseYaw:0,basePitch:0,headYaw:0,headPitch:0,lookPending:false,distance:0,speed:0,offset:0,lean:0,steer:0,brake:0,cadence:0,pedalAngle:0,walkX:0,walkY:18,walkZ:0,mountProgress:0,parkYaw:-.4};
-export interface RoadCinemaReturn {mapId?:string;distance:number;gear:number;offset:number;heading:number;headYaw:number;headPitch:number;yaw:number;pitch:number;roll:number;mounted:boolean;photo:boolean;comfort:boolean}
+export const roadView={active:false,mounted:false,yaw:0,pitch:0,roll:0,baseYaw:0,basePitch:0,headYaw:0,headPitch:0,lookPending:false,distance:0,speed:0,offset:0,lean:0,rock:0,steer:0,brake:0,cadence:0,pedalAngle:0,standing:0,walkX:0,walkY:18,walkZ:0,mountProgress:0,parkYaw:-.4};
+export interface RoadCinemaReturn {mapId?:string;distance:number;gear:number;offset:number;heading:number;headYaw:number;headPitch:number;yaw:number;pitch:number;roll:number;mounted:boolean;photo:boolean;comfort:boolean;standing?:boolean}
 let cinemaReturn:RoadCinemaReturn|null=null;
 // Cinema 的同次访问保留骑姿与朝向，速度安全归零；不写数据库，不在刷新后自动上车。
 export function rememberRoadCinema(value:RoadCinemaReturn){cinemaReturn={...value};}

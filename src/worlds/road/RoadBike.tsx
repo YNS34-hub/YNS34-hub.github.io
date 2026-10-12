@@ -6,7 +6,7 @@ import {forestMap} from "./maps";
 import type {RideMap} from "./mapTypes";
 import { usePalaceStore } from "../../systems/store";
 import { outfits, useAppearance } from "../presence/appearance";
-import {settleCranks} from "../presence/riderPose";
+import {riderPosture,settleCranks} from "../presence/riderPose";
 
 type V=[number,number,number];
 function tube(points:V[],radius:number,segments=12){return new TubeGeometry(new CatmullRomCurve3(points.map(p=>new Vector3(...p))),segments,radius,8,false);}
@@ -25,9 +25,10 @@ function useBikeParts(){
     const stem=tube([head,[0,.968,-.43],[0,.975,-.48]],.022);
     const cityStem=tube([head,[0,1.06,-.40],[0,1.185,-.41]],.022);
     const cityBar=tube([[-.31,1.185,-.41],[-.265,1.185,-.41],[0,1.16,-.42],[.265,1.185,-.41],[.31,1.185,-.41]],.012,24);
-    const rim=new LatheGeometry([new Vector2(.277,-.013),new Vector2(.32,-.014),new Vector2(.331,-.008),new Vector2(.331,.008),new Vector2(.32,.014),new Vector2(.277,.013),new Vector2(.277,-.013)],64);
+    const rim=new LatheGeometry([new Vector2(.277,-.013),new Vector2(.32,-.014),new Vector2(.331,-.008),new Vector2(.331,.008),new Vector2(.32,.014),new Vector2(.277,.013),new Vector2(.277,-.013)],96);
     const spokes=new BufferGeometry(),vertices:number[]=[];
-    for(let i=0;i<24;i++){const a=i/24*Math.PI*2;vertices.push(i%2?.025:-.025,0,0,0,Math.sin(a)*.30,Math.cos(a)*.30);}
+    // 辐条从花鼓侧缘交叉穿至轮圈，保留轻量线几何；不是从轮心同点放射的示意图。
+    for(let i=0;i<28;i++){const a=i/28*Math.PI*2,b=a+(i%2?1:-1)*Math.PI*4/28;vertices.push(i%2?.025:-.025,Math.sin(b)*.017,Math.cos(b)*.017,0,Math.sin(a)*.305,Math.cos(a)*.305);}
     spokes.setAttribute("position",new Float32BufferAttribute(vertices,3));
     const chain=tube([[.071,.29,.18],[.071,.345,.60],[.071,.365,.54],[.071,.37,.25],[.071,.39,.08],[.071,.35,-.03],[.071,.24,.01],[.071,.19,.08],[.071,.22,.18]],.003,60);
     const canvas=document.createElement("canvas");canvas.width=64;canvas.height=512;const c=canvas.getContext("2d")!;c.fillStyle="#242b31";c.fillRect(0,0,64,512);
@@ -64,6 +65,8 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
     const palacePaused=usePalaceStore.getState().overlay||usePalaceStore.getState().focus||s.controls||s.photo||document.hidden;
     if(!palacePaused){pose.spin-=roadView.speed*dt/.345;pose.pedal+=roadView.cadence/60*Math.PI*2*dt;pose.pedal=settleCranks(pose.pedal,roadView.cadence,roadView.speed,dt);}
     roadView.pedalAngle=pose.pedal;
+    roadView.rock=riderPosture(city?"city":"road",Math.min(1,roadView.cadence/88),roadView.brake,pose.pedal,usePalaceStore.getState().reducedMotion||s.comfort,roadView.standing).rock;
+    if(s.mounted)root.current.rotation.z=-(roadView.lean+roadView.rock)*e;
     if(frontWheel.current)frontWheel.current.rotation.x=pose.spin;if(rearWheel.current)rearWheel.current.rotation.x=pose.spin;
     if(cranks.current)cranks.current.rotation.x=-pose.pedal;
     if(cockpit.current)cockpit.current.rotation.y=roadView.steer*.5;
@@ -122,9 +125,10 @@ export default function RoadBike({map=forestMap}:{map?:RideMap}){
   </group>;
   function Wheel({center,wheelRef}:{center:V;wheelRef:React.RefObject<Group|null>}){return <group position={center} ref={wheelRef}>
       <mesh geometry={p.rim} rotation={[0,0,Math.PI/2]} castShadow><meshStandardMaterial color="#24303b" metalness={.48} roughness={.3}/></mesh>
-      <mesh rotation={[0,Math.PI/2,0]} castShadow><torusGeometry args={[.331,.0145,12,64]}/><meshStandardMaterial color="#1c2124" roughness={.91}/></mesh>
+      <mesh rotation={[0,Math.PI/2,0]} castShadow><torusGeometry args={[.331,.0145,12,96]}/><meshStandardMaterial color="#1c2124" roughness={.91}/></mesh>
       <mesh rotation={[0,Math.PI/2,0]}><torusGeometry args={[.332,.008,8,64]}/><meshStandardMaterial color="#5c6260" roughness={.92}/></mesh>
-      <lineSegments geometry={p.spokes}><lineBasicMaterial color="#a6b2b9" transparent opacity={.58}/></lineSegments>
+      <lineSegments geometry={p.spokes}><lineBasicMaterial color="#b0bcc2" transparent opacity={.78}/></lineSegments>
+      <mesh position={[0,.285,0]}><cylinderGeometry args={[.003,.003,.026,6]}/><meshStandardMaterial color="#7e929c" metalness={.8} roughness={.3}/></mesh>
       <mesh rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.022,.022,.08,12]}/><meshStandardMaterial color="#4b5a68" metalness={.8} roughness={.24}/></mesh>
       <mesh position={[.065,0,0]} rotation={[0,Math.PI/2,0]}><torusGeometry args={[.075,.006,8,32]}/><meshStandardMaterial color="#849093" metalness={.8} roughness={.36}/></mesh>
     </group>;}

@@ -8,7 +8,8 @@ const input = { held: true, position: { x: -.35, y: 1.65, z: -9.7 }, direction: 
 describe("personal basketball control and footwork", () => {
   it("supports both 5 locations and both Enter locations without borrowing music keys", () => {
     for (const key of ["Digit5", "Numpad5"]) expect(isPrimaryShotKey(key)).toBe(true);
-    for (const key of ["Enter", "NumpadEnter", "ShiftLeft", "ShiftRight"]) expect(isCourtTurboKey(key)).toBe(true);
+    for (const key of ["Enter", "NumpadEnter"]) expect(isCourtTurboKey(key)).toBe(true);
+    for (const key of ["ShiftLeft", "ShiftRight"]) expect(isCourtTurboKey(key)).toBe(false);
     expect(isPrimaryShotKey("Space")).toBe(false); expect(isCourtTurboKey("KeyE")).toBe(false);
   });
   it("selects a layup near the rim, running dunk with turbo, and jump shot outside / behind the board", () => {

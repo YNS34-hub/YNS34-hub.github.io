@@ -24,5 +24,6 @@ export const presence = {
   sprinting: false, jump: 0, finishLocked: false, ball: new Vector3(), held: false, dribbling: false, hand: 1,
   finish: "idle" as "idle" | "layup" | "dunk", shot: 0, charge: 0,
   releaseHand: new Vector3(), turboHeld: false, shotJump: 0, finishPose: null as FinishPose | null,
+  dribblePalm:new Vector3(),dribblePhase:0,crossover:0,leftFoot:new Vector3(),rightFoot:new Vector3(),
 };
 export function actorCamera(camera: Camera, roomId: string) { return isAdventureRoom(roomId) ? presence.camera : camera; }

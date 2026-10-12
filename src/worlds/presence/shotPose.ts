@@ -3,8 +3,8 @@ const smooth = (v: number) => { const t = clamp(v); return t * t * (3 - 2 * t); 
 
 export function prepareShot(charge: number) {
   const c = clamp(charge), lift = smooth(c / .56), air = clamp((c - .30) / .65);
-  return { x: .23 - lift * .10, y: 1.07 + lift * .64, z: -.42 - lift * .14,
-    jump: c < .30 ? -.075 * Math.sin(Math.PI * c / .30) : .30 * Math.sin(Math.PI * air),
+  return { x: .23 - lift * .10, y: 1.07 + lift * .96, z: -.40 + lift * .13,
+    jump: c < .30 ? -.105 * Math.sin(Math.PI * c / .30) : .30 * Math.sin(Math.PI * air),
     pitch: -.12 * (1 - lift), guide: 1 - smooth((c - .65) / .25) * .25 };
 }
 

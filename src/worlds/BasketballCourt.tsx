@@ -19,6 +19,7 @@ import { actorCamera, presence } from "./presence/state";
 import SportAvatar from "./presence/Avatar";
 import { isPrimaryShotKey, primaryCourtAction } from "./court/controls";
 import { prepareShot, shotRecovery } from "./presence/shotPose";
+import { dribblePose } from "./presence/dribblePose";
 export { preloadCourtAssets } from "./court/assets";
 
 function PracticeBall() {
@@ -27,8 +28,8 @@ function PracticeBall() {
   const finish = useMemo(() => new FinishMotion(), []);
   const sound = useSceneAudio("court");
   const quiet = useQuietMotion();
-  const scratch = useRef({ aim: new Vector3(), hand: new Vector3(), forward: new Vector3(), up: new Vector3(0, 1, 0) });
-  const state = useRef({ charging: false, charge: 0, dribble: false, dribbleTime: 0, dribblePeriod: .65, publish: 0, contact: 0, pickup: 0 });
+  const scratch = useRef({ aim: new Vector3(), hand: new Vector3(), forward: new Vector3(), up: new Vector3(0, 1, 0),dribble:dribblePose(0,0) });
+  const state = useRef({ charging: false, charge: 0, dribble: false, dribbleTime: 0, dribblePeriod: .65, handSide:1, publish: 0, contact: 0, pickup: 0 });
   const texture = useWorldTexture("ball");
   const publish = () => {
     camera.getWorldDirection(scratch.current.aim);
@@ -46,7 +47,7 @@ function PracticeBall() {
     sound.unlock();
     if (simulation.mode !== "held" && distance() < 3.3) {
       simulation.pickup(); state.current.dribble = false; state.current.pickup = .24; publish(); acknowledge("Ball in hand · hold 5, release to shoot · near rim: 5 layup, Enter + 5 dunk");
-    } else if (simulation.mode === "held") { state.current.dribble = !state.current.dribble; publish(); }
+    } else if (simulation.mode === "held") { state.current.dribble = !state.current.dribble; if(state.current.dribble)state.current.dribbleTime=0; publish(); }
   };
   useInteractable(ball, { title: "THE PRACTICE BALL", hint: "Pick up / dribble", radius: 5, activate: pickup });
   useEffect(() => {
@@ -54,7 +55,7 @@ function PracticeBall() {
     const attemptFinish = (kind: FinishKind) => {
       if (presence.finishLocked) return;
       camera.getWorldDirection(scratch.current.aim);
-      const result = finish.start(kind, { position: camera.position, direction: scratch.current.aim, held: simulation.mode === "held", speed: presence.speed, hand: presence.hand, ball: simulation.position });
+      const result = finish.start(kind, { position: camera.position, direction: scratch.current.aim, held: simulation.mode === "held", speed: presence.speed, hand: presence.hand, ball: simulation.position, feet:presence.leftFoot.y>0?{left:presence.leftFoot,right:presence.rightFoot}:undefined });
       if (!result.allowed) { useActivity.setState({ result: result.reason }); acknowledge(result.reason); return; }
       sound.unlock(); state.current.charging = false; state.current.charge = 0; state.current.dribble = false;
       presence.finishLocked = true; presence.finish = kind; useActivity.setState({ result: kind === "dunk" ? "ATTACK THE RIM" : "LAYUP · SOFT TOUCH" }); publish();
@@ -91,19 +92,15 @@ function PracticeBall() {
       if (event.repeat || event.defaultPrevented || !enabled() || (event.target instanceof HTMLElement && event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
       if (event.code === "KeyE") { event.preventDefault(); pickup(); }
       if (event.code === "KeyR") { event.preventDefault(); command(new CustomEvent("palace:court", { detail: "recall" })); }
-      if (event.code === "KeyF" || event.code === "KeyG") { event.preventDefault(); attemptFinish(event.code === "KeyF" ? "layup" : "dunk"); }
+      if (event.code === "KeyX" && simulation.mode === "held" && state.current.dribble && !presence.finishLocked) { event.preventDefault(); presence.hand*=-1; acknowledge(presence.hand>0?"Right hand":"Left hand"); }
       if (isPrimaryShotKey(event.code)) {
         if (!document.pointerLockElement && event.target instanceof HTMLElement && event.target.closest("button,a")) return;
         event.preventDefault(); camera.getWorldDirection(scratch.current.aim);
         const action = primaryCourtAction({ held: simulation.mode === "held", position: camera.position, direction: scratch.current.aim, speed: presence.speed, hand: presence.hand }, presence.turboHeld);
         if (action === "shoot") command(new CustomEvent("palace:court", { detail: "charge" })); else attemptFinish(action);
       }
-      if (event.code === "Space") {
-        if (!document.pointerLockElement && event.target instanceof HTMLElement && event.target.closest("button,a")) return;
-        event.preventDefault(); command(new CustomEvent("palace:court", { detail: "charge" }));
-      }
     };
-    const keyup = (event: KeyboardEvent) => { if (event.code === "Space" || isPrimaryShotKey(event.code)) { if (enabled()) release(); else state.current.charging = false; } };
+    const keyup = (event: KeyboardEvent) => { if (isPrimaryShotKey(event.code)) { if (enabled()) release(); else state.current.charging = false; } };
     const pointerDown = (event: PointerEvent) => { if (event.button === 0 && document.pointerLockElement === gl.domElement) command(new CustomEvent("palace:court", { detail: "charge" })); };
     const pointerUp = () => { if (enabled()) release(); else state.current.charging = false; };
     const pause = () => { state.current.charging = false; state.current.charge = 0; publish(); };
@@ -140,13 +137,18 @@ function PracticeBall() {
     if(local.dribblePeriod!==dribblePeriod){local.dribbleTime=local.dribbleTime/local.dribblePeriod*dribblePeriod;local.dribblePeriod=dribblePeriod;}
     if (simulation.mode === "held" && !movement) {
       const prep = prepareShot(local.charging ? local.charge : 0);
-      const hand = scratch.current.hand.set(local.charging ? prep.x : .31, (local.charging ? prep.y : 1.07) - 1.65 + presence.jump, local.charging ? prep.z : -.40);
+      const hand = scratch.current.hand.set((local.charging ? prep.x : .31)*presence.hand, (local.charging ? prep.y : 1.07) - 1.65 + presence.jump, local.charging ? prep.z : -.40);
       camera.getWorldDirection(scratch.current.forward); const yaw = Math.atan2(-scratch.current.forward.x, -scratch.current.forward.z);
       hand.applyAxisAngle(scratch.current.up, yaw).add(camera.position);
       if (local.dribble) {
         const old = local.dribbleTime; local.dribbleTime = (old + dt) % dribblePeriod;
-        if (local.dribbleTime < old) sound.sound("bounce");
-        const t = local.dribbleTime / dribblePeriod; hand.y = BALL_RADIUS + 4 * (sprintDribble ? 1.04 : 1.25) * t * (1 - t);
+        const before=old/dribblePeriod,t=local.dribbleTime/dribblePeriod;
+        if(before<.44&&t>=.44)sound.sound("bounce");
+        local.handSide+=(presence.hand-local.handSide)*(1-Math.exp(-dt*13));
+        const pose=dribblePose(t,presence.speed,local.handSide,scratch.current.dribble);
+        hand.set(pose.ball.x,pose.ball.y-1.65,pose.ball.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
+        presence.dribblePalm.set(pose.palm.x,pose.palm.y-1.65,pose.palm.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
+        presence.dribblePhase=t;presence.crossover=Math.min(1,Math.abs(local.handSide-presence.hand));
       }
       Object.assign(simulation.position, { x: hand.x, y: hand.y, z: hand.z });
     } else if (simulation.mode !== "held") {

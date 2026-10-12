@@ -24,15 +24,15 @@ function RoadRider({map}:{map:RideMap}){
   const local=useRef({keys:new Set<string>(),accumulator:0,publish:0,save:0,autoShift:0,mountTime:0,brakeLatch:false,photoPending:false,start:new Vector3(),startQ:new Quaternion(),point:new Vector3(),tangent:new Vector3(),target:new Vector3(),look:new Euler(0,0,0,"YXZ"),targetQ:new Quaternion(),yawReady:false,cinemaResume:peekRoadCinemaReturn(map.id)});
   useLayoutEffect(()=>{
     const saved=readRoadSave(map),p=local.current.point,t=local.current.tangent;roadSample(model.distance,p,t);
-    Object.assign(roadView,{active:true,mounted:false,distance:model.distance,speed:0,walkX:p.x,walkY:p.y,walkZ:p.z,mountProgress:0,offset:0,lookPending:false});
-    useRoadRide.setState({mounted:false,state:"stopped",nearBike:false,speed:0,distance:model.distance,gear:model.gear,cadence:0,photo:false,easy:false,controls:false,place:"",comfort:saved.comfort});
+    Object.assign(roadView,{active:true,mounted:false,distance:model.distance,speed:0,walkX:p.x,walkY:p.y,walkZ:p.z,mountProgress:0,offset:0,lookPending:false,standing:0});
+    useRoadRide.setState({mounted:false,state:"stopped",nearBike:false,speed:0,distance:model.distance,gear:model.gear,cadence:0,photo:false,easy:false,controls:false,place:"",comfort:saved.comfort,standing:false});
     // 返回快照只由这个骑行实例消费；StrictMode 的 effect 重播仍使用该快照，不会丢失骑姿。
     const resume=local.current.cinemaResume;if(resume){
       takeRoadCinemaReturn();
       model.offset=resume.offset;model.heading=resume.heading;local.current.brakeLatch=true;local.current.mountTime=1;
       local.current.yawReady=true;
-      Object.assign(roadView,{mounted:resume.mounted,mountProgress:resume.mounted?1:0,offset:resume.offset,headYaw:resume.headYaw,headPitch:resume.headPitch,yaw:resume.yaw,pitch:resume.pitch,roll:resume.roll,lookPending:resume.mounted});
-      useRoadRide.setState({mounted:resume.mounted,photo:resume.photo,comfort:resume.comfort});
+      Object.assign(roadView,{mounted:resume.mounted,mountProgress:resume.mounted?1:0,offset:resume.offset,headYaw:resume.headYaw,headPitch:resume.headPitch,yaw:resume.yaw,pitch:resume.pitch,roll:resume.roll,lookPending:resume.mounted,standing:resume.standing?1:0});
+      useRoadRide.setState({mounted:resume.mounted,photo:resume.photo,comfort:resume.comfort,standing:!!resume.standing});
     }
     return()=>{saveRoadRide(model.distance,model.gear,useRoadRide.getState().comfort,map);roadView.active=false;roadView.mounted=false;roadView.speed=0;useRoadRide.setState({mounted:false,photo:false,speed:0,easy:false});};
   },[model,camera,map,roadSample]);
@@ -41,6 +41,7 @@ function RoadRider({map}:{map:RideMap}){
       const palace=usePalaceStore.getState(),s=useRoadRide.getState(),l=local.current;
       if(palace.overlay||palace.focus||palace.mode==="index"||useActivity.getState().warming)return;
       const action=(event as CustomEvent<RoadCommand>).detail;sound.unlock();
+      if(action==="stance"&&s.mounted&&!s.photo&&!s.controls){useRoadRide.setState({standing:!s.standing});acknowledge(s.standing?"Seated cadence":"Standing on the pedals");}
       if(action==="mount"){
         if(s.mounted)return;if(!s.nearBike){acknowledge("Approach the bicycle to ride");return;}
         l.keys.clear();l.brakeLatch=true;l.mountTime=0;l.start.copy(camera.position);l.startQ.copy(camera.quaternion);
@@ -70,6 +71,7 @@ function RoadRider({map}:{map:RideMap}){
       if(event.code==="KeyP"&&s.mounted){event.preventDefault();command(new CustomEvent("palace:road",{detail:"photo"}));return;}
       if(event.code==="KeyE"){event.preventDefault();command(new CustomEvent("palace:road",{detail:s.mounted?"harder":"mount"}));return;}
       if(event.code==="KeyQ"&&s.mounted){event.preventDefault();command(new CustomEvent("palace:road",{detail:"easier"}));return;}
+      if(event.code==="KeyC"&&s.mounted&&!s.controls){event.preventDefault();command(new CustomEvent("palace:road",{detail:"stance"}));return;}
       if(!s.mounted||s.photo)return;
       if(["KeyW","KeyA","KeyS","KeyD","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","ShiftLeft","ShiftRight","Space"].includes(event.code)){
         if(event.code==="Space"&&!document.pointerLockElement&&event.target instanceof HTMLElement&&event.target.closest("button,a"))return;
@@ -88,7 +90,7 @@ function RoadRider({map}:{map:RideMap}){
       else if(!document.pointerLockElement){local.current.brakeLatch=true;useRoadRide.setState({easy:false,controls:true});}
     };
     const unsubscribe=usePalaceStore.subscribe((s,p)=>{
-      if(p.roomId===map.id&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({mapId:map.id,distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort});}
+      if(p.roomId===map.id&&s.roomId==="cinema"){const r=useRoadRide.getState();rememberRoadCinema({mapId:map.id,distance:model.distance,gear:model.gear,offset:model.offset,heading:model.heading,headYaw:roadView.headYaw,headPitch:roadView.headPitch,yaw:roadView.yaw,pitch:roadView.pitch,roll:roadView.roll,mounted:r.mounted,photo:r.photo,comfort:r.comfort,standing:r.standing});}
       if((s.overlay&&!p.overlay)||(s.focus&&!p.focus)||s.mode==="index"&&p.mode!=="index")halt();
     });
     window.addEventListener("palace:road",command);document.addEventListener("keydown",down);document.addEventListener("keyup",up);window.addEventListener("keydown",escape,true);window.addEventListener("blur",halt);window.addEventListener("pagehide",halt);
@@ -121,11 +123,13 @@ function RoadRider({map}:{map:RideMap}){
     roadSample(model.distance,l.point,l.tangent);const yaw=Math.atan2(-l.tangent.x,-l.tangent.z)-model.heading;
     if(!l.yawReady){roadView.yaw=yaw;l.yawReady=true;}else roadView.yaw+=Math.atan2(Math.sin(yaw-roadView.yaw),Math.cos(yaw-roadView.yaw))*(1-Math.exp(-dt*8));
     roadView.pitch=Math.atan2(l.tangent.y,Math.hypot(l.tangent.x,l.tangent.z))-.035;roadView.roll=comfort?0:-model.lean*.16;
-    Object.assign(roadView,{distance:model.distance,speed:model.speed,offset:model.offset,lean:comfort?0:model.lean,steer:model.steering,brake:model.braking,cadence:model.cadence});
+    // 舒适模式只稳定眼位；车和身体仍按真实曲率保持平衡，不能变成直立滑着过弯。
+    Object.assign(roadView,{distance:model.distance,speed:model.speed,offset:model.offset,lean:model.lean,steer:model.steering,brake:model.braking,cadence:model.cadence});
+    if(!s.photo&&!s.controls)roadView.standing+=(Number(s.standing)-roadView.standing)*(1-Math.exp(-dt*5));
     presence.speed=model.speed;
     const nx=-l.tangent.z,nz=l.tangent.x,r=Math.hypot(nx,nz),aero=comfort?0:Math.max(0,(model.speed-10)/5)*.025;
     const bikeStyle=outfits[useAppearance.getState().selected[map.id==="alpine-ride"?"alpine-ride":"cycling"]].bike;
-    l.target.set(l.point.x+nx/r*model.offset-l.tangent.x*.23,l.point.y+1.47+(bikeStyle==="city"?.085:0)-aero-(comfort?0:model.braking*.013)+ (comfort?0:Math.sin(model.distance*3.4)*.0015*Math.min(1,model.speed/8)),l.point.z+nz/r*model.offset-l.tangent.z*.23);
+    l.target.set(l.point.x+nx/r*model.offset-l.tangent.x*.23,l.point.y+1.47+(bikeStyle==="city"?.085:0)+roadView.standing*.075-aero-(comfort?0:model.braking*.013)+ (comfort?0:Math.sin(model.distance*3.4)*.0015*Math.min(1,model.speed/8)),l.point.z+nz/r*model.offset-l.tangent.z*.23);
     if(mounting){l.mountTime+=dt;roadView.mountProgress=Math.min(1,l.mountTime/(comfort?.08:.72));const p=roadView.mountProgress,e=p*p*(3-2*p);camera.position.lerpVectors(l.start,l.target,e);l.look.set(roadView.pitch,roadView.yaw,0,"YXZ");l.targetQ.setFromEuler(l.look);camera.quaternion.slerpQuaternions(l.startQ,l.targetQ,e);}
     else{camera.position.copy(l.target);l.look.set(roadView.pitch+roadView.headPitch,roadView.yaw+roadView.headYaw,roadView.roll,"YXZ");camera.quaternion.setFromEuler(l.look);}
     const fov=60+(comfort?0:Math.max(0,Math.min(3,(model.speed-9)*.6)));

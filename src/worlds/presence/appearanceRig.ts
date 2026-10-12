@@ -54,7 +54,7 @@ export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: Outfi
   for (const value of materials) {
     if (!(value instanceof MeshStandardMaterial)) continue;
     const head = /head/.test(value.name), shirtless = outfit.style === "training" || outfit.style === "denim";
-    value.roughness = head ? .70 : outfit.style === "urban" ? .88 : .78;
+    value.roughness = head ? .56 : outfit.style === "urban" ? .82 : .66;
     value.onBeforeCompile = shader => {
       Object.assign(shader.uniforms, { athleteSkin: { value: new Color(profile.skin) }, athleteHair: { value: new Color(profile.hair) }, athleteTop: { value: new Color(outfit.top) }, athleteBottom: { value: new Color(outfit.bottom) }, athleteStyle: { value: shirtless ? 1 : outfit.style === "urban" ? 2 : 0 }, athleteDenim: { value: outfit.style === "denim" ? 1 : 0 } });
       shader.vertexShader = "attribute float athleteSleeve;\nvarying float vAthleteSleeve;\nvarying vec3 vAthleteRest;\n" + shader.vertexShader;
