@@ -21,6 +21,7 @@ try{
   // 固定同一输出分辨率来比较真实贴图 / 材质；不注入任何游戏状态，不用镜头拉近冒充清晰度。
   await page.evaluate(()=>window.__PALACE_DEBUG__.renderer.setPixelRatio(1));await page.waitForTimeout(250);
   const view=await page.evaluate(()=>{const d=window.__PALACE_DEBUG__,a=d.scene.getObjectByName('visitor-athlete'),maps=new Map();a.traverse(o=>{for(const m of(Array.isArray(o.material)?o.material:[o.material]).filter(Boolean))if(m.map)maps.set(m.map.uuid,{name:m.name,width:m.map.image.width,height:m.map.image.height});});return{position:d.camera.position.toArray(),quaternion:d.camera.quaternion.toArray(),fov:d.camera.fov,dpr:d.renderer.getPixelRatio(),drawing:[d.renderer.domElement.width,d.renderer.domElement.height],maps:[...maps.values()]};});
+  view.quality=await page.evaluate(()=>window.__PALACE_DEV__.state.getState().effectiveQuality);assert.equal(view.quality,'medium');
   assert.equal(view.dpr,1);assert.deepEqual(view.drawing,[1920,1080]);assert.ok(view.maps.every(m=>m.width===(label==='before'?1024:2048)));
   await page.screenshot({path:path.join(out,label+'.png')});report.views.push({label,...view});await context.close();
  }
