@@ -86,6 +86,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           </button>
           <button
             className="guide-button"
+            aria-label="GUIDE"
             onClick={() => s.setOverlay("guide")}
           >
             <Map size={17} />

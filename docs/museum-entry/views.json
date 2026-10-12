@@ -1,0 +1,400 @@
+{
+  "sha": "fce81e1c426ccf3f20566adc0f5a06ca98eb5920",
+  "dirty": false,
+  "browser": "148.0.3967.70",
+  "quality": "medium",
+  "headless": true,
+  "base": "http://127.0.0.1:5190",
+  "errors": [],
+  "uploads": [],
+  "views": [
+    {
+      "room": "atrium",
+      "name": "welcome",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-atrium-welcome.png",
+      "position": [
+        0,
+        1.65,
+        23
+      ],
+      "quaternion": [
+        0.03845611658914412,
+        0,
+        0,
+        0.9992602899629717
+      ],
+      "fov": 48,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 227,
+      "triangles": 64324,
+      "textures": 42,
+      "lights": 8,
+      "environment": "atrium-radiance-probe",
+      "mirrorCaptures": 3,
+      "glass": {
+        "roughness": 0.013,
+        "transmission": 1,
+        "attenuationDistance": 32,
+        "env": 1.8
+      },
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": "\"Cormorant Garamond\", Georgia, \"Noto Serif SC\", serif"
+    },
+    {
+      "room": "atrium",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-atrium-entry.png",
+      "position": [
+        0,
+        1.65,
+        23
+      ],
+      "quaternion": [
+        0.03845611658914412,
+        0,
+        0,
+        0.9992602899629717
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 264,
+      "triangles": 67366,
+      "textures": 47,
+      "lights": 8,
+      "environment": "atrium-radiance-probe",
+      "mirrorCaptures": 3,
+      "glass": {
+        "roughness": 0.013,
+        "transmission": 1,
+        "attenuationDistance": 32,
+        "env": 1.8
+      },
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "atrium",
+      "name": "glass",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-atrium-glass.png",
+      "position": [
+        4.9,
+        2,
+        4.2
+      ],
+      "quaternion": [
+        0.08339335520475197,
+        0.4160927392261538,
+        -0.038355516360645166,
+        0.9046774204298892
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 177,
+      "triangles": 60196,
+      "textures": 45,
+      "lights": 8,
+      "environment": "atrium-radiance-probe",
+      "mirrorCaptures": 4,
+      "glass": {
+        "roughness": 0.013,
+        "transmission": 1,
+        "attenuationDistance": 32,
+        "env": 1.8
+      },
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "atrium",
+      "name": "glass-side",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-atrium-glass-side.png",
+      "position": [
+        -6.3,
+        2,
+        -1.6
+      ],
+      "quaternion": [
+        0.055962664787334936,
+        -0.786066048828364,
+        0.07195199758371634,
+        0.6113847046442831
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 131,
+      "triangles": 55652,
+      "textures": 52,
+      "lights": 8,
+      "environment": "atrium-radiance-probe",
+      "mirrorCaptures": 4,
+      "glass": {
+        "roughness": 0.013,
+        "transmission": 1,
+        "attenuationDistance": 32,
+        "env": 1.8
+      },
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "projects",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-projects-entry.png",
+      "position": [
+        0,
+        1.65,
+        13.8
+      ],
+      "quaternion": [
+        0.03434277490580371,
+        0,
+        0,
+        0.9994101129225024
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 34,
+      "triangles": 2294,
+      "textures": 15,
+      "lights": 5,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "research",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-research-entry.png",
+      "position": [
+        0,
+        1.65,
+        13.8
+      ],
+      "quaternion": [
+        0.03434277490580371,
+        0,
+        0,
+        0.9994101129225024
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 67,
+      "triangles": 46612,
+      "textures": 15,
+      "lights": 4,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "music",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-music-entry.png",
+      "position": [
+        1.5,
+        1.65,
+        10.8
+      ],
+      "quaternion": [
+        0.03455334255363208,
+        0.047280531657547045,
+        -0.0016365111226376782,
+        0.9982824949261087
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 72,
+      "triangles": 5558,
+      "textures": 8,
+      "lights": 6,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "wallpapers",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-wallpapers-entry.png",
+      "position": [
+        0,
+        1.65,
+        13.8
+      ],
+      "quaternion": [
+        0.03434277490580371,
+        0,
+        0,
+        0.9994101129225024
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 33,
+      "triangles": 2398,
+      "textures": 13,
+      "lights": 5,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "imagined-worlds",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-imagined-worlds-entry.png",
+      "position": [
+        0,
+        1.65,
+        13.8
+      ],
+      "quaternion": [
+        0.03434277490580371,
+        0,
+        0,
+        0.9994101129225024
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 53,
+      "triangles": 4346,
+      "textures": 13,
+      "lights": 5,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "archive",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-archive-entry.png",
+      "position": [
+        0,
+        1.65,
+        13.8
+      ],
+      "quaternion": [
+        0.03434277490580371,
+        0,
+        0,
+        0.9994101129225024
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 58,
+      "triangles": 3932,
+      "textures": 23,
+      "lights": 5,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    },
+    {
+      "room": "unfinished",
+      "name": "entry",
+      "width": 1920,
+      "height": 1080,
+      "file": "1920-unfinished-entry.png",
+      "position": [
+        0,
+        1.65,
+        10.8
+      ],
+      "quaternion": [
+        0.03979877062495478,
+        0,
+        0,
+        0.9992077150706664
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "calls": 39,
+      "triangles": 2728,
+      "textures": 15,
+      "lights": 5,
+      "environment": "PMREM.cubeUv",
+      "glass": null,
+      "bodyFont": "Manrope, \"Microsoft YaHei\", sans-serif",
+      "titleFont": null
+    }
+  ],
+  "passed": true
+}

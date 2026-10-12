@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "Low quality preserves original glass silhouette without a reflection render target",
+    "Native enter button, guide, single Escape and reduced-motion camera settling",
+    "Public entry / fonts / guide / index at 1920 × 1080",
+    "Public entry / fonts / guide / index at 390 × 844"
+  ],
+  "errors": [],
+  "publicBase": "http://127.0.0.1:5191",
+  "passed": true
+}

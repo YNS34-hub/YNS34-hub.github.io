@@ -1,0 +1,83 @@
+{
+  "checkedAt": "2026-10-12T08:28:38.605Z",
+  "gitHead": "fce81e1c426ccf3f20566adc0f5a06ca98eb5920",
+  "workingTreeModified": false,
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "scope": "Visible installed Edge on the local GTX 1650; requestAnimationFrame wall timings, renderer.info and estimated uncompressed scene texture bytes. Not GPU timer-query timings.",
+  "samples": [
+    {
+      "label": "atrium / still",
+      "movement": false,
+      "frames": 413,
+      "elapsedMs": 5011.800000005962,
+      "fps": 82.40552296570269,
+      "medianMs": 13.80000000000291,
+      "p95Ms": 20.799999999999272,
+      "maxMs": 41.70000000000073,
+      "peak": {
+        "calls": 265,
+        "triangles": 67368,
+        "textures": 48,
+        "lights": 8,
+        "textureMB": 80.77592468261729
+      },
+      "last": {
+        "room": "atrium",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 265,
+        "triangles": 67368,
+        "textures": 48,
+        "lights": 8,
+        "textureMB": 80.77592468261729,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 2,
+          "changed": 4
+        }
+      }
+    },
+    {
+      "label": "atrium / walking",
+      "movement": true,
+      "frames": 591,
+      "elapsedMs": 7004.200000008939,
+      "fps": 84.37794466166667,
+      "medianMs": 13.799999999999272,
+      "p95Ms": 20.69999999999709,
+      "maxMs": 48.5,
+      "peak": {
+        "calls": 264,
+        "triangles": 67366,
+        "textures": 48,
+        "lights": 8,
+        "textureMB": 80.77592468261729
+      },
+      "last": {
+        "room": "atrium",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 176,
+        "triangles": 59982,
+        "textures": 48,
+        "lights": 8,
+        "textureMB": 80.77592468261729,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 2,
+          "changed": 4
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "meetsMean45": true,
+  "meetsP95Frame22ms": true
+}
