@@ -28,6 +28,7 @@
 - [clarity.ts](../../src/worlds/presence/clarity.ts)、[math.ts](../../src/worlds/presence/math.ts)：1080p medium 的篮球 / 森林从 DPR1 提升至 1.25，高山保留已接受的 DPR1.5；1440p / 4K 有像素预算。缩短、降低第三人称观看距离，骑行轻微越肩；不改逻辑眼位、碰撞或返回姿态。
 - [riderPose.ts](../../src/worlds/presence/riderPose.ts)、[RoadBike.tsx](../../src/worlds/road/RoadBike.tsx)、[Experience.tsx](../../src/worlds/road/Experience.tsx)：保留蓝色直把车与公路车。站姿抬髋并移至曲柄上方，同一实际踏频驱动车 / 人的小幅摇车、脚踝和车轮；停止后不伪造节奏。补交叉辐条、气嘴、车把转向、真实鞋底接触。完整踏圈发现左腿目标超出真实腿长，骨盆基准下降 1.5 cm 修正，没有拉长四肢。
 - [balance.ts](../../src/worlds/road/balance.ts)、[physics.ts](../../src/worlds/road/physics.ts)：以速度² × 曲率 / 重力计算压弯，保留原动力 / 路线。舒适模式稳定相机，车和人仍侧倾。刹停时踏频真正归零，Cinema 保留坐 / 站状态与曲柄相位；现有存储键和数据库不变。
+- [walkingSurface.ts](../../src/worlds/road/walkingSurface.ts)：步行采用实际铺装高度；路基低于沥青 12–16 cm 的设计继续保留，离开道路仍使用原地形。森林离散路线投影至相邻线段，避免鞋底陷入路面。挂载骑行的路线和动力没有改变。
 
 实际观看了用户本机 43.7 秒直把蓝车视频的关键帧和所给 [街球视频](https://www.bilibili.com/video/BV1P8tH6gEMM/) 约 1:01–1:08 的局部片段。参考了 [2K25 官方 ProPLAY 说明](https://nba.2k.com/2k25/pt-BR/courtside-report/gameplay/) 中用真实动作与连续过渡组织动画的原则；未把 2K25 说明当成已验证的 2K27 内部实现，未复制游戏动作、模型、Logo 或视频素材。
 
@@ -49,10 +50,10 @@
 
 ## 测试与全程骑行
 
-- `npm test -- --maxWorkers=1 --minWorkers=1`：40 文件 / 224 测试通过；最终源代码类型检查、lint 及 `build:public` 通过。
+- `npm test -- --maxWorkers=1 --minWorkers=1`：2026-10-13 最终 41 文件 / 226 测试通过；源代码类型检查、lint 及 `build:public` 通过。新增两图实际道路顶点与路侧地形测试，原测试保留。
 - 原生 1920×1080 与 2560×1440：各 6 项 / 21 帧，六套穿搭、弹窗暂停、5 / Numpad5、物理投篮 / 上篮 / 扣篮和两图骑行。
 - 最新动作 / 接触：8 项 / 14 帧，两个 Enter、Space 不出手、Shift 不加速、换手、坐 / 站姿接触、压弯、刹车、舒适镜头、Cinema 曲柄相位误差 < 1e-8、下车 / 返回。
-- 最新公开生产包：两种桌面尺寸共 8 条原生流程，无开发状态入口；六套穿搭刷新恢复，C 坐 / 站、V、照片 / ESC 和返回通过。
+- 最新公开生产包：2026-10-13 在 `8cda046` 两种桌面尺寸重新完成共 8 条原生流程，无开发状态入口；六套穿搭刷新恢复，C 坐 / 站、V、照片 / ESC 和返回通过。
 - 原馆 12 项回归通过：v1 IndexedDB、所有主要房间 / WASD、真实收藏显影、目标房间批量导入 / 刷新、精确 Cinema 返回、单个网页预览、收藏、五段回廊、边界、实际音频 / FFT / 暂停、房间配乐恢复、非 3D 入口。
 - 两条完整路线见下文和 [森林报告](results/journey-forest.json) / [高山报告](results/journey-alpine.json)；实际查看静态对照、动作帧、站姿 / 压弯 / 车架及公开 1440p 图。
 - 本机照片参考人物另外完成 6 项 / 21 帧原生操作，实际查看头部、穿搭和骑姿；私人截图、录像与头像不公开。
@@ -62,6 +63,8 @@
 新完整骑行检查比短采样多发现一个踏圈接触问题，已修正。森林约 3.53 km，实际 389.741 秒结束并返回，左鞋底采样峰值 1.393 cm；高山 10,156.693 m，实际 697.028 秒结束并返回，鞋底采样峰值 1.249 cm，右腕峰值 2.482 cm，均保持原 2.5 cm 检查标准。两程交替坐 / 站，实测读取原路线、档位、踏频与有界分块，没有注入距离、速度或相机。高山最初被错误的共用 600 秒验收窗口中止，随后按实际长度改正预算并加入 45 秒无进展检查，从起点完整重跑。两程证据分开保存，不把中止的一程标为通过。
 
 接触数值来自腕骨与定义把位、鞋底锚点的距离，每秒 / 短周期采样；不是逐帧所有鞋面和手指的实体碰撞证明。完整骑行是交互与加载验收，不能充当长时间硬件帧率成绩。
+
+2026-10-13 最终预览发现步行鞋底陷入路基，重新打开验收并提交 `8cda046`。新增原生步行 / 上车 / 踩踏 / 刹停 / 下车 / 返回检查，两图共 2 条流程 / 4 帧通过；实际骨骼变形后的最低鞋底顶点与铺装差为森林约 3 mm、高山约 19 mm，保持 2.5 cm 断言，逐张查看画面。报告记录修复提交前的 `8c7a05c + dirty`，对应代码随后原样提交为 `8cda046`，不伪改测量 SHA。见 [真实鞋底检查](results/walking-surface.json)、[森林步行](images/cycling-walking.webp)、[高山下车](images/alpine-ride-dismounted.webp)。此前全程骑行和硬件采样仍按各自的真实提交保留，没有把步行复测冒充再次完整骑行或 FPS 测量。
 
 ## GTX 1650 实测
 
@@ -115,3 +118,4 @@
 | 63ccd3f | test: derive route budgets from distance and compare fixed optical views |
 | 95ceb42 | test: require equal effective quality in optical comparison |
 | f74d0ca | test: measure high quality with restored local avatar |
+| 8cda046 | fix: ground walking riders on the visible pavement |

@@ -1,5 +1,5 @@
 {
-  "sha": "95ceb429734116deb4ec6294828f093b9f789cc7",
+  "sha": "8cda046",
   "manifestCounts": {
     "wallpapers": 0,
     "visuals": 0,
@@ -7,6 +7,7 @@
     "projects": 0,
     "research": 0
   },
+  "avatarProfile": null,
   "privateAudio": 0,
   "privateDocuments": 0,
   "routes": {

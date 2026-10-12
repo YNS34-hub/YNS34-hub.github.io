@@ -1,0 +1,87 @@
+{
+  "sha": "8c7a05cb8a57a85d51589a6c05a3abe4f13e0be7",
+  "dirty": true,
+  "checkedAt": "2026-10-12T17:10:31.701Z",
+  "scope": "Native walking, mount and dismount. Read-only actual skinned shoe vertices against the visible road surface; no position or simulation injection.",
+  "checks": [
+    "cycling native walk / actual shoe surface / mount / pedal / brake / dismount / return",
+    "alpine-ride native walk / actual shoe surface / mount / pedal / brake / dismount / return"
+  ],
+  "poses": [
+    {
+      "name": "cycling-walking",
+      "room": "cycling",
+      "mounted": false,
+      "root": [
+        2.560171526697024,
+        18.00893792031247,
+        -0.9179451118860515
+      ],
+      "lowest": {
+        "x": 2.4099678195228442,
+        "y": 18.011939454800252,
+        "z": -1.0650259274437675
+      },
+      "surface": 18.00882326440523,
+      "shoeGap": 0.0031161903950227554,
+      "dpr": 1.5
+    },
+    {
+      "name": "cycling-dismounted",
+      "room": "cycling",
+      "mounted": false,
+      "root": [
+        1.7823578053661355,
+        18.008873205497544,
+        -2.2496046682760413
+      ],
+      "lowest": {
+        "x": 1.631999959323608,
+        "y": 18.011767454570997,
+        "z": -2.3936694762978963
+      },
+      "surface": 18.00881406167319,
+      "shoeGap": 0.0029533928978082713,
+      "dpr": 1.5
+    },
+    {
+      "name": "alpine-ride-walking",
+      "room": "alpine-ride",
+      "mounted": false,
+      "root": [
+        -1072.2734899125774,
+        892.978226589166,
+        -239.03449754446595
+      ],
+      "lowest": {
+        "x": -1072.4235548920283,
+        "y": 892.9812296329284,
+        "z": -239.18195814737263
+      },
+      "surface": 892.9624801233275,
+      "shoeGap": 0.018749509600866077,
+      "dpr": 1.5
+    },
+    {
+      "name": "alpine-ride-dismounted",
+      "room": "alpine-ride",
+      "mounted": false,
+      "root": [
+        -1075.6679584864664,
+        892.7651772180094,
+        -238.1746137443443
+      ],
+      "lowest": {
+        "x": -1075.8182701141184,
+        "y": 892.768086419933,
+        "z": -238.3193264193306
+      },
+      "surface": 892.7493938548822,
+      "shoeGap": 0.018692565050741905,
+      "dpr": 1.5
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}
