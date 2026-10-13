@@ -1,0 +1,259 @@
+{
+  "sha": "28d8fe7088ab3492d4c49dccc9e5742e60626486",
+  "dirty": false,
+  "at": "2026-10-13T01:06:40.858Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5193",
+  "quality": "medium",
+  "deviceScaleFactor": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Actual drawing DPR is recorded per frame. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "forest-entry",
+      "width": 2560,
+      "progress": 0.045,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-forest-entry.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          -5.206077310338233,
+          21.386010129343028,
+          -156.13605506513284
+        ],
+        "quaternion": [
+          -0.008711880327178076,
+          -0.1648378838467825,
+          -0.0014560229155643457,
+          0.98628112381174
+        ],
+        "fov": 60,
+        "distance": 158.8374145214789,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 105,
+        "triangles": 1945489,
+        "textures": 36,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 164.79947916666666,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      }
+    },
+    {
+      "name": "lake-reveal",
+      "width": 2560,
+      "progress": 0.185,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-lake-reveal.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          244.38626014611853,
+          21.596557815378183,
+          -495.21011020896054
+        ],
+        "quaternion": [
+          -0.011533898128327488,
+          -0.28499065071513296,
+          -0.003429533925863371,
+          0.9584547649711914
+        ],
+        "fov": 60,
+        "distance": 652.9982596994132,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 107,
+        "triangles": 1214509,
+        "textures": 36,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 164.79947916666666,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      }
+    },
+    {
+      "name": "overlook",
+      "width": 2560,
+      "progress": 0.487,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "2560-overlook.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          790.4901119890376,
+          56.248301207727934,
+          -655.8345262329177
+        ],
+        "quaternion": [
+          -0.013460403481022584,
+          0.914137384262718,
+          0.03045444473716086,
+          0.4040348834286407
+        ],
+        "fov": 60,
+        "distance": 1718.9737971546717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 61,
+        "triangles": 330111,
+        "textures": 39,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 164.79947916666666,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      }
+    },
+    {
+      "name": "forest-surface",
+      "width": 2560,
+      "progress": 0.1,
+      "yaw": 0,
+      "pitch": -0.3,
+      "file": "2560-forest-surface.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          8.127700623029327,
+          24.16852419723228,
+          -335.1105877782508
+        ],
+        "quaternion": [
+          -0.023293145410275003,
+          -0.21891631766064457,
+          -0.005227578512712625,
+          0.9754515608997163
+        ],
+        "fov": 60,
+        "distance": 352.97203226995316,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 105,
+        "triangles": 1415901,
+        "textures": 36,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 164.79947916666666,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      }
+    },
+    {
+      "name": "alpine-forest",
+      "width": 2560,
+      "progress": 0.89,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-alpine-forest.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -3688.958814347607,
+          342.2203395232925,
+          1175.2769750376517
+        ],
+        "quaternion": [
+          -0.022346500395875962,
+          0.8758815422657295,
+          0.0407528563313558,
+          0.48028258612935376
+        ],
+        "fov": 60,
+        "distance": 9039.456690764127,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.275775907699572,
+        "drawing": [
+          3265,
+          1837
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 139,
+        "triangles": 2837398,
+        "textures": 41,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 267.4356384277345,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      }
+    },
+    {
+      "name": "forest-verge",
+      "width": 2560,
+      "progress": 0.093,
+      "yaw": -0.44,
+      "pitch": -0.4,
+      "file": "2560-forest-verge.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          0.4630716390814178,
+          24.357688242816256,
+          -311.7073133895641
+        ],
+        "quaternion": [
+          -0.0178613156648622,
+          -0.08028628978245894,
+          -0.001438895522060224,
+          0.9966107638668988
+        ],
+        "fov": 60,
+        "distance": 328.2639900110564,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 102,
+        "triangles": 1757743,
+        "textures": 36,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 164.79947916666666,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

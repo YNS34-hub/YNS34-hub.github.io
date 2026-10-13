@@ -1,0 +1,169 @@
+{
+  "sha": "28d8fe7088ab3492d4c49dccc9e5742e60626486",
+  "base": "http://127.0.0.1:5191",
+  "checkedAt": "2026-10-13T01:39:11.144Z",
+  "scope": "Actual public build; native keys/buttons and visible DOM only. No debug APIs, camera staging or simulation injection.",
+  "checks": [
+    {
+      "width": 1920,
+      "name": "Public Enter + Numpad5 physically scores; six outfits / original ESC gate / refresh restoration; no private avatar profile"
+    },
+    {
+      "width": 1920,
+      "name": "Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"
+    },
+    {
+      "width": 1920,
+      "name": "cycling: public third-person native mount/ride/brake, standing / seated C, views, photo/ESC, Palace return"
+    },
+    {
+      "width": 1920,
+      "name": "alpine-ride: public third-person native mount/ride/brake, standing / seated C, views, photo/ESC, Palace return"
+    },
+    {
+      "width": 2560,
+      "name": "Public Enter + Numpad5 physically scores; six outfits / original ESC gate / refresh restoration; no private avatar profile"
+    },
+    {
+      "width": 2560,
+      "name": "Public court: native sprint/dunk physically scores, view toggle and reload, no dev exports"
+    },
+    {
+      "width": 2560,
+      "name": "cycling: public third-person native mount/ride/brake, standing / seated C, views, photo/ESC, Palace return"
+    },
+    {
+      "width": 2560,
+      "name": "alpine-ride: public third-person native mount/ride/brake, standing / seated C, views, photo/ESC, Palace return"
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "browserArgs": [
+    "--use-angle=d3d11",
+    "--disable-background-timer-throttling",
+    "--disable-backgrounding-occluded-windows",
+    "--disable-renderer-backgrounding"
+  ],
+  "courtRuns": [
+    {
+      "width": 1920,
+      "samples": [],
+      "acceptedAtSeconds": 3.274,
+      "inputTrace": {
+        "frames": 346,
+        "events": [
+          {
+            "type": "keydown",
+            "code": "Enter",
+            "repeat": false,
+            "at": 16212.300000011921,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keydown",
+            "code": "KeyW",
+            "repeat": false,
+            "at": 16223.200000017881,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keydown",
+            "code": "Numpad5",
+            "repeat": false,
+            "at": 19449,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keyup",
+            "code": "Numpad5",
+            "repeat": false,
+            "at": 19459,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keyup",
+            "code": "KeyW",
+            "repeat": false,
+            "at": 19480.90000000596,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keyup",
+            "code": "Enter",
+            "repeat": false,
+            "at": 19489.09999999404,
+            "hidden": false,
+            "focused": true
+          }
+        ]
+      }
+    },
+    {
+      "width": 2560,
+      "samples": [],
+      "acceptedAtSeconds": 3.29,
+      "inputTrace": {
+        "frames": 249,
+        "events": [
+          {
+            "type": "keydown",
+            "code": "Enter",
+            "repeat": false,
+            "at": 12178.699999988079,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keydown",
+            "code": "KeyW",
+            "repeat": false,
+            "at": 12190.59999999404,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keydown",
+            "code": "Numpad5",
+            "repeat": false,
+            "at": 15430.699999988079,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keyup",
+            "code": "Numpad5",
+            "repeat": false,
+            "at": 15449.199999988079,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keyup",
+            "code": "KeyW",
+            "repeat": false,
+            "at": 15466.90000000596,
+            "hidden": false,
+            "focused": true
+          },
+          {
+            "type": "keyup",
+            "code": "Enter",
+            "repeat": false,
+            "at": 15488.299999982119,
+            "hidden": false,
+            "focused": true
+          }
+        ]
+      }
+    }
+  ],
+  "passed": true
+}

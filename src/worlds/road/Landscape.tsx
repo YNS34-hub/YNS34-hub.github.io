@@ -1,12 +1,12 @@
 import { useMemo,useEffect,useLayoutEffect,useRef,useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry,Float32BufferAttribute,Vector3,CylinderGeometry,PlaneGeometry,BoxGeometry,MeshStandardMaterial,CanvasTexture,SRGBColorSpace,Group,Mesh,InstancedMesh,Texture } from "three";
+import { BufferGeometry,Float32BufferAttribute,Vector3,BoxGeometry,MeshStandardMaterial,Group,InstancedMesh } from "three";
 import Instances,{type Instance} from "../Instances";
 import { Block,Label } from "../../world/primitives";
 import { roadLength,sectorLength,sectorCount,roadSample,roadRibbon,terrainHeight,roadForestDensity,activeRoadSectors,lake,lakeDistance,roadStops,closestRoad } from "./route";
 import { roadView,useRoadRide } from "./state";
-import { useRoadTextures,usePineShape,useRidgeSamples,type PineShape } from "./textures";
-import { useWorldTexture } from "../materials";
+import { useRoadTextures,useRidgeSamples } from "./textures";
+import ForestTrees,{useForestAssets,type ForestAssets,type ForestTree} from "../scenery/ForestTrees";
 import { usePalaceStore } from "../../systems/store";
 import { useQuietMotion } from "../../motion/useMotionCue";
 import {dryRoadMaterial,weatheredEdgePaint} from "../scenery/roadFinish";
@@ -68,41 +68,14 @@ function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
   },[maps.meadow]);
   return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v5"}/></mesh>;
 }
-function WindField(props:Parameters<typeof Instances>[0]){
-  const quiet=useQuietMotion();
-  const root=useRef<Group>(null),wind=useRef({time:{value:0},amount:{value:.08},eye:{value:new Vector3()}});
-  useEffect(()=>{
-    root.current?.traverse(object=>{
-      if(!(object instanceof Mesh)||!(object.material instanceof MeshStandardMaterial))return;
-      const material=object.material;
-      if(props.map){material.alphaToCoverage=true;material.forceSinglePass=true;}
-      material.onBeforeCompile=shader=>{
-        shader.uniforms.roadTime=wind.current.time;shader.uniforms.roadWind=wind.current.amount;shader.uniforms.roadEye=wind.current.eye;
-        shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nuniform float roadTime;uniform float roadWind;uniform vec3 roadEye;")
-          .replace("#include <begin_vertex>","#include <begin_vertex>\n#ifdef USE_INSTANCING\nfloat nearby=1.-smoothstep(28.,85.,distance(roadEye,instanceMatrix[3].xyz));transformed.x+=sin(roadTime*1.2+instanceMatrix[3].x*.09+position.y)*roadWind*uv.y*uv.y*nearby;\n#endif");
-        if(props.map){
-          // 少量朝向天空的冠层法线保持树叶暗部层次，双面卡片不再形成一片纯黑剪纸。
-          shader.fragmentShader=shader.fragmentShader.replace("#include <normal_fragment_maps>","#include <normal_fragment_maps>\nnormal=normalize(mix(normal,(viewMatrix*vec4(0.,1.,0.,0.)).xyz,.42));").replace("#include <opaque_fragment>","outgoingLight+=diffuseColor.rgb*.09;\n#include <opaque_fragment>");
-        }
-        if(!props.map){
-          shader.vertexShader="varying float grassLeafHeight;\n"+shader.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\ngrassLeafHeight=uv.y;");
-          shader.fragmentShader="varying float grassLeafHeight;\n"+shader.fragmentShader.replace("#include <color_fragment>","#include <color_fragment>\ndiffuseColor.rgb*=.60+.40*smoothstep(.03,.75,grassLeafHeight);");
-        }
-      };
-      material.customProgramCacheKey=()=>props.map?"road-readable-canopy-wind-v2":"road-rooted-grass-wind-v2";material.needsUpdate=true;
-    });
-  },[props.map]);
-  useFrame(({camera},dt)=>{if(!quiet)wind.current.time.value+=Math.min(dt,.06);wind.current.amount.value=quiet?0:.08+Math.min(1,roadView.speed/15.28)*.18;wind.current.eye.value.copy(camera.position);});
-  return <group ref={root}><Instances {...props}/></group>;
-}
-function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplates,verge,details}:{index:number;shadow:boolean;maps:Maps;leaves:Texture;pineShape:PineShape;wood:BufferGeometry;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>;verge:MeshStandardMaterial;details:ReturnType<typeof roadsideDetailMaterials>}){
+function RoadSector({index,shadow,maps,forestAssets,scans,grassTemplates,verge,details}:{index:number;shadow:boolean;maps:Maps;forestAssets:ForestAssets;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>;verge:MeshStandardMaterial;details:ReturnType<typeof roadsideDetailMaterials>}){
   const quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion();
   const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.normal,[2,5],6.4),[maps.asphalt,maps.normal]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
   const geometry=useMemo(()=>{
     const start=index*sectorLength,end=Math.min(roadLength,start+sectorLength),p=new Vector3(),t=new Vector3();
     const random=seeded(index+908),terrain=makeTerrain(start,end),ground=terrainSampler(terrain,terrainHeight);
-    const trunks:Instance[]=[],branches:Instance[]=[],pines:Instance[]=[],needles:Instance[]=[],broad:Instance[]=[],rocks:Instance[]=[],grass:Instance[][]=Array.from({length:6},()=>[]),markers:Instance[]=[];
+    const trees:ForestTree[]=[],rocks:Instance[]=[],grass:Instance[][]=Array.from({length:6},()=>[]),markers:Instance[]=[];
     for(let d=start;d<end;d+=4){
       roadSample(d,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),density=roadForestDensity(d/roadLength);
       for(const side of [-1,1]){
@@ -116,35 +89,29 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplate
         if(Math.floor(d/4)%7===0){const a=side*3.8;markers.push({position:[p.x+nx/r*a,p.y+.31,p.z+nz/r*a],scale:[.10,.62,.10],color:"#c7c6b5"});}
         const off=side*(5.8+random()**2.15*35),along=(random()-.5)*7,tr=Math.hypot(t.x,t.z),x=p.x+nx/r*off+t.x/tr*along,z=p.z+nz/r*off+t.z/tr*along;
         if(random()>density*(.75+habitat(x,z)*.65)||lakeDistance(x,z)<1.09||closestRoad(x,z).distance<5.5||d<25&&x>-5&&x<7)continue;
-        const birch=random()>.80,y=ground(x,z),juvenile=random()<.14,h=birch?11+random()*6:juvenile?7.5+random()*5:15+random()*10,lean=(random()-.5)*.03,wide=birch?2.8+random()*1.7:2.1+random()*1.8;
-        const crownRandom=seeded(Math.round(x*31+z*53)+1781);
-        if(!birch){
-          const size=h/pineShape.height,sx=size*(.93+random()*.42),sz=size*(.91+random()*.40),angle=random()*Math.PI*2,cs=Math.cos(angle),sn=Math.sin(angle),stride=quality==="low"?5:2;
-          pines.push({position:[x,y-.035,z],scale:[sx,size,sz],rotation:[0,angle,0],color:"#a59d84"});
-          for(let k=0;k<pineShape.crown.length;k+=stride){const a=pineShape.crown[k],w=.95+crownRandom()*.30;
-            needles.push({position:[x+a[0]*sx*cs+a[2]*sz*sn,y+a[1]*size,z-a[0]*sx*sn+a[2]*sz*cs],scale:[.82*w*size,1.95*w*size,1],rotation:[(crownRandom()-.5)*1.4,crownRandom()*6.28,(crownRandom()-.5)*1.6],color:k%7===0?"#c2c4a4":"#aeb99b"});
-          }
-        }else{
-          trunks.push({position:[x,y+h*.5-.03,z],scale:[.19+random()*.14,h,.19+random()*.14],rotation:[lean,random()*6.28,lean],color:"#c3b9a2"});
-          const count=quality==="low"?70:190;
-          for(let k=0;k<count;k++){
-            const angle=k*2.4+crownRandom()*.5,radius=Math.sqrt(crownRandom())*wide,level=crownRandom(),spread=wide*(1-level*.65),height=h*(.40+level*.58);
-            broad.push({position:[x+Math.cos(angle)*radius,y+h*.71+(crownRandom()-.5)*wide*1.65,z+Math.sin(angle)*radius],scale:[1.3+crownRandom()*.65,1.3+crownRandom()*.65,1],rotation:[(crownRandom()-.5)*1.6,angle,(crownRandom()-.5)],color:["#a8b398","#c1b387","#b8c19d","#b5aa85"][k%4]});
-            if(k%22===0)branches.push({position:[x+Math.cos(angle)*spread*.25,y+height-.25,z+Math.sin(angle)*spread*.25],scale:[.035,spread*.7,.035],rotation:[Math.cos(angle)*1.0,0,Math.sin(angle)*1.0],color:"#9a8e76"});
-          }
+        const y=ground(x,z),angle=random()*Math.PI*2,juvenile=random()<.19;
+        const model=juvenile?1:0,variant=juvenile?Math.floor(random()*3):angle/(Math.PI*2)<.62?1:0;
+        const size=juvenile?1.15+random()*1.7:.83+random()*.83;
+        trees.push({model,variant,position:[x,y-.014,z],scale:[size*(.87+random()*.27),size,size*(.91+random()*.22)],rotation:[0,angle,0]});
+        // 林下幼苗沿已有生态密度成小簇，留出公路、湖岸和停靠区；不是沿每个路段放同一棵树。
+        const saplingRandom=seeded(Math.round(x*31+z*53)+1781);
+        if(saplingRandom()<.40)for(let j=0;j<2;j++){
+          const a=saplingRandom()*Math.PI*2,radius=1.6+saplingRandom()*3,sx=x+Math.cos(a)*radius,sz=z+Math.sin(a)*radius;
+          if(closestRoad(sx,sz).distance<4.5||lakeDistance(sx,sz)<1.09||insideStopApron(sx,sz))continue;
+          const scale=.75+saplingRandom()*1.1;trees.push({model:1,variant:j%3,position:[sx,ground(sx,sz)-.012,sz],scale:[scale,scale,scale],rotation:[0,saplingRandom()*Math.PI*2,0]});
         }
         if(random()>.68&&d>25){const a=side*(4.6+random()*14),rx=p.x+nx/r*a,rz=p.z+nz/r*a,size=.5+random()*1.8;if(closestRoad(rx,rz).distance>4.1&&!insideStopApron(rx,rz))rocks.push({position:[rx,ground(rx,rz)-size*.12,rz],scale:[size*1.3,size*.65,size],rotation:[0,random()*6,0]});}
       }
     }
-    const stem=new CylinderGeometry(.06,.65,1,12),leaf=new PlaneGeometry(1,1),cube=new BoxGeometry(1,1,1);
+    const cube=new BoxGeometry(1,1,1);
     const roadStart=index===0?-12:start;
     const road=roadRibbon(roadStart,end,6.4),edges=[roadRibbon(roadStart,end,.1,-2.95,.012),roadRibbon(roadStart,end,.1,2.95,.012)];
     const site={kind:"forest" as const,sample:roadSample,ground,nearest:(x:number,z:number)=>closestRoad(x,z).distance,blocked:insideStopApron};
     const shoulders=createShoulders(roadStart,end,site),intrusion=createVergeGrass(start,end,site,shoulders),small=createRoadsideDetails(start,end,site,shoulders);
     intrusion.forEach((items,i)=>grass[i].push(...(quality==="low"?items.filter((_,j)=>j%3===0):items)));
-    return{start,end,terrain,road,edges,shoulders,small,stem,leaf,cube,trunks,branches,pines,needles,broad,rocks,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,time:{value:0},wind:{value:quiet?0:.012}};
-  },[index,quality,pineShape,quiet]);
-  useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.shoulders,geometry.small.drains,geometry.stem,geometry.leaf,geometry.cube].forEach(g=>g.dispose());},[geometry]);
+    return{start,end,terrain,road,edges,shoulders,small,cube,trees,rocks,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,time:{value:0},wind:{value:quiet?0:.012}};
+  },[index,quality,quiet]);
+  useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.shoulders,geometry.small.drains,geometry.cube].forEach(g=>g.dispose());},[geometry]);
   useFrame((_,dt)=>{if(!quiet)geometry.time.value+=Math.min(.06,dt);});
   return <group name={"road-sector:"+index}>
     <TerrainSurface geometry={geometry.terrain} maps={maps}/>
@@ -152,43 +119,35 @@ function RoadSector({index,shadow,maps,leaves,pineShape,wood,scans,grassTemplate
     <mesh name="grounded-road-shoulder" geometry={geometry.shoulders} receiveShadow material={verge} dispose={null}/>
     <RoadsideDetails data={geometry.small} scan={scans[0]} materials={details}/>
     {geometry.edges.map((g,i)=><mesh key={i} geometry={g} receiveShadow><meshStandardMaterial color="#c9c6b7" roughness={.96} onUpdate={m=>weatheredEdgePaint(m,[2,5])}/></mesh>)}
-    <Instances geometry={geometry.stem} items={geometry.trunks} color="#9c8e78" map={maps.bark} shadows={shadow}/>
-    <Instances geometry={wood} items={geometry.pines} map={maps.bark} shadows={shadow}/>
-    <Instances geometry={geometry.stem} items={geometry.branches} color="#7a725f" shadows={shadow}/>
-    <WindField geometry={geometry.leaf} items={geometry.needles} map={maps.pine} cutout shadows={shadow}/>
-    <WindField geometry={geometry.leaf} items={geometry.broad} map={leaves} cutout shadows={shadow}/>
+    <ForestTrees trees={geometry.trees} assets={forestAssets} shadows={shadow}/>
     <ScanInstances scan={scans[0]} items={geometry.rocks} shadows={shadow}/>
     {grassTemplates.map((template,i)=><GrassField key={i} template={template} items={i<3?geometry.grass[i]:geometry.farGrass[i-3]} time={geometry.time} wind={geometry.wind} near={i<3} blend={quality!=="low"}/>)}
     <Instances geometry={geometry.cube} items={geometry.markers} color="#bebfae"/>
     <Delineators items={geometry.markers} stem={geometry.cube}/>
   </group>;
 }
-function Geography({maps,pineShape}:{maps:Maps;pineShape:PineShape}){
+function Geography({maps,forestAssets}:{maps:Maps;forestAssets:ForestAssets}){
   const samples=useRidgeSamples();
   const groundMaterial=useMemo(()=>valleyTerrainMaterial(maps),[maps]),mountainMaterial=useMemo(()=>valleyTerrainMaterial(maps,true),[maps]);
   useEffect(()=>()=>{groundMaterial.dispose();mountainMaterial.dispose();},[groundMaterial,mountainMaterial]);
   const shape=useMemo(()=>{
     const g=createValleyFloor();
     const ridges=createValleyRidges(samples);
-    // 远林用同一松针图像离线式合成的透明树冠；不用近处可识别的实体圆锥代替森林。
-    const canvas=document.createElement("canvas");canvas.width=512;canvas.height=1024;const ctx=canvas.getContext("2d")!;ctx.fillStyle="#5c6350";ctx.fillRect(250,130,9,894);
-    const painter=seeded(991);for(const p of pineShape.crown){const x=256+p[0]*48,y=1024-p[1]/pineShape.height*1010;ctx.save();ctx.translate(x,y);ctx.rotate((painter()-.5)*1.6);ctx.drawImage(maps.pine.image as CanvasImageSource,-15,-36,30,72);ctx.restore();}
-    const crown=new CanvasTexture(canvas);crown.colorSpace=SRGBColorSpace;crown.anisotropy=2;
     // 远林必须落在实际粗网格三角形上，不能把精细高度加到下移后的远景表面而悬空。
     const farGround=terrainSampler(g,terrainHeight);
-    const tree=new PlaneGeometry(1,1),forest:Instance[]=[],random=seeded(417);
+    const forest:ForestTree[]=[],random=seeded(417);
     for(let i=0;i<4000;i++){
       const x=-300+random()*2000,z=-1520+random()*1750;
       const h=terrainHeight(x,z),near=closestRoad(x,z);if(lakeDistance(x,z)<1.13||h<10||near.distance<125||near.distance<200&&roadForestDensity(near.progress)<.25||random()>habitat(x,z)*.92+.05)continue;
-      const height=8+random()**.65*14,width=height*(.37+random()*.18),a=random()*Math.PI;for(const angle of [a,a+Math.PI/2])forest.push({position:[x,farGround(x,z)+height/2-.12,z],scale:[width,height,1],rotation:[0,angle,0],color:["#a9b3a0","#b6b69e","#a6b39d"][i%3]});
+      const size=.75+random()*.85,a=random()*Math.PI*2;forest.push({model:0,variant:a/Math.PI<1.24?1:0,position:[x,farGround(x,z)-.012,z],scale:[size*(.86+random()*.28),size,size],rotation:[0,a,0]});
     }
-    return{g,ridges,tree,forest,crown};
-  },[maps.pine.image,pineShape,samples]);
-  useEffect(()=>()=>{shape.g.dispose();shape.ridges.forEach(g=>g.dispose());shape.tree.dispose();shape.crown.dispose();},[shape]);
+    return{g,ridges,forest};
+  },[samples]);
+  useEffect(()=>()=>{shape.g.dispose();shape.ridges.forEach(g=>g.dispose());},[shape]);
   return <group name="continuous-lake-valley-geography">
     <mesh geometry={shape.g} material={groundMaterial} dispose={null}/>
     {shape.ridges.map(g=><mesh key={g.name} name={g.name} geometry={g} material={mountainMaterial} dispose={null}/>)}
-    <WindField geometry={shape.tree} items={shape.forest} map={shape.crown} color="#adb8ab" cutout/>
+    <ForestTrees trees={shape.forest} assets={forestAssets}/>
   </group>;
 }
 function Trailhead(){
@@ -232,13 +191,11 @@ export default function RoadLandscape(){
   useEffect(()=>()=>verge.dispose(),[verge]);
   const scans=useAlpineScans(),grassTemplates=useAlpineGrass();
   const details=useMemo(()=>roadsideDetailMaterials(scans[0].material),[scans]);useEffect(()=>()=>{details.stone.dispose();details.drain.dispose();},[details]);
-  const pineShape=usePineShape(),wood=useMemo(()=>{const g=new BufferGeometry();g.setAttribute("position",new Float32BufferAttribute(pineShape.position,3));g.setAttribute("normal",new Float32BufferAttribute(pineShape.normal,3));g.setAttribute("uv",new Float32BufferAttribute(pineShape.uv,2));g.setIndex(pineShape.index);return g;},[pineShape]);
-  useEffect(()=>()=>wood.dispose(),[wood]);
-  const leaves=useWorldTexture("leaves");
+  const forestAssets=useForestAssets();
   const [sectors,setSectors]=useState(()=>activeRoadSectors(roadView.distance)),last=useRef(-1),tick=useRef(0);
   // 草木与远山没有交互入口，跳过几十万个实例的导航射线测试；近处路面和自行车仍正常拾取。
   useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} pineShape={pineShape}/><RoadLake scans={scans} grassTemplates={grassTemplates}/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} leaves={leaves} pineShape={pineShape} wood={wood} scans={scans} grassTemplates={grassTemplates} verge={verge} details={details} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} forestAssets={forestAssets}/><RoadLake scans={scans} grassTemplates={grassTemplates}/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} forestAssets={forestAssets} scans={scans} grassTemplates={grassTemplates} verge={verge} details={details} shadow={Math.abs(index-current)<2}/>)}</group>;
 }

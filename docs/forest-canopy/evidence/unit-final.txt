@@ -1,0 +1,63 @@
+
+> the-memory-palace@3.0.0 test
+> vitest run --maxWorkers=1 --minWorkers=1
+
+
+ RUN  v3.2.7 [workspace]
+
+ ✓ tests/personal-media.test.ts (3 tests) 1913ms
+   ✓ personal media registration > keeps stable audio IDs, registers real LRC, uses safe delivery paths and excludes music and lyrics from public builds  868ms
+   ✓ personal media registration > registers nested, uppercase and unicode files, keeps originals, removes stale copies, and excludes private files in a public release  756ms
+ ✓ tests/alpine-ride.test.ts (5 tests) 871ms
+   ✓ independent alpine world > can ride the complete independent descent without a stuck bend or invalid simulation  741ms
+ ✓ tests/alpine-fidelity.test.ts (5 tests) 489ms
+   ✓ measured alpine detail > stitches adaptive boundaries and gives culled tiles real local bounds and shared normals  398ms
+ ✓ tests/cycling-lake.test.ts (1 test) 788ms
+   ✓ the lake meets rendered valley triangles > has a horizontal bounded surface, actual depths and a clipped zero-depth shoreline  786ms
+ ✓ tests/audio-runtime.test.ts (3 tests) 338ms
+stdout | tests/road-cycling.test.ts > authored road ride > finishes the authored route in 5–8 minutes with ordinary continuous effort and suitable gears
+Route physics elapsed seconds: 387.2
+
+ ✓ tests/road-cycling.test.ts (8 tests) 275ms
+ ✓ tests/content.test.ts (6 tests) 308ms
+ ✓ tests/cycling-scenery.test.ts (7 tests) 237ms
+ ✓ tests/motion-preservation.test.ts (2 tests) 179ms
+ ✓ tests/forest-canopy.test.ts (4 tests) 108ms
+ ✓ tests/roadside.test.ts (8 tests) 109ms
+ ✓ tests/court-fidelity.test.ts (5 tests) 84ms
+ ✓ tests/road-stop-apron.test.ts (4 tests) 91ms
+ ✓ tests/athlete-appearance.test.ts (8 tests) 74ms
+ ✓ tests/adventure-play.test.ts (11 tests) 55ms
+ ✓ tests/cycling.test.ts (6 tests) 62ms
+ ✓ tests/texture-cache.test.ts (3 tests) 37ms
+ ✓ tests/basketball.test.ts (5 tests) 36ms
+ ✓ tests/walking-surface.test.ts (2 tests) 33ms
+ ✓ tests/world-texture-sources.test.ts (1 test) 44ms
+ ✓ tests/world.test.ts (8 tests) 30ms
+ ✓ tests/surface-detail.test.ts (6 tests) 23ms
+ ✓ tests/alpine-daylight.test.ts (4 tests) 35ms
+ ✓ tests/quality-leap.test.ts (9 tests) 25ms
+ ✓ tests/scene-audio.test.ts (3 tests) 31ms
+ ✓ tests/world-warmup.test.ts (6 tests) 32ms
+ ✓ tests/road-audio.test.ts (2 tests) 33ms
+ ✓ tests/personal-athlete.test.ts (7 tests) 32ms
+ ✓ tests/alpine-persistence.test.ts (5 tests) 23ms
+ ✓ tests/navigation.test.ts (11 tests) 25ms
+ ✓ tests/museum-entry.test.ts (7 tests) 19ms
+ ✓ tests/sport-detail.test.ts (9 tests) 21ms
+ ✓ tests/motion.test.ts (6 tests) 18ms
+ ✓ tests/rider-contact.test.ts (4 tests) 18ms
+ ✓ tests/audio-library.test.ts (19 tests) 13ms
+ ✓ tests/road-restoration.test.ts (4 tests) 11ms
+ ✓ tests/lyrics.test.ts (7 tests) 14ms
+ ✓ tests/living-motion.test.ts (5 tests) 8ms
+ ✓ tests/interaction-occlusion.test.ts (1 test) 7ms
+ ✓ tests/court-camera.test.ts (5 tests) 7ms
+ ✓ tests/interaction.test.ts (3 tests) 6ms
+ ✓ tests/room-music.test.ts (2 tests) 5ms
+
+ Test Files  42 passed (42)
+      Tests  230 passed (230)
+   Start at  09:31:57
+   Duration  43.25s (transform 1.43s, setup 0ms, collect 7.91s, tests 6.57s, environment 15ms, prepare 8.69s)
+
