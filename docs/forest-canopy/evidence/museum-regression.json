@@ -1,0 +1,62 @@
+{
+  "environment": "Installed Edge / real D3D11 GPU / 1920x1080 DPR1 medium",
+  "checks": [
+    "v1 IndexedDB records retain blob, favorite and ID after placement migration",
+    "all main rooms enter, return, load real works and retain WASD control",
+    "memory revelation uses a real collection image, stays in place and is interruptible",
+    "batch import targets Portraits, persists, renders its stable ID, and isolates failure",
+    "Cinema restores exact view from every source; ESC first closes metadata; Back returns",
+    "modal suspends WASD; project viewing retains the room; exactly one web preview mounts on demand",
+    "kept website references appear in My Collection and disappear when unkept",
+    "stateful corridor door changes after a real visit, with five bounded resident segments",
+    "observatory bridge rails and Unfinished exit match their physical walking boundaries",
+    "actual local audio drives measured frequency bands and settles after pause",
+    "local audio placement and room soundtrack metadata survive refresh",
+    "accessible index Cinema returns to index without discarding navigation"
+  ],
+  "skippedChecks": [
+    "Live iframe: no private HTML in this build; actual public preview and SOURCE fallback verified"
+  ],
+  "observations": [
+    {
+      "playing": {
+        "signal": {
+          "available": true,
+          "bass": 0.450283904184926,
+          "mid": 0.1339656299145227,
+          "treble": 0,
+          "rms": 0.01714022703076966
+        },
+        "fins": [
+          -0.165,
+          -0.10803649303749177,
+          -0.05255892899867206,
+          0.0010712811728555683,
+          0.05389076711040748,
+          0.10754969838453567,
+          0.16306296907070783
+        ]
+      },
+      "paused": {
+        "signal": {
+          "available": false,
+          "bass": 5.074676969136887e-05,
+          "mid": 1.510960383241113e-05,
+          "treble": 0,
+          "rms": 1.9973298963388254e-06
+        },
+        "fins": [
+          -0.165,
+          -0.1099943726431181,
+          -0.054993003957734383,
+          3.0702623395968316e-06,
+          0.05499682096908538,
+          0.10999297750304847,
+          0.16499444852270018
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "exitCode": 0
+}
