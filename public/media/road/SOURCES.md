@@ -5,6 +5,7 @@ The photographed materials are public-domain CC0 assets from Poly Haven, resized
 - `asphalt.webp` and `asphalt-normal.webp`: [Asphalt 02](https://polyhaven.com/a/asphalt_02).
 - `bark.webp` and `pine.webp`: bark and a cropped twig of [Pine Tree 01](https://polyhaven.com/a/pine_tree_01). The supplied twig alpha channel is preserved.
 - `pine-shape.json`: an offline, vertex-clustered version of that CC0 tree's wood (3,756 triangles), with 1,700 sampled canopy positions rendered as cutout twig cards. The 905 MB needle model is never shipped. `scripts/prepare-road-tree.mjs` records this conversion. Each streamed sector instances the small shared geometry; distant crowns are locally composed from the same canopy and texture.
+- The current forest ride uses the two fir and three sapling derivatives in [forest/SOURCES.md](forest/SOURCES.md), with complete-source canopy distribution and three distance LODs. The earlier pine resource above is preserved; it no longer describes the active forest tree renderer.
 - `ground.webp`: [Forest Leaves 04](https://polyhaven.com/a/forest_leaves_04).
 - `grass.webp`: [Leafy Grass](https://polyhaven.com/a/leafy_grass).
 - Close grass and stones reuse the existing public CC0 [Grass Medium 01](https://polyhaven.com/a/grass_medium_01) and [Rock 09](https://polyhaven.com/a/rock_09) under `/media/alpine/`. Attribution and bounded LOD conversions are retained in that directory. Clusters are grounded on the actual rendered road-side triangles, with simplified photographed clumps in the distance.
