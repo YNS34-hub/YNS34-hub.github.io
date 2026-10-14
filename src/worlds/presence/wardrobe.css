@@ -22,3 +22,16 @@
 .athlete-outfits small { display:block; margin-top:6px; font-size:10px; opacity:.56; }
 .athlete-private-note { font-size:11px; line-height:1.8; opacity:.6; margin:20px 0; }
 @media(max-width:700px) { .palace-app .dialog-backdrop:has(.athlete-wardrobe) { padding:20px; } .palace-app .panel.athlete-wardrobe { width:100%; } .athlete-outfits { grid-template-columns:1fr; } }
+.court-motion-packs { margin-top:30px; padding-top:26px; border-top:1px solid rgba(160,184,190,.22); }
+.court-motion-packs h3 { margin:10px 0 12px; font-size:20px; font-weight:500; }
+.court-motion-packs .eyebrow { margin-top:0; font-size:10px; }
+.court-hand-choice { display:flex; gap:10px; }
+.court-hand-choice legend { width:100%; }
+.court-hand-choice button { flex:1; padding:11px 16px; text-align:center; background:rgba(116,149,162,.06); }
+.court-package-options { display:grid; grid-template-columns:1fr; gap:8px; }
+.court-package-options legend { grid-column:1/-1; }
+.court-package-options button { padding:13px 14px; text-align:left; background:rgba(116,149,162,.06); }
+.court-package-options button span { display:block; font-size:12px; }
+.court-package-options button small { display:block; margin-top:6px; font-size:10px; line-height:1.6; color:#b9c7c9; }
+.court-hand-choice button[aria-pressed=true],.court-package-options button[aria-pressed=true] { background:rgba(116,149,162,.17); box-shadow:inset 2px 0 #c9dce1; }
+.court-motion-packs button:focus-visible { outline:2px solid #c9dce1; outline-offset:3px; }

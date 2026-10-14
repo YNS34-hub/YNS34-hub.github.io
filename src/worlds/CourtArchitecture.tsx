@@ -1,3 +1,5 @@
+import CourtSets from "./court/CourtVenue";
+import {useCourtSet} from "./court/courtSets";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { BufferGeometry, CylinderGeometry, Group, Quaternion, Vector3, MeshPhysicalMaterial } from "three";
@@ -99,7 +101,8 @@ function Fence() {
   </>;
 }
 export default function CourtArchitecture() {
+  const set=useCourtSet(s=>s.selected);
   return <group name="original-after-hours-court">
-    <CourtSurface /><Fence /><CourtPark /><Hoop side={-1} /><Hoop side={1} />
+    {set==="park"?<><CourtSurface/><Fence/><CourtPark/></>:<CourtSets/>}<Hoop side={-1} /><Hoop side={1} />
   </group>;
 }

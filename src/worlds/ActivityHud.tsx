@@ -7,13 +7,14 @@ import RoadHud, { rememberRoadReturn } from "./road/Hud";
 import {roadTravel} from "./road/state";
 import {isRideScene} from "./road/maps";
 import { useCourtTime } from "./court/state";
+import {courtSets,useCourtSet} from "./court/courtSets";
 import PerspectiveControls from "./presence/Controls";
 import {isPrimaryShotKey} from "./court/controls";
 
 export default function ActivityHud() {
   const room = usePalaceStore(s => s.roomId), blocked = usePalaceStore(s => !!s.overlay || !!s.focus || s.mode === "index" || !s.started);
   const a = useActivity();
-  const courtTime = useCourtTime();
+  const courtTime = useCourtTime(), selectedCourt=useCourtSet(s=>s.selected);
   const result = useMotionCue<HTMLParagraphElement>(a.result, "copy", room === "basketball" && !blocked);
   const score = useMotionCue<HTMLElement>(a.made, "copy", room === "basketball" && !blocked && a.made > 0);
   useEffect(() => usePalaceStore.subscribe((state, previous) => {
@@ -31,7 +32,7 @@ export default function ActivityHud() {
   }
   if (blocked || a.warming || room !== "basketball") return null;
   return <aside className="activity-hud court-hud" aria-label="Basketball practice controls" data-primary-action={a.primaryAction} data-finish-ready={a.finishReady}>
-    <div className="practice-score"><span>PRACTICE / {courtTime.time === "day" ? "PARK COURT" : "AFTER HOURS"}</span><strong ref={score}>{a.made}<small> / {a.shots}</small></strong><span>MADE / ATTEMPTED{a.streak > 1 ? " · STREAK " + a.streak : ""}</span></div>
+    <div className="practice-score"><span>PRACTICE / {courtSets[selectedCourt].title}{!courtSets[selectedCourt].indoor&&courtTime.time==="night"?" / AFTER HOURS":""}</span><strong ref={score}>{a.made}<small> / {a.shots}</small></strong><span>MADE / ATTEMPTED{a.streak > 1 ? " · STREAK " + a.streak : ""}</span></div>
     <p className="shot-result" ref={result} role="status">{a.result || (a.finishReady ? a.primaryAction === "dunk" ? "ENTER + 5 · DUNK IN RANGE" : "5 · LAYUP IN RANGE" : "Find your spot.")}</p>
     {a.mode === "held" && <div className="release-meter" aria-label="Shot release" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(a.charge * 100)}><span className="release-zone" /><i style={{ width: a.charge * 100 + "%" }} /></div>}
     <div className="activity-actions">
@@ -42,10 +43,10 @@ export default function ActivityHud() {
       {a.mode === "held" && <><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("layup")}>5 · Layup</button><button disabled={a.finishing !== "idle"} onClick={() => courtCommand("dunk")}>Enter + 5 · Dunk</button></>}
     </div>
     <PerspectiveControls roomId="basketball" />
-    <div className="court-time" role="group" aria-label="Court lighting">
+    {!courtSets[selectedCourt].indoor&&<div className="court-time" role="group" aria-label="Court lighting">
       <button aria-pressed={courtTime.time === "day"} onClick={() => courtTime.setTime("day")}>Daylight</button>
       <button aria-pressed={courtTime.time === "night"} onClick={() => courtTime.setTime("night")}>Night lights</button>
-    </div>
+    </div>}
     <small>WASD 移动 · Enter 加速运球 · V 切换视角<br />长按 5 / 小键盘 5，松开投篮 · 近篮 5 上篮 · 助跑 Enter + 5 扣篮<br />E 拾球 / 运球 · X 换手 · R 找回球</small>
   </aside>;
 }

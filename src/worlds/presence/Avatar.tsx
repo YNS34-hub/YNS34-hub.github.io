@@ -11,12 +11,14 @@ import { ATHLETE } from "./assets";
 import { pedalPoint } from "./math";
 import { presence, usePerspective, type AdventureRoom } from "./state";
 import { LimbIK } from "./ik";
-import { prepareShot, shotRecovery } from "./shotPose";
+import { prepareShot, shotRecovery, shotFollowThroughTarget } from "./shotPose";
 import { outfits, neutralProfile, useAppearance } from "./appearance";
 import { dressAthlete, reshapeAthlete } from "./appearanceRig";
 import { ankleFromContact, gripPoint, riderAnkle, riderPosture } from "./riderPose";
 import {createRiderOutline} from "./riderOutline";
 import {useAlpineVisuals} from "../alpine/visualPreferences";
+import {motionPacks} from "../court/motionPacks";
+import {useCourtPackages} from "../court/packagePreferences";
 
 export default function SportPresence({roomId}:{roomId:AdventureRoom}) {
   const head = useAppearance(s => s.personal ? s.head : null);
@@ -85,8 +87,8 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     if (!root.current) return;
     const palace = usePalaceStore.getState(), ride = useRoadRide.getState(), third = usePerspective.getState().views[roomId] === "third";
     root.current.visible = third && !(roomId !== "basketball" && ride.photo);
-    if (!root.current.visible) return;
-    rig.outline?.update(_.gl,roomId!=="alpine-ride"||useAlpineVisuals.getState().outline);
+    if (!root.current.visible && roomId!=="basketball") return;
+    if(root.current.visible)rig.outline?.update(_.gl,roomId!=="alpine-ride"||useAlpineVisuals.getState().outline);
     const riding = roomId !== "basketball" && ride.mounted;
     const blocked = !palace.started || !!palace.overlay || !!palace.focus || palace.mode === "index" || useActivity.getState().warming || document.hidden;
     // 换装使用原 settings 门控暂停物理；允许以零时间恢复新网格的当前 IK，避免换装时出现 T-pose。
@@ -158,54 +160,69 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     } else {
       presence.camera.getWorldDirection(rig.direction);
       // 路线上步行眼高为 1.77 m；不能套用球场的 1.65 m，否则人物脚底悬空 12 cm。
-      root.current.position.set(presence.camera.position.x, presence.camera.position.y - (roomId==="basketball"?1.65:1.77) + presence.jump, presence.camera.position.z);
+      const finishPose = presence.finishPose, prep = prepareShot(presence.charge,motionPacks.shot[presence.shotPack]), recovery = shotRecovery(presence.shot,presence.shotJump,motionPacks.shot[presence.shotPack],presence.shotVerticalVelocity);
+      const courtStance=roomId==="basketball"?(presence.finishPose?.stance??(presence.charge>0?Math.max(presence.shotStance*(1-presence.shotGather),prep.stance):presence.shot>0?presence.shotReleaseStance*recovery.reach:presence.dribbling?presence.dribbleStanceSeed+(presence.dribbleCrouch-presence.dribbleStanceSeed)*presence.dribbleBlend:presence.held?.08+(1-presence.holdBlend)*Math.max(0,presence.dribbleCrouch-.08):0)):0;
+      presence.courtStance=courtStance;
+      root.current.position.set(presence.camera.position.x,presence.camera.position.y-(roomId==="basketball"?1.65:1.77)+presence.jump-courtStance,presence.camera.position.z);
       const facing = Math.atan2(-rig.direction.x, -rig.direction.z);
       const moving = speed > .3 && !authoredAction ? Math.atan2(-presence.velocity.x, -presence.velocity.z) : facing;
       const heading = facing + Math.max(-.65, Math.min(.65, Math.atan2(Math.sin(moving - facing), Math.cos(moving - facing))));
       rig.yaw = blocked ? heading : rig.yaw + Math.atan2(Math.sin(heading - rig.yaw), Math.cos(heading - rig.yaw)) * (1 - Math.exp(-dt * 18));
+      if(roomId==="basketball"&&(presence.held||authoredAction)){
+        const turn=Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw));
+        if(Math.abs(turn)>.65)rig.yaw=facing-Math.max(-.65,Math.min(.65,turn));
+      }
       root.current.rotation.set(0, rig.yaw, 0);
       rig.object.position.set(0, 0, 0); rig.object.rotation.y = Math.PI; root.current.updateWorldMatrix(true, true);
-      const finishPose = presence.finishPose, prep = prepareShot(presence.charge), recovery = shotRecovery(presence.shot, presence.shotJump);
+      const settlePitch=Math.min(1,Math.max(0,(.65-presence.shot)/.16)),pitchBlend=settlePitch*settlePitch*(3-2*settlePitch);
       if (authoredAction) {
-        rotateBody("Bip01_Spine", finishPose?.torsoPitch ?? (presence.shot > 0 ? .03 * recovery.reach : prep.pitch), 1, 0, 0);
-        if (finishPose) rotateBody("Bip01_Spine1", finishPose.torsoTwist, 0, 1, 0);
-      } else if (presence.dribbling) {
-        rotateBody("Bip01_Spine", -.08 - Math.min(.08, speed * .014), 1, 0, 0);
+        rotateBody("Bip01_Spine", finishPose?.torsoPitch ?? (presence.shot > 0 ? presence.shotReleasePitch*(1-pitchBlend)+.03*recovery.reach*pitchBlend : prep.pitch), 1, 0, 0);
+        rotateBody("Bip01_Spine1",(finishPose?.torsoTwist??0)+Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)),0,1,0);
+      } else if (roomId==="basketball"&&presence.held) {
+        if(presence.dribbling)rotateBody("Bip01_Spine",presence.dribbleTorso,1,0,0);
+        rotateBody("Bip01_Spine1",(presence.dribbling?presence.dribbleTwist:0)+Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)),0,1,0);
       }
       if (presence.held || presence.finish !== "idle" || presence.shot>0) {
-        if(presence.held)rig.target.copy(presence.dribbling?presence.dribblePalm:presence.ball);
-        else if (finishPose) rig.target.set(finishPose.ball.x, finishPose.ball.y, finishPose.ball.z);
-        else {
-          rig.target.copy(presence.releaseHand); rig.head.set(presence.hand * .18, 1.03, -.23); root.current.localToWorld(rig.head);
-          rig.target.lerp(rig.head, 1 - recovery.reach);
-        }
-        if(!presence.dribbling)rig.target.y-=.115;
-        rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld); rig.target.addScaledVector(rig.axis,-presence.hand*.025);
-        rig.pole.set(presence.hand * (authoredAction ? .34 : .52), 1.02, -.38); root.current.localToWorld(rig.pole); limb(presence.hand as -1 | 1, "arm");
-        orientPalm(presence.hand as -1|1, presence.dribbling);
-        if (authoredAction) rotateBody("Bip01_" + (presence.hand > 0 ? "R" : "L") + "_Hand", -.42 * (finishPose?.wrist ?? recovery.wrist), 1, 0, 0);
-        if (!presence.dribbling) {
-          const guide = finishPose?.guide ?? (presence.shot > 0 ? recovery.guide : 1);
-          if (presence.held) rig.target.copy(presence.ball);
-          else if (finishPose) rig.target.set(finishPose.ball.x, finishPose.ball.y, finishPose.ball.z);
-          else rig.target.copy(presence.releaseHand);
-          rig.target.y -= .03;
-          rig.head.set(-presence.hand * .48, 1.13, -.14); root.current.localToWorld(rig.head);
-          rig.target.lerp(rig.head, 1 - guide);
-          rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld); rig.target.addScaledVector(rig.axis,-presence.hand*.14*guide);
-          rig.pole.set(-presence.hand * .50, 1.02, -.24); root.current.localToWorld(rig.pole); limb(-presence.hand as -1 | 1, "arm");
-          orientPalm(-presence.hand as -1|1,false);
-        }
-        else {
-          // 非持球手保护身体 / 接应换手，不与运球手同步机械抽动。
-          const side=-presence.hand as -1|1;rig.target.set(side*.35,1.16,-.30);root.current.localToWorld(rig.target);
-          rig.target.lerp(presence.dribblePalm,presence.crossover*.6);rig.pole.set(side*.49,1.14,-.15);root.current.localToWorld(rig.pole);limb(side,"arm");orientPalm(side,false);
+        if(presence.dribbling&&presence.held){
+          for(const side of [-1,1]as const){
+            rig.target.copy(side===-1?presence.dribbleLeftPalm:presence.dribbleRightPalm);
+            rig.head.copy(side===-1?presence.dribbleLeftSeed:presence.dribbleRightSeed).add(presence.camera.position).sub(presence.dribbleOrigin);rig.target.lerp(rig.head,1-presence.dribbleBlend);
+            rig.pole.set(side*.48,1.04,-.28);root.current.localToWorld(rig.pole);limb(side,"arm");orientPalm(side,true);
+            if(import.meta.env.DEV){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.point);root.current.userData[side===1?"basketballRightWristError":"basketballLeftWristError"]=rig.point.distanceTo(rig.target);}
+          }
+        }else{
+          const guide=finishPose?.guide??(presence.shot>0?recovery.guide:prep.guide),twoHands=finishPose?.twoHands??(presence.held&&presence.charge===0?1:0);
+          for(const side of [-1,1]as const){
+            if(presence.held)rig.target.copy(presence.ball);
+            else if(finishPose)rig.target.set(finishPose.ball.x,finishPose.ball.y,finishPose.ball.z);
+            else shotFollowThroughTarget(rig.target,presence.releaseHand,presence.releaseBody,presence.camera.position,presence.shotJump,presence.jump,presence.shotReleaseStance,courtStance);
+            const dominant=side===presence.hand,follow=dominant?(presence.held||finishPose?1:recovery.reach):guide;
+            rig.target.y-=dominant?.115:finishPose?.03:.13;
+            rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);
+            rig.target.addScaledVector(rig.axis,dominant?-presence.hand*.025:-presence.hand*.14*guide);
+            if(twoHands>0){
+              if(presence.held)rig.head.copy(presence.ball);else if(finishPose)rig.head.set(finishPose.ball.x,finishPose.ball.y,finishPose.ball.z);else rig.head.copy(presence.releaseHand);
+              rig.head.y-=.045;rig.head.addScaledVector(rig.axis,side*(finishPose?.handSpread??motionPacks.hands[useCourtPackages.getState().packs.hands].spread));rig.target.lerp(rig.head,twoHands);
+            }
+            if(!presence.held&&!finishPose)rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.head);
+            else{rig.head.set(side*.38,1.11,-.23);root.current.localToWorld(rig.head);}
+            rig.target.lerp(rig.head,1-follow);
+            if(finishPose&&!presence.held&&finishPose.elapsed>.95){const t=Math.min(1,(finishPose.elapsed-.95)/.35);rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.head);rig.target.lerp(rig.head,t*t*(3-2*t));}
+            if(presence.held&&presence.holdBlend<1){rig.head.copy(side<0?presence.holdLeftSeed:presence.holdRightSeed).add(presence.camera.position).sub(presence.holdOrigin);rig.target.lerp(rig.head,1-presence.holdBlend);}
+            if(finishPose&&finishPose.elapsed<.16){rig.head.copy(side<0?presence.finishLeftSeed:presence.finishRightSeed).add(presence.camera.position).sub(presence.finishOrigin);const t=finishPose.elapsed/.16;rig.target.lerp(rig.head,1-t*t*(3-2*t));}
+            if((presence.charge>0||presence.shot>0)&&presence.shotGather<1){rig.head.copy(side<0?presence.shotLeftSeed:presence.shotRightSeed).add(presence.camera.position).sub(presence.shotOrigin);rig.target.lerp(rig.head,1-presence.shotGather);}
+            rig.pole.set(side*(authoredAction?.36:.50),1.02,-.32);root.current.localToWorld(rig.pole);limb(side,"arm");orientPalm(side,false);
+            if(authoredAction&&dominant)rotateBody("Bip01_"+(side>0?"R":"L")+"_Hand",-.42*(finishPose?.wrist??recovery.wrist),1,0,0);
+            if(import.meta.env.DEV){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.point);root.current.userData[side===1?"basketballRightWristError":"basketballLeftWristError"]=rig.point.distanceTo(rig.target);}
+          }
         }
       }
-      if (finishPose || presence.charge > 0 || presence.shot > 0) {
+      if(import.meta.env.DEV&&roomId==="basketball")root.current.userData.basketballPackages={...useCourtPackages.getState().packs};
+      if (finishPose || presence.charge > 0 || presence.shot > 0 || roomId==="basketball"&&(presence.dribbling||presence.held||presence.holdBlend<1)) {
         for(const side of [-1,1] as const){
           if (finishPose) { const foot = side === 1 ? finishPose.rightFoot : finishPose.leftFoot; rig.target.set(foot.x, foot.y, foot.z); }
-          else { rig.target.set(side * .13, .095 + Math.max(0, presence.jump) * .06, side === presence.hand ? -.075 : .075); root.current.localToWorld(rig.target); if (presence.jump < 0) rig.target.y -= presence.jump; }
+          else if(presence.dribbling||presence.held||presence.holdBlend<1){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldPosition(rig.target);rig.target.y+=courtStance-Math.min(0,presence.jump);}
+          else { rig.target.set(side * .13, .095 + Math.max(0, presence.jump) * .06, side === presence.hand ? -.075 : .075); root.current.localToWorld(rig.target);rig.target.y+=courtStance; if (presence.jump < 0) rig.target.y -= presence.jump; }
           rig.pole.set(side*.2,.65,-.40);root.current.localToWorld(rig.pole);limb(side,"leg");
           const foot = rig.bones.get("Bip01_" + (side === 1 ? "R" : "L") + "_Foot")!;
           root.current.getWorldQuaternion(rig.world); rig.world.multiply(rig.feet.get(side)!); foot.parent!.getWorldQuaternion(rig.parent);
@@ -231,7 +248,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     }
     accessory(cap.current, "Bip01_Head", rig.headBase, [0, .178, 0], outfit.cap);
     accessory(pack.current, "Bip01_Spine2", rig.spineBase, [0, -.025, .168], outfit.backpack);
-    if(roomId==="basketball"){rig.bones.get("Bip01_L_Foot")!.getWorldPosition(presence.leftFoot);rig.bones.get("Bip01_R_Foot")!.getWorldPosition(presence.rightFoot);}
+    if(roomId==="basketball"){rig.bones.get("Bip01_L_Hand")!.getWorldPosition(presence.leftWrist);rig.bones.get("Bip01_R_Hand")!.getWorldPosition(presence.rightWrist);rig.bones.get("Bip01_L_Foot")!.getWorldPosition(presence.leftFoot);rig.bones.get("Bip01_R_Foot")!.getWorldPosition(presence.rightFoot);}
   }, -2);
   function rotateBody(name: string, angle: number, x: number, y: number, z: number) {
     const bone = rig.bones.get(name); if (!bone?.parent || !root.current) return;
