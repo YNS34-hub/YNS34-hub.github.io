@@ -14,7 +14,7 @@ export const useActivity = create<{
   warming: false, finishing: "idle", sprinting: false,
   primaryAction: "shoot", finishReady: false,
 }));
-export type CourtCommand = "pickup" | "dribble" | "charge" | "release" | "cancel" | "recall" | "layup" | "dunk";
+export type CourtCommand = "pickup" | "dribble" | "charge" | "release" | "cancel" | "recall" | "layup" | "dunk" | "between-legs" | "behind-back" | "hesitation";
 export function courtCommand(command: CourtCommand) { window.dispatchEvent(new CustomEvent("palace:court", { detail: command })); }
 export type RideCommand = "start" | "brake" | "viewpoint" | "restart" | "photo" | "save-photo";
 export function rideCommand(command: RideCommand) { window.dispatchEvent(new CustomEvent("palace:ride", { detail: command })); }

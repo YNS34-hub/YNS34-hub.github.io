@@ -12,5 +12,5 @@ export function dribblePose(phase:number,speed:number,side=1,result:DribblePose=
  const palmFloor=options.height===undefined?Math.max(.85,height-.03):.98-Math.max(0,.95-options.height)*.30;
  const palmY=Math.max(y+.075,Math.min(palmFloor+.025*Math.cos(2*Math.PI*p),.12+height+.075));
  const palmZ=z+(options.height===undefined?0:(running*.10+.045)*Math.sin(Math.PI*p)**2);
- Object.assign(result.ball,{x,y,z});Object.assign(result.palm,{x,y:palmY,z:palmZ});result.push=clamp(1-p/.23);result.torso=(options.torso??-.08)-running*.09;return result;
+ Object.assign(result.ball,{x,y,z});Object.assign(result.palm,{x,y:palmY,z:palmZ});result.push=clamp(1-p/.23);result.torso=(options.torso??-.08)-running*.24;return result;
 }

@@ -14,7 +14,7 @@ import { worksForRoom } from "../systems/mediaPlacement";
 import { setWorldView } from "../worlds/worldConfig";
 import { applyRoadLook } from "../worlds/road/state";
 import { actorCamera, isAdventureRoom, presence } from "../worlds/presence/state";
-import { courtMovementSpeed } from "../worlds/court/controls";
+import { courtMovementSpeed,creativeDribbleWindow,creativeDribbleSpeed } from "../worlds/court/controls";
 // 交互扩展结束
 
 const EYE = 1.65;
@@ -268,8 +268,9 @@ export default function Player({ roomId }: { roomId: string }) {
     const z =
       (input.has("KeyS") || input.has("ArrowDown") ? 1 : 0) -
       (input.has("KeyW") || input.has("ArrowUp") ? 1 : 0);
-    const speed =
-      courtMovementSpeed(roomId, input);
+    const creativeActive=roomId==="basketball"&&presence.held&&presence.dribbling&&!presence.finishLocked&&presence.charge<=0&&presence.shot<=0;
+    const creative=creativeDribbleWindow(presence.dribbleMove,presence.dribblePhase,creativeActive);
+    const speed=creativeDribbleSpeed(courtMovementSpeed(roomId,input),presence.dribbleMove,presence.dribblePhase,creativeActive);
     // 交互扩展开始 player-presence-sprint
     if (isAdventureRoom(roomId)) {
       presence.turboHeld = roomId === "basketball" ? input.has("Enter") || input.has("NumpadEnter") : input.has("ShiftLeft") || input.has("ShiftRight");
@@ -299,7 +300,7 @@ export default function Player({ roomId }: { roomId: string }) {
     } else desired.current.set(0, 0, 0);
     velocity.current.lerp(
       desired.current,
-      1 - Math.exp(-delta * (state.reducedMotion ? 14 : 7)),
+      1 - Math.exp(-delta * ((state.reducedMotion ? 14 : 7)+28*creative)),
     );
     previousPosition.current.copy(camera.position);
     camera.position.addScaledVector(velocity.current, delta);

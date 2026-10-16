@@ -29,7 +29,7 @@ export const motionPacks = {
   } satisfies Record<string, HandMotionPack>,
   dribble: {
     balanced: { title: "均衡运球", description: "平稳的腰侧节奏，适合移动与左右换手。", period: .65, sprintPeriod: .43, height: .95, spread: .31, front: .40, torso: -.08, twist: .025 },
-    low: { title: "低重心控球", description: "降低运球高度，收紧节奏与持球空间。", period: .55, sprintPeriod: .39, height: .68, spread: .28, front: .37, torso: -.13, twist: .06 },
+    low: { title: "低重心控球", description: "降低重心，球落点留在膝外侧，保持紧凑节奏。", period: .55, sprintPeriod: .39, height: .68, spread: .40, front: .37, torso: -.13, twist: .06 },
     wide: { title: "横向变向", description: "扩大左右落点，配合肩腰转动完成换手。", period: .71, sprintPeriod: .47, height: .90, spread: .41, front: .36, torso: -.09, twist: .10 },
   } satisfies Record<string, DribbleMotionPack>,
   layup: {

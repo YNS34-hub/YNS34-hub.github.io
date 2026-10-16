@@ -7,7 +7,7 @@ import { acknowledge } from "../interaction/registry";
 import { ContactShadow } from "../world/primitives";
 import { BallPhysics, BALL_RADIUS, shotVelocity } from "./basketballPhysics";
 import CourtArchitecture, { courtResponse } from "./CourtArchitecture";
-import { useWorldTexture } from "./materials";
+import {useBasketballSurface,BALL_SURFACE_COLOR} from "./court/basketballSurface";
 import { useSceneAudio } from "./sceneAudio";
 import { useActivity, type CourtCommand } from "./activity";
 import { WorldPortal } from "./WorldPortal";
@@ -19,6 +19,7 @@ import { actorCamera, presence } from "./presence/state";
 import SportAvatar from "./presence/Avatar";
 import { isPrimaryShotKey, primaryCourtAction } from "./court/controls";
 import { prepareShot, shotRecovery } from "./presence/shotPose";
+import {blendShotGather,chooseShotGatherDuration} from "./presence/shotGather";
 import { DribbleMotion } from "./presence/dribbleMotion";
 import {motionPacks,type MotionPackSelection} from "./court/motionPacks";
 import {useCourtPackages} from "./court/packagePreferences";
@@ -32,7 +33,7 @@ function PracticeBall() {
   const quiet = useQuietMotion();
   const scratch = useRef({ aim: new Vector3(), hand: new Vector3(), forward: new Vector3(), up: new Vector3(0, 1, 0) });
   const state = useRef({ releasePending:false,release:null as (()=>void)|null, charging: false, charge: 0, dribble: false, dribbleTime: 0, dribblePeriod: .65, handSide:presence.hand, dribbleMotion:new DribbleMotion(useCourtPackages.getState().preferredHand,useCourtPackages.getState().packs.dribble),dribbleStop:false,dribbleElapsed:0,holdElapsed:.22,holdPack:useCourtPackages.getState().packs.hands,holdHand:presence.hand,holdSeed:new Vector3(),holdStart:new Vector3(),shotPack:useCourtPackages.getState().packs.shot as MotionPackSelection["shot"],shotSeed:new Vector3(),shotStart:new Vector3(),finishElapsed:0,finishJump:0,publish: 0, contact: 0, pickup: 0 });
-  const texture = useWorldTexture("ball");
+  const surface = useBasketballSurface();
   const publish = () => {
     camera.getWorldDirection(scratch.current.aim);
     const input = { held: simulation.mode === "held", position:camera.position, direction:scratch.current.aim, speed:presence.speed, hand:presence.hand };
@@ -72,6 +73,8 @@ function PracticeBall() {
       camera.getWorldDirection(scratch.current.aim);
       const from = { x: simulation.position.x, y: simulation.position.y, z: simulation.position.z };
       presence.releaseHand.set(simulation.position.x, simulation.position.y, simulation.position.z);presence.releaseBody.copy(camera.position);presence.shotReleasePitch=prepareShot(state.current.charge,motionPacks.shot[state.current.shotPack]).pitch;presence.shotReleaseStance=Math.max(presence.shotStance*(1-presence.shotGather),prepareShot(state.current.charge,motionPacks.shot[state.current.shotPack]).stance);presence.shot=.65;
+      presence.shotReleaseLeftWrist.copy(presence.leftWrist);presence.shotReleaseRightWrist.copy(presence.rightWrist);presence.shotReleaseLeftRotation.copy(presence.leftWristRotation);presence.shotReleaseRightRotation.copy(presence.rightWristRotation);presence.shotGuideAtRelease=prepareShot(state.current.charge,motionPacks.shot[state.current.shotPack]).guide;
+      presence.shotChargeAtRelease=state.current.charge;presence.shotLanded=false;presence.shotLandOrigin.copy(camera.position);
       presence.shotJump = presence.jump;presence.shotPack=state.current.shotPack;presence.shotVerticalVelocity=prepareShot(state.current.charge,motionPacks.shot[state.current.shotPack]).verticalVelocity;
       simulation.launch(from, shotVelocity(from, scratch.current.aim, state.current.charge, useActivity.getState().assist));
       const quality = Math.abs(state.current.charge - .64);
@@ -84,7 +87,19 @@ function PracticeBall() {
       const action = (event as CustomEvent<CourtCommand>).detail; sound.unlock();
       if (action === "pickup" || action === "dribble") pickup();
       if (action === "layup" || action === "dunk") attemptFinish(action);
-      if (action === "charge" && simulation.mode === "held" && !presence.finishLocked && !state.current.charging) { state.current.shotPack=useCourtPackages.getState().packs.shot;presence.shotPack=state.current.shotPack;state.current.shotSeed.copy(presence.ball);state.current.shotStart.copy(camera.position);presence.shotStance=presence.courtStance;presence.shotGather=0;presence.shotLeftSeed.copy(presence.leftWrist);presence.shotRightSeed.copy(presence.rightWrist);presence.shotOrigin.copy(camera.position);state.current.releasePending=false;state.current.charging = true; state.current.charge = 0; state.current.dribble = false; state.current.dribbleStop = false; }
+      if((action==="between-legs"||action==="behind-back"||action==="hesitation")&&simulation.mode==="held"&&state.current.dribble&&!presence.finishLocked&&!state.current.charging&&state.current.dribbleMotion.requestMove(action))acknowledge(action==="between-legs"?"胯下换手 · 下一次接球衔接":action==="behind-back"?"背后换手 · 下一次接球衔接":"迟疑运球 · 改变节奏");
+      if (action === "charge" && simulation.mode === "held" && !presence.finishLocked && !state.current.charging) {
+        state.current.shotPack=useCourtPackages.getState().packs.shot;presence.shotPack=state.current.shotPack;
+        state.current.shotSeed.copy(presence.ball);state.current.shotStart.copy(camera.position);
+        presence.shotStance=presence.courtStance;presence.shotGather=0;
+        presence.shotLeftSeed.copy(presence.leftWrist);presence.shotRightSeed.copy(presence.rightWrist);presence.shotOrigin.copy(camera.position);
+        presence.shotFootOrigin.copy(camera.position);presence.shotLeftFootSeed.copy(presence.leftFoot);presence.shotRightFootSeed.copy(presence.rightFoot);
+        camera.getWorldDirection(scratch.current.forward);presence.shotFacing=Math.atan2(-scratch.current.forward.x,-scratch.current.forward.z);
+        const rest=prepareShot(0,motionPacks.shot[state.current.shotPack]);
+        scratch.current.hand.set(rest.x*presence.hand,rest.y-1.65,rest.z).applyAxisAngle(scratch.current.up,presence.shotFacing).add(camera.position);
+        presence.shotGatherDuration=chooseShotGatherDuration(state.current.dribble,state.current.shotSeed.distanceTo(scratch.current.hand));
+        presence.shotLanded=false;state.current.releasePending=false;state.current.charging=true;state.current.charge=0;state.current.dribble=false;state.current.dribbleStop=false;
+      }
       if (action === "release") release();
       if (action === "cancel") { state.current.releasePending=false;state.current.charging = false; state.current.charge = 0; publish(); }
       if (action === "recall") {
@@ -100,6 +115,8 @@ function PracticeBall() {
       if (event.code === "KeyE") { event.preventDefault(); pickup(); }
       if (event.code === "KeyR") { event.preventDefault(); command(new CustomEvent("palace:court", { detail: "recall" })); }
       if (event.code === "KeyX" && simulation.mode === "held" && state.current.dribble && !presence.finishLocked) { event.preventDefault(); useCourtPackages.getState().setHand(useCourtPackages.getState().preferredHand===1?-1:1); acknowledge(useCourtPackages.getState().preferredHand>0?"Right hand · catch to switch":"Left hand · catch to switch"); }
+      const creative=event.code==="KeyZ"?"between-legs":event.code==="KeyC"?"behind-back":event.code==="KeyQ"?"hesitation":null;
+      if(creative&&simulation.mode==="held"&&state.current.dribble&&!presence.finishLocked){event.preventDefault();command(new CustomEvent("palace:court",{detail:creative}));}
       if (isPrimaryShotKey(event.code)) {
         if (!document.pointerLockElement && event.target instanceof HTMLElement && event.target.closest("button,a")) return;
         event.preventDefault(); camera.getWorldDirection(scratch.current.aim);
@@ -143,8 +160,9 @@ function PracticeBall() {
     } else if (presence.finishLocked) { presence.finishLocked = false; presence.finish = "idle"; presence.finishPose = null; presence.jump = 0; }
     presence.shot = Math.max(0, presence.shot - dt);
     if (local.charging) local.charge = Math.min(1, local.charge + dt / motionPacks.shot[local.shotPack].chargeDuration);
-    if(local.charging||presence.shot>0)presence.shotGather=Math.min(1,presence.shotGather+dt/.16);
-    if (!movement) presence.jump = local.charging ? prepareShot(local.charge,motionPacks.shot[local.shotPack]).jump : presence.shot > 0 ? shotRecovery(presence.shot,presence.shotJump,motionPacks.shot[presence.shotPack],presence.shotVerticalVelocity).jump : 0;
+    if(local.charging||presence.shot>0)presence.shotGather=Math.min(1,presence.shotGather+dt/presence.shotGatherDuration);
+    if (!movement) presence.jump = local.charging ? prepareShot(local.charge,motionPacks.shot[local.shotPack]).jump : presence.shot > 0 ? shotRecovery(presence.shot,presence.shotJump,motionPacks.shot[presence.shotPack],presence.shotVerticalVelocity,presence.shotGuideAtRelease).jump : 0;
+    if(presence.shot>0&&!presence.finishPose&&!presence.shotLanded&&presence.jump<=0){presence.shotLandOrigin.copy(camera.position);presence.shotLanded=true;}
     const sprintDribble = presence.sprinting && presence.speed > 3.4 && simulation.mode === "held" && !presence.finishLocked && !local.charging;
     if(sprintDribble&&!local.dribble&&!local.dribbleStop){local.dribble=true;local.dribbleElapsed=0;presence.dribbleStanceSeed=presence.courtStance;presence.dribbleBlend=0;presence.dribbleOrigin.copy(camera.position);presence.dribbleLeftSeed.copy(presence.leftWrist);presence.dribbleRightSeed.copy(presence.rightWrist);local.dribbleMotion=new DribbleMotion(presence.hand,packs.dribble);scratch.current.hand.set(simulation.position.x,simulation.position.y,simulation.position.z).sub(camera.position);scratch.current.hand.y+=1.65;camera.getWorldDirection(scratch.current.forward);scratch.current.hand.applyAxisAngle(scratch.current.up,-Math.atan2(-scratch.current.forward.x,-scratch.current.forward.z));local.dribbleMotion.seedPosition(scratch.current.hand,presence.courtStance);}
     const dribblePeriod = sprintDribble ? motionPacks.dribble[packs.dribble].sprintPeriod : motionPacks.dribble[packs.dribble].period;
@@ -155,18 +173,24 @@ function PracticeBall() {
       const hand = scratch.current.hand.set((local.charging ? prep.x : hold.holdX)*presence.hand, (local.charging ? prep.y : hold.holdY) - 1.65 + presence.jump, local.charging ? prep.z : hold.holdZ);
       camera.getWorldDirection(scratch.current.forward); const yaw = Math.atan2(-scratch.current.forward.x, -scratch.current.forward.z);
       hand.applyAxisAngle(scratch.current.up, yaw).add(camera.position);
-      if(local.charging&&local.charge*motionPacks.shot[local.shotPack].chargeDuration<.16){const t=local.charge*motionPacks.shot[local.shotPack].chargeDuration/.16,s=t*t*(3-2*t);scratch.current.aim.copy(local.shotSeed).add(camera.position).sub(local.shotStart);hand.lerp(scratch.current.aim,1-s);}
+      if(local.charging){
+        presence.shotBallTarget.copy(hand);
+        blendShotGather(hand,local.shotSeed,local.shotStart,camera.position,local.charge*motionPacks.shot[local.shotPack].chargeDuration,presence.shotGatherDuration);
+      }
       if (local.dribble) {
         local.dribbleElapsed+=dt;presence.dribbleBlend=Math.min(1,local.dribbleElapsed/.18);
         const before=presence.dribblePhase;local.dribbleMotion.requestHand(useCourtPackages.getState().preferredHand);
         const pose=local.dribbleMotion.advance(dt,presence.speed,packs.dribble,sprintDribble),t=pose.phase;
-        presence.hand=pose.hand;local.dribbleTime=t*dribblePeriod;
+        if(presence.hand!==pose.hand&&presence.dribbleMove!=="crossover")useCourtPackages.getState().setHand(pose.hand<0?-1:1);
+        presence.hand=pose.hand;presence.dribbleMove=pose.move;local.dribbleTime=t*dribblePeriod;
         if(before<.44&&t>=.44)sound.sound("bounce");
         hand.set(pose.ball.x,pose.ball.y-1.65,pose.ball.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
         presence.dribbleLeftPalm.set(pose.leftPalm.x,pose.leftPalm.y-1.65,pose.leftPalm.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
         presence.dribbleRightPalm.set(pose.rightPalm.x,pose.rightPalm.y-1.65,pose.rightPalm.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
+        presence.dribbleContactPalm.set(pose.contactPalm.x,pose.contactPalm.y-1.65,pose.contactPalm.z).applyAxisAngle(scratch.current.up,yaw).add(camera.position);
+        presence.dribbleLeftInfluence=pose.leftInfluence;presence.dribbleRightInfluence=pose.rightInfluence;
         presence.dribblePalm.copy(presence.hand<0?presence.dribbleLeftPalm:presence.dribbleRightPalm);
-        presence.dribblePhase=t;presence.crossover=pose.crossover;presence.dribbleTorso=pose.torso;presence.dribbleTwist=pose.twist;presence.dribbleCrouch=pose.crouch;
+        presence.dribblePhase=t;presence.dribbleLeftWeight=pose.leftWeight;presence.dribbleRightWeight=pose.rightWeight;presence.crossover=pose.crossover;presence.dribbleTorso=pose.torso;presence.dribbleTwist=pose.twist;presence.dribbleCrouch=pose.crouch;
         if(local.dribbleStop&&t<before){local.dribble=false;local.dribbleStop=false;local.holdElapsed=0;local.holdSeed.copy(hand);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdOrigin.copy(camera.position);}
       }
       if(!local.dribble&&!local.charging){local.holdElapsed=Math.min(.22,local.holdElapsed+dt);const h=local.holdElapsed/.22,s=h*h*(3-2*h);presence.holdBlend=s;if(s<1){scratch.current.aim.copy(local.holdSeed).add(camera.position).sub(local.holdStart);hand.lerp(scratch.current.aim,1-s);}}else presence.holdBlend=1;
@@ -214,7 +238,7 @@ function PracticeBall() {
   }, -3);
   return <>
     <group ref={ball} name="practice-ball" position={[1.5, BALL_RADIUS, 6]} onClick={event => { if (event.delta < 5) { event.stopPropagation(); if (!document.pointerLockElement) pickup(); } }}>
-      <mesh castShadow><sphereGeometry args={[BALL_RADIUS, 32, 24]} /><meshStandardMaterial map={texture} roughness={.83} bumpMap={texture} bumpScale={.0025} /></mesh>
+      <mesh castShadow><sphereGeometry args={[BALL_RADIUS, 32, 24]} /><meshStandardMaterial map={surface?.color} color={surface?"#ffffff":BALL_SURFACE_COLOR} roughnessMap={surface?.roughness} roughness={1} bumpMap={surface?.height} bumpScale={.0016} /></mesh>
     </group>
     <group ref={shadow}><ContactShadow width={.58} depth={.58} opacity={.28} /></group>
   </>;

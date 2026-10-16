@@ -2,7 +2,7 @@ import CourtSets from "./court/CourtVenue";
 import {useCourtSet} from "./court/courtSets";
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry, CylinderGeometry, Group, Quaternion, Vector3, MeshPhysicalMaterial } from "three";
+import { BoxGeometry, BufferGeometry, CylinderGeometry, Group, Quaternion, SphereGeometry, Vector3, MeshPhysicalMaterial } from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { useQuietMotion } from "../motion/useMotionCue";
 import { Block } from "../world/primitives";
@@ -12,28 +12,52 @@ import { makeBackboardGlass } from "./court/backboardGlass";
 
 
 export const courtResponse = { hoop: -1, rim: 0, net: 0, board: 0 };
+function mergeHoopPieces(pieces: BufferGeometry[]) {
+  const geometry = mergeGeometries(pieces)!;
+  pieces.forEach(piece => piece.dispose());
+  return geometry;
+}
+function appendRope(pieces: BufferGeometry[], a: Vector3, b: Vector3, radius: number, sides = 5) {
+  const direction = b.clone().sub(a), center = a.clone().add(b).multiplyScalar(.5);
+  const rope = new CylinderGeometry(radius, radius, direction.length(), sides, 1);
+  rope.applyQuaternion(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), direction.normalize()));
+  rope.translate(center.x, center.y, center.z); pieces.push(rope);
+}
+export function makeHoopNetGeometry() {
+  const pieces: BufferGeometry[] = [];
+  for (let row = 0; row < 5; row++) for (let i = 0; i < 16; i++) {
+    const y = -row * .083, radius = .225 - row * .021, lower = radius - .021;
+    const a = i / 16 * Math.PI * 2 + row * .09;
+    const top = new Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius);
+    for (const offset of [-1, 1]) appendRope(pieces, top, new Vector3(Math.cos(a + offset * Math.PI / 16 + .09) * lower, y - .083, Math.sin(a + offset * Math.PI / 16 + .09) * lower), .0019);
+    // 小结点让网绳在近景保持实体连接，全部合并成一张受光照的网。
+    const knot = new SphereGeometry(.0031, 6, 4); knot.translate(top.x, top.y, top.z); pieces.push(knot);
+  }
+  return mergeHoopPieces(pieces);
+}
+export function makeHoopHardwareGeometry(side: number) {
+  const pieces: BufferGeometry[] = [];
+  for (let i = 0; i < 16; i++) {
+    const a = i / 16 * Math.PI * 2;
+    const point = (radius: number, y: number) => new Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius);
+    appendRope(pieces, point(.225, -.006), point(.225, -.029), .0024, 6);
+    appendRope(pieces, point(.225, -.029), point(.213, -.029), .0024, 6);
+    appendRope(pieces, point(.213, -.029), point(.213, -.015), .0024, 6);
+  }
+  for (const x of [-.83, .83]) for (const y of [.15, .95]) {
+    const clamp = new BoxGeometry(.065, .065, .036); clamp.translate(x, y, side * .622); pieces.push(clamp);
+    const bolt = new CylinderGeometry(.009, .009, .045, 8); bolt.rotateX(Math.PI / 2); bolt.translate(x, y, side * .593); pieces.push(bolt);
+  }
+  return mergeHoopPieces(pieces);
+}
 function Hoop({ side }: { side: number }) {
   const rim = useRef<Group>(null), net = useRef<Group>(null), board = useRef<MeshPhysicalMaterial>(null);
   const quiet = useQuietMotion();
   const glass = useMemo(makeBackboardGlass, []);
   useEffect(() => () => glass.dispose(), [glass]);
-  const geometry = useMemo(() => {
-    const points: Vector3[] = [];
-    for (let row = 0; row < 5; row++) for (let i = 0; i < 16; i++) {
-      const y = -row * .083, radius = .225 - row * .021;
-      const lower = radius - .021;
-      const a = i / 16 * Math.PI * 2 + row * .09;
-      for (const offset of [-1, 1]) points.push(new Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius), new Vector3(Math.cos(a + offset * Math.PI / 16 + .09) * lower, y - .083, Math.sin(a + offset * Math.PI / 16 + .09) * lower));
-    }
-    // 用细绳实体保持侧光和暗部，不让篮网在夜里像不受光照影响的白色线框。
-    const segments: BufferGeometry[] = [], up = new Vector3(0, 1, 0), direction = new Vector3(), center = new Vector3(), rotation = new Quaternion();
-    for (let i = 0; i < points.length; i += 2) {
-      direction.subVectors(points[i + 1], points[i]); center.addVectors(points[i], points[i + 1]).multiplyScalar(.5);
-      const rope = new CylinderGeometry(.0019, .0019, direction.length(), 5, 1); rotation.setFromUnitVectors(up, direction.normalize()); rope.applyQuaternion(rotation); rope.translate(center.x, center.y, center.z); segments.push(rope);
-    }
-    const result = mergeGeometries(segments)!; segments.forEach(g => g.dispose()); return result;
-  }, []);
+  const geometry = useMemo(makeHoopNetGeometry, []), hardware = useMemo(() => makeHoopHardwareGeometry(side), [side]);
   useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => () => hardware.dispose(), [hardware]);
   useFrame(({ clock }, dt) => {
     // 风只轻轻带动篮网，安静模式归零；不移动篮圈、篮板或碰撞体。
     const breeze = quiet ? 0 : Math.sin(clock.elapsedTime * .43 + side) * .002;
@@ -62,6 +86,8 @@ function Hoop({ side }: { side: number }) {
     </mesh>
     {[-1, 1].map(s => <Block key={s} position={[s * .91, 3.6, side * 12.72]} scale={[.035, 1.09, .07]} color="#d9e0d2" metalness={.4} />)}
     {[3.06, 4.14].map(y => <Block key={y} position={[0, y, side * 12.72]} scale={[1.86, .035, .07]} color="#d9e0d2" metalness={.4} />)}
+    <Block position={[0, 3.025, side * 12.72]} scale={[1.82, .075, .115]} color="#293635" roughness={.94} bevel={.017} />
+    <mesh geometry={hardware} position={[0, 3.05, side * 12.1]}><meshStandardMaterial color="#b8bdb8" metalness={.76} roughness={.34} /></mesh>
     <group position={[0, 3.34, side * 12.68]}>
       {[-.29, .29].map(x => <Block key={x} position={[x, 0, 0]} scale={[.025, .43, .018]} color="#eef0dd" />)}
       {[-.215, .215].map(y => <Block key={y} position={[0, y, 0]} scale={[.6, .025, .018]} color="#eef0dd" />)}

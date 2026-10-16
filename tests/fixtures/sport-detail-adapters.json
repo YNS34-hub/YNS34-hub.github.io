@@ -5,11 +5,15 @@
     "src/world/Player.tsx": [
       {
         "before": "import { setWorldView } from \"../worlds/worldConfig\";\nimport { applyRoadLook } from \"../worlds/road/state\";\nimport { actorCamera, isAdventureRoom, presence } from \"../worlds/presence/state\";\n// 交互扩展结束\n\nconst EYE = 1.65;\n",
-        "after": "import { setWorldView } from \"../worlds/worldConfig\";\nimport { applyRoadLook } from \"../worlds/road/state\";\nimport { actorCamera, isAdventureRoom, presence } from \"../worlds/presence/state\";\nimport { courtMovementSpeed } from \"../worlds/court/controls\";\n// 交互扩展结束\n\nconst EYE = 1.65;\n"
+        "after": "import { setWorldView } from \"../worlds/worldConfig\";\nimport { applyRoadLook } from \"../worlds/road/state\";\nimport { actorCamera, isAdventureRoom, presence } from \"../worlds/presence/state\";\nimport { courtMovementSpeed,creativeDribbleWindow,creativeDribbleSpeed } from \"../worlds/court/controls\";\n// 交互扩展结束\n\nconst EYE = 1.65;\n"
       },
       {
         "before": "      (input.has(\"KeyS\") || input.has(\"ArrowDown\") ? 1 : 0) -\n      (input.has(\"KeyW\") || input.has(\"ArrowUp\") ? 1 : 0);\n    const speed =\n      input.has(\"ShiftLeft\") || input.has(\"ShiftRight\") || roomId === \"basketball\" && (input.has(\"Enter\") || input.has(\"NumpadEnter\")) ? roomId === \"basketball\" ? 6.2 : 4.45 : 2.7;\n    // 交互扩展开始 player-presence-sprint\n    if (isAdventureRoom(roomId)) {\n      presence.turboHeld = input.has(\"ShiftLeft\") || input.has(\"ShiftRight\") || roomId === \"basketball\" && (input.has(\"Enter\") || input.has(\"NumpadEnter\"));\n      presence.sprinting = presence.turboHeld && !!(x || z);\n    }\n    // 交互扩展结束\n",
-        "after": "      (input.has(\"KeyS\") || input.has(\"ArrowDown\") ? 1 : 0) -\n      (input.has(\"KeyW\") || input.has(\"ArrowUp\") ? 1 : 0);\n    const speed =\n      courtMovementSpeed(roomId, input);\n    // 交互扩展开始 player-presence-sprint\n    if (isAdventureRoom(roomId)) {\n      presence.turboHeld = roomId === \"basketball\" ? input.has(\"Enter\") || input.has(\"NumpadEnter\") : input.has(\"ShiftLeft\") || input.has(\"ShiftRight\");\n      presence.sprinting = presence.turboHeld && !!(x || z);\n    }\n    // 交互扩展结束\n"
+        "after": "      (input.has(\"KeyS\") || input.has(\"ArrowDown\") ? 1 : 0) -\n      (input.has(\"KeyW\") || input.has(\"ArrowUp\") ? 1 : 0);\n    const creativeActive=roomId===\"basketball\"&&presence.held&&presence.dribbling&&!presence.finishLocked&&presence.charge<=0&&presence.shot<=0;\n    const creative=creativeDribbleWindow(presence.dribbleMove,presence.dribblePhase,creativeActive);\n    const speed=creativeDribbleSpeed(courtMovementSpeed(roomId,input),presence.dribbleMove,presence.dribblePhase,creativeActive);\n    // 交互扩展开始 player-presence-sprint\n    if (isAdventureRoom(roomId)) {\n      presence.turboHeld = roomId === \"basketball\" ? input.has(\"Enter\") || input.has(\"NumpadEnter\") : input.has(\"ShiftLeft\") || input.has(\"ShiftRight\");\n      presence.sprinting = presence.turboHeld && !!(x || z);\n    }\n    // 交互扩展结束\n"
+      },
+      {
+        "before": "1 - Math.exp(-delta * (state.reducedMotion ? 14 : 7)),",
+        "after": "1 - Math.exp(-delta * ((state.reducedMotion ? 14 : 7)+28*creative)),"
       }
     ],
     "src/world/World.tsx": [

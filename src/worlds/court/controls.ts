@@ -8,6 +8,16 @@ export function courtMovementSpeed(room: string, keys: ReadonlySet<string>) {
     : keys.has("ShiftLeft") || keys.has("ShiftRight") ? 4.45 : 2.7;
 }
 
+/** Creative gathers brake and accelerate on their existing physical bounce phase. */
+export function creativeDribbleWindow(move:string,phase:number,active:boolean):number{
+ if(!active||(move!=="between-legs"&&move!=="behind-back"&&move!=="hesitation")||!Number.isFinite(phase))return 0;
+ const smooth=(v:number)=>{const t=Math.max(0,Math.min(1,v));return t*t*(3-2*t);};
+ return smooth(phase/.18)*(1-smooth((phase-.70)/.30));
+}
+export function creativeDribbleSpeed(base:number,move:string,phase:number,active:boolean):number{
+ return base-(base-Math.min(base,3))*creativeDribbleWindow(move,phase,active);
+}
+
 // 同一个投篮键根据场上位置选择动作；远投继续交给原有蓄力 / 松键 / 球物理链路。
 export function primaryCourtAction(input: FinishInput, turbo: boolean): "shoot" | "layup" | "dunk" {
   const layup = finishEligibility("layup", input);

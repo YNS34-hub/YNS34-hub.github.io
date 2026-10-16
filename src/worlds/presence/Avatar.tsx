@@ -11,7 +11,7 @@ import { ATHLETE } from "./assets";
 import { pedalPoint } from "./math";
 import { presence, usePerspective, type AdventureRoom } from "./state";
 import { LimbIK } from "./ik";
-import { prepareShot, shotRecovery, shotFollowThroughTarget } from "./shotPose";
+import { prepareShot, shotRecovery, shotFollowThroughTarget,shotGuideTarget } from "./shotPose";
 import { outfits, neutralProfile, useAppearance } from "./appearance";
 import { dressAthlete, reshapeAthlete } from "./appearanceRig";
 import { ankleFromContact, gripPoint, riderAnkle, riderPosture } from "./riderPose";
@@ -19,6 +19,14 @@ import {createRiderOutline} from "./riderOutline";
 import {useAlpineVisuals} from "../alpine/visualPreferences";
 import {motionPacks} from "../court/motionPacks";
 import {useCourtPackages} from "../court/packagePreferences";
+import {installBasketballAppearance} from "./basketballAppearance";
+import {createBasketballFootwork,sampleShotFootwork,shotFootSettleTarget} from "./basketballFootwork";
+import {sampleDribblePalmNormal,advanceDribbleHandRotation,sampleDribbleElbowPole} from "./dribblePalm";
+import {sampleShotHandRotation,advanceShotHandRotation} from "./shotHandRotation";
+import {blendDribbleArmTarget,blendDribbleArmRotation} from "./dribbleArm";
+import {captureAnimationContinuity,createAnimationContinuity,restoreAnimationContinuity} from "./animationContinuity";
+import {blendShotGather} from "./shotGather";
+import {createCourtLocomotion,sampleCourtLocomotion,dribbleLegWindow,sampleDribbleKneePole} from "./courtLocomotion";
 
 export default function SportPresence({roomId}:{roomId:AdventureRoom}) {
   const head = useAppearance(s => s.personal ? s.head : null);
@@ -35,6 +43,7 @@ function LocalHead({roomId,url}:{roomId:AdventureRoom;url:string}) {
   return <SportAvatar roomId={roomId} headMap={map??undefined}/>;
 }
 function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Texture }) {
+  const continuity=useMemo(createAnimationContinuity,[]),restoredMixer=useRef<AnimationMixer|null>(null);
   const gltf = useGLTF(ATHLETE), root = useRef<Group>(null), helmet = useRef<Group>(null), cap = useRef<Group>(null), pack = useRef<Group>(null);
   const profile = useAppearance(s => s.personal && s.profile ? s.profile : neutralProfile), outfitId = useAppearance(s => s.selected[roomId]), outfit = outfits[outfitId];
   const rig = useMemo(() => {
@@ -53,7 +62,8 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
         materials.push(child.material); child.castShadow = true; child.receiveShadow = true; child.raycast = () => {};
       }
     });
-    const outline=createRiderOutline(roomId==="basketball"?.75:1.1),skinned:SkinnedMesh[]=[];
+    const basketballAppearance=roomId==="basketball"?installBasketballAppearance(object,{outfitId,personalHead:!!headMap}):null;
+    const outline=createRiderOutline(roomId==="basketball"?.28:1.1),skinned:SkinnedMesh[]=[];
     object.traverse(child=>{if(child instanceof SkinnedMesh)skinned.push(child);});
     // 先收集再添加壳体，避免 traverse 把新壳体再次当作主体而无限递归。
     if(outline)for(const mesh of skinned)outline.attach(mesh);
@@ -65,17 +75,20 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     const feet=new Map([-1,1].map(side=>[side,bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldQuaternion(new Quaternion())]));
     const soles=new Map([-1,1].map(side=>[side,new Vector3(0,-.112,-.064).applyQuaternion(feet.get(side)!.clone().invert())]));
     const hips=new Map([-1,1].map(side=>[side,{position:new Vector3(),quaternion:new Quaternion()}]));
+    const animatedArms=new Map([-1,1].map(side=>[side,{wrist:new Vector3(),elbow:new Vector3(),rotation:new Quaternion()}]));
+    const dribbleArmEntry={left:new Vector3(),right:new Vector3(),leftElbow:new Vector3(),rightElbow:new Vector3(),origin:new Vector3(),elapsed:0};
     const headBase=bones.get("Bip01_Head")!.getWorldQuaternion(new Quaternion()).invert();
     const spineBase = bones.get("Bip01_Spine2")!.getWorldQuaternion(new Quaternion()).invert();
-    return { object, bones, materials, geometries, textures, mixer, actions, seatedBase, animatedBase, feet, soles, outline, footWorld:new Quaternion(), contact:new Vector3(), hips, headBase, spineBase, helmetOffset:new Vector3(), yaw: 0, effort: 0, ik: new LimbIK(), target: new Vector3(), pole: new Vector3(), point: new Vector3(), tangent: new Vector3(), direction: new Vector3(), head: new Vector3(), tilt: new Quaternion(), world: new Quaternion(), parent: new Quaternion(), axis: new Vector3(1, 0, 0), palm: new Vector3(), fingers: new Vector3(), width: new Vector3(), handMatrix: new Matrix4() };
+    return { dribbleArmEntry,animatedArms,basketballAppearance, shotFeet:createBasketballFootwork(),shotFadeActive:false,shotFadeLeft:new Vector3(),shotFadeRight:new Vector3(),shotFadeOrigin:new Vector3(),shotFadeRemaining:0,leftGait:createCourtLocomotion(),rightGait:createCourtLocomotion(),gaitActive:false, object, bones, materials, geometries, textures, mixer, actions, seatedBase, animatedBase, feet, soles, outline, guideRest:new Quaternion(),dribbleOrientationActive:false,dribbleLeftRotation:new Quaternion(),dribbleRightRotation:new Quaternion(),footWorld:new Quaternion(), contact:new Vector3(), hips, headBase, spineBase, helmetOffset:new Vector3(), yaw: 0, effort: 0, ik: new LimbIK(), target: new Vector3(), pole: new Vector3(), point: new Vector3(), tangent: new Vector3(), direction: new Vector3(), head: new Vector3(), tilt: new Quaternion(), world: new Quaternion(), parent: new Quaternion(), axis: new Vector3(1, 0, 0), palm: new Vector3(), fingers: new Vector3(), width: new Vector3(), handMatrix: new Matrix4() };
   }, [gltf, profile, outfitId, headMap,roomId]);
   useEffect(() => {
     // StrictMode 会重播 effect；清理后的同一实例必须重新激活动作，不能留下静止绑定姿态。
-    rig.outline?.activate();
+    rig.basketballAppearance?.activate();rig.outline?.activate();
     rig.actions=gltf.animations.map(clip=>rig.mixer.clipAction(clip).reset().play().setEffectiveWeight(clip.name==="idle"?1:0));
+    restoredMixer.current=null;
     return () => {
       rig.mixer.stopAllAction(); rig.mixer.uncacheRoot(rig.object);
-      rig.outline?.dispose();
+      rig.outline?.dispose();rig.basketballAppearance?.dispose();
       rig.materials.flat().forEach(m => m.dispose());
       rig.textures.forEach(texture=>texture.dispose());
       rig.geometries.forEach(g => g.dispose());
@@ -94,6 +107,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     // 换装使用原 settings 门控暂停物理；允许以零时间恢复新网格的当前 IK，避免换装时出现 T-pose。
     const dt = blocked ? 0 : Math.min(rawDelta, .06), speed = presence.speed;
     const authoredAction = !!presence.finishPose || presence.charge > 0 || presence.shot > 0;
+    if(roomId==="basketball"&&restoredMixer.current!==rig.mixer){restoreAnimationContinuity(continuity,rig.mixer,rig.actions,rig.animatedBase);restoredMixer.current=rig.mixer;}
     for (const action of rig.actions) {
       const weight = riding || authoredAction ? Number(action.getClip().name === "idle") : action.getClip().name === "idle" ? Number(speed < .12) : action.getClip().name === "walk" ? Number(speed >= .12 && speed < 3.5) : Number(speed >= 3.5);
       action.setEffectiveWeight(riding ? weight : action.getEffectiveWeight()+(weight-action.getEffectiveWeight())*(1-Math.exp(-dt*14)));
@@ -105,6 +119,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       rig.mixer.update(dt);
       // IK 是动画之上的一层；保留未加约束的姿态，避免常量轨道把抬手或骑姿永久留在人物身上。
       for(const [name,pose] of rig.animatedBase){const bone=rig.bones.get(name)!;pose.position.copy(bone.position);pose.quaternion.copy(bone.quaternion);}
+      if(roomId==="basketball")captureAnimationContinuity(continuity,rig.mixer,rig.actions,rig.animatedBase);
     }
     if (riding) {
       const map = getRideMap(roomId); map.sample(roadView.distance, rig.point, rig.tangent);
@@ -160,7 +175,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     } else {
       presence.camera.getWorldDirection(rig.direction);
       // 路线上步行眼高为 1.77 m；不能套用球场的 1.65 m，否则人物脚底悬空 12 cm。
-      const finishPose = presence.finishPose, prep = prepareShot(presence.charge,motionPacks.shot[presence.shotPack]), recovery = shotRecovery(presence.shot,presence.shotJump,motionPacks.shot[presence.shotPack],presence.shotVerticalVelocity);
+      const finishPose = presence.finishPose, prep = prepareShot(presence.charge,motionPacks.shot[presence.shotPack]), recovery = shotRecovery(presence.shot,presence.shotJump,motionPacks.shot[presence.shotPack],presence.shotVerticalVelocity,presence.shotGuideAtRelease);
       const courtStance=roomId==="basketball"?(presence.finishPose?.stance??(presence.charge>0?Math.max(presence.shotStance*(1-presence.shotGather),prep.stance):presence.shot>0?presence.shotReleaseStance*recovery.reach:presence.dribbling?presence.dribbleStanceSeed+(presence.dribbleCrouch-presence.dribbleStanceSeed)*presence.dribbleBlend:presence.held?.08+(1-presence.holdBlend)*Math.max(0,presence.dribbleCrouch-.08):0)):0;
       presence.courtStance=courtStance;
       root.current.position.set(presence.camera.position.x,presence.camera.position.y-(roomId==="basketball"?1.65:1.77)+presence.jump-courtStance,presence.camera.position.z);
@@ -175,6 +190,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       root.current.rotation.set(0, rig.yaw, 0);
       rig.object.position.set(0, 0, 0); rig.object.rotation.y = Math.PI; root.current.updateWorldMatrix(true, true);
       const settlePitch=Math.min(1,Math.max(0,(.65-presence.shot)/.16)),pitchBlend=settlePitch*settlePitch*(3-2*settlePitch);
+      if(roomId==="basketball"&&(authoredAction||presence.held))for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.getWorldPosition(hip.position);thigh.getWorldQuaternion(hip.quaternion);}
       if (authoredAction) {
         rotateBody("Bip01_Spine", finishPose?.torsoPitch ?? (presence.shot > 0 ? presence.shotReleasePitch*(1-pitchBlend)+.03*recovery.reach*pitchBlend : prep.pitch), 1, 0, 0);
         rotateBody("Bip01_Spine1",(finishPose?.torsoTwist??0)+Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)),0,1,0);
@@ -182,21 +198,52 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
         if(presence.dribbling)rotateBody("Bip01_Spine",presence.dribbleTorso,1,0,0);
         rotateBody("Bip01_Spine1",(presence.dribbling?presence.dribbleTwist:0)+Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)),0,1,0);
       }
+      if(roomId==="basketball"&&(authoredAction||presence.held))for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.position.copy(thigh.parent!.worldToLocal(hip.position));thigh.parent!.getWorldQuaternion(rig.parent);thigh.quaternion.copy(rig.parent.invert().multiply(hip.quaternion));thigh.updateWorldMatrix(true,true);}
+      if(roomId==="basketball"&&(presence.held||authoredAction)){
+        const look=Math.max(-.20,Math.min(.26,Math.asin(Math.max(-1,Math.min(1,rig.direction.y)))));
+        // Eyes remain on the play; the head follows the aimed rim rather than the bouncing ball.
+        rotateBody("Bip01_Neck",look*.22,1,0,0);rotateBody("Bip01_Head",look*.52,1,0,0);
+      }
+      if(!presence.dribbling||!presence.held)rig.dribbleOrientationActive=false;
       if (presence.held || presence.finish !== "idle" || presence.shot>0) {
         if(presence.dribbling&&presence.held){
+          if(!rig.dribbleOrientationActive){
+            rig.dribbleLeftRotation.copy(presence.leftWristRotation);rig.dribbleRightRotation.copy(presence.rightWristRotation);rig.dribbleOrientationActive=true;
+            rig.dribbleArmEntry.left.copy(presence.leftWrist);rig.dribbleArmEntry.right.copy(presence.rightWrist);rig.dribbleArmEntry.origin.copy(presence.camera.position);rig.dribbleArmEntry.elapsed=0;
+            rig.dribbleArmEntry.leftElbow.copy(presence.leftElbow);rig.dribbleArmEntry.rightElbow.copy(presence.rightElbow);
+          }
+          rig.dribbleArmEntry.elapsed=Math.min(.18,rig.dribbleArmEntry.elapsed+dt);
+          const enter=rig.dribbleArmEntry.elapsed/.18,armBlend=Math.min(presence.dribbleBlend,enter*enter*(3-2*enter));
+          // Capture both arms before either IK solve. Their idle/walk/run pose
+          // already follows the real mixer clock, torso and lowered body root.
+          for(const side of[-1,1]){
+            const base=rig.animatedArms.get(side)!,prefix="Bip01_"+(side===1?"R":"L")+"_";
+            rig.bones.get(prefix+"Hand")!.getWorldPosition(base.wrist);rig.bones.get(prefix+"Hand")!.getWorldQuaternion(base.rotation);
+            rig.bones.get(prefix+"Forearm")!.getWorldPosition(base.elbow);
+          }
           for(const side of [-1,1]as const){
-            rig.target.copy(side===-1?presence.dribbleLeftPalm:presence.dribbleRightPalm);
-            rig.head.copy(side===-1?presence.dribbleLeftSeed:presence.dribbleRightSeed).add(presence.camera.position).sub(presence.dribbleOrigin);rig.target.lerp(rig.head,1-presence.dribbleBlend);
-            rig.pole.set(side*.48,1.04,-.28);root.current.localToWorld(rig.pole);limb(side,"arm");orientPalm(side,true);
+            const base=rig.animatedArms.get(side)!,influence=side<0?presence.dribbleLeftInfluence:presence.dribbleRightInfluence;
+            blendDribbleArmTarget(rig.target,base.wrist,presence.dribbleContactPalm,influence);
+            rig.head.copy(side===-1?rig.dribbleArmEntry.left:rig.dribbleArmEntry.right).add(presence.camera.position).sub(rig.dribbleArmEntry.origin);rig.target.lerp(rig.head,1-armBlend);
+            sampleDribbleElbowPole(rig.pole,side,presence.dribblePhase,presence.dribbleMove==="between-legs"||presence.dribbleMove==="behind-back");root.current.localToWorld(rig.pole);
+            rig.head.copy(rig.pole);blendDribbleArmTarget(rig.pole,base.elbow,rig.head,influence);
+            rig.head.copy(side<0?rig.dribbleArmEntry.leftElbow:rig.dribbleArmEntry.rightElbow).add(presence.camera.position).sub(rig.dribbleArmEntry.origin);rig.pole.lerp(rig.head,1-armBlend);
+            if(influence>0||armBlend<1)limb(side,"arm");
+            (side<0?presence.dribbleLeftPalm:presence.dribbleRightPalm).copy(rig.target);
+            orientPalm(side,true,dt);
+            if(import.meta.env.DEV){const key=side<0?"basketballLeftAnimatedArm":"basketballRightAnimatedArm";root.current.userData[key]=base;}
             if(import.meta.env.DEV){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.point);root.current.userData[side===1?"basketballRightWristError":"basketballLeftWristError"]=rig.point.distanceTo(rig.target);}
           }
+          if(import.meta.env.DEV)root.current.userData.basketballDribbleArmBlend=armBlend;
+          presence.dribblePalm.copy(presence.hand<0?presence.dribbleLeftPalm:presence.dribbleRightPalm);
         }else{
           const guide=finishPose?.guide??(presence.shot>0?recovery.guide:prep.guide),twoHands=finishPose?.twoHands??(presence.held&&presence.charge===0?1:0);
           for(const side of [-1,1]as const){
-            if(presence.held)rig.target.copy(presence.ball);
+            if(presence.held)rig.target.copy(presence.charge>0&&presence.shotGather<1?presence.shotBallTarget:presence.ball);
             else if(finishPose)rig.target.set(finishPose.ball.x,finishPose.ball.y,finishPose.ball.z);
             else shotFollowThroughTarget(rig.target,presence.releaseHand,presence.releaseBody,presence.camera.position,presence.shotJump,presence.jump,presence.shotReleaseStance,courtStance);
             const dominant=side===presence.hand,follow=dominant?(presence.held||finishPose?1:recovery.reach):guide;
+            const guideRelease=!presence.held&&!finishPose&&!dominant&&presence.shot>0;
             rig.target.y-=dominant?.115:finishPose?.03:.13;
             rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);
             rig.target.addScaledVector(rig.axis,dominant?-presence.hand*.025:-presence.hand*.14*guide);
@@ -210,32 +257,110 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
             if(finishPose&&!presence.held&&finishPose.elapsed>.95){const t=Math.min(1,(finishPose.elapsed-.95)/.35);rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.head);rig.target.lerp(rig.head,t*t*(3-2*t));}
             if(presence.held&&presence.holdBlend<1){rig.head.copy(side<0?presence.holdLeftSeed:presence.holdRightSeed).add(presence.camera.position).sub(presence.holdOrigin);rig.target.lerp(rig.head,1-presence.holdBlend);}
             if(finishPose&&finishPose.elapsed<.16){rig.head.copy(side<0?presence.finishLeftSeed:presence.finishRightSeed).add(presence.camera.position).sub(presence.finishOrigin);const t=finishPose.elapsed/.16;rig.target.lerp(rig.head,1-t*t*(3-2*t));}
-            if((presence.charge>0||presence.shot>0)&&presence.shotGather<1){rig.head.copy(side<0?presence.shotLeftSeed:presence.shotRightSeed).add(presence.camera.position).sub(presence.shotOrigin);rig.target.lerp(rig.head,1-presence.shotGather);}
-            rig.pole.set(side*(authoredAction?.36:.50),1.02,-.32);root.current.localToWorld(rig.pole);limb(side,"arm");orientPalm(side,false);
-            if(authoredAction&&dominant)rotateBody("Bip01_"+(side>0?"R":"L")+"_Hand",-.42*(finishPose?.wrist??recovery.wrist),1,0,0);
+            if(presence.charge>0&&presence.shotGather<1)blendShotGather(rig.target,side<0?presence.shotLeftSeed:presence.shotRightSeed,presence.shotOrigin,presence.camera.position,presence.shotGather*presence.shotGatherDuration,presence.shotGatherDuration);
+            const shotRelease=!presence.held&&!finishPose&&presence.shot>0;
+            if(shotRelease){
+              const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
+              hand.getWorldPosition(rig.head);hand.getWorldQuaternion(rig.guideRest);
+              if(guideRelease)shotGuideTarget(rig.target,side<0?presence.shotReleaseLeftWrist:presence.shotReleaseRightWrist,presence.releaseBody,presence.camera.position,presence.shotJump,presence.jump,presence.shotReleaseStance,courtStance,rig.head,presence.shot);
+            }
+            rig.pole.set(side*(authoredAction?(dominant?.20:.36):.50),authoredAction?1.12:1.02,-.32);root.current.localToWorld(rig.pole);limb(side,"arm");
+            if(guideRelease){
+              const t=Math.min(1,Math.max(0,(.65-presence.shot)/.24)),fade=t*t*(3-2*t);
+              const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
+              rig.world.copy(side<0?presence.shotReleaseLeftRotation:presence.shotReleaseRightRotation).slerp(rig.guideRest,fade);
+              hand.parent!.getWorldQuaternion(rig.parent);hand.quaternion.copy(rig.parent.invert().multiply(rig.world));hand.updateWorldMatrix(true,true);
+            }else if(shotRelease){
+              const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
+              rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);
+              sampleShotHandRotation(rig.world,side<0?presence.shotReleaseLeftRotation:presence.shotReleaseRightRotation,rig.guideRest,rig.axis,presence.shot,recovery.wrist);
+              hand.parent!.getWorldQuaternion(rig.parent);hand.quaternion.copy(rig.parent.invert().multiply(rig.world));hand.updateWorldMatrix(true,true);
+            }else orientPalm(side,false);
+            if(authoredAction&&dominant&&!shotRelease)rotateBody("Bip01_"+(side>0?"R":"L")+"_Hand",-.42*(finishPose?.wrist??recovery.wrist),1,0,0);
             if(import.meta.env.DEV){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.point);root.current.userData[side===1?"basketballRightWristError":"basketballLeftWristError"]=rig.point.distanceTo(rig.target);}
           }
         }
       }
       if(import.meta.env.DEV&&roomId==="basketball")root.current.userData.basketballPackages={...useCourtPackages.getState().packs};
-      if (finishPose || presence.charge > 0 || presence.shot > 0 || roomId==="basketball"&&(presence.dribbling||presence.held||presence.holdBlend<1)) {
+      if(roomId!=="basketball"||authoredAction||!presence.held&&speed<=.12)rig.gaitActive=false;
+      if (finishPose || presence.charge > 0 || presence.shot > 0 || roomId==="basketball"&&(presence.dribbling||presence.held||presence.holdBlend<1||speed>.12)) {
+        const shotFeet=roomId==="basketball"&&!finishPose&&(presence.charge>0||presence.shot>0)?sampleShotFootwork(rig.shotFeet,{charge:presence.charge,shotRemaining:presence.shot,releaseCharge:presence.shotChargeAtRelease,jump:presence.jump,stance:courtStance,hand:presence.hand,pack:motionPacks.shot[presence.shotPack],yaw:presence.shotFacing,origin:presence.shotFootOrigin,position:presence.camera.position,leftSeed:presence.shotLeftFootSeed,rightSeed:presence.shotRightFootSeed,landingOrigin:presence.shotLanded?presence.shotLandOrigin:presence.shotFootOrigin,floorY:.112}):null;
+        if(!shotFeet||presence.charge>0||presence.shot<=0)rig.shotFadeActive=false;
+        if(shotFeet&&presence.shot>0&&presence.shotLanded&&presence.shot<.16&&!rig.shotFadeActive){
+          rig.shotFadeLeft.copy(presence.leftFoot);rig.shotFadeRight.copy(presence.rightFoot);
+          rig.shotFadeOrigin.copy(presence.camera.position);rig.shotFadeRemaining=presence.shot;rig.shotFadeActive=true;
+        }
+        if(import.meta.env.DEV&&shotFeet)root.current.userData.basketballFootwork=shotFeet;
+        const ordinary=roomId==="basketball"&&!authoredAction;
+        const gap=presence.dribbling&&presence.dribbleMove==="between-legs"?dribbleLegWindow(presence.dribblePhase):0;
         for(const side of [-1,1] as const){
-          if (finishPose) { const foot = side === 1 ? finishPose.rightFoot : finishPose.leftFoot; rig.target.set(foot.x, foot.y, foot.z); }
-          else if(presence.dribbling||presence.held||presence.holdBlend<1){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldPosition(rig.target);rig.target.y+=courtStance-Math.min(0,presence.jump);}
+          if(shotFeet){
+            const goal=side<0?shotFeet.left:shotFeet.right;
+            rig.target.set(goal.x,goal.y,goal.z);
+            const anchor=presence.shotLanded?presence.shotLandOrigin:presence.shotFootOrigin;
+            const drift=Math.hypot(presence.camera.position.x-anchor.x,presence.camera.position.z-anchor.z);
+            const blend=Math.max(0,Math.min(1,(drift-.18)/.26));
+            if(blend>0){
+              rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldPosition(rig.head);
+              rig.head.y+=courtStance-Math.min(0,presence.jump);rig.target.lerp(rig.head,blend);
+            }
+            // A single fade from the actual ankle avoids accelerating a moving
+            // recovery target again. Horizontal body translation remains free.
+            if(rig.shotFadeActive){
+              rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldPosition(rig.head);
+              rig.head.y+=courtStance-Math.min(0,presence.jump);
+              shotFootSettleTarget(rig.target,side<0?rig.shotFadeLeft:rig.shotFadeRight,rig.shotFadeOrigin,presence.camera.position,rig.head,presence.shot,rig.shotFadeRemaining);
+            }
+            // The development probe publishes the final applied ankle goal.
+            goal.x=rig.target.x;goal.y=rig.target.y;goal.z=rig.target.z;
+          }
+          else if (finishPose) { const foot = side === 1 ? finishPose.rightFoot : finishPose.leftFoot; rig.target.set(foot.x, foot.y, foot.z); }
+          else if(presence.dribbling||presence.held||presence.holdBlend<1||roomId==="basketball"&&speed>.12){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldPosition(rig.target);rig.target.y+=courtStance-Math.min(0,presence.jump);}
           else { rig.target.set(side * .13, .095 + Math.max(0, presence.jump) * .06, side === presence.hand ? -.075 : .075); root.current.localToWorld(rig.target);rig.target.y+=courtStance; if (presence.jump < 0) rig.target.y -= presence.jump; }
-          rig.pole.set(side*.2,.65,-.40);root.current.localToWorld(rig.pole);limb(side,"leg");
+          if(ordinary){
+            // The between-legs bounce uses the same phase as the physical ball.
+            // Both ankles and the knee plane open before the ball reaches the floor.
+            if(presence.held&&speed<.12||gap>0){
+              rig.head.copy(rig.target);root.current.worldToLocal(rig.head);
+              const width=gap>0?.28:presence.dribbling?.20:.18;
+              const weight=gap>0?gap:1;
+              rig.head.x+=(side*width-rig.head.x)*weight;
+              if(presence.dribbleMove==="between-legs"&&speed<.12)rig.head.z+=((side===presence.hand?.12:-.12)-rig.head.z)*gap;
+              root.current.localToWorld(rig.head);rig.target.copy(rig.head);
+            }
+            const gait=side<0?rig.leftGait:rig.rightGait;
+            if(!rig.gaitActive){
+              const actual=side<0?presence.leftFoot:presence.rightFoot;
+              rig.head.set(actual.x-root.current.position.x,actual.y,actual.z-root.current.position.z);
+              sampleCourtLocomotion(gait,rig.head,0,true);
+            }
+            rig.head.set(rig.target.x-root.current.position.x,rig.target.y,rig.target.z-root.current.position.z);
+            sampleCourtLocomotion(gait,rig.head,dt);
+            rig.target.set(gait.x+root.current.position.x,gait.y,gait.z+root.current.position.z);
+          }
+          if(ordinary)sampleDribbleKneePole(rig.pole,side,gap);else rig.pole.set(side*.2,.65,-.40);root.current.localToWorld(rig.pole);limb(side,"leg");
           const foot = rig.bones.get("Bip01_" + (side === 1 ? "R" : "L") + "_Foot")!;
-          root.current.getWorldQuaternion(rig.world); rig.world.multiply(rig.feet.get(side)!); foot.parent!.getWorldQuaternion(rig.parent);
+          root.current.getWorldQuaternion(rig.world); rig.world.multiply(rig.feet.get(side)!);if(ordinary){const lift=Math.max(0,Math.min(1,(rig.target.y-.112)/.12));rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);rig.world.premultiply(rig.tilt.setFromAxisAngle(rig.axis,-(speed>3.5?.20:.12)*lift));}if(ordinary&&gap>0){rig.axis.set(0,1,0);rig.world.premultiply(rig.tilt.setFromAxisAngle(rig.axis,-side*.15*gap));}if(shotFeet){rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);rig.world.premultiply(rig.tilt.setFromAxisAngle(rig.axis,side<0?shotFeet.leftToe:shotFeet.rightToe));} foot.parent!.getWorldQuaternion(rig.parent);
           foot.quaternion.copy(rig.parent.invert().multiply(rig.world)); foot.updateWorldMatrix(true, true);
         }
+        if(ordinary)rig.gaitActive=true;
       }
+    }
+    // Preserve the previous rendered world wrist through gather, release and
+    // idle recovery. IK positions remain exact; paused/remounted rigs keep Q.
+    if(roomId==="basketball"&&!(presence.dribbling&&presence.held))for(const side of[-1,1]as const){
+      const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
+      hand.getWorldQuaternion(rig.guideRest);rig.world.copy(side<0?presence.leftWristRotation:presence.rightWristRotation);
+      advanceShotHandRotation(rig.world,rig.guideRest,dt);
+      hand.parent!.getWorldQuaternion(rig.parent);hand.quaternion.copy(rig.parent.invert().multiply(rig.world));hand.updateWorldMatrix(true,true);
     }
     // 在原骨骼与 IK 上补掌面朝向 / 指节小幅握持；没有独立动作钟，也不改变球的物理坐标。
     for (const side of [-1,1]) {
-      const grip = riding ? .68 : presence.held && !presence.dribbling ? .20 : 0;
+      const catching=presence.dribbling?Math.max(0,1-Math.min(presence.dribblePhase,1-presence.dribblePhase)/.15):0;
+      const grip = riding ? .68 : roomId==="basketball"?(presence.held&&!presence.dribbling?.30:catching*.19+(presence.shot>0?.05:0)):presence.held&&!presence.dribbling?.20:0;
       for (let finger=1;finger<=4;finger++) for (let joint=0;joint<=2;joint++) {
         const bone = rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Finger"+finger+(joint||""));
-        if (bone) bone.quaternion.multiply(rig.tilt.setFromAxisAngle(rig.axis.set(0,0,1),grip*(joint===0?.26:joint===1?.42:.30)));
+        if (bone) bone.quaternion.multiply(rig.tilt.setFromAxisAngle(rig.axis.set(0,0,1),grip*(joint===0?.26:joint===1?.42:.30)*(riding?1:1+finger*.07)));
       }
     }
     if (helmet.current) {
@@ -248,7 +373,8 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     }
     accessory(cap.current, "Bip01_Head", rig.headBase, [0, .178, 0], outfit.cap);
     accessory(pack.current, "Bip01_Spine2", rig.spineBase, [0, -.025, .168], outfit.backpack);
-    if(roomId==="basketball"){rig.bones.get("Bip01_L_Hand")!.getWorldPosition(presence.leftWrist);rig.bones.get("Bip01_R_Hand")!.getWorldPosition(presence.rightWrist);rig.bones.get("Bip01_L_Foot")!.getWorldPosition(presence.leftFoot);rig.bones.get("Bip01_R_Foot")!.getWorldPosition(presence.rightFoot);}
+    if(roomId==="basketball"){rig.bones.get("Bip01_L_Forearm")!.getWorldPosition(presence.leftElbow);rig.bones.get("Bip01_R_Forearm")!.getWorldPosition(presence.rightElbow);}
+    if(roomId==="basketball"){rig.bones.get("Bip01_L_Hand")!.getWorldQuaternion(presence.leftWristRotation);rig.bones.get("Bip01_R_Hand")!.getWorldQuaternion(presence.rightWristRotation);rig.bones.get("Bip01_L_Hand")!.getWorldPosition(presence.leftWrist);rig.bones.get("Bip01_R_Hand")!.getWorldPosition(presence.rightWrist);rig.bones.get("Bip01_L_Foot")!.getWorldPosition(presence.leftFoot);rig.bones.get("Bip01_R_Foot")!.getWorldPosition(presence.rightFoot);}
   }, -2);
   function rotateBody(name: string, angle: number, x: number, y: number, z: number) {
     const bone = rig.bones.get(name); if (!bone?.parent || !root.current) return;
@@ -256,19 +382,34 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     bone.getWorldQuaternion(rig.world); rig.world.premultiply(rig.tilt.setFromAxisAngle(rig.axis, angle));
     bone.parent.getWorldQuaternion(rig.parent); bone.quaternion.copy(rig.parent.invert().multiply(rig.world)); bone.updateWorldMatrix(true, true);
   }
-  function orientPalm(side: -1|1, dribble: boolean) {
+  function orientPalm(side: -1|1, dribble: boolean,dt=0) {
     const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand"); if (!hand?.parent || !root.current) return;
     hand.getWorldPosition(rig.point);
-    if (dribble) rig.palm.set(0,-1,0); else rig.palm.subVectors(presence.held?presence.ball:rig.target,rig.point).normalize();
-    if (rig.palm.lengthSq()<.01) rig.palm.set(0,1,0);
-    rig.palm.multiplyScalar(side); rig.fingers.copy(rig.direction).addScaledVector(rig.palm,-rig.direction.dot(rig.palm));
-    if (rig.fingers.lengthSq()<.01) rig.fingers.set(0,0,-1).transformDirection(root.current.matrixWorld);
-    orientHand(side);
+    if (dribble){sampleDribblePalmNormal(rig.palm,side,presence.dribblePhase,1);rig.palm.transformDirection(root.current.matrixWorld);} else {
+      if(presence.held)rig.palm.subVectors(presence.ball,rig.point);
+      else if(presence.finishPose)rig.palm.set(presence.finishPose.ball.x,presence.finishPose.ball.y,presence.finishPose.ball.z).sub(rig.point);
+      else rig.palm.set(0,1,0);
+      if(rig.palm.lengthSq()<1e-8)rig.palm.set(0,1,0);else rig.palm.normalize();
+    }
+    // Both athlete hands curl into local +Y; their bone transforms already mirror Z.
+    if(roomId!=="basketball")rig.palm.multiplyScalar(side);
+    rig.fingers.copy(rig.direction).addScaledVector(rig.palm,-rig.direction.dot(rig.palm));
+    if (rig.fingers.lengthSq()<.01){
+      const x=Math.abs(rig.palm.x),y=Math.abs(rig.palm.y),z=Math.abs(rig.palm.z);
+      rig.fingers.set(x<=y&&x<=z?1:0,y<x&&y<=z?1:0,z<x&&z<y?1:0);
+    }
+    orientHand(side,dribble,dt);
   }
-  function orientHand(side:-1|1){
+  function orientHand(side:-1|1,dribble=false,dt=0){
     const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand");if(!hand?.parent)return;
     rig.fingers.addScaledVector(rig.palm,-rig.fingers.dot(rig.palm)).normalize(); rig.width.crossVectors(rig.fingers,rig.palm).normalize(); rig.palm.crossVectors(rig.width,rig.fingers);
-    rig.handMatrix.makeBasis(rig.fingers,rig.palm,rig.width); rig.world.setFromRotationMatrix(rig.handMatrix); hand.parent.getWorldQuaternion(rig.parent);
+    rig.handMatrix.makeBasis(rig.fingers,rig.palm,rig.width); rig.world.setFromRotationMatrix(rig.handMatrix);
+    if(dribble){
+      const previous=side<0?rig.dribbleLeftRotation:rig.dribbleRightRotation,base=rig.animatedArms.get(side)!;
+      rig.guideRest.copy(rig.world);blendDribbleArmRotation(rig.world,base.rotation,rig.guideRest,side<0?presence.dribbleLeftInfluence:presence.dribbleRightInfluence);
+      advanceDribbleHandRotation(previous,rig.world,dt);rig.world.copy(previous);
+    }
+    hand.parent.getWorldQuaternion(rig.parent);
     hand.quaternion.copy(rig.parent.invert().multiply(rig.world)); hand.updateWorldMatrix(true,true);
   }
   function accessory(group: Group | null, name: string, basis: Quaternion, offset: [number, number, number], visible: boolean) {

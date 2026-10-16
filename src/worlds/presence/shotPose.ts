@@ -10,12 +10,12 @@ export function prepareShot(charge:number,options?:ShotMotionPack){
  return{x:.23+(options.releaseX-.23)*lift,y:1.13+(options.releaseHeight-1.13)*lift,z:-.35+(options.releaseZ+.35)*lift,jump,
   stance:.08*(1-lift),pitch:options.torsoPitch*(1-lift),guide:1-smooth((c-options.guidePeel)/.20),verticalVelocity:c>=takeoff&&time<flight?launch-9.81*time:0};
 }
-export function shotRecovery(remaining:number,initialJump:number,options?:ShotMotionPack,initialVelocity=0){
+export function shotRecovery(remaining:number,initialJump:number,options?:ShotMotionPack,initialVelocity=0,initialGuide=1){
  const time=Math.max(0,.65-remaining);
  if(!options){const down=smooth(time/.35);return{jump:Math.max(0,initialJump)*(1-down)-.065*Math.sin(Math.PI*clamp((time-.35)/.23)),reach:1-smooth((time-.17)/.48),guide:1-smooth(time/.12),wrist:smooth(time/.08)*(1-smooth((time-.38)/.27))};}
  const height=Math.max(0,initialJump),landing=(initialVelocity+Math.sqrt(initialVelocity*initialVelocity+19.62*height))/9.81;
  const jump=initialJump<0?initialJump*(1-smooth(time/.16)):time<landing?Math.max(0,height+initialVelocity*time-4.905*time*time):-.060*Math.sin(Math.PI*clamp((time-landing)/.18));
- return{jump,reach:1-smooth((time-.15)/.50),guide:1-smooth(time/.24),wrist:smooth(time*options.wristRate)*(1-smooth((time-.38)/.27))};
+ return{jump,reach:1-smooth((time-.15)/.50),guide:clamp(initialGuide)*(1-smooth(time/.24)),wrist:smooth(time*options.wristRate)*(1-smooth((time-.38)/.27))};
 }
 
 type ShotWorldPoint = { x: number; y: number; z: number };
@@ -46,5 +46,20 @@ export function shotFollowThroughTarget<Point extends ShotWorldPoint>(
   out.x = Number.isFinite(x) ? x : releaseX;
   out.y = Number.isFinite(y) ? y : releaseY;
   out.z = Number.isFinite(z) ? z : releaseZ;
+  return out;
+}
+
+/** Release from the actual guide wrist, including a hand already peeled on a late hold.
+ * out is distinct from all read-only input points; no snapshots are changed or allocated. */
+export function shotGuideTarget<Point extends ShotWorldPoint>(
+  out:Point, releaseWrist:Readonly<ShotWorldPoint>, releaseBody:Readonly<ShotWorldPoint>, body:Readonly<ShotWorldPoint>,
+  releasedJump:number,currentJump:number,releasedStance:number,currentStance:number,
+  restWrist:Readonly<ShotWorldPoint>,remaining:number,
+):Point{
+  shotFollowThroughTarget(out,releaseWrist,releaseBody,body,releasedJump,currentJump,releasedStance,currentStance);
+  const fade=smooth((.65-finiteCoordinate(remaining))/.24);
+  out.x+=(finiteCoordinate(restWrist.x)-out.x)*fade;
+  out.y+=(finiteCoordinate(restWrist.y)-out.y)*fade;
+  out.z+=(finiteCoordinate(restWrist.z)-out.z)*fade;
   return out;
 }
