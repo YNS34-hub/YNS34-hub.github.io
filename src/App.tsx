@@ -27,6 +27,7 @@ import InteractionHud from "./interaction/InteractionHud";
 const ActivityHud = lazy(() => import("./worlds/ActivityHud"));
 // 交互扩展结束
 const World = lazy(() => import("./world/World"));
+const FitnessHud=lazy(()=>import('./fitness/FitnessHud'));
 class WorldBoundary extends Component<
   { children: ReactNode; onError: () => void },
   { failed: boolean }
@@ -176,6 +177,7 @@ export default function App() {
           )}
           <Hud ready={ready} />
           {s.roomId === "cinema" && <CinemaControls />}
+          {s.roomId === "private-gym" && <Suspense fallback={null}><FitnessHud/></Suspense>}
         </>
       )}
       {s.overlay === "guide" && <Guide />}

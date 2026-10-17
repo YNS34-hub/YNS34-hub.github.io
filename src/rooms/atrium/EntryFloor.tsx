@@ -12,7 +12,7 @@ import { useQuietMotion } from "../../motion/useMotionCue";
 
 export default function EntryFloor(){
   const quality=usePalaceStore(s=>s.effectiveQuality);
-  return quality==="low"?<group position={[0,.035,0]}><Floor width={42} depth={54} color="#a4bfd5"/></group>:<ReflectiveStone high={quality==="high"}/>;
+  return quality==="low"?<group position={[0,.035,0]}><Floor width={42} depth={54} color="#b9beb7"/></group>:<ReflectiveStone high={quality==="high"}/>;
 }
 function ReflectiveStone({high}:{high:boolean}){
   const stone=useSurfaceTexture("stone"),floor=useRef<Mesh>(null),pending=useRef(true),quiet=useQuietMotion();
@@ -25,7 +25,7 @@ function ReflectiveStone({high}:{high:boolean}){
     // 原基底上表面为 -0.03，旧 Floor 在 -0.035 被遮住；饰面置于实际行走的零高度。
     mirror.name="atrium-floor-capture";mirror.position.y=0;mirror.rotation.x=-Math.PI/2;mirror.visible=false;mirror.raycast=()=>{};
     const capture=mirror.onBeforeRender.bind(mirror);mirror.onBeforeRender=()=>{};
-    const material=new MeshStandardMaterial({color:"#a4bfd5",roughness:.19,metalness:.12,bumpMap:stone,bumpScale:.008});
+    const material=new MeshStandardMaterial({color:"#b9beb7",roughness:.32,metalness:.06,bumpMap:stone,bumpScale:.0045});
     material.onBeforeCompile=shader=>{
       shader.uniforms.entryMirror={value:mirror.getRenderTarget().texture};shader.uniforms.entryMatrix=mirrorMaterial.uniforms.textureMatrix;shader.uniforms.entryTexel={value:1/size};
       shader.vertexShader="uniform mat4 entryMatrix;varying vec4 entryUV;\n"+shader.vertexShader;
@@ -33,14 +33,14 @@ function ReflectiveStone({high}:{high:boolean}){
       shader.fragmentShader="uniform sampler2D entryMirror;uniform float entryTexel;varying vec4 entryUV;\n"+shader.fragmentShader;
       // 反射在主通道色调映射之前混入线性光；五点软采样保留石材粗糙感，不把原图染色。
       shader.fragmentShader=shader.fragmentShader.replace("#include <opaque_fragment>",`vec2 euv=entryUV.xy/max(.0001,entryUV.w);
-        vec2 spread=vec2(entryTexel*1.5);vec3 reflection=texture2D(entryMirror,euv).rgb*.4;
+        vec2 spread=vec2(entryTexel*2.5);vec3 reflection=texture2D(entryMirror,euv).rgb*.4;
         reflection+=(texture2D(entryMirror,euv+vec2(spread.x,0.)).rgb+texture2D(entryMirror,euv-vec2(spread.x,0.)).rgb+texture2D(entryMirror,euv+vec2(0.,spread.y)).rgb+texture2D(entryMirror,euv-vec2(0.,spread.y)).rgb)*.15;
         float valid=step(0.,euv.x)*step(euv.x,1.)*step(0.,euv.y)*step(euv.y,1.)*step(0.,entryUV.w);
         float grazing=pow(1.-clamp(dot(normal,geometryViewDir),0.,1.),3.);
-        outgoingLight=mix(outgoingLight,reflection,valid*(.18+.32*grazing));
+        outgoingLight=mix(outgoingLight,reflection,valid*(.13+.28*grazing));
         #include <opaque_fragment>`);
     };
-    material.customProgramCacheKey=()=>"museum-entry-floor-reflection-v1";
+    material.customProgramCacheKey=()=>"museum-entry-stone-soft-reflection-v2";
     return {mirror,mirrorMaterial,material,geometry,capture,budget:new ReflectionBudget(high?12:8)};
   },[high,stone]);
   useEffect(()=>()=>{optics.material.dispose();optics.mirror.dispose();optics.geometry.dispose();},[optics]);

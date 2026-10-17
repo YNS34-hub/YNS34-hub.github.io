@@ -21,20 +21,25 @@ import {GrassField,useAlpineGrass} from "../alpine/Grass";
 import {ScanInstances,useAlpineScans} from "../alpine/Scans";
 import Delineators from "../Delineators";
 import { createStopApron,insideStopApron,stopGroundHeight } from "./stopApron";
+import {useAlpineGeography} from '../alpine/assets';
+import {terrainSkirtHeight,terrainSkirtWeight} from './terrainTransition';
+import {pastureSampling} from '../scenery/pastureSampling';
+import {lakeBankShader} from './lakeShore';
 
 function seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
-function makeTerrain(start:number,end:number){
+export function makeTerrain(start:number,end:number,farGround:(x:number,z:number)=>number){
   const vertices:number[]=[],uv:number[]=[],colors:number[]=[],zones:number[]=[],sides:number[]=[],indices:number[]=[],n=Math.ceil((end-start)/4),across=28;
   const p=new Vector3(),tangent=new Vector3();
   for(let i=0;i<=n;i++){
     roadSample(start+(end-start)*i/n,p,tangent);const nx=-tangent.z,nz=tangent.x,r=Math.hypot(nx,nz);
     for(let j=0;j<=across;j++){
-      const offset=(j/across-.5)*170,x=p.x+nx/r*offset,z=p.z+nz/r*offset,y=terrainHeight(x,z);
+      const offset=(j/across-.5)*170,x=p.x+nx/r*offset,z=p.z+nz/r*offset,y=terrainSkirtHeight(terrainHeight(x,z),farGround(x,z),offset);
       vertices.push(x,y,z);uv.push(x/4,z/4);sides.push(offset);
       const progress=(start+(end-start)*i/n)/roadLength;
       const enter=Math.max(0,Math.min(1,(progress-.395)/.045)),leave=Math.max(0,Math.min(1,(.63-progress)/.05));zones.push(enter*enter*(3-2*enter)*leave*leave*(3-2*leave));
       const bank=Math.min(1,Math.abs(offset)/7),meadow=roadForestDensity((start+(end-start)*i/n)/roadLength)<.3;
       colors.push(meadow?.82:.65,meadow?.85:.68,meadow?.65:.52);
+      const skirt=terrainSkirtWeight(offset);for(let c=1;c<=3;c++)colors[colors.length-c]+=(1-colors[colors.length-c])*skirt;
       if(i<n&&j<across){const a=i*(across+1)+j;indices.push(a,a+1,a+across+1,a+1,a+across+2,a+across+1);}
       if(bank<.6){colors[colors.length-3]=.46;colors[colors.length-2]=.42;colors[colors.length-1]=.31;}
     }
@@ -46,7 +51,7 @@ function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
   const compile=useMemo(()=>(shader:Parameters<MeshStandardMaterial["onBeforeCompile"]>[0])=>{
     shader.uniforms.roadGrassMap={value:maps.meadow};
     shader.vertexShader=shader.vertexShader.replace("#include <common>","#include <common>\nattribute float roadMeadow;attribute float roadOffset;varying float roadZone;varying float roadSide;varying vec3 shoreWorld;").replace("#include <begin_vertex>","#include <begin_vertex>\nroadZone=roadMeadow;roadSide=roadOffset;shoreWorld=(modelMatrix*vec4(position,1.)).xyz;");
-    shader.fragmentShader=shader.fragmentShader.replace("#include <common>",`#include <common>
+    shader.fragmentShader=pastureSampling+lakeBankShader+shader.fragmentShader.replace("#include <common>",`#include <common>
       uniform sampler2D roadGrassMap;varying float roadZone;varying float roadSide;varying vec3 shoreWorld;
       float soilNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);vec4 h=fract(sin(vec4(dot(i,vec2(127.1,311.7)),dot(i+vec2(1.,0.),vec2(127.1,311.7)),dot(i+vec2(0.,1.),vec2(127.1,311.7)),dot(i+vec2(1.,1.),vec2(127.1,311.7))))*43758.5453);return mix(mix(h.x,h.y,f.x),mix(h.z,h.w,f.x),f.y);}
     `).replace("#include <map_fragment>",`#ifdef USE_MAP
@@ -61,20 +66,19 @@ function TerrainSurface({geometry,maps}:{geometry:BufferGeometry;maps:Maps}){
       float soilVariation=mix(soilNoise(vMapUv*.09),soilNoise(vMapUv*.57),.28);
       float shoulder=1.-smoothstep(3.3+groundPatch*.4,5.1+groundPatch*1.4,abs(roadSide));
       vec3 mineral=vec3(dot(roadSoil.rgb,vec3(.2126,.7152,.0722)))*vec3(.90,.91,.87);
-      float shoreRadius=length((shoreWorld.xz-vec2(${lake.x.toFixed(1)},${lake.z.toFixed(1)}))/vec2(${lake.rx.toFixed(1)},${lake.rz.toFixed(1)}));
-      float shoreWet=(1.-smoothstep(.04,.9,abs(shoreWorld.y-${lake.y})))*(1.-smoothstep(1.22,1.45,shoreRadius));
-      roadSoil.rgb=mix(roadSoil.rgb,mineral,shoulder*.68)*(.91+.15*soilVariation)*mix(1.,.60,shoreWet);diffuseColor*=roadSoil;
+      roadSoil.rgb=mix(roadSoil.rgb,mineral,shoulder*.68)*(.91+.15*soilVariation);
+      roadSoil.rgb=lakeBankColor(mix(roadSoil.rgb,worldPasture(roadGrassMap,shoreWorld.xz),smoothstep(65.,85.,abs(roadSide))),lakeBankZones(shoreWorld));diffuseColor*=roadSoil;
       #endif`);
   },[maps.meadow]);
-  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-shoulder-v5"}/></mesh>;
+  return <mesh geometry={geometry} receiveShadow><meshStandardMaterial vertexColors map={maps.ground} roughness={.98} onBeforeCompile={compile} customProgramCacheKey={()=>"road-continuous-biomes-bank-skirt-v7"}/></mesh>;
 }
-function RoadSector({index,shadow,maps,forestAssets,scans,grassTemplates,verge,details}:{index:number;shadow:boolean;maps:Maps;forestAssets:ForestAssets;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>;verge:MeshStandardMaterial;details:ReturnType<typeof roadsideDetailMaterials>}){
+function RoadSector({index,shadow,maps,forestAssets,scans,grassTemplates,verge,details,farGround}:{index:number;shadow:boolean;maps:Maps;forestAssets:ForestAssets;scans:ReturnType<typeof useAlpineScans>;grassTemplates:ReturnType<typeof useAlpineGrass>;verge:MeshStandardMaterial;details:ReturnType<typeof roadsideDetailMaterials>;farGround:(x:number,z:number)=>number}){
   const quality=usePalaceStore(s=>s.effectiveQuality),quiet=useQuietMotion();
   const asphalt=useMemo(()=>dryRoadMaterial(maps.asphalt,maps.normal,[2,5],6.4),[maps.asphalt,maps.normal]);
   useEffect(()=>()=>asphalt.dispose(),[asphalt]);
   const geometry=useMemo(()=>{
     const start=index*sectorLength,end=Math.min(roadLength,start+sectorLength),p=new Vector3(),t=new Vector3();
-    const random=seeded(index+908),terrain=makeTerrain(start,end),ground=terrainSampler(terrain,terrainHeight);
+    const random=seeded(index+908),terrain=makeTerrain(start,end,farGround),ground=terrainSampler(terrain,terrainHeight);
     const trees:ForestTree[]=[],rocks:Instance[]=[],grass:Instance[][]=Array.from({length:6},()=>[]),markers:Instance[]=[];
     for(let d=start;d<end;d+=4){
       roadSample(d,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),density=roadForestDensity(d/roadLength);
@@ -110,7 +114,7 @@ function RoadSector({index,shadow,maps,forestAssets,scans,grassTemplates,verge,d
     const shoulders=createShoulders(roadStart,end,site),intrusion=createVergeGrass(start,end,site,shoulders),small=createRoadsideDetails(start,end,site,shoulders);
     intrusion.forEach((items,i)=>grass[i].push(...(quality==="low"?items.filter((_,j)=>j%3===0):items)));
     return{start,end,terrain,road,edges,shoulders,small,cube,trees,rocks,grass,farGrass:grass.slice(3).map((items,i)=>[...items,...grass[i]]),markers,time:{value:0},wind:{value:quiet?0:.012}};
-  },[index,quality,quiet]);
+  },[index,quality,quiet,farGround]);
   useEffect(()=>()=>{[geometry.terrain,geometry.road,...geometry.edges,geometry.shoulders,geometry.small.drains,geometry.cube].forEach(g=>g.dispose());},[geometry]);
   useFrame((_,dt)=>{if(!quiet)geometry.time.value+=Math.min(.06,dt);});
   return <group name={"road-sector:"+index}>
@@ -126,26 +130,24 @@ function RoadSector({index,shadow,maps,forestAssets,scans,grassTemplates,verge,d
     <Delineators items={geometry.markers} stem={geometry.cube}/>
   </group>;
 }
-function Geography({maps,forestAssets}:{maps:Maps;forestAssets:ForestAssets}){
-  const samples=useRidgeSamples();
+function Geography({maps,forestAssets,floor,farGround}:{maps:Maps;forestAssets:ForestAssets;floor:BufferGeometry;farGround:(x:number,z:number)=>number}){
+  const samples=useRidgeSamples(),meta=useAlpineGeography();
   const groundMaterial=useMemo(()=>valleyTerrainMaterial(maps),[maps]),mountainMaterial=useMemo(()=>valleyTerrainMaterial(maps,true),[maps]);
   useEffect(()=>()=>{groundMaterial.dispose();mountainMaterial.dispose();},[groundMaterial,mountainMaterial]);
   const shape=useMemo(()=>{
-    const g=createValleyFloor();
-    const ridges=createValleyRidges(samples);
+    const ridges=createValleyRidges(samples,meta.imagery);
     // 远林必须落在实际粗网格三角形上，不能把精细高度加到下移后的远景表面而悬空。
-    const farGround=terrainSampler(g,terrainHeight);
     const forest:ForestTree[]=[],random=seeded(417);
     for(let i=0;i<4000;i++){
       const x=-300+random()*2000,z=-1520+random()*1750;
       const h=terrainHeight(x,z),near=closestRoad(x,z);if(lakeDistance(x,z)<1.13||h<10||near.distance<125||near.distance<200&&roadForestDensity(near.progress)<.25||random()>habitat(x,z)*.92+.05)continue;
       const size=.75+random()*.85,a=random()*Math.PI*2;forest.push({model:0,variant:a/Math.PI<1.24?1:0,position:[x,farGround(x,z)-.012,z],scale:[size*(.86+random()*.28),size,size],rotation:[0,a,0]});
     }
-    return{g,ridges,forest};
-  },[samples]);
-  useEffect(()=>()=>{shape.g.dispose();shape.ridges.forEach(g=>g.dispose());},[shape]);
+    return{ridges,forest};
+  },[samples,meta,farGround]);
+  useEffect(()=>()=>{shape.ridges.forEach(g=>g.dispose());},[shape]);
   return <group name="continuous-lake-valley-geography">
-    <mesh geometry={shape.g} material={groundMaterial} dispose={null}/>
+    <mesh geometry={floor} material={groundMaterial} dispose={null}/>
     {shape.ridges.map(g=><mesh key={g.name} name={g.name} geometry={g} material={mountainMaterial} dispose={null}/>)}
     <ForestTrees trees={shape.forest} assets={forestAssets}/>
   </group>;
@@ -187,6 +189,8 @@ function RoadStops({maps}:{maps:Maps}){
 export default function RoadLandscape(){
   const scenery=useRef<Group>(null);
   const maps=useRoadTextures();
+  const far=useMemo(()=>{const floor=createValleyFloor();return{floor,ground:terrainSampler(floor,terrainHeight)};},[]);
+  useEffect(()=>()=>far.floor.dispose(),[far]);
   const verge=useMemo(()=>shoulderMaterial(maps.rock,maps.rockNormal,maps.ground),[maps]);
   useEffect(()=>()=>verge.dispose(),[verge]);
   const scans=useAlpineScans(),grassTemplates=useAlpineGrass();
@@ -197,5 +201,5 @@ export default function RoadLandscape(){
   useLayoutEffect(()=>{scenery.current?.traverse(object=>{if(object instanceof InstancedMesh||object.parent?.name==="continuous-lake-valley-geography"||object.name==="long-way-home-lake")object.raycast=()=>{};});},[sectors]);
   useFrame((_,delta)=>{tick.current+=delta;if(tick.current<.25)return;tick.current=0;const sector=Math.min(sectorCount-1,Math.floor(roadView.distance/sectorLength));if(sector!==last.current){last.current=sector;setSectors(activeRoadSectors(roadView.distance));}});
   const current=useRoadRide(s=>Math.floor(s.distance/sectorLength));
-  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} forestAssets={forestAssets}/><RoadLake scans={scans} grassTemplates={grassTemplates}/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} forestAssets={forestAssets} scans={scans} grassTemplates={grassTemplates} verge={verge} details={details} shadow={Math.abs(index-current)<2}/>)}</group>;
+  return <group ref={scenery} name="authored-road-cycling-landscape"><Geography maps={maps} forestAssets={forestAssets} floor={far.floor} farGround={far.ground}/><RoadLake bedMap={maps.rock} scans={scans} grassTemplates={grassTemplates} floor={far.floor} farGround={far.ground}/><RoadStops maps={maps}/><Trailhead/>{sectors.map(index=><RoadSector key={index} index={index} maps={maps} forestAssets={forestAssets} scans={scans} grassTemplates={grassTemplates} verge={verge} details={details} farGround={far.ground} shadow={Math.abs(index-current)<2}/>)}</group>;
 }

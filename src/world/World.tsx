@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { lazy,Suspense, useEffect, useRef, useState } from "react";
 import {
   Canvas,
   events as pointerEvents,
@@ -44,6 +44,8 @@ import { isAdventureRoom } from "../worlds/presence/state";
 import {alpinePixelRatio} from "../worlds/alpine/daylight";
 import {sportPixelRatio} from "../worlds/presence/clarity";
 import {useAlpineVisuals} from "../worlds/alpine/visualPreferences";
+import {loadGymRoom} from '../fitness/preload';
+const PrivateGym=lazy(loadGymRoom);
 // 交互扩展结束
 
 function Environment({
@@ -284,6 +286,8 @@ function Scene({
         {/* 交互扩展结束 */}
         {roomId === "atrium" ? (
           <Atrium />
+        ) : roomId === "private-gym" ? (
+          <Suspense fallback={null}><PrivateGym/></Suspense>
         ) : roomId === "corridor" ? (
           <Corridor />
         ) : ["liquid-web", "editorial", "experiments"].includes(baseRoom) ? (

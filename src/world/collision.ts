@@ -17,6 +17,7 @@ export function roomBounds(roomId: string): [number, number, number, number] {
   // 交互扩展结束
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [-20.7, 20.7, -24.4, 25];
+  if (roomId === "private-gym") return [-12.1,12.1,-14.6,14.9];
   if (roomId === "corridor") return [-6.1, 6.1, -Infinity, Infinity];
   if (plan.rule === "floating") return [-1.3, 1.3, -15.6, 15.6];
   if (plan.rule === "gravity") return [-8.5, 8.5, -15.6, 15.6];
@@ -35,6 +36,7 @@ export function roomFootprints(roomId: string): Footprint[] {
   // 交互扩展结束
   const plan = resolveRoomPlan(roomId);
   if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
+  if (roomId === "private-gym") return [{x:0,z:-4,halfWidth:1.8,halfDepth:1.95},{x:-9,z:-6,halfWidth:.65,halfDepth:2.6},{x:-9,z:5,halfWidth:2,halfDepth:.6},{x:8,z:7,radius:.85}];
   if (["cosmic", "imagined-worlds"].includes(roomId.split("-page-")[0]))
     return [-1, 1].flatMap((side) => [
       { x: side * 6.7, z: 1, halfWidth: 0.8, halfDepth: 0.9 },

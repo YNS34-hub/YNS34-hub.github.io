@@ -63,6 +63,9 @@ export default function Player({ roomId }: { roomId: string }) {
     if (roomId === "atrium") {
       camera.position.set(0, EYE, 23);
       camera.lookAt(0, 3.5, -1);
+    } else if (roomId === "private-gym") {
+      camera.position.set(3.6,1.9,2.6);
+      camera.lookAt(0,.9,-4);
     } else if (roomId === "corridor") {
       camera.position.set(0, EYE, 14);
       camera.lookAt(0, 2.3, -40);

@@ -110,7 +110,7 @@ function Core() {
       <mesh position={[0, 0.16, 0]} receiveShadow>
         <cylinderGeometry args={[3.5, 3.56, 0.3, 80]} />
         <meshStandardMaterial
-          color="#d8eaf0"
+          color="#d3d5cb"
           roughness={0.25}
           metalness={0.12}
         />
@@ -166,7 +166,7 @@ export default function Atrium() {
           <Block
             position={[side * 20.6, 7, 0]}
             scale={[0.8, 14, 54]}
-            color="#e4eff2"
+            color="#dcded5"
           />
           <Block
             position={[side * 20.12, 0.18, 0]}
@@ -359,14 +359,15 @@ export default function Atrium() {
       />
       <pointLight
         position={[7, 5, -3]}
-        intensity={35}
+        intensity={16}
         distance={14}
-        color="#c0e9ff"
+        color="#dee9e4"
       />
       {[
         ["projects", "Project Gallery", -1, -12],
         ["research", "Research Vault", 1, -12],
         ["music", "Listening Room", -1, 3],
+        ["private-gym", "私人健身房", -1, -4.5],
         ["wallpapers", "Wallpaper Vault", 1, 3],
         ["liquid-web", "Liquid Web", -1, 13],
         ["archive", "Archive", 1, 13],

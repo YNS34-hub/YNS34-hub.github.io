@@ -1,11 +1,15 @@
 import { useEffect, useMemo } from "react";
-import { useTexture } from "@react-three/drei";
+import { useTexture,useGLTF } from "@react-three/drei";
 import { useLoader, useThree } from "@react-three/fiber";
 import { BackSide, BoxGeometry, Color, EquirectangularReflectionMapping, Mesh, MeshBasicMaterial, PMREMGenerator, Scene, SRGBColorSpace } from "three";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
 RectAreaLightUniformsLib.init();
+const entrySky='/media/road/sky-4k.webp',entryDaylight='/media/alpine/daylight-2k.hdr';
+// World is imported lazily. Start these requests before Environment subscribes to
+// loader progress, so a cold atrium render never updates another React component.
+if(typeof window!=='undefined'){useTexture.preload(entrySky);useLoader.preload(RGBELoader,entryDaylight);useGLTF.preload('/assets/memory-glass.glb');}
 
 export function createEntryRadiance() {
   const scene=new Scene();scene.background=new Color("#668fb8");
@@ -25,7 +29,7 @@ export function createEntryRadiance() {
 }
 
 export default function AtriumAtmosphere() {
-  const {gl,scene}=useThree(),source=useTexture("/media/road/sky-4k.webp"),daylight=useLoader(RGBELoader,"/media/alpine/daylight-2k.hdr");
+  const {gl,scene}=useThree(),source=useTexture(entrySky),daylight=useLoader(RGBELoader,entryDaylight);
   const sky=useMemo(()=>{const texture=source.clone();texture.colorSpace=SRGBColorSpace;texture.needsUpdate=true;return texture;},[source]);
   useEffect(()=>()=>sky.dispose(),[sky]);
   useEffect(()=>{

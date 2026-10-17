@@ -19,7 +19,8 @@ export interface AlpineGeography {
 }
 const terrainUrl="/media/alpine/geography.json",demUrls=["/media/alpine/massif-dem.bin","/media/alpine/detail-dem.bin"];
 const urls = ['road-color','road-normal','meadow-color','meadow-normal','rock-color','rock-normal','swissimage','swissimage-near','terrain-sun'].map(n=>"/media/alpine/"+n+".webp");
-export function preloadAlpineAssets() { useTexture.preload(urls);useTexture.preload(scenicSky); useLoader.preload(RGBELoader,alpineSky); useLoader.preload(GeographyLoader,terrainUrl);useLoader.preload(ElevationLoader,demUrls); }
+export function preloadAlpineGeography(){useLoader.preload(GeographyLoader,terrainUrl);}
+export function preloadAlpineAssets() { useTexture.preload(urls);useTexture.preload(scenicSky); useLoader.preload(RGBELoader,alpineSky); preloadAlpineGeography();useLoader.preload(ElevationLoader,demUrls); }
 export function useAlpineGeography(){return useLoader(GeographyLoader,terrainUrl) as unknown as AlpineGeography;}
 export function useAlpineHeightfield() {
   const meta=useAlpineGeography(),buffers=useLoader(ElevationLoader,demUrls) as unknown as ArrayBuffer[];

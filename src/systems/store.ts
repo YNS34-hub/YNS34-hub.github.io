@@ -25,6 +25,7 @@ export type Overlay =
   | "about"
   | "collection"
   | "player"
+  | "fitness-media"
   | null;
 interface PalaceState {
   roomId: string;

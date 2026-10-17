@@ -1,0 +1,58 @@
+{
+  "baseline": "5f90eafbe5e329e59bcdef3b9c10b1c2e288ec3d",
+  "scope": "Explicit indoor gym navigation, warm room theme and room-bound controls; preserve accepted basketball source.",
+  "files": {
+    "src/App.tsx": [
+      {
+        "before": "const ActivityHud = lazy(() => import(\"./worlds/ActivityHud\"));\n// 交互扩展结束\nconst World = lazy(() => import(\"./world/World\"));\nclass WorldBoundary extends Component<\n  { children: ReactNode; onError: () => void },\n  { failed: boolean }\n",
+        "after": "const ActivityHud = lazy(() => import(\"./worlds/ActivityHud\"));\n// 交互扩展结束\nconst World = lazy(() => import(\"./world/World\"));\nconst FitnessHud=lazy(()=>import('./fitness/FitnessHud'));\nclass WorldBoundary extends Component<\n  { children: ReactNode; onError: () => void },\n  { failed: boolean }\n"
+      },
+      {
+        "before": "          )}\n          <Hud ready={ready} />\n          {s.roomId === \"cinema\" && <CinemaControls />}\n        </>\n      )}\n      {s.overlay === \"guide\" && <Guide />}\n",
+        "after": "          )}\n          <Hud ready={ready} />\n          {s.roomId === \"cinema\" && <CinemaControls />}\n          {s.roomId === \"private-gym\" && <Suspense fallback={null}><FitnessHud/></Suspense>}\n        </>\n      )}\n      {s.overlay === \"guide\" && <Guide />}\n"
+      }
+    ],
+    "src/world/World.tsx": [
+      {
+        "before": "import { Suspense, useEffect, useRef, useState } from \"react\";\nimport {\n  Canvas,\n  events as pointerEvents,\n",
+        "after": "import { lazy,Suspense, useEffect, useRef, useState } from \"react\";\nimport {\n  Canvas,\n  events as pointerEvents,\n"
+      },
+      {
+        "before": "import {alpinePixelRatio} from \"../worlds/alpine/daylight\";\nimport {sportPixelRatio} from \"../worlds/presence/clarity\";\nimport {useAlpineVisuals} from \"../worlds/alpine/visualPreferences\";\n// 交互扩展结束\n\nfunction Environment({\n",
+        "after": "import {alpinePixelRatio} from \"../worlds/alpine/daylight\";\nimport {sportPixelRatio} from \"../worlds/presence/clarity\";\nimport {useAlpineVisuals} from \"../worlds/alpine/visualPreferences\";\nimport {loadGymRoom} from '../fitness/preload';\nconst PrivateGym=lazy(loadGymRoom);\n// 交互扩展结束\n\nfunction Environment({\n"
+      },
+      {
+        "before": "        {/* 交互扩展结束 */}\n        {roomId === \"atrium\" ? (\n          <Atrium />\n        ) : roomId === \"corridor\" ? (\n          <Corridor />\n        ) : [\"liquid-web\", \"editorial\", \"experiments\"].includes(baseRoom) ? (\n",
+        "after": "        {/* 交互扩展结束 */}\n        {roomId === \"atrium\" ? (\n          <Atrium />\n        ) : roomId === \"private-gym\" ? (\n          <Suspense fallback={null}><PrivateGym/></Suspense>\n        ) : roomId === \"corridor\" ? (\n          <Corridor />\n        ) : [\"liquid-web\", \"editorial\", \"experiments\"].includes(baseRoom) ? (\n"
+      }
+    ],
+    "src/world/Player.tsx": [
+      {
+        "before": "    if (roomId === \"atrium\") {\n      camera.position.set(0, EYE, 23);\n      camera.lookAt(0, 3.5, -1);\n    } else if (roomId === \"corridor\") {\n      camera.position.set(0, EYE, 14);\n      camera.lookAt(0, 2.3, -40);\n",
+        "after": "    if (roomId === \"atrium\") {\n      camera.position.set(0, EYE, 23);\n      camera.lookAt(0, 3.5, -1);\n    } else if (roomId === \"private-gym\") {\n      camera.position.set(3.6,1.9,2.6);\n      camera.lookAt(0,.9,-4);\n    } else if (roomId === \"corridor\") {\n      camera.position.set(0, EYE, 14);\n      camera.lookAt(0, 2.3, -40);\n"
+      }
+    ],
+    "src/world/collision.ts": [
+      {
+        "before": "  // 交互扩展结束\n  const plan = resolveRoomPlan(roomId);\n  if (roomId === \"atrium\") return [-20.7, 20.7, -24.4, 25];\n  if (roomId === \"corridor\") return [-6.1, 6.1, -Infinity, Infinity];\n  if (plan.rule === \"floating\") return [-1.3, 1.3, -15.6, 15.6];\n  if (plan.rule === \"gravity\") return [-8.5, 8.5, -15.6, 15.6];\n",
+        "after": "  // 交互扩展结束\n  const plan = resolveRoomPlan(roomId);\n  if (roomId === \"atrium\") return [-20.7, 20.7, -24.4, 25];\n  if (roomId === \"private-gym\") return [-12.1,12.1,-14.6,14.9];\n  if (roomId === \"corridor\") return [-6.1, 6.1, -Infinity, Infinity];\n  if (plan.rule === \"floating\") return [-1.3, 1.3, -15.6, 15.6];\n  if (plan.rule === \"gravity\") return [-8.5, 8.5, -15.6, 15.6];\n"
+      },
+      {
+        "before": "  // 交互扩展结束\n  const plan = resolveRoomPlan(roomId);\n  if (roomId === \"atrium\") return [{ x: 0, z: 0, radius: 3.8 }];\n  if ([\"cosmic\", \"imagined-worlds\"].includes(roomId.split(\"-page-\")[0]))\n    return [-1, 1].flatMap((side) => [\n      { x: side * 6.7, z: 1, halfWidth: 0.8, halfDepth: 0.9 },\n",
+        "after": "  // 交互扩展结束\n  const plan = resolveRoomPlan(roomId);\n  if (roomId === \"atrium\") return [{ x: 0, z: 0, radius: 3.8 }];\n  if (roomId === \"private-gym\") return [{x:0,z:-4,halfWidth:1.8,halfDepth:1.95},{x:-9,z:-6,halfWidth:.65,halfDepth:2.6},{x:-9,z:5,halfWidth:2,halfDepth:.6},{x:8,z:7,radius:.85}];\n  if ([\"cosmic\", \"imagined-worlds\"].includes(roomId.split(\"-page-\")[0]))\n    return [-1, 1].flatMap((side) => [\n      { x: side * 6.7, z: 1, halfWidth: 0.8, halfDepth: 0.9 },\n"
+      }
+    ],
+    "src/world/artDirection.ts": [
+      {
+        "before": "      hemisphere: 0.44,\n      dark: false,\n    },\n    corridor: {\n      background: \"#102131\",\n      sky: \"#81b3d2\",\n",
+        "after": "      hemisphere: 0.44,\n      dark: false,\n    },\n    \"private-gym\": {\n      background: \"#c7c4ad\",sky: \"#e1e7d6\",ground: \"#8c8e72\",key: \"#fff0d5\",keyIntensity: 1.5,environment: .58,hemisphere: .64,dark: false,\n    },\n    corridor: {\n      background: \"#102131\",\n      sky: \"#81b3d2\",\n"
+      }
+    ],
+    "src/rooms/Atrium.tsx": [
+      {
+        "before": "        [\"projects\", \"Project Gallery\", -1, -12],\n        [\"research\", \"Research Vault\", 1, -12],\n        [\"music\", \"Listening Room\", -1, 3],\n        [\"wallpapers\", \"Wallpaper Vault\", 1, 3],\n        [\"liquid-web\", \"Liquid Web\", -1, 13],\n        [\"archive\", \"Archive\", 1, 13],\n",
+        "after": "        [\"projects\", \"Project Gallery\", -1, -12],\n        [\"research\", \"Research Vault\", 1, -12],\n        [\"music\", \"Listening Room\", -1, 3],\n        [\"private-gym\", \"私人健身房\", -1, -4.5],\n        [\"wallpapers\", \"Wallpaper Vault\", 1, 3],\n        [\"liquid-web\", \"Liquid Web\", -1, 13],\n        [\"archive\", \"Archive\", 1, 13],\n"
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "baseline": "be675d7246d0f8c1ce468f05f5b8c88aad017885",
+  "scope": "Requested atrium palette and separate local fitness-media overlay type only. Reverse these exact hunks before old immutable digest checks.",
+  "files": {
+    "src/rooms/Atrium.tsx": [
+      {
+        "before": "      <mesh position={[0, 0.16, 0]} receiveShadow>\n        <cylinderGeometry args={[3.5, 3.56, 0.3, 80]} />\n        <meshStandardMaterial\n          color=\"#d8eaf0\"\n          roughness={0.25}\n          metalness={0.12}\n        />\n",
+        "after": "      <mesh position={[0, 0.16, 0]} receiveShadow>\n        <cylinderGeometry args={[3.5, 3.56, 0.3, 80]} />\n        <meshStandardMaterial\n          color=\"#d3d5cb\"\n          roughness={0.25}\n          metalness={0.12}\n        />\n"
+      },
+      {
+        "before": "          <Block\n            position={[side * 20.6, 7, 0]}\n            scale={[0.8, 14, 54]}\n            color=\"#e4eff2\"\n          />\n          <Block\n            position={[side * 20.12, 0.18, 0]}\n",
+        "after": "          <Block\n            position={[side * 20.6, 7, 0]}\n            scale={[0.8, 14, 54]}\n            color=\"#dcded5\"\n          />\n          <Block\n            position={[side * 20.12, 0.18, 0]}\n"
+      },
+      {
+        "before": "      />\n      <pointLight\n        position={[7, 5, -3]}\n        intensity={35}\n        distance={14}\n        color=\"#c0e9ff\"\n      />\n      {[\n        [\"projects\", \"Project Gallery\", -1, -12],\n",
+        "after": "      />\n      <pointLight\n        position={[7, 5, -3]}\n        intensity={16}\n        distance={14}\n        color=\"#dee9e4\"\n      />\n      {[\n        [\"projects\", \"Project Gallery\", -1, -12],\n"
+      }
+    ],
+    "src/world/artDirection.ts": [
+      {
+        "before": "    }\n  > = {\n    atrium: {\n      background: \"#86b2d8\",\n      sky: \"#d9ebfb\",\n      ground: \"#789cb6\",\n      key: \"#fff0df\",\n      keyIntensity: 2.4,\n      environment: 0.72,\n      hemisphere: 0.5,\n      dark: false,\n    },\n    corridor: {\n",
+        "after": "    }\n  > = {\n    atrium: {\n      background: \"#8da6b6\",\n      sky: \"#e1e9e5\",\n      ground: \"#949d91\",\n      key: \"#fff0df\",\n      keyIntensity: 2.4,\n      environment: 0.64,\n      hemisphere: 0.44,\n      dark: false,\n    },\n    corridor: {\n"
+      }
+    ],
+    "src/systems/store.ts": [
+      {
+        "before": "  | \"about\"\n  | \"collection\"\n  | \"player\"\n  | null;\ninterface PalaceState {\n  roomId: string;\n",
+        "after": "  | \"about\"\n  | \"collection\"\n  | \"player\"\n  | \"fitness-media\"\n  | null;\ninterface PalaceState {\n  roomId: string;\n"
+      }
+    ]
+  }
+}

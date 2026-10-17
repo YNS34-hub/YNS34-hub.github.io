@@ -56,6 +56,14 @@ const additions: Record<string, string[]> = {
   "scripts/register-personal-media.mjs": ["media-avatar-import", "media-avatar-register"],
 };
 function withoutAdditions(file: string, source: string) {
+  const gym=JSON.parse(readFileSync('tests/fixtures/private-gym-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+  expect(gym.baseline).toBe('5f90eafbe5e329e59bcdef3b9c10b1c2e288ec3d');
+  expect(Object.keys(gym.files).every(name=>['src/App.tsx','src/world/World.tsx','src/world/Player.tsx','src/world/collision.ts','src/world/artDirection.ts','src/rooms/Atrium.tsx'].includes(name))).toBe(true);
+  source=source.replace(/\r\n/g,'\n');for(const patch of gym.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
+  const refinement=JSON.parse(readFileSync('tests/fixtures/museum-refinement-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+  expect(refinement.baseline).toBe('be675d7246d0f8c1ce468f05f5b8c88aad017885');
+  expect(Object.keys(refinement.files).every(name=>['src/rooms/Atrium.tsx','src/world/artDirection.ts','src/systems/store.ts'].includes(name))).toBe(true);
+  source=source.replace(/\r\n/g,'\n');for(const patch of refinement.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
   // 仅撤销本轮明确要求的运动键位和像素配置，再继续所有入口 / 旧架构与固定摘要检查。
   if(["src/world/Player.tsx","src/world/World.tsx"].includes(file)){
     const sport=JSON.parse(readFileSync("tests/fixtures/sport-detail-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};

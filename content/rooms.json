@@ -237,5 +237,13 @@
     "subtitle": "An original alpine descent, inspired by the saved cycling film.",
     "type": "white-cube",
     "color": "#8da6a1"
+  },
+  {
+    "id": "private-gym",
+    "number": "G1",
+    "title": "PRIVATE GYM",
+    "subtitle": "私人健身房 · 训练、记录与自己的节奏",
+    "type": "installation",
+    "color": "#b8b39b"
   }
 ]

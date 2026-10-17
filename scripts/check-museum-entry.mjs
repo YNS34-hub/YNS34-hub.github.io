@@ -4,12 +4,15 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 const out=path.resolve(process.env.PALACE_ARTIFACTS||'qa-artifacts/museum-entry');await mkdir(out,{recursive:true});
 const browser=await chromium.launch({channel:'msedge',headless:true,args:['--use-angle=d3d11']});
-const report={checks:[],errors:[],publicBase:'http://127.0.0.1:5191',passed:false};
+const report={checks:[],errors:[],uploads:[],base:process.env.PALACE_URL||'http://127.0.0.1:5190',publicBase:process.env.PALACE_PUBLIC_URL||'http://127.0.0.1:5191',passed:false};
+const audit=page=>{page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});page.on('request',r=>{if(!['GET','HEAD','OPTIONS'].includes(r.method()))report.uploads.push(r.method()+' '+r.url());});};
 try{
  const context=await browser.newContext({viewport:{width:1920,height:1080},deviceScaleFactor:1});
  await context.addInitScript(()=>localStorage.setItem('memory-palace:v3',JSON.stringify({state:{quality:'low',tutorialDone:true,reducedMotion:true,mute:true,roomSoundtracks:false},version:0})));
- const page=await context.newPage();page.setDefaultTimeout(90000);page.on('pageerror',e=>report.errors.push(e.message));
- await page.goto('http://127.0.0.1:5190/');await page.locator('.world-ready canvas').waitFor();
+ await context.route('**/personal-media/manifest.json',r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
+ await context.route('**/personal-media/avatar.json',r=>r.fulfill({json:{profile:null}}));
+ const page=await context.newPage();page.setDefaultTimeout(90000);audit(page);
+ await page.goto(report.base+'/');await page.locator('.world-ready canvas').waitFor();
  await page.waitForFunction(()=>window.__PALACE_DEBUG__?.camera.fov===48);
  assert.equal(await page.evaluate(()=>!!window.__PALACE_DEBUG__.scene.getObjectByName('atrium-floor-capture')),false);
  report.checks.push('Low quality preserves original glass silhouette without a reflection render target');
@@ -22,7 +25,7 @@ try{
  // 生产版不借助开发调试接口；直接验证字体、按钮和已有非 3D 入口。
  for(const viewport of [{width:1920,height:1080},{width:390,height:844}]){
   const publicContext=await browser.newContext({viewport,deviceScaleFactor:1});
-  const p=await publicContext.newPage();p.setDefaultTimeout(90000);p.on('pageerror',e=>report.errors.push(e.message));
+  const p=await publicContext.newPage();p.setDefaultTimeout(90000);audit(p);
   await p.goto(report.publicBase+'/');await p.locator('.world-ready canvas').waitFor();await p.evaluate(()=>document.fonts.ready);
   const type=await p.evaluate(()=>({title:getComputedStyle(document.querySelector('h1')).fontFamily,ui:getComputedStyle(document.body).fontFamily,overflow:document.documentElement.scrollWidth>innerWidth}));
   assert.match(type.title,/Cormorant Garamond/);assert.match(type.ui,/Manrope/);assert.equal(type.overflow,false);
@@ -33,7 +36,7 @@ try{
   report.checks.push('Public entry / fonts / guide / index at '+viewport.width+' × '+viewport.height);
   await publicContext.close();
  }
- assert.deepEqual(report.errors,[]);report.passed=true;
+ assert.deepEqual(report.errors,[]);assert.deepEqual(report.uploads,[]);report.passed=true;
 }catch(error){report.failure=error.stack;process.exitCode=1;console.error(error.stack);}
 finally{await writeFile(path.join(out,'entry-flows.json'),JSON.stringify(report,null,2));await browser.close();}
 console.log(report.checks.join('\n'));

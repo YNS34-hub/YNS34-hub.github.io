@@ -30,6 +30,16 @@ describe("two-map preservation",()=>{
     };
     for(const [file,digest] of Object.entries(files)){
       let source=readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n");
+      const transition=JSON.parse(readFileSync('tests/fixtures/scenery-transition-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+      expect(transition.baseline).toBe('6f345d86f9abf7a79963799be5e37669912d13b5');
+      for(const patch of transition.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
+      const lakeShore=JSON.parse(readFileSync('tests/fixtures/lake-shore-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+      expect(lakeShore.baseline).toBe('6f345d86f9abf7a79963799be5e37669912d13b5');
+      for(const patch of lakeShore.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
+      // 只撤销本轮明确的远山影像接入；已有路线 / 地形 / 旧版摘要保护继续执行。
+      const terrain=JSON.parse(readFileSync('tests/fixtures/terrain-material-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
+      expect(terrain.baseline).toBe('6f345d86f9abf7a79963799be5e37669912d13b5');
+      for(const patch of terrain.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}
       // 本轮只撤销 28d8fe7 后明确记录的树林视觉差异，再检查既有全部保护与原摘要。
       const canopy=JSON.parse(readFileSync("tests/fixtures/forest-canopy-adapters.json","utf8")) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
       expect(canopy.baseline).toBe("28d8fe7088ab3492d4c49dccc9e5742e60626486");expect(Object.keys(canopy.files)).toEqual(["Landscape.tsx"]);

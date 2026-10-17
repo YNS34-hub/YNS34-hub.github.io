@@ -1,0 +1,19 @@
+{
+  "baseline": "6f345d86f9abf7a79963799be5e37669912d13b5",
+  "files": {
+    "Landscape.tsx": [
+      {
+        "before": "import {ScanInstances,useAlpineScans} from \"../alpine/Scans\";\nimport Delineators from \"../Delineators\";\nimport { createStopApron,insideStopApron,stopGroundHeight } from \"./stopApron\";\n\nfunction seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}\nfunction makeTerrain(start:number,end:number){\n",
+        "after": "import {ScanInstances,useAlpineScans} from \"../alpine/Scans\";\nimport Delineators from \"../Delineators\";\nimport { createStopApron,insideStopApron,stopGroundHeight } from \"./stopApron\";\nimport {useAlpineGeography} from '../alpine/assets';\n\nfunction seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}\nfunction makeTerrain(start:number,end:number){\n"
+      },
+      {
+        "before": "  </group>;\n}\nfunction Geography({maps,forestAssets}:{maps:Maps;forestAssets:ForestAssets}){\n  const samples=useRidgeSamples();\n  const groundMaterial=useMemo(()=>valleyTerrainMaterial(maps),[maps]),mountainMaterial=useMemo(()=>valleyTerrainMaterial(maps,true),[maps]);\n  useEffect(()=>()=>{groundMaterial.dispose();mountainMaterial.dispose();},[groundMaterial,mountainMaterial]);\n  const shape=useMemo(()=>{\n    const g=createValleyFloor();\n    const ridges=createValleyRidges(samples);\n    // 远林必须落在实际粗网格三角形上，不能把精细高度加到下移后的远景表面而悬空。\n    const farGround=terrainSampler(g,terrainHeight);\n    const forest:ForestTree[]=[],random=seeded(417);\n",
+        "after": "  </group>;\n}\nfunction Geography({maps,forestAssets}:{maps:Maps;forestAssets:ForestAssets}){\n  const samples=useRidgeSamples(),meta=useAlpineGeography();\n  const groundMaterial=useMemo(()=>valleyTerrainMaterial(maps),[maps]),mountainMaterial=useMemo(()=>valleyTerrainMaterial(maps,true),[maps]);\n  useEffect(()=>()=>{groundMaterial.dispose();mountainMaterial.dispose();},[groundMaterial,mountainMaterial]);\n  const shape=useMemo(()=>{\n    const g=createValleyFloor();\n    const ridges=createValleyRidges(samples,meta.imagery);\n    // 远林必须落在实际粗网格三角形上，不能把精细高度加到下移后的远景表面而悬空。\n    const farGround=terrainSampler(g,terrainHeight);\n    const forest:ForestTree[]=[],random=seeded(417);\n"
+      },
+      {
+        "before": "      const size=.75+random()*.85,a=random()*Math.PI*2;forest.push({model:0,variant:a/Math.PI<1.24?1:0,position:[x,farGround(x,z)-.012,z],scale:[size*(.86+random()*.28),size,size],rotation:[0,a,0]});\n    }\n    return{g,ridges,forest};\n  },[samples]);\n  useEffect(()=>()=>{shape.g.dispose();shape.ridges.forEach(g=>g.dispose());},[shape]);\n  return <group name=\"continuous-lake-valley-geography\">\n    <mesh geometry={shape.g} material={groundMaterial} dispose={null}/>\n",
+        "after": "      const size=.75+random()*.85,a=random()*Math.PI*2;forest.push({model:0,variant:a/Math.PI<1.24?1:0,position:[x,farGround(x,z)-.012,z],scale:[size*(.86+random()*.28),size,size],rotation:[0,a,0]});\n    }\n    return{g,ridges,forest};\n  },[samples,meta]);\n  useEffect(()=>()=>{shape.g.dispose();shape.ridges.forEach(g=>g.dispose());},[shape]);\n  return <group name=\"continuous-lake-valley-geography\">\n    <mesh geometry={shape.g} material={groundMaterial} dispose={null}/>\n"
+      }
+    ]
+  }
+}

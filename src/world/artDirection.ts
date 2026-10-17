@@ -29,14 +29,17 @@ export function roomLighting(plan: RoomPlan, roomId: string) {
     }
   > = {
     atrium: {
-      background: "#86b2d8",
-      sky: "#d9ebfb",
-      ground: "#789cb6",
+      background: "#8da6b6",
+      sky: "#e1e9e5",
+      ground: "#949d91",
       key: "#fff0df",
       keyIntensity: 2.4,
-      environment: 0.72,
-      hemisphere: 0.5,
+      environment: 0.64,
+      hemisphere: 0.44,
       dark: false,
+    },
+    "private-gym": {
+      background: "#c7c4ad",sky: "#e1e7d6",ground: "#8c8e72",key: "#fff0d5",keyIntensity: 1.5,environment: .58,hemisphere: .64,dark: false,
     },
     corridor: {
       background: "#102131",
