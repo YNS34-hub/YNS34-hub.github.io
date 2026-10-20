@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { Mesh, MeshStandardMaterial, PlaneGeometry, ShaderMaterial } from "three";
-import { Reflector } from "three/addons/objects/Reflector.js";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Mesh, MeshStandardMaterial } from "three";
 import { usePalaceStore } from "../../systems/store";
 import { useSurfaceTexture } from "../../world/materials";
 import { Floor } from "../../world/primitives";
@@ -9,22 +8,18 @@ import { textureStatus } from "../../world/textureCache";
 import { setWalkTarget } from "../../world/walkTarget";
 import { ReflectionBudget } from "./budget";
 import { useQuietMotion } from "../../motion/useMotionCue";
+import {getEntryMirror} from './entryMirror';
 
 export default function EntryFloor(){
   const quality=usePalaceStore(s=>s.effectiveQuality);
   return quality==="low"?<group position={[0,.035,0]}><Floor width={42} depth={54} color="#b9beb7"/></group>:<ReflectiveStone high={quality==="high"}/>;
 }
 function ReflectiveStone({high}:{high:boolean}){
-  const stone=useSurfaceTexture("stone"),floor=useRef<Mesh>(null),pending=useRef(true),quiet=useQuietMotion();
+  const stone=useSurfaceTexture("stone"),floor=useRef<Mesh>(null),pending=useRef(true),quiet=useQuietMotion(),{gl}=useThree();
   const memory=useRef(false),memoryAt=useRef(-Infinity);
   const optics=useMemo(()=>{
-    const geometry=new PlaneGeometry(42,54),size=high?768:512;
-    const mirror=new Reflector(geometry,{textureWidth:size,textureHeight:size,clipBias:.003,multisample:0});
-    const mirrorMaterial=mirror.material;
-    if(!(mirrorMaterial instanceof ShaderMaterial))throw new Error("Expected the built-in Reflector shader");
+    const size=high?768:512,{geometry,mirror,mirrorMaterial,capture}=getEntryMirror(gl,size);
     // 原基底上表面为 -0.03，旧 Floor 在 -0.035 被遮住；饰面置于实际行走的零高度。
-    mirror.name="atrium-floor-capture";mirror.position.y=0;mirror.rotation.x=-Math.PI/2;mirror.visible=false;mirror.raycast=()=>{};
-    const capture=mirror.onBeforeRender.bind(mirror);mirror.onBeforeRender=()=>{};
     const material=new MeshStandardMaterial({color:"#b9beb7",roughness:.32,metalness:.06,bumpMap:stone,bumpScale:.0045});
     material.onBeforeCompile=shader=>{
       shader.uniforms.entryMirror={value:mirror.getRenderTarget().texture};shader.uniforms.entryMatrix=mirrorMaterial.uniforms.textureMatrix;shader.uniforms.entryTexel={value:1/size};
@@ -42,8 +37,8 @@ function ReflectiveStone({high}:{high:boolean}){
     };
     material.customProgramCacheKey=()=>"museum-entry-stone-soft-reflection-v2";
     return {mirror,mirrorMaterial,material,geometry,capture,budget:new ReflectionBudget(high?12:8)};
-  },[high,stone]);
-  useEffect(()=>()=>{optics.material.dispose();optics.mirror.dispose();optics.geometry.dispose();},[optics]);
+  },[gl,high,stone]);
+  useEffect(()=>()=>{optics.material.dispose();},[optics]);
   useFrame(({gl,scene,camera,clock})=>{
     const state=usePalaceStore.getState(),loading=!!textureStatus().pending;
     if(pending.current&&!loading)optics.budget.invalidate();pending.current=loading;

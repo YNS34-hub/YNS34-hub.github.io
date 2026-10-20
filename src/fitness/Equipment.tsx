@@ -4,8 +4,8 @@ import {Group,Quaternion,Vector3} from 'three';
 import {Block} from '../world/primitives';
 import type {FitnessRig} from './trainerRig';
 import {fitnessClock} from './session';
-function Plate({x,radius=.18}:{x:number;radius?:number}){return <mesh position={[x,0,0]} rotation={[0,0,Math.PI/2]} castShadow><cylinderGeometry args={[radius,radius,.055,24]}/><meshStandardMaterial color="#303734" metalness={.24} roughness={.64}/></mesh>;}
-function Dumbbell(){return <group><mesh rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.022,.022,.31,12]}/><meshStandardMaterial color="#a4aca7" metalness={.8} roughness={.28}/></mesh><Plate x={-.13} radius={.10}/><Plate x={.13} radius={.10}/></group>;}
+function Plate({x,radius=.18}:{x:number;radius?:number}){return <mesh position={[x,0,0]} rotation={[0,0,Math.PI/2]} castShadow><cylinderGeometry args={[radius,radius,.055,radius>.12?24:6]}/><meshStandardMaterial color="#252d29" metalness={.10} roughness={.82}/></mesh>;}
+function Dumbbell(){return <group><mesh rotation={[0,0,Math.PI/2]} castShadow><cylinderGeometry args={[.022,.022,.31,12]}/><meshStandardMaterial color="#b6bfbb" metalness={.88} roughness={.32}/></mesh><Plate x={-.13} radius={.10}/><Plate x={.13} radius={.10}/></group>;}
 export function HeldFitnessEquipment({rig,frame}:{rig:FitnessRig;frame:RefObject<Group|null>}){
  const bar=useRef<Group>(null),left=useRef<Group>(null),right=useRef<Group>(null),bench=useRef<Group>(null),rack=useRef<Group>(null);
  const contact=useMemo(()=>({left:new Vector3(),right:new Vector3(),q:new Quaternion(),parent:new Quaternion(),offset:new Vector3(.065,.02,0),axis:new Vector3(1,0,0),gripRotation:new Quaternion().setFromAxisAngle(new Vector3(0,1,0),-Math.PI/2)}),[]);
@@ -26,9 +26,9 @@ export function HeldFitnessEquipment({rig,frame}:{rig:FitnessRig;frame:RefObject
  </group>;
 }
 export function GymEquipment(){return <group name="private-gym-equipment">
- <Block position={[0,.022,-4]} scale={[3.0,.045,3.1]} color="#515e50" roughness={.98}/>
- <Block position={[-9,.43,-6]} scale={[1.1,.22,5.0]} color="#675f50" roughness={.8}/>
- {[-1,1].map(side=><Block key={side} position={[-9,.20,-6+side*1.8]} scale={[.8,.40,.16]} color="#333b35"/>)}
+ <Block position={[-9,.43,-6]} scale={[1.1,.12,5.0]} color="#404a42" metalness={.48} roughness={.48} castShadow/>
+ <Block position={[-9,.16,-6]} scale={[1.1,.075,5.0]} color="#343e37" metalness={.48} roughness={.48}/>
+ {[-1,1].map(side=><Block key={side} position={[-9,.24,-6+side*1.8]} scale={[.8,.48,.10]} color="#303a33" metalness={.5} roughness={.46} castShadow/>)}
  {Array.from({length:6},(_,i)=><group key={i} position={[-9,.65,-8+i*.7]}><Dumbbell/></group>)}
  <Block position={[-9,.43,5.0]} scale={[3.8,.17,1.0]} color="#aa8760" roughness={.8}/>
  {[-1,1].map(side=><Block key={side} position={[-9+side*1.4,.20,5]} scale={[.12,.4,.8]} color="#3a433b"/>)}

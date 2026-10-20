@@ -12,6 +12,7 @@ import {createFitnessRig,applyFitnessRig} from './trainerRig';
 import {fitnessClock,advanceFitness,useFitness} from './session';
 import {createFitnessPose,sampleFitnessPose,copyFitnessPose,blendFitnessPose} from './pose';
 import {HeldFitnessEquipment} from './Equipment';
+import {installBasketballAppearance} from '../worlds/presence/basketballAppearance';
 export function preloadGymAthlete(){useGLTF.preload(ATHLETE);void loadLocalAppearance();}
 export default function FitnessTrainer(){
  const profile=useAppearance(s=>s.personal&&s.profile?s.profile:neutralProfile),head=useAppearance(s=>s.personal?s.head:null),[headMap,setHeadMap]=useState<Texture|null>(null),frame=useRef<Group>(null);
@@ -22,9 +23,9 @@ export default function FitnessTrainer(){
    if(headMap)for(const material of Array.isArray(node.material)?node.material:[node.material])if(material instanceof MeshStandardMaterial&&/head/.test(material.name)){material.map=headMap;material.normalScale.multiplyScalar(.35);}
   }});
   const mixer=new AnimationMixer(model),idle=gltf.animations.find(clip=>clip.name==='idle');if(idle){mixer.clipAction(idle).play();mixer.setTime(.1);}
-  const body=createFitnessRig(model);mixer.stopAllAction();mixer.uncacheRoot(model);return{...body,materials,geometries};
+  const body=createFitnessRig(model),surface=installBasketballAppearance(model,{outfitId:'training-blue',personalHead:!!headMap});mixer.stopAllAction();mixer.uncacheRoot(model);return{...body,materials,geometries,surface};
  },[gltf,profile,headMap]);
- useEffect(()=>()=>{rig.materials.flat().forEach(material=>material.dispose());rig.geometries.forEach(geometry=>geometry.dispose());rig.model.traverse(node=>{if(node instanceof SkinnedMesh)node.skeleton.dispose();});},[rig]);
+ useEffect(()=>{rig.surface.activate();return()=>{rig.surface.dispose();rig.materials.flat().forEach(material=>material.dispose());rig.geometries.forEach(geometry=>geometry.dispose());rig.model.traverse(node=>{if(node instanceof SkinnedMesh)node.skeleton.dispose();});};},[rig]);
  const pose=useMemo(()=>sampleFitnessPose(createFitnessPose(),fitnessClock.exercise,fitnessClock.phase),[]),from=useMemo(createFitnessPose,[]),revision=useRef(fitnessClock.revision);
  useEffect(()=>{const hidden=()=>{if(document.hidden){fitnessClock.running=false;useFitness.setState({running:false});}};document.addEventListener('visibilitychange',hidden);return()=>{document.removeEventListener('visibilitychange',hidden);fitnessClock.running=false;useFitness.setState({running:false});};},[]);
  useFrame((_,delta)=>{

@@ -16,7 +16,7 @@ function Photo({item,index}:{item:GymMedia;index:number}){
  return <group position={[x,y,-14.72]}>
   <Block position={[0,0,0]} scale={[2.85,2.02,.10]} color="#baa084" roughness={.8}/><Block position={[0,0,.065]} scale={[2.67,1.84,.03]} color="#e4ddce"/>
   {map&&<mesh position={[0,0,.088]}><planeGeometry args={[width,height]}/><meshBasicMaterial map={map} toneMapped={false}/></mesh>}
-  <Label text={item.title} position={[0,-1.17,.08]} size={.10} color="#6b6257" maxWidth={2.7}/>
+  <Label text={item.title} position={[0,-1.17,.08]} size={.10} color="#d4cab7" maxWidth={2.7}/>
  </group>;
 }
 function VideoScreen(){
@@ -44,9 +44,9 @@ function VideoScreen(){
 export default function FitnessMediaWall(){
  const items=useGymMedia(s=>s.items),photos=useMemo(()=>items.filter(item=>item.kind==='photo').slice(0,8),[items]);
  useEffect(()=>{void useGymMedia.getState().initialize();},[]);
- return <group name="private-gym-local-media"><Label text="YOUR TRAINING ARCHIVE" position={[0,5.4,-14.61]} color="#514c41" size={.24}/>
+ return <group name="private-gym-local-media"><Label text="我的训练档案" position={[0,5.85,-14.61]} color="#e0d4bd" size={.28}/>
   {photos.map((item,index)=><Photo key={item.id} item={item} index={index}/>)}
-  {!photos.length&&<group position={[0,2.9,-14.65]}><Label text="这里留给你的训练照片" position={[0,0,0]} color="#655c4f" size={.24}/><Label text="从本机导入，慢慢留下变化。" position={[0,-.48,0]} color="#807362" size={.13}/></group>}
+  {!photos.length&&<group position={[0,3.05,-14.65]}><Label text="这里留给你的训练照片" position={[0,0,0]} color="#ded2bb" size={.24}/><Label text="从本机导入，慢慢留下变化。" position={[0,-.48,0]} color="#b8b9a2" size={.13}/></group>}
   <VideoScreen/>
  </group>;
 }
