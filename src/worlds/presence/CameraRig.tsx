@@ -10,9 +10,11 @@ import { followPose } from "./math";
 import { limitCourtBoom } from "./courtBoom";
 import { presence, usePerspective, type AdventureRoom } from "./state";
 import { useAppearance } from "./appearance";
+import {useCourtFraming} from './courtFraming';
 
 export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
   const { camera } = useThree(), quiet = useQuietMotion(), view = usePerspective(s => s.views[roomId]);
+  const detail=useCourtFraming(s=>s.framing==='detail')&&roomId==='basketball';
   const last = useRef(view), transition = useRef(0), initialized = useRef(false);
   const scratch = useMemo(() => ({ eye: new Vector3(), direction: new Vector3(), position: new Vector3(), target: new Vector3(), matrix: new Matrix4(), quaternion: new Quaternion(), up: new Vector3(0, 1, 0) }), []);
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
     scratch.eye.copy(body.position); if (!comfort && roomId === "basketball") scratch.eye.y += presence.jump * (mode === "first" ? .65 : .3);
     body.getWorldDirection(scratch.direction);
     if (riding && mode === "third") scratch.direction.set(-Math.sin(roadView.yaw + roadView.headYaw * 1.25), Math.sin(roadView.headPitch), -Math.cos(roadView.yaw + roadView.headYaw * 1.25)).normalize();
-    followPose(scratch.eye, scratch.direction, mode, riding, scratch.position, scratch.target);
+    followPose(scratch.eye, scratch.direction, mode, riding, scratch.position, scratch.target,detail);
     const appearance = useAppearance.getState();
     if (appearance.wardrobe === roomId && mode === "third") {
       // 只转展示镜头；原逻辑眼位 / 朝向 / 控制 / Cinema 返回快照完全不动。

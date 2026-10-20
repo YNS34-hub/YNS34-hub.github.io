@@ -127,7 +127,6 @@ function PracticeBall() {
       const creative=event.code==="KeyZ"?"between-legs":event.code==="KeyC"?"behind-back":event.code==="KeyQ"?"hesitation":null;
       if(creative&&simulation.mode==="held"&&state.current.dribble&&!presence.finishLocked){event.preventDefault();command(new CustomEvent("palace:court",{detail:creative}));}
       if (isPrimaryShotKey(event.code)) {
-        if (!document.pointerLockElement && event.target instanceof HTMLElement && event.target.closest("button,a")) return;
         event.preventDefault(); camera.getWorldDirection(scratch.current.aim);
         const action = primaryCourtAction({ held: simulation.mode === "held", position: camera.position, direction: scratch.current.aim, speed: presence.speed, hand: presence.hand }, presence.turboHeld);
         if (action === "shoot") command(new CustomEvent("palace:court", { detail: "charge" })); else attemptFinish(action);

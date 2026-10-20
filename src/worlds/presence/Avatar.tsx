@@ -29,6 +29,7 @@ import {blendShotGather} from "./shotGather";
 import {createCourtLocomotion,sampleCourtLocomotion,dribbleLegWindow,sampleDribbleKneePole,sampleCourtClipWeights} from "./courtLocomotion";
 import {dribbleRecoveryWindow} from "./dribblePose";
 import {advanceCourtTorso,createCourtTorso} from './courtTorso';
+import CourtFootContact from './CourtFootContact';
 
 export default function SportPresence({roomId}:{roomId:AdventureRoom}) {
   const head = useAppearance(s => s.personal ? s.head : null);
@@ -452,7 +453,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     const c = rig.bones.get(prefix + (kind === "arm" ? "Hand" : "Foot"));
     if (a && b && c) rig.ik.solve(a, b, c, rig.target, rig.pole);
   }
-  return <group ref={root} name="visitor-athlete" visible={false}>
+  return <><group ref={root} name="visitor-athlete" visible={false}>
     <primitive object={rig.object} dispose={null} />
     <group ref={helmet} visible={false} raycast={() => {}}>
       <mesh scale={[.113, .079, .157]} castShadow><sphereGeometry args={[1, 24, 16]} /><meshStandardMaterial color="#e4e9e8" roughness={.48} /></mesh>
@@ -470,5 +471,5 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       {[-1,1].map(side => <mesh key={side} position={[side*.105,.05,-.075]} rotation={[.24,0,side*-.10]}><boxGeometry args={[.025,.35,.012]}/><meshStandardMaterial color="#41494b" roughness={.94}/></mesh>)}
       <mesh position={[0,.086,.086]}><boxGeometry args={[.175,.005,.007]}/><meshStandardMaterial color="#84918e" metalness={.3} roughness={.55}/></mesh>
     </group>
-  </group>;
+  </group>{roomId==='basketball'&&<CourtFootContact actor={root} bones={rig.bones}/>}</>;
 }

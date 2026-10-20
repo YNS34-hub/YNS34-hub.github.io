@@ -44,5 +44,7 @@ try{
  }
  await page.getByRole('button',{name:'Night lights',exact:true}).click();await page.waitForTimeout(1800);
  await measure('rooftop / night still',7);await page.keyboard.press('e');await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.presence.dribbling);await measure('rooftop / night dribble',4);
+ await page.keyboard.press('e');await page.waitForFunction(()=>!window.__PRESENCE_DEBUG__.presence.dribbling);await page.getByRole('button',{name:'Daylight',exact:true}).click();await page.waitForTimeout(3500);await page.getByRole('button',{name:'动作近景',exact:true}).click();await page.waitForTimeout(800);
+ await measure('rooftop / detail still',7);await page.keyboard.press('e');await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.presence.dribbling);await measure('rooftop / detail dribble',4);
  assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(e){report.failure=e.stack;process.exitCode=1;console.error(e);}finally{await flush();await browser.close();}

@@ -23,6 +23,7 @@ const sourceFiles=["src/worlds/basketballPhysics.ts","src/worlds/activity.ts","s
 const sourceHash=async file=>createHash("sha256").update(await readFile(file)).digest("hex");
 sourceFiles.push("src/world/Player.tsx","src/worlds/court/controls.ts","src/worlds/presence/dribblePalm.ts","src/worlds/presence/courtLocomotion.ts","src/worlds/presence/basketballFootwork.ts","src/worlds/presence/shotHandRotation.ts","src/worlds/presence/shotGather.ts","src/worlds/presence/dribbleArm.ts","src/worlds/presence/animationContinuity.ts","src/worlds/presence/basketballAppearance.ts","src/worlds/court/basketballSurface.ts");
 sourceFiles.push('src/worlds/presence/courtTorso.ts');
+sourceFiles.push('src/worlds/presence/math.ts','src/worlds/presence/CameraRig.tsx','src/worlds/presence/Controls.tsx','src/worlds/presence/courtFraming.ts','src/worlds/presence/CourtFootContact.tsx');
 const sourceHashes=Object.fromEntries(await Promise.all(sourceFiles.map(async file=>[file,await sourceHash(file)])));
 
 await mkdir(out, { recursive: true });

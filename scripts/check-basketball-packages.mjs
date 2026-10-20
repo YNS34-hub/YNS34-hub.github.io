@@ -10,6 +10,7 @@ const out = path.resolve(process.env.PALACE_ARTIFACTS || "qa-artifacts/basketbal
 const journeyScope = process.env.PALACE_JOURNEYS || "all";
 const personal = process.env.PALACE_PERSONAL==="1";
 const sourceFiles=["src/worlds/ActivityHud.tsx","src/worlds/BasketballCourt.tsx","src/worlds/CourtArchitecture.tsx","src/worlds/court/Environment.tsx","src/worlds/court/finishing.ts","src/worlds/court/CourtVenue.tsx","src/worlds/court/courtSets.ts","src/worlds/court/motionPacks.ts","src/worlds/court/packagePreferences.ts","src/worlds/presence/Avatar.tsx","src/worlds/presence/Wardrobe.tsx","src/worlds/presence/dribblePose.ts","src/worlds/presence/dribbleMotion.ts","src/worlds/presence/shotPose.ts","src/worlds/presence/state.ts","src/worlds/presence/wardrobe.css","src/worlds/worldConfig.ts"];
+sourceFiles.push('src/worlds/presence/math.ts','src/worlds/presence/CameraRig.tsx','src/worlds/presence/Controls.tsx','src/worlds/presence/courtFraming.ts','src/worlds/presence/CourtFootContact.tsx');
 const sourceHash=async file=>createHash("sha256").update(await readFile(file)).digest("hex");
 const sourceHashes=Object.fromEntries(await Promise.all(sourceFiles.map(async file=>[file,await sourceHash(file)])));
 assert.ok(["all", "remaining"].includes(journeyScope), "PALACE_JOURNEYS must be all or remaining");
