@@ -39,7 +39,7 @@ const publishReport = async () => {
 const distance = (a, b) => Math.hypot(...a.map((v, i) => v - b[i]));
 const packIds = { shot: ["quick", "classic", "high-release"], hands: ["natural", "protect"], dribble: ["balanced", "low", "wide"], layup: ["standard", "scoop", "euro"], dunk: ["one-hand", "two-hand"] };
 const legends = { shot: "投篮包", hands: "双手动作包", dribble: "运球包", layup: "上篮包", dunk: "扣篮包" };
-const courtIds = ["park", "blacktop", "retro-arena", "practice-gym"];
+const courtIds = ["park", "blacktop", "retro-arena", "practice-gym", "rooftop"];
 
 class CourtPage {
   constructor(page) { this.page = page; this.dialog = page.getByRole("dialog", { name: /^(人物与穿搭|人物、穿搭与球场动作)$/ }); }
@@ -209,7 +209,7 @@ try {
   await page.reload(); await court.ready(); await installReadOnlyRecorder(page); await court.openWardrobe();
   assert.deepEqual(await court.selected(), selected, "every chosen package persists across browser reload");
   assert.equal(await court.dialog.getByRole("button", { name: "左手", exact: true }).getAttribute("aria-pressed"), "true", "preferred starting hand persists across reload");
-  assert.equal(await court.venueField().getByRole("button").nth(3).getAttribute("aria-pressed"), "true", "court set persists across reload");
+  assert.equal(await court.venueField().getByRole("button").nth(courtIds.length-1).getAttribute("aria-pressed"), "true", "last natively selected court set persists across reload");
   report.checks.push({ name: "native selection / preferred left hand / wardrobe gameplay pause / reload persistence", selected, selectionLabels });
   await court.closeWardrobe();
   await page.waitForFunction(() => window.__PRESENCE_DEBUG__.presence.hand === -1);

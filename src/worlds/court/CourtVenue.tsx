@@ -1,10 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import { BoxGeometry, BufferGeometry, CanvasTexture, Color, Float32BufferAttribute, InstancedMesh, Object3D, PlaneGeometry, RepeatWrapping, SRGBColorSpace, Vector2, type Texture } from "three";
+import { BoxGeometry, BufferGeometry, CanvasTexture, Color, Float32BufferAttribute, InstancedMesh, LineBasicMaterial, Object3D, PlaneGeometry, RepeatWrapping, SRGBColorSpace, Vector2, type Texture } from "three";
 import Instances from "../Instances";
 import { Label } from "../../world/primitives";
 import { usePalaceStore } from "../../systems/store";
 import { useActivity } from "../activity";
 import { useCourtMaps } from "./assets";
+import {useFrame} from '@react-three/fiber';
+import {courtAtmosphere} from './state';
 import { courtSets, courtSetLayout, useCourtSet, type CourtSetId, type CourtSetBlock } from "./courtSets";
 
 
@@ -96,14 +98,32 @@ function PlankFloor({ items, map }: { items: CourtSetBlock[]; map?: Texture }) {
   </instancedMesh>;
 }
 
-function AsphaltFloor() {
-  const maps = useCourtMaps("aggregate", [12, 18]), paving = useCourtMaps("paving", [32, 32]);
+function AsphaltFloor({roof=false}:{roof?:boolean}) {
+  const maps = useCourtMaps("aggregate", [12, 18]), paving = useCourtMaps("paving", roof?[10,14]:[32, 32]);
   return <>
-    <mesh name="city-sidewalk-apron" position={[0, -.035, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[100, 100]} /><meshStandardMaterial {...paving} color="#787c78" roughness={.96} normalScale={new Vector2(.35, .35)} /></mesh>
+    {roof&&<mesh name="rooftop-building-below-deck" position={[0,-12.1,0]}><boxGeometry args={[31,24,43]}/><meshStandardMaterial color="#536463" roughness={.88}/></mesh>}
+    <mesh name={roof?'rooftop-concrete-apron':"city-sidewalk-apron"} position={[0, -.035, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={roof?[31,43]:[100, 100]} /><meshStandardMaterial {...paving} color={roof?'#858d83':"#787c78"} roughness={.96} normalScale={new Vector2(.35, .35)} /></mesh>
     <mesh name="city-asphalt-surface" rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[24, 36]} /><meshStandardMaterial {...maps} color="#505359" roughness={.96} normalScale={new Vector2(.3, .3)} />
+      <planeGeometry args={[24, 36]} /><meshStandardMaterial {...maps} color={roof?'#465962':"#505359"} roughness={.96} normalScale={new Vector2(.3, .3)} />
     </mesh>
   </>;
+}
+
+function RooftopWindowLights({items}:{items:CourtSetBlock[]}){
+  const mesh=useRef<InstancedMesh>(null),lit=useMemo(()=>items.filter((_,i)=>i%4===0||i%7===0),[items]),geometry=useMemo(()=>new PlaneGeometry(1,1),[]);
+  useEffect(()=>()=>geometry.dispose(),[geometry]);
+  useLayoutEffect(()=>{
+    const object=new Object3D(),color=new Color();lit.forEach((item,i)=>{const sideWindow=item.scale[0]<.1;object.position.set(...item.position);object.rotation.set(0,sideWindow?(item.position[0]<0?Math.PI/2:-Math.PI/2):0,0);if(sideWindow)object.position.x+=item.position[0]<0?.036:-.036;else object.position.z+=.036;object.scale.set(sideWindow?item.scale[2]:item.scale[0],item.scale[1],1);object.updateMatrix();mesh.current!.setMatrixAt(i,object.matrix);mesh.current!.setColorAt(i,color.set(i%3?'#cbb582':'#9dbbc2'));});
+    mesh.current!.instanceMatrix.needsUpdate=true;if(mesh.current!.instanceColor)mesh.current!.instanceColor.needsUpdate=true;mesh.current!.computeBoundingSphere();
+  },[lit]);
+  useFrame(()=>{if(!mesh.current)return;const night=courtAtmosphere.night;mesh.current.visible=night>.01;const material=mesh.current.material;if(!Array.isArray(material))material.opacity=night*.8;});
+  return <instancedMesh ref={mesh} name="rooftop-night-window-lights" args={[geometry,undefined,lit.length]} visible={false}><meshBasicMaterial color="#ffffff" transparent opacity={0} depthWrite={false} toneMapped={false}/></instancedMesh>;
+}
+
+function RooftopFence({geometry}:{geometry:BufferGeometry}){
+  const material=useRef<LineBasicMaterial>(null),colors=useMemo(()=>[new Color('#6c8080'),new Color('#283b40')],[]);
+  useFrame(()=>{material.current?.color.lerpColors(colors[0],colors[1],courtAtmosphere.night);});
+  return <lineSegments geometry={geometry} name="rooftop-chain-link-fence"><lineBasicMaterial ref={material} color="#6c8080" transparent opacity={.50}/></lineSegments>;
 }
 
 function PracticeScoreboard() {
@@ -131,30 +151,31 @@ function SetScenery({ id }: { id: Exclude<CourtSetId, "park"> }) {
   const quality = usePalaceStore(s => s.effectiveQuality);
   const style = courtSets[id], indoor = style.indoor, layout = useMemo(() => courtSetLayout(id), [id]);
   const box = useMemo(() => new BoxGeometry(1, 1, 1), []), lines = useMemo(() => courtLines(), []);
-  const grain = useMemo(() => id === "blacktop" ? undefined : woodGrain(), [id]);
+  const grain = useMemo(() => indoor ? woodGrain() : undefined, [indoor]);
   const masonry = useMemo(() => id === "blacktop" ? masonryGrain() : undefined, [id]);
-  const fence = useMemo(() => id === "blacktop" ? chainLinkGeometry() : undefined, [id]);
+  const fence = useMemo(() => !indoor ? chainLinkGeometry() : undefined, [indoor]);
   useEffect(() => () => { box.dispose(); lines.dispose(); grain?.dispose(); masonry?.dispose(); fence?.dispose(); }, [box, lines, grain, masonry, fence]);
   return <group name={"court-set-" + id}>
     <group name="court-set-floor">
-      {id === "blacktop" ? <AsphaltFloor /> : <>
+      {!indoor ? <AsphaltFloor roof={id==='rooftop'}/> : <>
         <mesh name="indoor-floor-apron" position={[0, -.018, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[id === "retro-arena" ? 40 : 33.4, 43]} /><meshStandardMaterial color={id === "retro-arena" ? "#76665c" : "#ac9e85"} roughness={.78} /></mesh>
         <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[24, 36]} /><meshStandardMaterial color="#856745" roughness={.72} /></mesh>
         <PlankFloor items={layout.floor} map={grain} />
       </>}
       {[-1, 1].map(side => <mesh key={side} position={[0, .013, side * 11.15]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[4.90, 5.7]} /><meshStandardMaterial color={style.accent} transparent opacity={id === "blacktop" ? .60 : id === "retro-arena" ? .68 : .50} depthWrite={false} roughness={.69} />
+        <planeGeometry args={[4.90, 5.7]} /><meshStandardMaterial color={style.accent} transparent opacity={!indoor ? .60 : id === "retro-arena" ? .68 : .50} depthWrite={false} roughness={.69} />
       </mesh>)}
       <mesh geometry={lines}><meshBasicMaterial color={style.line} toneMapped={false} /></mesh>
       {id === "retro-arena" && <Label text="JIE TIAN" position={[0, .026, 0]} rotation={[-Math.PI / 2, 0, 0]} size={.40} color="#71313a" maxWidth={2.6} />}
     </group>
     <group name="court-set-structure"><Instances geometry={box} items={layout.structure} roughness={.81} shadows /></group>
-    {layout.facades.length > 0 && <group name="city-masonry-facades"><Instances geometry={box} items={layout.facades} map={masonry} bumpMap={masonry} roughness={.90} shadows /></group>}
-    {fence && <lineSegments geometry={fence} name="city-chain-link-fence"><lineBasicMaterial color="#6a7770" transparent opacity={.58} /></lineSegments>}
+    {layout.facades.length > 0 && <group name={id==='rooftop'?'rooftop-city-skyline':"city-masonry-facades"}><Instances geometry={box} items={layout.facades} map={masonry} bumpMap={masonry} roughness={id==='rooftop'?.74:.90} shadows /></group>}
+    {fence && (id==='rooftop'?<RooftopFence geometry={fence}/>:<lineSegments geometry={fence} name="city-chain-link-fence"><lineBasicMaterial color="#6a7770" transparent opacity={.58} /></lineSegments>)}
     {layout.seats.length > 0 && <group name="retro-maroon-seating"><Instances geometry={box} items={layout.seats} roughness={.72} shadows /></group>}
     {layout.windows.length > 0 && <group name={indoor ? "practice-high-windows" : "city-building-windows"}>
       <Instances geometry={box} items={layout.windows} color={indoor ? "#c4d6d0" : "#384e58"} roughness={.33} metalness={.18} />
     </group>}
+    {id==='rooftop'&&<RooftopWindowLights items={layout.windows}/>}
     {layout.gear.length > 0 && <BenchGear items={layout.gear} />}
     <group name="court-set-luminaires">{layout.lamps.map((item, i) => <mesh key={i} position={item.position} scale={item.scale}>
       <boxGeometry /><meshStandardMaterial color="#e9ebdd" emissive="#fff3d8" emissiveIntensity={indoor ? .85 : .3} roughness={.3} />
@@ -168,6 +189,7 @@ function SetScenery({ id }: { id: Exclude<CourtSetId, "park"> }) {
     {id === "practice-gym" && <Label text="JIE TIAN / TRAINING HALL" position={[0, 4.3, -21.20]} size={.31} color="#39575c" maxWidth={7} />}
     {indoor && <Label text="RETURN / MEMORY PALACE" position={[0, 3.16, 20.98]} rotation={[0, Math.PI, 0]} size={.18} color="#c7d4c4" maxWidth={3} />}
     {id === "blacktop" && <Label text="JIE TIAN / STREET COURT" position={[-9, 1.35, -18.25]} size={.20} color="#eee5cd" maxWidth={4} />}
+    {id==='rooftop'&&<Label text="JIE TIAN / ROOFTOP COURT" position={[-8.9,1.35,-18.25]} size={.19} color="#f0e6d2" maxWidth={4.2}/>}
   </group>;
 }
 

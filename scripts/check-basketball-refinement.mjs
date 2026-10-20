@@ -61,7 +61,7 @@ const quaternionAngle=(a,b)=>2*Math.acos(Math.max(0,Math.min(1,Math.abs(a.reduce
 const vectorAngle=(a,b)=>Math.acos(Math.max(-1,Math.min(1,a.reduce((sum,v,i)=>sum+v*b[i],0)/(Math.hypot(...a)*Math.hypot(...b)))));
 const packIds = { shot: ["quick", "classic", "high-release"], hands: ["natural", "protect"], dribble: ["balanced", "low", "wide"], layup: ["standard", "scoop", "euro"], dunk: ["one-hand", "two-hand"] };
 const legends = { shot: "投篮包", hands: "双手动作包", dribble: "运球包", layup: "上篮包", dunk: "扣篮包" };
-const courtIds = ["park", "blacktop", "retro-arena", "practice-gym"];
+const courtIds = ["park", "blacktop", "retro-arena", "practice-gym", "rooftop"];
 
 class CourtPage {
   constructor(page) { this.page = page; this.dialog = page.getByRole("dialog", { name: /^(人物与穿搭|人物、穿搭与球场动作)$/ }); }

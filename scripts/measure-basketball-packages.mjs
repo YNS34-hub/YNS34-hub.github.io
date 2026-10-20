@@ -31,7 +31,7 @@ try{
   },seconds);
   report.samples.push({label,...sample});await flush();assert.equal(sample.hidden,0);assert.equal(sample.unfocused,0);assert.ok(sample.renderedFrames>0);console.log(label+": "+sample.fps.toFixed(1)+" FPS; p95 "+sample.p95Ms.toFixed(1)+"ms");
  }
- for(const[id,index]of[["park",0],["blacktop",1],["retro-arena",2],["practice-gym",3]]){
+ for(const[id,index]of[["park",0],["blacktop",1],["retro-arena",2],["practice-gym",3],["rooftop",4]]){
   await page.getByRole("button",{name:"人物 / 穿搭",exact:true}).click();
   const dialog=page.getByRole("dialog",{name:"人物与穿搭",exact:true});
   await dialog.locator("fieldset").filter({has:page.locator("legend",{hasText:"球场风格"})}).getByRole("button").nth(index).click();
@@ -42,5 +42,7 @@ try{
   await measure(id+" / dribble",4);
   await page.keyboard.press("e");await page.waitForFunction(()=>!window.__PRESENCE_DEBUG__.presence.dribbling);
  }
+ await page.getByRole('button',{name:'Night lights',exact:true}).click();await page.waitForTimeout(1800);
+ await measure('rooftop / night still',7);await page.keyboard.press('e');await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.presence.dribbling);await measure('rooftop / night dribble',4);
  assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(e){report.failure=e.stack;process.exitCode=1;console.error(e);}finally{await flush();await browser.close();}

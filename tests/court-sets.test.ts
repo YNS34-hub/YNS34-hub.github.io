@@ -7,6 +7,13 @@ import { courtLines, chainLinkGeometry } from "../src/worlds/court/CourtVenue";
 afterEach(() => { vi.unstubAllGlobals(); vi.resetModules(); });
 
 describe("original selectable court spaces", () => {
+  it("adds a persistent rooftop choice alongside every existing venue", () => {
+    expect(normalizeCourtSet('rooftop')).toBe('rooftop');
+    expect(Object.keys(courtSets)).toEqual(expect.arrayContaining(['park','blacktop','retro-arena','practice-gym']));
+    const previous=useCourtSet.getState().selected;
+    try{useCourtSet.getState().setCourt(normalizeCourtSet('rooftop'));expect(useCourtSet.getState().selected).toBe('rooftop');}
+    finally{useCourtSet.getState().setCourt(previous);}
+  });
   it("keeps original hoop obstacles and bounds while removing invisible park benches from other courts", () => {
     const previous = useCourtSet.getState().selected, originalBounds = worldBounds("basketball");
     const hoops = [{ x: 0, z: -14.8, halfWidth: .55, halfDepth: 1.6 }, { x: 0, z: 14.8, halfWidth: .55, halfDepth: 1.6 }];
@@ -38,14 +45,15 @@ describe("original selectable court spaces", () => {
     expect(courtSets["retro-arena"].indoor).toBe(true); expect(courtSets["practice-gym"].indoor).toBe(true);
   });
   it("provides distinct real forms without exceeding the original box-triangle budget", () => {
-    const city = courtSetLayout("blacktop"), arena = courtSetLayout("retro-arena"), gym = courtSetLayout("practice-gym");
+    const city = courtSetLayout("blacktop"), arena = courtSetLayout("retro-arena"), gym = courtSetLayout("practice-gym"),roof=courtSetLayout('rooftop');
     expect(city.floor).toHaveLength(0); expect(city.seats).toHaveLength(0); expect(city.windows.length).toBeGreaterThan(40);
     expect(arena.seats.length).toBeGreaterThan(400); expect(gym.seats).toHaveLength(0); expect(gym.windows).toHaveLength(16);
     // 原预算为 1500 个盒体，即 18000 三角形；窄板改为每块两三角形的平面，按真实几何预算计算。
-    for (const layout of [city, arena, gym]) {
+    for (const layout of [city, arena, gym,roof]) {
       const boxes = layout.structure.length + layout.seats.length + layout.windows.length + layout.lamps.length + layout.facades.length;
       const gear = layout.gear.reduce((sum, item) => sum + (item.kind === "bag" ? 496 : 88), 0);
-      expect(layout.floor.length * 2 + boxes * 12 + gear).toBeLessThan(18000);
+      const roofDetails=layout===roof?12+roof.windows.filter((_,i)=>i%4===0||i%7===0).length*2:0;
+      expect(layout.floor.length * 2 + boxes * 12 + gear+roofDetails).toBeLessThan(18000);
       expect(layout.floor.length).toBeLessThan(4000);
     }
   });

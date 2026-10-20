@@ -5,6 +5,7 @@ export const courtSets = {
   blacktop: { title: "城市黑街", description: "粗粒沥青、钢丝围网与街区楼面，回到城市街球。", indoor: false, surface: "#303438", line: "#eee5cd", accent: "#9a7745", floor: "asphalt" },
   "retro-arena": { title: "复古馆场", description: "拼接木地板、酒红阶梯席与钢架顶棚的经典馆场。", indoor: true, surface: "#ae8457", line: "#f5ead3", accent: "#692c36", floor: "parquet" },
   "practice-gym": { title: "日光训练馆", description: "明亮枫木、高窗与简洁场边，专注每一次训练。", indoor: true, surface: "#c3a377", line: "#fcf9ed", accent: "#305b64", floor: "maple" },
+  rooftop: {title:"城市天台",description:"高处围网、城市天际线与夜间窗光。",indoor:false,surface:"#465962",line:"#f0e6d2",accent:"#ad653f",floor:"asphalt"},
 } as const;
 export type CourtSetId = keyof typeof courtSets;
 const KEY = "memory-palace:court-set:v1";
@@ -36,6 +37,66 @@ export function courtSetLayout(id: CourtSetId): CourtSetLayout {
   const add = (group: keyof CourtSetLayout, x: number, y: number, z: number, sx: number, sy: number, sz: number, color?: string, rotation?: [number, number, number], kind?: "bag" | "bottle") =>
     layout[group].push({ position: [x, y, z], scale: [sx, sy, sz], ...(color ? { color } : {}), ...(rotation ? { rotation } : {}), ...(kind ? { kind } : {}) });
   if (id === "park") return layout;
+  if(id==='rooftop'){
+    for(const side of[-1,1]){
+      add('structure',side*13.65,.25,0,.24,.5,36.8,'#687371');
+      for(let z=-18;z<=18;z+=3)add('structure',side*13.3,1.68,z,.08,3.36,.08,'#465759');
+      for(const y of[.12,3.32])add('structure',side*13.3,y,0,.075,.055,36,'#71817d');
+      if(side<0)add('structure',0,.25,side*18.60,26.8,.5,.22,'#687371');
+      else for(const x of[-7.85,7.85])add('structure',x,.25,18.60,11.1,.5,.22,'#687371');
+      for(const z of[-9,9]){
+        add('structure',side*13.1,4.6,z,.14,9.2,.14,'#405456');
+        add('structure',side*11.8,9.2,z,2.7,.16,.22,'#405456');
+        add('structure',side*10.5,9.16,z,.94,.18,.63,'#405456');
+        add('lamps',side*10.5,9.04,z,.76,.06,.46);
+      }
+      for(let slat=0;slat<4;slat++){
+        add('structure',side*14.4+(slat-1.5)*.135,.51,3,.11,.075,5.8,'#806b51');
+        add('structure',side*14.68,.72+slat*.12,3,.075,.095,5.8,'#8e775a');
+      }
+      for(const z of[.8,5.2])add('structure',side*14.4,.24,z,.55,.48,.075,'#485653');
+      for(const z of[-18.8,18.8]){
+        add('structure',side*13.8,3.35,z,.28,6.7,.28,'#536b6d');
+        for(const y of[.45,2.4,4.4,6.3])add('structure',side*13.8,y,z,.34,.12,.35,'#a6a896');
+      }
+      for(let building=0;building<6;building++){
+        const x=side*(34+(building%2)*13),z=-38+building*16,height=18+(building*13+(side+1)*3)%24,top=height-24;
+        add('facades',x,height/2-24,z,10,height,10,['#637578','#76837e','#8b8171'][building%3]);
+        add('structure',x,top+.10,z,10.4,.20,10.4,'#a1a99e');
+        add('structure',x,top+.65,z,6.6,1.1,6.6,'#5c706e');
+        for(let y=-20;y<top-1;y+=3.2){
+          add('structure',x-side*5.07,y-1.0,z,.15,.14,10,'#a0a99e');
+          for(const dz of[-3,0,3]){add('windows',x-side*5.04,y,z+dz,.055,1.5,1.45,building%2?'#657f88':'#536e7b');add('structure',x-side*5.10,y,z+dz,.06,1.55,.055,'#9ca79f');}
+        }
+      }
+    }
+    for(const z of[-18.8,18.8]){
+      for(const y of[5.65,6.6])add('structure',0,y,z,27.9,.18,.18,'#536b6d');
+      for(let bay=0;bay<10;bay++){const width=2.79,depth=.95;add('structure',-13.95+width*(bay+.5),6.125,z,Math.hypot(width,depth),.09,.09,'#6a8382',[0,0,Math.atan2(depth,width)*(bay%2?1:-1)]);}
+    }
+    for(let building=0;building<5;building++){
+      const x=-28+building*14,z=building%2?-64:-54,height=20+building*7%20,top=height-27;
+      add('facades',x,height/2-27,z,8.5,height,9,['#718082','#8c897b','#617579'][building%3]);
+      add('structure',x,top+.1,z,8.8,.2,9.3,'#b0b1a2');
+      for(let y=-23;y<top-1;y+=3.2){add('structure',x,y-.95,z+4.58,8.5,.13,.14,'#a6aca2');for(const dx of[-2.6,0,2.6]){add('windows',x+dx,y,z+4.55,1.3,1.5,.055,'#66828b');add('structure',x+dx,y,z+4.61,.055,1.55,.05,'#a6aca2');}}
+    }
+    for(const side of[-1,1]){
+      const x=side*44,z=-86,height=side<0?64:57,top=height-28;
+      add('facades',x,height/2-28,z,12,height,12,side<0?'#536f7b':'#73858b');
+      add('structure',x,top+.6,z,10.8,1.2,10.8,'#a5b5ac');add('structure',x,top+3,z,.12,5,.12,'#7f9d9c');
+      for(let y=-24;y<top-1;y+=3.2){add('structure',x,y-.9,z+6.08,12,.1,.1,'#9eb1ad');for(const dx of[-4,-2,0,2,4])add('windows',x+dx,y,z+6.05,1.35,1.55,.05,'#799ba7');}
+    }
+    add('structure',-16.7,1.5,10,4,3,5,'#78847e');
+    add('structure',-16.7,3.08,10,4.25,.16,5.25,'#acafa0');
+    add('windows',-14.65,1.55,10,.055,1.7,1.3,'#4c646b');
+    for(let vent=0;vent<3;vent++){
+      add('structure',16.5,.68,-12+vent*1.6,1.4,1.35,1.2,'#909c93');
+      for(let fin=0;fin<4;fin++)add('structure',15.77,.34+fin*.18,-12+vent*1.6,.025,.055,.9,'#586e6b');
+    }
+    add('gear',14.9,.68,2,.56,.3,.32,'#6b5745',undefined,'bag');
+    add('gear',14.8,.68,3,.11,.35,.11,'#809e95',undefined,'bottle');
+    return layout;
+  }
   if (id !== "blacktop") {
     const arena = id === "retro-arena", columns = arena ? 200 : 240, width = 24 / columns;
     // 真实窄木条；错缝头尾裁切，主体板长 2.1—2.75 m。渲染为单次实例化平面，不画每块的六面。
