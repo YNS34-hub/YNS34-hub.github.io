@@ -53,8 +53,14 @@ function PracticeBall() {
     } else if (simulation.mode === "held") { if(state.current.dribble){state.current.dribbleStop=true;}else{state.current.dribble=true;state.current.dribbleStop=false;state.current.dribbleElapsed=0;presence.dribbleStanceSeed=presence.courtStance;presence.dribbleBlend=0;presence.dribbleOrigin.copy(camera.position);presence.dribbleLeftSeed.copy(presence.leftWrist);presence.dribbleRightSeed.copy(presence.rightWrist);state.current.dribbleTime=0;state.current.handSide=presence.hand;state.current.dribbleMotion=new DribbleMotion(presence.hand,useCourtPackages.getState().packs.dribble);scratch.current.hand.set(simulation.position.x,simulation.position.y,simulation.position.z).sub(camera.position);scratch.current.hand.y+=1.65;camera.getWorldDirection(scratch.current.forward);scratch.current.hand.applyAxisAngle(scratch.current.up,-Math.atan2(-scratch.current.forward.x,-scratch.current.forward.z));state.current.dribbleMotion.seedPosition(scratch.current.hand,presence.courtStance);} publish(); }
   };
   useInteractable(ball, { title: "THE PRACTICE BALL", hint: "Pick up / dribble", radius: 5, activate: pickup });
+  useEffect(()=>{
+    const object=ball.current;if(!import.meta.env.DEV||!object)return;
+    object.userData.basketballPhysics=simulation;
+    return()=>{delete object.userData.basketballPhysics;};
+  },[simulation]);
   useEffect(() => {
     presence.hand=useCourtPackages.getState().preferredHand;
+    presence.courtTorso.pitch=0;presence.courtTorso.turn=0;presence.courtTorso.roll=0;
     useActivity.setState({ ...simulation.stats, mode: "ground", result: "", charge: 0, dribbling: false, finishing: "idle", sprinting: false, primaryAction:"shoot", finishReady:false });
     const attemptFinish = (kind: FinishKind) => {
       if (presence.finishLocked) return;
@@ -79,7 +85,9 @@ function PracticeBall() {
       simulation.launch(from, shotVelocity(from, scratch.current.aim, state.current.charge, useActivity.getState().assist));
       const quality = Math.abs(state.current.charge - .64);
       useActivity.setState({ result: quality < .065 ? "CLEAN RELEASE" : state.current.charge < .64 ? "EARLY RELEASE" : "LATE RELEASE" });
-      state.current.charge = 0; state.current.dribble = false; publish();
+      state.current.charge = 0; state.current.dribble = false;
+      // 原生 key-up 可以发生在两帧之间；释放后立即同步持球状态，不能继续显示上一帧的 held。
+      presence.held=false;presence.charge=0;presence.dribbling=false;publish();
     };
     state.current.release=release;
     const command = (event: Event) => {
@@ -106,6 +114,7 @@ function PracticeBall() {
         finish.cancel(); presence.finishLocked = false; presence.finish = "idle"; presence.finishPose = null; presence.shot = 0; presence.jump = 0;
         camera.getWorldDirection(scratch.current.forward); scratch.current.forward.y = 0; scratch.current.forward.normalize();
         simulation.recall({ x: camera.position.x + scratch.current.forward.x * 1.3, y: BALL_RADIUS, z: camera.position.z + scratch.current.forward.z * 1.3 });
+        presence.ball.set(simulation.position.x,simulation.position.y,simulation.position.z);presence.held=false;presence.dribbling=false;presence.charge=0;
         state.current.releasePending=false;state.current.charging = false; state.current.charge = 0; state.current.dribble = false; state.current.dribbleStop = false;
         publish(); acknowledge("Ball returned · score kept");
       }
@@ -168,7 +177,7 @@ function PracticeBall() {
     const dribblePeriod = sprintDribble ? motionPacks.dribble[packs.dribble].sprintPeriod : motionPacks.dribble[packs.dribble].period;
     if(local.dribblePeriod!==dribblePeriod){local.dribbleTime=local.dribbleTime/local.dribblePeriod*dribblePeriod;local.dribblePeriod=dribblePeriod;}
     if (simulation.mode === "held" && !movement) {
-      if(!local.dribble&&!local.charging&&(local.holdPack!==packs.hands||local.holdHand!==presence.hand)){local.holdElapsed=0;local.holdSeed.copy(presence.ball);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdOrigin.copy(camera.position);}
+      if(!local.dribble&&!local.charging&&(local.holdPack!==packs.hands||local.holdHand!==presence.hand)){local.holdElapsed=0;local.holdSeed.set(simulation.position.x,simulation.position.y,simulation.position.z);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdOrigin.copy(camera.position);}
       const prep = prepareShot(local.charging ? local.charge : 0,motionPacks.shot[local.shotPack]),hold=motionPacks.hands[packs.hands];
       const hand = scratch.current.hand.set((local.charging ? prep.x : hold.holdX)*presence.hand, (local.charging ? prep.y : hold.holdY) - 1.65 + presence.jump, local.charging ? prep.z : hold.holdZ);
       camera.getWorldDirection(scratch.current.forward); const yaw = Math.atan2(-scratch.current.forward.x, -scratch.current.forward.z);

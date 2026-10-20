@@ -27,13 +27,15 @@ export class BallPhysics {
   mode: "ground" | "held" | "flight" = "ground";
   stats = { shots: 0, made: 0, streak: 0 };
   elapsed = 0;
+  /** Counts real collision / net responses so QA can distinguish them from free flight. */
+  responses = 0;
   private resolved = true;
   private accumulator = 0;
   private contactAt = { rim: -100, backboard: -100 };
   launch(origin: Vec, velocity: Vec) {
     Object.assign(this.position, origin); Object.assign(this.velocity, velocity);
     this.mode = "flight"; this.stats.shots++; this.elapsed = 0; this.resolved = false;
-    this.accumulator = 0; this.contactAt = { rim: -100, backboard: -100 };
+    this.accumulator = 0; this.responses=0;this.contactAt = { rim: -100, backboard: -100 };
   }
   pickup() { if (!this.resolved) this.stats.streak = 0; this.mode = "held"; this.velocity = { x: 0, y: 0, z: 0 }; this.resolved = true; }
   recall(position: Vec) {
@@ -57,7 +59,7 @@ export class BallPhysics {
         const boardSide = Math.sign(hoop.z);
         if (Math.abs(p.x) < 0.9 + BALL_RADIUS && p.y > 3.075 - BALL_RADIUS && p.y < 4.125 + BALL_RADIUS &&
           (oldZ - boardZ) * boardSide < -BALL_RADIUS && (p.z - boardZ) * boardSide >= -BALL_RADIUS) {
-          p.z = boardZ - boardSide * (BALL_RADIUS + 0.003); v.z = -v.z * 0.68;
+          this.responses++;p.z = boardZ - boardSide * (BALL_RADIUS + 0.003); v.z = -v.z * 0.68;
           if (this.elapsed - this.contactAt.backboard > 0.12) { events.push("backboard"); this.contactAt.backboard = this.elapsed; }
         }
         const dx = p.x - hoop.x, dz = p.z - hoop.z, radial = Math.hypot(dx, dz);
@@ -66,6 +68,7 @@ export class BallPhysics {
         let nx = p.x - ringX, ny = p.y - hoop.y, nz = p.z - ringZ;
         const contactDistance = Math.hypot(nx, ny, nz), sum = BALL_RADIUS + RIM_TUBE;
         if (contactDistance < sum && contactDistance > 1e-6) {
+          this.responses++;
           nx /= contactDistance; ny /= contactDistance; nz /= contactDistance;
           p.x = ringX + nx * sum; p.y = hoop.y + ny * sum; p.z = ringZ + nz * sum;
           const impact = v.x * nx + v.y * ny + v.z * nz;
@@ -77,11 +80,12 @@ export class BallPhysics {
           const crossX = oldX + (p.x - oldX) * mix, crossZ = oldZ + (p.z - oldZ) * mix;
           if (Math.hypot(crossX - hoop.x, crossZ - hoop.z) < RIM_RADIUS - BALL_RADIUS - 0.005) {
             this.resolved = true; this.stats.made++; this.stats.streak++;
-            events.push("made"); v.x *= 0.45; v.z *= 0.45;
+            this.responses++;events.push("made"); v.x *= 0.45; v.z *= 0.45;
           }
         }
       }
       if (p.y <= BALL_RADIUS) {
+        this.responses++;
         const impact = Math.abs(v.y);
         p.y = BALL_RADIUS; v.y = impact > 0.8 ? impact * 0.65 : 0;
         v.x *= 0.87; v.z *= 0.87;
@@ -93,7 +97,7 @@ export class BallPhysics {
       }
       for (const axis of ["x", "z"] as const) {
         const bound = axis === "x" ? 11.7 : 17.7;
-        if (Math.abs(p[axis]) > bound) { p[axis] = clamp(p[axis], -bound, bound); v[axis] *= -0.62; }
+        if (Math.abs(p[axis]) > bound) { this.responses++;p[axis] = clamp(p[axis], -bound, bound); v[axis] *= -0.62; }
       }
     }
     return events;

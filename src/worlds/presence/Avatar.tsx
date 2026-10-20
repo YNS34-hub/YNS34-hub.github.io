@@ -11,7 +11,7 @@ import { ATHLETE } from "./assets";
 import { pedalPoint } from "./math";
 import { presence, usePerspective, type AdventureRoom } from "./state";
 import { LimbIK } from "./ik";
-import { prepareShot, shotRecovery, shotFollowThroughTarget,shotGuideTarget } from "./shotPose";
+import { prepareShot, shotRecovery, shotFollowThroughTarget,shotGuideTarget,shotGuideWristDrop } from "./shotPose";
 import { outfits, neutralProfile, useAppearance } from "./appearance";
 import { dressAthlete, reshapeAthlete } from "./appearanceRig";
 import { ankleFromContact, gripPoint, riderAnkle, riderPosture } from "./riderPose";
@@ -26,7 +26,9 @@ import {sampleShotHandRotation,advanceShotHandRotation} from "./shotHandRotation
 import {blendDribbleArmTarget,blendDribbleArmRotation} from "./dribbleArm";
 import {captureAnimationContinuity,createAnimationContinuity,restoreAnimationContinuity} from "./animationContinuity";
 import {blendShotGather} from "./shotGather";
-import {createCourtLocomotion,sampleCourtLocomotion,dribbleLegWindow,sampleDribbleKneePole} from "./courtLocomotion";
+import {createCourtLocomotion,sampleCourtLocomotion,dribbleLegWindow,sampleDribbleKneePole,sampleCourtClipWeights} from "./courtLocomotion";
+import {dribbleRecoveryWindow} from "./dribblePose";
+import {advanceCourtTorso,createCourtTorso} from './courtTorso';
 
 export default function SportPresence({roomId}:{roomId:AdventureRoom}) {
   const head = useAppearance(s => s.personal ? s.head : null);
@@ -44,6 +46,8 @@ function LocalHead({roomId,url}:{roomId:AdventureRoom;url:string}) {
 }
 function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Texture }) {
   const continuity=useMemo(createAnimationContinuity,[]),restoredMixer=useRef<AnimationMixer|null>(null);
+  const torsoTarget=useMemo(createCourtTorso,[]);
+  const courtClipWeights=useMemo(()=>({idle:1,walk:0,run:0}),[]);
   const gltf = useGLTF(ATHLETE), root = useRef<Group>(null), helmet = useRef<Group>(null), cap = useRef<Group>(null), pack = useRef<Group>(null);
   const profile = useAppearance(s => s.personal && s.profile ? s.profile : neutralProfile), outfitId = useAppearance(s => s.selected[roomId]), outfit = outfits[outfitId];
   const rig = useMemo(() => {
@@ -107,9 +111,11 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     // 换装使用原 settings 门控暂停物理；允许以零时间恢复新网格的当前 IK，避免换装时出现 T-pose。
     const dt = blocked ? 0 : Math.min(rawDelta, .06), speed = presence.speed;
     const authoredAction = !!presence.finishPose || presence.charge > 0 || presence.shot > 0;
+    if(roomId==="basketball")sampleCourtClipWeights(courtClipWeights,speed,authoredAction);
     if(roomId==="basketball"&&restoredMixer.current!==rig.mixer){restoreAnimationContinuity(continuity,rig.mixer,rig.actions,rig.animatedBase);restoredMixer.current=rig.mixer;}
     for (const action of rig.actions) {
-      const weight = riding || authoredAction ? Number(action.getClip().name === "idle") : action.getClip().name === "idle" ? Number(speed < .12) : action.getClip().name === "walk" ? Number(speed >= .12 && speed < 3.5) : Number(speed >= 3.5);
+      const clipName=action.getClip().name;
+      const weight = roomId==="basketball"?(clipName==="idle"?courtClipWeights.idle:clipName==="walk"?courtClipWeights.walk:courtClipWeights.run):riding || authoredAction ? Number(clipName === "idle") : clipName === "idle" ? Number(speed < .12) : clipName === "walk" ? Number(speed >= .12 && speed < 3.5) : Number(speed >= 3.5);
       action.setEffectiveWeight(riding ? weight : action.getEffectiveWeight()+(weight-action.getEffectiveWeight())*(1-Math.exp(-dt*14)));
       if (action.getClip().name !== "idle") action.setEffectiveTimeScale(Math.min(1.55, Math.max(.45, speed / (action.getClip().name === "run" ? 5.4 : 1.9))));
     }
@@ -190,19 +196,39 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       root.current.rotation.set(0, rig.yaw, 0);
       rig.object.position.set(0, 0, 0); rig.object.rotation.y = Math.PI; root.current.updateWorldMatrix(true, true);
       const settlePitch=Math.min(1,Math.max(0,(.65-presence.shot)/.16)),pitchBlend=settlePitch*settlePitch*(3-2*settlePitch);
-      if(roomId==="basketball"&&(authoredAction||presence.held))for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.getWorldPosition(hip.position);thigh.getWorldQuaternion(hip.quaternion);}
-      if (authoredAction) {
+      const torso=presence.courtTorso;
+      if(roomId==="basketball"){
+        if(authoredAction){
+          const upper=presence.shot>0?prepareShot(presence.shotChargeAtRelease,motionPacks.shot[presence.shotPack]):prep;
+          const upperBlend=presence.shot>0?recovery.reach:1;
+          torsoTarget.pitch=finishPose?.torsoPitch??(presence.shot>0?presence.shotReleasePitch*(1-pitchBlend)+.03*recovery.reach*pitchBlend:prep.pitch);
+          torsoTarget.turn=finishPose?.torsoTwist??presence.hand*upper.turn*upperBlend;
+          torsoTarget.roll=finishPose?0:presence.hand*upper.roll*upperBlend;
+        }else if(presence.held&&presence.dribbling){
+          torsoTarget.pitch=presence.dribbleTorso;torsoTarget.turn=presence.dribbleTwist;
+          torsoTarget.roll=-presence.hand*.024*dribbleRecoveryWindow(presence.dribblePhase);
+        }else{
+          torsoTarget.pitch=0;torsoTarget.turn=0;torsoTarget.roll=0;
+        }
+        advanceCourtTorso(torso,torsoTarget,dt);
+        if(import.meta.env.DEV)root.current.userData.basketballTorso=torso;
+      }
+      const torsoActive=roomId==="basketball"&&(authoredAction||presence.held||Math.abs(torso.pitch)+Math.abs(torso.turn)+Math.abs(torso.roll)>1e-7);
+      if(torsoActive)for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.getWorldPosition(hip.position);thigh.getWorldQuaternion(hip.quaternion);}
+      if(torsoActive){
+        rotateBody("Bip01_Spine",torso.pitch,1,0,0);
+        rotateBody("Bip01_Spine1",torso.turn+(presence.held||authoredAction?Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)):0),0,1,0);
+        rotateBody("Bip01_Spine2",torso.roll,0,0,1);
+      }else if (authoredAction) {
         rotateBody("Bip01_Spine", finishPose?.torsoPitch ?? (presence.shot > 0 ? presence.shotReleasePitch*(1-pitchBlend)+.03*recovery.reach*pitchBlend : prep.pitch), 1, 0, 0);
         rotateBody("Bip01_Spine1",(finishPose?.torsoTwist??0)+Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)),0,1,0);
-      } else if (roomId==="basketball"&&presence.held) {
-        if(presence.dribbling)rotateBody("Bip01_Spine",presence.dribbleTorso,1,0,0);
-        rotateBody("Bip01_Spine1",(presence.dribbling?presence.dribbleTwist:0)+Math.atan2(Math.sin(facing-rig.yaw),Math.cos(facing-rig.yaw)),0,1,0);
       }
-      if(roomId==="basketball"&&(authoredAction||presence.held))for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.position.copy(thigh.parent!.worldToLocal(hip.position));thigh.parent!.getWorldQuaternion(rig.parent);thigh.quaternion.copy(rig.parent.invert().multiply(hip.quaternion));thigh.updateWorldMatrix(true,true);}
+      if(torsoActive)for(const side of[-1,1]){const thigh=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Thigh")!,hip=rig.hips.get(side)!;thigh.position.copy(thigh.parent!.worldToLocal(hip.position));thigh.parent!.getWorldQuaternion(rig.parent);thigh.quaternion.copy(rig.parent.invert().multiply(hip.quaternion));thigh.updateWorldMatrix(true,true);}
       if(roomId==="basketball"&&(presence.held||authoredAction)){
         const look=Math.max(-.20,Math.min(.26,Math.asin(Math.max(-1,Math.min(1,rig.direction.y)))));
         // Eyes remain on the play; the head follows the aimed rim rather than the bouncing ball.
         rotateBody("Bip01_Neck",look*.22,1,0,0);rotateBody("Bip01_Head",look*.52,1,0,0);
+        rotateBody("Bip01_Neck",-torso.roll*.25,0,0,1);rotateBody("Bip01_Head",-torso.roll*.55,0,0,1);
       }
       if(!presence.dribbling||!presence.held)rig.dribbleOrientationActive=false;
       if (presence.held || presence.finish !== "idle" || presence.shot>0) {
@@ -225,7 +251,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
             const base=rig.animatedArms.get(side)!,influence=side<0?presence.dribbleLeftInfluence:presence.dribbleRightInfluence;
             blendDribbleArmTarget(rig.target,base.wrist,presence.dribbleContactPalm,influence);
             rig.head.copy(side===-1?rig.dribbleArmEntry.left:rig.dribbleArmEntry.right).add(presence.camera.position).sub(rig.dribbleArmEntry.origin);rig.target.lerp(rig.head,1-armBlend);
-            sampleDribbleElbowPole(rig.pole,side,presence.dribblePhase,presence.dribbleMove==="between-legs"||presence.dribbleMove==="behind-back");root.current.localToWorld(rig.pole);
+            sampleDribbleElbowPole(rig.pole,side,presence.dribblePhase,presence.dribbleMove==="between-legs"||presence.dribbleMove==="behind-back",dribbleRecoveryWindow(presence.dribblePhase));root.current.localToWorld(rig.pole);
             rig.head.copy(rig.pole);blendDribbleArmTarget(rig.pole,base.elbow,rig.head,influence);
             rig.head.copy(side<0?rig.dribbleArmEntry.leftElbow:rig.dribbleArmEntry.rightElbow).add(presence.camera.position).sub(rig.dribbleArmEntry.origin);rig.pole.lerp(rig.head,1-armBlend);
             if(influence>0||armBlend<1)limb(side,"arm");
@@ -244,7 +270,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
             else shotFollowThroughTarget(rig.target,presence.releaseHand,presence.releaseBody,presence.camera.position,presence.shotJump,presence.jump,presence.shotReleaseStance,courtStance);
             const dominant=side===presence.hand,follow=dominant?(presence.held||finishPose?1:recovery.reach):guide;
             const guideRelease=!presence.held&&!finishPose&&!dominant&&presence.shot>0;
-            rig.target.y-=dominant?.115:finishPose?.03:.13;
+            rig.target.y-=dominant?.115:finishPose?.03:presence.charge>0?shotGuideWristDrop(prep.y):.13;
             rig.axis.set(1,0,0).transformDirection(root.current.matrixWorld);
             rig.target.addScaledVector(rig.axis,dominant?-presence.hand*.025:-presence.hand*.14*guide);
             if(twoHands>0){

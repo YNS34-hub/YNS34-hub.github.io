@@ -3,6 +3,7 @@ import {Vector3} from 'three';
 import {blendShotGather,chooseShotGatherDuration} from '../src/worlds/presence/shotGather';
 import {prepareShot} from '../src/worlds/presence/shotPose';
 import {motionPacks} from '../src/worlds/court/motionPacks';
+import {readFileSync} from 'node:fs';
 
 // Native quick-transition-right: the ball is still at the low rear bounce when
 // the player stops and starts gathering. These are neutral-avatar world points.
@@ -24,7 +25,12 @@ describe('collecting a low rear dribble into a shot',()=>{
   for(const pack of Object.values(motionPacks.shot))expect(chooseShotGatherDuration(true,20)).toBeLessThan(.46*pack.chargeDuration);
  });
  it('reproduces the excessive velocity of the old fixed .16-second collection',()=>{
-  const old=trajectory(120,.16);expect(old.maximum).toBeGreaterThan(12);expect(old.violations).toBeGreaterThan(0);
+  // 历史失败必须使用当时的举球与蹬地曲线，不能随新的动作设计漂移。
+  const old=JSON.parse(readFileSync('tests/fixtures/legacy-shot-gather-20261016.json','utf8')) as {baseline:string;sourceSha256:string;fps:number;positions:number[][]};
+  expect(old.baseline).toBe('3fc477b64917f19dcbbaa74faff8332c3675585b');
+  expect(old.sourceSha256).toBe('bcd3296ba41e72061b9aff794a3e285ec3a1b77f974a1e5ff73187f4d18b642e');
+  const steps=old.positions.slice(1).map((point,index)=>Math.hypot(...point.map((v,j)=>v-old.positions[index][j])));
+  expect(Math.max(...steps)*old.fps).toBeGreaterThan(12);expect(steps.some(step=>step>=.025+9/old.fps)).toBe(true);
  });
  for(const fps of [30,60,120,240])it(`keeps the captured physical gather continuous at ${fps}fps`,()=>{
   const result=trajectory(fps);expect(result.violations).toBe(0);expect(result.maximum).toBeLessThan(9);

@@ -4,12 +4,13 @@ type Point={x:number;y:number;z:number};
 const clamp=(v:number)=>Math.max(0,Math.min(1,Number.isFinite(v)?v:0));
 const ease=(v:number)=>{const t=clamp(v);return t*t*(3-2*t);};
 export function dribbleContact(phase:number):number{
- const p=clamp(phase);return ease(1-p/.18)+ease((p-.78)/.22);
+ const p=clamp(phase);return ease(1-p/.18)+ease((p-.75)/.25);
 }
 /** The released hand relaxes with the elbow below and behind its shoulder. */
-export function sampleDribbleElbowPole<T extends Point>(out:T,side:number,phase:number,creative:boolean):T{
+export function sampleDribbleElbowPole<T extends Point>(out:T,side:number,phase:number,creative:boolean,recovery=0):T{
  const free=creative?1-dribbleContact(phase):0;
- out.x=(side<0?-1:1)*.48;out.y=1.04-.26*free;out.z=-.28+.42*free;return out;
+ const recover=creative?0:clamp(recovery);
+ out.x=(side<0?-1:1)*(.48-.17*recover);out.y=1.04-.26*free-.12*recover;out.z=-.28+.42*free+.27*recover;return out;
 }
 /** Participation belongs to each palm, independent of the catch's hand commit. */
 export function sampleDribblePalmNormal(out:Point,side:number,phase:number,participation:number):Point{

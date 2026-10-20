@@ -1,6 +1,15 @@
 /** Court-space X/Z are relative to the actor root; Y remains absolute world height. */
 export type CourtFootPoint = { x: number; y: number; z: number };
 export type CourtLocomotion = CourtFootPoint & { initialized: boolean };
+export type CourtClipWeights={idle:number;walk:number;run:number};
+
+/** Blend the actual walk/run clips over a speed range instead of switching at 3.5m/s. */
+export function sampleCourtClipWeights(out:CourtClipWeights,speed:number,authored=false):CourtClipWeights{
+ const s=Number.isFinite(speed)?Math.max(0,speed):0;
+ const ease=(value:number)=>{const t=Math.max(0,Math.min(1,value));return t*t*(3-2*t);};
+ const moving=authored?0:ease((s-.05)/.45),running=ease((s-2.6)/1.8);
+ out.idle=1-moving;out.walk=moving*(1-running);out.run=moving*running;return out;
+}
 
 const ANKLE_CLEARANCE = .112;
 const RESPONSE = 25;

@@ -60,7 +60,7 @@ export class DribbleMotion{
   if(this.seed){r.ball.x=this.seed.x+(r.ball.x-this.seed.x)*entry;r.ball.z=this.seed.z+(r.ball.z-this.seed.z)*entry;}
   // The renderer mixes this raw contact with its actual animated arm once.
   // Bone targets never feed back into the physical bounce or hand commit.
-  r.contactPalm.x=r.ball.x;r.contactPalm.y=pose.palm.y;r.contactPalm.z=r.ball.z+pose.palm.z-pose.ball.z;
+  r.contactPalm.x=r.ball.x+pose.palm.x-pose.ball.x;r.contactPalm.y=pose.palm.y;r.contactPalm.z=r.ball.z+pose.palm.z-pose.ball.z;
   if(this.palmSeeds){
    const seed=this.hand<0?this.palmSeeds.left:this.palmSeeds.right;
    r.contactPalm.x=seed.x+(r.contactPalm.x-seed.x)*entry;r.contactPalm.y=seed.y+(r.contactPalm.y-seed.y)*entry;r.contactPalm.z=seed.z+(r.contactPalm.z-seed.z)*entry;
@@ -74,7 +74,7 @@ export class DribbleMotion{
    const palm=sign<0?r.leftPalm:r.rightPalm,rest={x:sign*.34,y:Math.max(1.02,style.height-.015),z:-.29+(this.activeMove==="behind-back"?.16*Math.sin(Math.PI*p)**2:0)};
    // Once the ball leaves the pushing hand, the arm follows through beside the
    // hip. The receiving hand reaches the real ball again on the catching phase.
-   palm.x=rest.x+(r.ball.x-rest.x)*reach;palm.y=rest.y+(pose.palm.y-rest.y)*reach;palm.z=rest.z+(r.ball.z+pose.palm.z-pose.ball.z-rest.z)*reach;
+   palm.x=rest.x+(r.ball.x+pose.palm.x-pose.ball.x-rest.x)*reach;palm.y=rest.y+(pose.palm.y-rest.y)*reach;palm.z=rest.z+(r.ball.z+pose.palm.z-pose.ball.z-rest.z)*reach;
    if(this.palmSeeds){const seed=sign<0?this.palmSeeds.left:this.palmSeeds.right;palm.x=seed.x+(palm.x-seed.x)*entry;palm.y=seed.y+(palm.y-seed.y)*entry;palm.z=seed.z+(palm.z-seed.z)*entry;}
   }
   const crouch=Math.min(.36,.12+Math.max(0,.95-style.height)*.72+clamp(speed/6.2)*.03);

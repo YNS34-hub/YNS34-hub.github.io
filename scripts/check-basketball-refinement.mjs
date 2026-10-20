@@ -22,6 +22,7 @@ const personal = process.env.PALACE_PERSONAL==="1";
 const sourceFiles=["src/worlds/basketballPhysics.ts","src/worlds/activity.ts","src/worlds/ActivityHud.tsx","src/worlds/BasketballCourt.tsx","src/worlds/CourtArchitecture.tsx","src/worlds/court/Environment.tsx","src/worlds/court/finishing.ts","src/worlds/court/CourtVenue.tsx","src/worlds/court/courtSets.ts","src/worlds/court/motionPacks.ts","src/worlds/court/packagePreferences.ts","src/worlds/presence/Avatar.tsx","src/worlds/presence/Wardrobe.tsx","src/worlds/presence/dribblePose.ts","src/worlds/presence/dribbleMotion.ts","src/worlds/presence/shotPose.ts","src/worlds/presence/state.ts","src/worlds/presence/wardrobe.css","src/worlds/worldConfig.ts"];
 const sourceHash=async file=>createHash("sha256").update(await readFile(file)).digest("hex");
 sourceFiles.push("src/world/Player.tsx","src/worlds/court/controls.ts","src/worlds/presence/dribblePalm.ts","src/worlds/presence/courtLocomotion.ts","src/worlds/presence/basketballFootwork.ts","src/worlds/presence/shotHandRotation.ts","src/worlds/presence/shotGather.ts","src/worlds/presence/dribbleArm.ts","src/worlds/presence/animationContinuity.ts","src/worlds/presence/basketballAppearance.ts","src/worlds/court/basketballSurface.ts");
+sourceFiles.push('src/worlds/presence/courtTorso.ts');
 const sourceHashes=Object.fromEntries(await Promise.all(sourceFiles.map(async file=>[file,await sourceHash(file)])));
 
 await mkdir(out, { recursive: true });
@@ -36,6 +37,7 @@ const report = {
     "Neutral public avatar, empty private-media routes and medium app quality. Only logical camera starting positions use the existing development return-view adapter.",
     refinementMoves.length ? "Filtered native creative-dribble journeys reuse every original physical clearance, contact, continuity and hand-orientation gate for the named actions. Cancellation and outfit-remount journeys are covered only by an unfiltered run." : refinementSingle ? "One targeted native quick/left near-clean release retry at requested charge .61; actual release charge is recorded. It supplements the separately retained full native shot run." : refinementStage === "free-arms" ? "Native free-arm matrix: actual zero-influence wrists and elbows inherit the same-frame animated idle/walk/run pose, hand orientations follow the real animation with 10rad/s continuity, native X and creative transfer, blacktop full-body evidence. Filtered eight-case diagnostics are not final acceptance." : refinementStage === "finishes" ? "Ten native layup and dunk journeys: three layup and two dunk profiles on both hands, real release/contact/physics score, two-hand support and actual SO3 continuity through entry and exit." : refinementStage === "moves" ? "Twenty-four native creative-dribble journeys: three profiles, both hands, Z/C/Q stationary plus both hands at sprint speed; native wardrobe pause, recall and pointer-blur cancellation." : refinementStage === "shots" ? "Thirty-two native shot journeys: three profiles, both hands and five actual early/clean/late releases, plus both hands moving behind-back into a quick stop gather. Actual hand SO3, palm normals and physical ball-facing alignment are verified." : "Full native creative-dribble and jump-shot journeys with actual release timing coverage.",
     "Native wardrobe selections exercise all six original outfits and front/orbit detail captures. Samples read actual scene bones, physical ball, same-pose avatar root, R3F clock and requestAnimationFrame timing; no animation phase, hand, score, ball velocity or package store is injected. Screenshots record actual capture phase and wall duration; these traces are not an fps benchmark."
+    ,"Night refinement adds actual applied torso continuity at 4.5rad/s. Held-ball, limbs, palm contact, orientation and collision-frame continuity gates are unchanged. Free flight is checked against the authoritative 120Hz simulation time, velocity, response count and ballistic position with residual below 1e-5m, because released shots legitimately exceed the authored hand-motion speed. Initial return-view fixtures finish native recall/pickup before recording an action."
   ].join(" "),
   checks: [], fixtures: [], frames: [], journeys: [], errors: [], uploads: [],
 };
@@ -121,7 +123,10 @@ class CourtPage {
     await this.page.keyboard.press("r");
     await this.page.waitForFunction(() => window.__PRESENCE_DEBUG__.activity.getState().mode === "ground");
     await this.page.keyboard.press("e");
-    await this.page.waitForFunction(() => window.__PRESENCE_DEBUG__.presence.held);
+    // The return-view fixture can cross the whole court. Complete its native
+    // recall/pickup before measuring the following action, rather than treating
+    // an unfinished fixture transfer as part of a dribble or shot journey.
+    await this.page.waitForFunction(() => {const p=window.__PRESENCE_DEBUG__.presence;return p.held&&!p.dribbling&&p.holdBlend===1&&p.ball.distanceTo(p.camera.position)<1.2;});
   }
   async dribble() {
     if (!(await this.read()).dribbling) await this.page.keyboard.press("e");
@@ -165,6 +170,7 @@ const installReadOnlyRecorder = page => page.evaluate(() => {
     const palmNormal=name=>{const bone=root?.getObjectByName(name);return bone?p.ball.clone().set(0,1,0).applyQuaternion(bone.getWorldQuaternion(p.camera.quaternion.clone())).toArray():null;};
     const animatedArm=side=>{const a=root?.userData[side<0?"basketballLeftAnimatedArm":"basketballRightAnimatedArm"];return a?{wrist:a.wrist.toArray(),elbow:a.elbow.toArray(),rotation:a.rotation.toArray()}:null;};
   const pose = p.finishPose, scene = window.__PALACE_DEBUG__.scene, ballShells = [], hoops = [];
+    const physics=scene.getObjectByName('practice-ball')?.userData.basketballPhysics;
     scene.getObjectByName("basketball-practice-world")?.traverse(object => {
       if (!object.isMesh) return;
       let visible = true, ancestor = object; while (ancestor) { if (!ancestor.visible) visible = false; ancestor = ancestor.parent; }
@@ -178,6 +184,8 @@ const installReadOnlyRecorder = page => page.evaluate(() => {
     return {
       label, time: performance.now(), renderTime: scene.__r3f?.root?.getState?.()?.clock?.elapsedTime, body: p.camera.position.toArray(), shotLanded:p.shotLanded, releasedCharge:p.shotChargeAtRelease, hand: p.hand, held: p.held, dribbling: p.dribbling,
       ball: p.ball.toArray(), courtStance:p.courtStance,dribbleBlend:p.dribbleBlend, holdBlend: p.holdBlend, dribblePhase: p.dribblePhase, leftParticipation:p.dribbleLeftWeight,rightParticipation:p.dribbleRightWeight, crossover: p.crossover, leftPalm: p.dribbleLeftPalm?.toArray(), rightPalm: p.dribbleRightPalm?.toArray(),
+      physics:physics?{time:physics.elapsed,position:[physics.position.x,physics.position.y,physics.position.z],velocity:[physics.velocity.x,physics.velocity.y,physics.velocity.z],responses:physics.responses,shot:physics.stats.shots,mode:physics.mode}:null,
+      torso:root?.userData.basketballTorso?{...root.userData.basketballTorso}:null,
       leftHandBoneId:root?.getObjectByName("Bip01_L_Hand")?.uuid,rightHandBoneId:root?.getObjectByName("Bip01_R_Hand")?.uuid,leftPalmNormal:palmNormal("Bip01_L_Hand"),rightPalmNormal:palmNormal("Bip01_R_Hand"),leftHandQuaternion:orientation("Bip01_L_Hand"),rightHandQuaternion:orientation("Bip01_R_Hand"),leftWrist: position("Bip01_L_Hand"), rightWrist: position("Bip01_R_Hand"), leftWristError: root?.userData.basketballLeftWristError, rightWristError: root?.userData.basketballRightWristError,
       leftAnimatedArm:animatedArm(-1),rightAnimatedArm:animatedArm(1),leftInfluence:p.dribbleLeftInfluence,rightInfluence:p.dribbleRightInfluence,armBlend:root?.userData.basketballDribbleArmBlend,velocity:p.velocity.toArray(),
       packages: root?.userData.basketballPackages, speed: p.speed, turboHeld: p.turboHeld, charge: p.charge, shotGather:p.shotGather,shotGatherDuration:p.shotGatherDuration, jump: p.jump, finishing: p.finish, shotRemaining: p.shot, shotPack: p.shotPack, releaseHand: p.releaseHand.toArray(), shotJump: p.shotJump,
@@ -203,7 +211,7 @@ const installReadOnlyRecorder = page => page.evaluate(() => {
     document.addEventListener(type,event=>{if(active&&creativeInput(event))creativeBefore=read();},true);
     document.addEventListener(type,event=>{if(active&&creativeInput(event)){lastCreativeInput={before:creativeBefore,after:read(),trusted:true,type};}},false);
   }
-  window.__BASKETBALL_QA__ = { read, lastCreative:()=>lastCreativeInput,lastRelease: () => lastNativeRelease, start(name) { label = name; samples = []; lastNativeRelease = null;lastCreativeInput=null;creativeBefore=null; active = true; requestAnimationFrame(loop); }, stop() { active = false; return samples; } };
+  window.__BASKETBALL_QA__ = { read, freeFrames:side=>samples.filter(s=>s.armBlend===1&&(side<0?s.leftInfluence:s.rightInfluence)===0).length,lastCreative:()=>lastCreativeInput,lastRelease: () => lastNativeRelease, start(name) { label = name; samples = []; lastNativeRelease = null;lastCreativeInput=null;creativeBefore=null; active = true; requestAnimationFrame(loop); }, stop() { active = false; return samples; } };
 });
 
 let context, page;
@@ -312,8 +320,22 @@ function measureShotHandOrientation(samples,name,{finish=false,neutral=false}={}
   return {inputSnapshotsExcluded,validIntervals:pairs.length/2,pairs:pairs.length,skipped,releaseCrossings,tailEndCrossings,finishEntryCrossings,finishExitCrossings,finishReleaseCrossings,maximumAngle:Math.max(...pairs.map(pair=>pair.angle)),maximumNormalAngle:Math.max(...pairs.map(pair=>pair.normalAngle)),maximumInterval:Math.max(...pairs.map(pair=>pair.dt))};
 }
 
+function measureTorso(samples,name){
+ let intervals=0,maximumRate=0;
+ for(let i=1;i<samples.length;i++){
+  const a=samples[i-1],b=samples[i],dt=b.renderTime-a.renderTime;if(dt<=.003||dt>.12)continue;
+  assert.ok(a.torso&&b.torso,name+': actual applied torso pose exists');
+  for(const key of ['pitch','turn','roll']){
+   const step=Math.abs(b.torso[key]-a.torso[key]);assert.ok(step<=4.5*Math.min(.06,dt)+1e-6,name+': torso '+key+' continues through action transitions');maximumRate=Math.max(maximumRate,step/dt);
+  }
+  intervals++;
+ }
+ assert.ok(intervals>=12,name+': actual torso transition intervals sampled');return{intervals,maximumRate};
+}
+
 function measure(samples,name,{shot=false}={}) {
   const rotations=[];
+  let ballisticPairs=0,ballisticResidualMax=0;
   const velocities={leftFoot:[],rightFoot:[],leftWrist:[],rightWrist:[],ball:[]};
   for(let i=1;i<samples.length;i++){
     const dt=samples[i].renderTime-samples[i-1].renderTime;
@@ -321,6 +343,20 @@ function measure(samples,name,{shot=false}={}) {
     for(const key of ["leftHandQuaternion","rightHandQuaternion"]){const q=samples[i][key],r=samples[i-1][key],dot=q.reduce((sum,v,j)=>sum+v*r[j],0);rotations.push({key,angle:2*Math.acos(Math.max(0,Math.min(1,Math.abs(dot)))),dt});}
     for(const field of Object.keys(velocities)){
       const d=distance(samples[i][field],samples[i-1][field]);velocities[field].push(d/dt);
+      const a=samples[i-1],b=samples[i],physical=field==='ball'&&!a.held&&!b.held&&a.physics&&b.physics&&a.physics.shot===b.physics.shot&&a.physics.responses===b.physics.responses;
+      if(physical){
+        // A released three-point shot can legitimately exceed 9m/s. Verify
+        // exact fixed-step ballistic motion instead of applying an authored
+        // hand-speed envelope to it. Held-ball and contact-frame gates below
+        // remain unchanged; even a 0.1mm free-flight teleport fails this check.
+        const elapsed=b.physics.time-a.physics.time;
+        assert.ok(elapsed>=0&&elapsed<=Math.min(.06,dt)+1/120+1e-6,name+': actual physics clock stays inside the real rendered interval plus one fixed quantum');
+        assert.ok(Math.abs(elapsed*120-Math.round(elapsed*120))<1e-6,name+': actual flight uses the original 120Hz clock');
+        assert.ok(distance(a.ball,a.physics.position)<1e-8&&distance(b.ball,b.physics.position)<1e-8,name+': rendered ball samples read the authoritative physical position');
+        const expected=a.physics.position.map((v,j)=>v+a.physics.velocity[j]*elapsed-(j===1?4.905*elapsed*elapsed:0));
+        const residual=distance(b.ball,expected);assert.ok(residual<1e-5,name+': free-flight ballistic residual below 0.01mm at sample '+i+'; '+residual);
+        ballisticPairs++;ballisticResidualMax=Math.max(ballisticResidualMax,residual);continue;
+      }
       // Real runner foot speed includes body translation. Check articulation
       // relative to the actual body during locomotion, retaining world velocity.
       const movingFoot=field.endsWith("Foot")&&Math.max(samples[i].speed,samples[i-1].speed)>.3;
@@ -333,7 +369,7 @@ function measure(samples,name,{shot=false}={}) {
   }
   const knees=samples.flatMap(s=>[-1,1].map(side=>kneeAngle(side<0?s.leftHip:s.rightHip,side<0?s.leftKnee:s.rightKnee,side<0?s.leftFoot:s.rightFoot)));
   assert.ok(knees.every(Number.isFinite),`${name}: actual knee angles are finite`);
-  const metrics={maximumHandRotationRadians:Math.max(...rotations.map(r=>r.angle)),maximumHandRotationRate:Math.max(...rotations.map(r=>r.angle/r.dt)),physicsFixedStep:1/120,maximumVelocity:Object.fromEntries(Object.entries(velocities).map(([field,list])=>[field,Math.max(0,...list)])),kneeAngleMin:Math.min(...knees),kneeAngleMax:Math.max(...knees)};
+  const metrics={torso:measureTorso(samples,name),maximumHandRotationRadians:Math.max(...rotations.map(r=>r.angle)),maximumHandRotationRate:Math.max(...rotations.map(r=>r.angle/r.dt)),physicsFixedStep:1/120,ballisticPairs,ballisticResidualMax,maximumVelocity:Object.fromEntries(Object.entries(velocities).map(([field,list])=>[field,Math.max(0,...list)])),kneeAngleMin:Math.min(...knees),kneeAngleMax:Math.max(...knees)};
   if(shot){
     metrics.shotHandOrientation=measureShotHandOrientation(samples,name);
     metrics.shotPalmAlignment=measureShotPalmAlignment(samples,name);
@@ -457,7 +493,9 @@ try {
   await context.route('**/personal-media/manifest.json',r=>r.fulfill({json:{wallpapers:[],visuals:[],music:[],projects:[],research:[]}}));
   await context.route('**/personal-media/avatar.json',r=>r.fulfill({json:{profile:null}}));
   await context.addInitScript(()=>localStorage.setItem('memory-palace:v3',JSON.stringify({state:{quality:'medium',tutorialDone:true,roomSoundtracks:false},version:0})));
-  await context.tracing.start({screenshots:true,snapshots:true,sources:false});
+  // Explicit case screenshots and continuous bone samples carry the visual
+  // evidence. Avoid a second, very large incidental canvas recording in trace.
+  await context.tracing.start({screenshots:false,snapshots:true,sources:false});
   page=await context.newPage();page.setDefaultTimeout(45000);
   page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});
   page.on('request',r=>{if(r.method()==='POST')report.uploads.push(r.url());});
@@ -481,7 +519,7 @@ try {
     }
     if(!freeFocused)for(const style of packIds.dribble)for(const side of [1,-1]){
       await court.openWardrobe();await court.select('dribble',style);await court.closeWardrobe();await court.start([0,1.65,7],[0,1.75,-12.1],style+'/'+side+' native X animated hand transfer');await court.hand(side);await page.waitForFunction(()=>window.__PALACE_DEBUG__.scene.getObjectByName('visitor-athlete').userData.basketballDribbleArmBlend===1);
-      const name='free-X-'+style+'-'+(side>0?'right':'left');await court.record(name);await waitRendered(.12);await page.keyboard.press('x');await page.waitForFunction(side=>{const p=window.__PRESENCE_DEBUG__.presence;return p.hand===-side&&p.crossover<.02;},side);await waitRendered(1.3);contactFrames.push({file:await court.capture(name),label:name+' / native X transfer complete'});const samples=await court.finishRecord(name);assert.ok(samples.some(s=>s.hand===side)&&samples.some(s=>s.hand===-side),name+': source and destination actual hand both sampled');const metrics=measureFreeArms(samples,name);assert.ok(metrics.perSide.left.samples>=12&&metrics.perSide.right.samples>=12,name+': both real arms inherit animation before or after hand transfer');check(name,{style,side,metrics});await flush();
+      const name='free-X-'+style+'-'+(side>0?'right':'left');await court.record(name);await page.waitForFunction(freeSide=>window.__BASKETBALL_QA__.freeFrames(freeSide)>=14,-side);await page.keyboard.press('x');await page.waitForFunction(side=>{const p=window.__PRESENCE_DEBUG__.presence;return p.hand===-side&&p.crossover<.02;},side);await waitRendered(1.3);contactFrames.push({file:await court.capture(name),label:name+' / native X transfer complete'});const samples=await court.finishRecord(name);assert.ok(samples.some(s=>s.hand===side)&&samples.some(s=>s.hand===-side),name+': source and destination actual hand both sampled');const metrics=measureFreeArms(samples,name);assert.ok(metrics.perSide.left.samples>=12&&metrics.perSide.right.samples>=12,name+': both real arms inherit animation before or after hand transfer');check(name,{style,side,metrics});await flush();
       for(const [move,key]of [['between-legs','z'],['behind-back','c'],['hesitation','q']]){
         await court.start([0,1.65,7],[0,1.75,-12.1],style+'/'+side+'/'+move+' native free-arm recovery');await court.hand(side);await page.waitForFunction(()=>window.__PALACE_DEBUG__.scene.getObjectByName('visitor-athlete').userData.basketballDribbleArmBlend===1);const name='free-creative-'+style+'-'+(side>0?'right':'left')+'-'+move;await court.record(name);await page.keyboard.press(key);await page.waitForFunction(move=>{const p=window.__PRESENCE_DEBUG__.presence;return p.dribbleMove===move&&p.dribblePhase>.32&&p.dribblePhase<.65;},move);contactFrames.push({file:await court.capture(name),label:name+' / actual creative free phase'});await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.presence.dribbleMove==='crossover');await waitRendered(1.3);const samples=await court.finishRecord(name),active=samples.filter(s=>s.dribbleMove===move);assert.ok(active.length>12,name+': native creative frames sampled');const metrics=measureFreeArms(samples,name);if(move!=='hesitation'){assert.ok(active.some(s=>s.leftInfluence===0&&s.rightInfluence===0),name+': both arms return to actual animation while ball is free');}check(name,{style,side,move,metrics});await flush();
       }
@@ -608,6 +646,8 @@ try {
     await page.waitForFunction(target=>window.__PRESENCE_DEBUG__.presence.charge>=target,releaseCharge);
     await page.keyboard.up('5');const launch=await page.evaluate(()=>window.__BASKETBALL_QA__.lastRelease());
     assert.ok(launch?.nativeShotRelease,`${name}: trusted native physical shot launch`);
+    assert.equal(launch.held,false,`${name}: trusted release immediately publishes physical possession`);
+    assert.equal(launch.charge,0,`${name}: trusted release clears the published charge in the same input event`);
     assert.ok((side<0?launch.leftWristError:launch.rightWristError)<.035,`${name}: shooting wrist has real launch contact within 3.5cm`);
     contactFrames.push({file:await court.capture(name+'-release'),label:name+' / release, actual feet in air'});
     await page.waitForFunction(()=>window.__PRESENCE_DEBUG__.presence.shot===0);await page.waitForTimeout(180);
