@@ -23,11 +23,13 @@ import {blendShotGather,chooseShotGatherDuration} from "./presence/shotGather";
 import { DribbleMotion } from "./presence/dribbleMotion";
 import {motionPacks,type MotionPackSelection} from "./court/motionPacks";
 import {useCourtPackages} from "./court/packagePreferences";
+import {BallVisualSpin} from "./court/ballSpin";
 export { preloadCourtAssets } from "./court/assets";
 
 function PracticeBall() {
   const { camera: renderCamera, gl } = useThree(), camera = actorCamera(renderCamera, "basketball"), ball = useRef<Group>(null), shadow = useRef<Group>(null);
   const simulation = useMemo(() => new BallPhysics(), []);
+  const spin = useMemo(() => new BallVisualSpin(), []);
   const finish = useMemo(() => new FinishMotion(), []);
   const sound = useSceneAudio("court");
   const quiet = useQuietMotion();
@@ -83,6 +85,7 @@ function PracticeBall() {
       presence.shotChargeAtRelease=state.current.charge;presence.shotLanded=false;presence.shotLandOrigin.copy(camera.position);
       presence.shotJump = presence.jump;presence.shotPack=state.current.shotPack;presence.shotVerticalVelocity=prepareShot(state.current.charge,motionPacks.shot[state.current.shotPack]).verticalVelocity;
       simulation.launch(from, shotVelocity(from, scratch.current.aim, state.current.charge, useActivity.getState().assist));
+      spin.launch(simulation.velocity);
       const quality = Math.abs(state.current.charge - .64);
       useActivity.setState({ result: quality < .065 ? "CLEAN RELEASE" : state.current.charge < .64 ? "EARLY RELEASE" : "LATE RELEASE" });
       state.current.charge = 0; state.current.dribble = false;
@@ -148,7 +151,7 @@ function PracticeBall() {
       gl.domElement.removeEventListener("pointerdown", pointerDown); window.removeEventListener("pointerup", pointerUp); window.removeEventListener("blur", pause); window.removeEventListener("palace:footstep", step);
     };
     // 输入只安装一次；当前相机、控制门控、分析器和辅助设置都从现有实例读取。
-  }, [camera, gl, simulation, sound, finish]);
+  }, [camera, gl, simulation, sound, finish, spin]);
   useFrame((_, rawDelta) => {
     if (!ball.current || !enabled()) return;
     const dt = Math.min(rawDelta, .06), local = state.current,packs=useCourtPackages.getState().packs;
@@ -163,7 +166,7 @@ function PracticeBall() {
       presence.finishPose = movement;
       camera.position.set(movement.position.x, movement.position.y, movement.position.z); presence.jump = movement.jump;
       if (simulation.mode === "held") Object.assign(simulation.position, movement.ball);
-      if (movement.release) { simulation.launch(movement.release.origin, movement.release.velocity); presence.shot = .65; }
+      if (movement.release) { simulation.launch(movement.release.origin, movement.release.velocity); spin.launch(simulation.velocity,movement.kind); presence.shot = .65; }
       presence.finish = movement.kind;
     } else if (presence.finishLocked) { presence.finishLocked = false; presence.finish = "idle"; presence.finishPose = null; presence.jump = 0; }
     presence.shot = Math.max(0, presence.shot - dt);
@@ -231,10 +234,8 @@ function PracticeBall() {
     shell.scale.set(shape.xz, shape.y, shape.xz);
     local.contact *= Math.exp(-dt * 28);
     if (local.contact < .001) local.contact = 0;
-    if (simulation.mode === "flight") {
-      shell.rotation.x += dt * simulation.velocity.z * 1.8;
-      shell.rotation.z -= dt * simulation.velocity.x * 1.8;
-    }
+    spin.step(dt,simulation.mode,simulation.position,simulation.velocity);
+    shell.quaternion.copy(spin.orientation);
     if (shadow.current) {
       shadow.current.position.set(p.x, 0, p.z);
       const mesh = shadow.current.children[0] as Mesh;

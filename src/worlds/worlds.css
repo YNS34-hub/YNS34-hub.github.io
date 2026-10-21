@@ -38,3 +38,20 @@
 .perspective-controls button:focus-visible { outline:1px solid currentColor; outline-offset:4px; }
 .road-ui > .perspective-controls { position:fixed; bottom:28px; right:32px; pointer-events:auto; color:#f2f4ef; text-shadow:0 1px 3px #172720; }
 @media(max-width:700px) { .road-ui > .perspective-controls { bottom:92px; right:20px; } }
+/* 小屏保留所有原生动作入口，缩短面板，给近景人物的头和双手留出画面。 */
+@media(max-width:600px) {
+ .court-hud { top:96px; right:12px; left:12px; width:auto; padding:10px 12px; display:grid; grid-template-columns:78px minmax(0,1fr); gap:4px 10px; }
+ .court-hud .practice-score { grid-column:1; grid-row:1 / span 3; gap:6px; align-self:start; }
+ .court-hud .practice-score > span { font-size:7px; line-height:1.4; letter-spacing:.06em; }
+ .court-hud .practice-score strong { font-size:28px; }
+ .court-hud .practice-score strong small { font-size:14px; }
+ .court-hud .shot-result { grid-column:2; margin:0; font-size:10px; min-height:14px; }
+ .court-hud .release-meter { grid-column:2; width:100%; margin:5px 0; }
+ .court-hud .activity-actions { grid-column:2; gap:2px 10px; }
+ .court-hud .activity-actions button { font-size:10px; padding:5px 0; }
+ .court-hud .perspective-controls { grid-column:1 / -1; flex-wrap:wrap; gap:4px 13px; }
+ .court-hud .perspective-controls button { font-size:10px; padding:5px 0; }
+ .court-hud .court-time { grid-column:1 / -1; margin-top:0; }
+ .court-hud > small { display:none; }
+ .palace-app[data-activity-world="basketball"] .interaction-response { top:54px; left:12px; right:12px; transform:none; max-width:none; padding:5px 8px; font-size:10px; line-height:1.4; }
+}
