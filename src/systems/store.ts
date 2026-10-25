@@ -2,20 +2,37 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ContentItem, WallpaperItem } from "../content/types";
 import { allContent, rooms } from "../content/catalog";
+import {
+  roomViews,
+  rememberCinema,
+  cinemaReturn,
+  cinemaOrigin,
+  cinemaOriginMode,
+} from "../world/visitView";
 export type Quality = "auto" | "high" | "medium" | "low";
 export type Mode = "explore" | "tour" | "index";
+export type IndexTab =
+  | "Projects"
+  | "Research"
+  | "Music"
+  | "Wallpapers"
+  | "Experiments"
+  | "Unfinished"
+  | "About";
 export type Overlay =
   | "guide"
   | "settings"
   | "about"
   | "collection"
   | "player"
+  | "fitness-media"
   | null;
 interface PalaceState {
   roomId: string;
   lastRoom: string;
   started: boolean;
   mode: Mode;
+  indexTab: IndexTab;
   overlay: Overlay;
   focus: ContentItem | null;
   near: string | null;
@@ -38,6 +55,11 @@ interface PalaceState {
   fps: number;
   coreNear: boolean;
   pointerLocked: boolean;
+  memoryReveal: boolean;
+  pendingDoor: string | null;
+  returnView: import("../world/visitView").VisitView | null;
+  openCinema: (image: WallpaperItem) => void;
+  exitCinema: () => void;
   enterRoom: (id: string) => void;
   setOverlay: (value: Overlay) => void;
   focusItem: (item: ContentItem | null) => void;
@@ -121,7 +143,30 @@ export const usePalaceStore = create<PalaceState>()(
       fps: 60,
       coreNear: false,
       pointerLocked: false,
+      memoryReveal: false,
+      pendingDoor: null,
+      returnView: null,
+      indexTab: "Projects",
+      openCinema: (image) => {
+        const state = usePalaceStore.getState();
+        window.dispatchEvent?.(new Event("palace:before-travel"));
+        rememberCinema(roomViews.get(state.roomId), state.roomId, state.mode);
+        set({
+          cinemaImage: image,
+          started: true,
+          mode: state.mode === "index" ? "tour" : state.mode,
+        });
+        state.enterRoom("cinema");
+      },
+      exitCinema: () => {
+        const target = cinemaOrigin;
+        set({ mode: cinemaOriginMode });
+        usePalaceStore.getState().enterRoom(target);
+        set({ returnView: cinemaReturn || null });
+      },
       enterRoom: (id) => {
+        if (typeof window !== "undefined")
+          window.dispatchEvent?.(new Event("palace:before-travel"));
         unlockPointer();
         set((s) => ({
           roomId: id,
@@ -133,6 +178,9 @@ export const usePalaceStore = create<PalaceState>()(
           recent: [id, ...s.recent.filter((x) => x !== id)].slice(0, 8),
           travelSequence: s.travelSequence + 1,
           coreNear: false,
+          memoryReveal: false,
+          pendingDoor: null,
+          returnView: roomViews.get(id) || null,
         }));
         if (typeof window !== "undefined")
           window.history.pushState(
@@ -181,12 +229,17 @@ export const usePalaceStore = create<PalaceState>()(
         })),
       syncRoute: (pathname, search = "") => {
         const route = resolvePalaceRoute(pathname, search);
+        const returning =
+          usePalaceStore.getState().roomId === "cinema" &&
+          route.roomId === cinemaOrigin;
         unlockPointer();
         set((s) => ({
           roomId: route.roomId,
           focus: route.focus,
           near: null,
           overlay: route.about ? "about" : null,
+          memoryReveal: false,
+          pendingDoor: null,
           mode: route.index
             ? "index"
             : s.mode === "index"
@@ -212,6 +265,9 @@ export const usePalaceStore = create<PalaceState>()(
             ? [...new Set([...s.viewed, route.focus.id])]
             : s.viewed,
           travelSequence: s.travelSequence + 1,
+          returnView: returning
+            ? cinemaReturn || null
+            : roomViews.get(route.roomId) || null,
         }));
       },
     }),
@@ -219,6 +275,7 @@ export const usePalaceStore = create<PalaceState>()(
       name: "memory-palace:v3",
       partialize: (s) => ({
         lastRoom: s.lastRoom,
+        indexTab: s.indexTab,
         quality: s.quality,
         reducedMotion: s.reducedMotion,
         sensitivity: s.sensitivity,

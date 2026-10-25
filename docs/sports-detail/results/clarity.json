@@ -1,0 +1,76 @@
+{
+  "before": "12671dfb211a3059c870dc7d00bf9d5ed6a8b3df",
+  "after": "95ceb429734116deb4ec6294828f093b9f789cc7",
+  "scope": "Actual static wardrobe view at medium, 1920×1080 and controlled DPR1 on both versions. Same existing wardrobe camera / logical start / neutral actor / outfit / daylight. Render resolution is controlled only for this optical comparison; normal gameplay uses its own adaptive DPR.",
+  "views": [
+    {
+      "label": "before",
+      "position": [
+        1.131562764602853,
+        1.9300000000002722,
+        -0.09992995239520827
+      ],
+      "quaternion": [
+        -0.02090302692201398,
+        0.9776039237960736,
+        0.11822401712836215,
+        0.17284881665215754
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "name": "m026_head",
+          "width": 1024,
+          "height": 1024
+        }
+      ],
+      "quality": "medium"
+    },
+    {
+      "label": "after",
+      "position": [
+        1.1315627646028728,
+        1.9300000000000919,
+        -0.09992995239556068
+      ],
+      "quaternion": [
+        -0.0209030267533036,
+        0.9776039235887811,
+        0.11822401710331532,
+        0.1728488178621029
+      ],
+      "fov": 60,
+      "dpr": 1,
+      "drawing": [
+        1920,
+        1080
+      ],
+      "maps": [
+        {
+          "name": "m026_body",
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "name": "m026_head",
+          "width": 2048,
+          "height": 2048
+        }
+      ],
+      "quality": "medium"
+    }
+  ],
+  "positionDelta": 3.963499783977204e-13,
+  "angleRadians": 0,
+  "passed": true
+}

@@ -1,0 +1,450 @@
+{
+  "sha": "32e7c8e8e5b5ae3ec19a5d333cd2162b1421dfdf",
+  "dirty": true,
+  "scope": "Static camera staging through valid saved route positions; approach and mount use native input. Separate journeys verify continuous travel.",
+  "frames": [
+    {
+      "name": "stationary-cockpit",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "-0.0000",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "forest-road",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.045,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "158.84",
+        "grade": "0.0173",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "woodland-s-curve",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.1,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "352.97",
+        "grade": "-0.0128",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4,5",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "climb",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.285,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1005.97",
+        "grade": "0.0455",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "4,5,6,7,8,9",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "crest",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.48,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1694.27",
+        "grade": "-0.0122",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "first-lake-reveal",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.185,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "653.00",
+        "grade": "0.0109",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "2,3,4,5,6,7",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "lakeside-road",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.233,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "822.42",
+        "grade": "0.0501",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "high-meadow",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.487,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1718.97",
+        "grade": "-0.0316",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "golden-valley",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.51,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1800.16",
+        "grade": "-0.0592",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "9,10,11,12,13,14",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "descent",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.6,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2117.83",
+        "grade": "-0.0908",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "11,12,13,14,15,16",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "waterline",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.74,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2611.99",
+        "grade": "0.0131",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "14,15,16,17,18,19",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "sunset-road",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.89,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "3141.45",
+        "grade": "-0.0007",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "17,18,19,20,21,22",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "scenic-stop",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.23,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "811.84",
+        "grade": "0.0452",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "stationary-cockpit",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "0.00",
+        "grade": "-0.0000",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "forest-road",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.045,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "158.84",
+        "grade": "0.0173",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "woodland-s-curve",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.1,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "352.97",
+        "grade": "-0.0128",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3,4,5",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "climb",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.285,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1005.97",
+        "grade": "0.0455",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "4,5,6,7,8,9",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "crest",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.48,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1694.27",
+        "grade": "-0.0122",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "first-lake-reveal",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.185,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "653.00",
+        "grade": "0.0109",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "2,3,4,5,6,7",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "lakeside-road",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.233,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "822.42",
+        "grade": "0.0501",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "high-meadow",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.487,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1718.97",
+        "grade": "-0.0316",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "8,9,10,11,12,13",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "golden-valley",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.51,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "1800.16",
+        "grade": "-0.0592",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "9,10,11,12,13,14",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "descent",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.6,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2117.83",
+        "grade": "-0.0908",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "11,12,13,14,15,16",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "waterline",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.74,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "2611.99",
+        "grade": "0.0131",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "14,15,16,17,18,19",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "sunset-road",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.89,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "3141.45",
+        "grade": "-0.0007",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "17,18,19,20,21,22",
+        "photo": "false"
+      }
+    },
+    {
+      "name": "scenic-stop",
+      "width": 2560,
+      "height": 1440,
+      "progress": 0.23,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "811.84",
+        "grade": "0.0452",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "3,4,5,6,7,8",
+        "photo": "false"
+      }
+    }
+  ],
+  "errors": []
+}

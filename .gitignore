@@ -6,6 +6,7 @@ coverage/
 qa-artifacts/
 .vite/
 *.log
+.serena/
 
 # On-demand AI repository map
 .ai/repomix-output.xml

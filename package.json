@@ -19,7 +19,11 @@
     "qa:visual": "node scripts/capture-art-direction.mjs",
     "sync:github": "node scripts/audit-public-projects.mjs",
     "sync:vendor": "node scripts/sync-three.mjs",
-    "test:hero": "node scripts/check-hero.mjs"
+    "test:hero": "node scripts/check-hero.mjs",
+    "qa:quality": "node scripts/capture-quality-leap.mjs",
+    "test:quality": "node scripts/check-quality-leap.mjs",
+    "test:listening": "node scripts/check-listening-identity.mjs",
+    "qa:performance": "node scripts/measure-quality-leap.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",

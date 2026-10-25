@@ -1,0 +1,48 @@
+{
+  "at": "2026-10-16T07:03:38.722Z",
+  "base": "http://127.0.0.1:5196",
+  "sourceHashes": {
+    "src/worlds/road/Lake.tsx": "b5d5b40a9468cb0e9dd80c8ab7841828f390a697c8422accdeee9488abad0af0",
+    "src/worlds/road/lakeMesh.ts": "d144de9cdca8987a85cebebed9c96be8dc602a889cfda75e495094171a8b181e",
+    "src/worlds/road/lakeShore.ts": "81bceaabf71764099d0b31a2be1bb6c4f550b59b668414b1481303b72a3ab7f7",
+    "src/worlds/road/Landscape.tsx": "c159f1ca72fe552e836aac97eeddb0d92646da578c6d89079af795b9cf59e033",
+    "src/worlds/road/textures.ts": "783ef7c02064237371cdc90d2934c8c5f00cd59ec77d1be9001e6c9a0cef543a",
+    "src/worlds/alpine/assets.ts": "43f171816a00d72a946200ed5dcb319a291d552db66b2bf74a4bdcdc0b260f3c",
+    "src/worlds/scenery/terrainFinish.ts": "e1687d3aae0b2a0e96a7241f83cada80e63552f5bcbe7ce2e350c4e522d247e9"
+  },
+  "checks": [
+    "Resume a valid saved shore distance on foot, approach and mount through native input.",
+    "Real 20-second pedaling and sector transitions beside the lake.",
+    "Native braking, photo mode and an actual downloaded local PNG.",
+    "Water advances normally, freezes for reduced motion and resumes without rebuilding geometry.",
+    "Photo Escape and native first/third-person views still operate.",
+    "Reload retains actual route progress and returns safely on foot.",
+    "Return from the lake ride to the existing museum."
+  ],
+  "errors": [],
+  "uploads": [],
+  "external": [],
+  "pedaling": {
+    "startDistance": 2440.834202035368,
+    "endDistance": 2574.706226631821,
+    "endSpeed": 8.716688865656108,
+    "fps": 70.87168678606972,
+    "p95Ms": 20.900000000001455,
+    "maxMs": 138.8000000000029,
+    "hidden": 0,
+    "unfocused": 0,
+    "peak": {
+      "calls": 147,
+      "triangles": 1444792,
+      "textures": 49
+    },
+    "dpr": 1.25,
+    "drawing": [
+      2400,
+      1350
+    ],
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "scope": "20 seconds of held W from saved shore progress, actual physics, no progress or speed injection during travel; no concurrent captures or builds; wall intervals, not thermal or whole-route minimum."
+  },
+  "passed": true
+}

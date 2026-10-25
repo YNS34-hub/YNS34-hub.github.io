@@ -4,6 +4,7 @@ import { usePalaceStore } from "../systems/store";
 import { adjacentTrack, playableTracks } from "./playlist";
 import type { MusicTrack } from "../content/types";
 import { restorePlayerState } from "./persistence";
+import { audioSignal, bandEnergy } from "./signal";
 
 type Repeat = "off" | "all" | "one";
 interface AudioState {
@@ -46,6 +47,7 @@ let context: AudioContext | undefined;
 let analyser: AnalyserNode | undefined;
 let output: GainNode | undefined;
 let signal: Uint8Array<ArrayBuffer> | undefined;
+let spectrum: Uint8Array<ArrayBuffer> | undefined;
 let pendingSeek = saved.progress || 0;
 let fadeTimer: ReturnType<typeof setTimeout> | undefined;
 let saveAt = 0;
@@ -190,8 +192,10 @@ function createAudioGraph() {
   try {
     context = new AudioContext();
     analyser = context.createAnalyser();
-    analyser.fftSize = 256;
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.78;
     signal = new Uint8Array(analyser.fftSize);
+    spectrum = new Uint8Array(analyser.frequencyBinCount);
     output = context.createGain();
     analyser.connect(output);
     output.connect(context.destination);
@@ -428,11 +432,33 @@ export function initializeAudio(): void {
   });
   window.addEventListener("pagehide", save);
   setInterval(() => {
-    if (!analyser || !signal || !useAudioStore.getState().playing) return;
-    analyser.getByteTimeDomainData(signal);
+    const audible = !!(
+      analyser &&
+      signal &&
+      spectrum &&
+      context?.state === "running" &&
+      useAudioStore.getState().playing
+    );
+    audioSignal.available = audible;
+    if (!audible) {
+      for (const key of ["bass", "mid", "treble", "rms"] as const)
+        audioSignal[key] *= 0.66;
+      return;
+    }
+    analyser!.getByteFrequencyData(spectrum!);
+    const hz = context!.sampleRate;
+    const bands = {
+      bass: bandEnergy(spectrum!, hz, analyser!.fftSize, 30, 240),
+      mid: bandEnergy(spectrum!, hz, analyser!.fftSize, 240, 3500),
+      treble: bandEnergy(spectrum!, hz, analyser!.fftSize, 3500, 13000),
+    };
+    for (const key of ["bass", "mid", "treble"] as const)
+      audioSignal[key] += (bands[key] - audioSignal[key]) * 0.28;
+    analyser!.getByteTimeDomainData(signal!);
     let square = 0;
-    for (const value of signal) square += ((value - 128) / 128) ** 2;
-    const energy = Math.min(1, Math.sqrt(square / signal.length) * 2.4);
+    for (const value of signal!) square += ((value - 128) / 128) ** 2;
+    const energy = Math.min(1, Math.sqrt(square / signal!.length) * 2.4);
+    audioSignal.rms += (energy - audioSignal.rms) * 0.28;
     useAudioStore.setState((state) => ({
       energy: state.energy * 0.78 + energy * 0.22,
     }));

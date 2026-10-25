@@ -71,9 +71,12 @@ await writeFile(
 // Only promote deliberately curated original projects. New repositories await review in Archive.
 const projects = JSON.parse(await readFile("content/projects.json", "utf8"));
 const archive = JSON.parse(await readFile("content/archive.json", "utf8"));
+// 用户明确撤下的项目不能在以后扫描 GitHub 时重新进入 Archive。
+const curation = JSON.parse(await readFile("content/curation.json", "utf8"));
+const excluded = new Set(curation.excludedProjectIds);
 const existing = new Set([...projects, ...archive].map((x) => x.github));
 for (const repo of snapshot.filter(
-  (r) => r.classification === "ORIGINAL" && !existing.has(r.github),
+  (r) => r.classification === "ORIGINAL" && !existing.has(r.github) && !excluded.has(r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")),
 )) {
   archive.push({
     id: repo.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),

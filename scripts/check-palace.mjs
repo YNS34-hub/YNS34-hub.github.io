@@ -85,8 +85,9 @@ if (process.env.PALACE_VERIFY_DIST === "1") {
       `${route} preserved document served`,
     );
   }
-  for (const name of await readdir(path.join(dist, "assets")))
-    assets.add(`/assets/${name}`);
+  for (const file of await readdir(path.join(dist, "assets"), { recursive: true, withFileTypes: true })) {
+    if (file.isFile()) assets.add("/" + path.relative(dist, path.join(file.parentPath, file.name)).split(path.sep).join("/"));
+  }
   for (const collection of [
     "projects",
     "research",
@@ -136,12 +137,11 @@ if (process.env.PALACE_STATIC_ONLY === "1") {
   process.exit(0);
 }
 const browser = await chromium.launch({
+  executablePath:
+    process.env.PALACE_BROWSER ||
+    "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
   headless: true,
-  args: [
-    "--no-sandbox",
-    "--use-angle=swiftshader",
-    "--enable-unsafe-swiftshader",
-  ],
+  args: ["--no-sandbox", "--use-angle=d3d11"],
 });
 const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
@@ -199,8 +199,12 @@ async function category(name) {
 async function travel(id) {
   await page.locator(".guide-button").click();
   const room = rooms.find((value) => value.id === id);
-  await page.locator(".room-link").filter({ hasText: room.title }).click();
-  await page.locator(".room-caption").filter({ hasText: room.title }).waitFor();
+  // 新区域的说明会引用旧房间名；以真实编号和标题定位同一入口。
+  const escaped = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  await page.getByRole("button", { name: new RegExp("^" + escaped(room.number) + "\\s+" + escaped(room.title)) }).click();
+  // 骑行使用更轻的地面入口标题；保留真实可见标题的断言，不能等待其已隐藏的旧 HUD 副本。
+  if(id==="cycling")await page.locator(".road-entry-copy h2").filter({hasText:room.title}).waitFor();
+  else await page.locator(".room-caption").filter({ hasText: room.title }).waitFor();
   await page.waitForTimeout(450);
 }
 async function slider(locator, value) {
@@ -261,7 +265,7 @@ try {
       );
       const sculpture = page.waitForResponse(
         (response) =>
-          response.url().endsWith("/assets/nonlinear-glass.glb") &&
+          response.url().endsWith("/assets/memory-glass.glb") &&
           response.status() < 400,
       );
       await page.goto(base);
@@ -330,15 +334,13 @@ try {
           .count(),
         0,
       );
-      await page
-        .getByLabel("Import local audio files")
-        .setInputFiles({
-          name: "QA_private_song.wav",
-          mimeType: "audio/wav",
-          buffer: await readFile(
-            path.join(root, "public/media/generated/palace-study.wav"),
-          ),
-        });
+      await page.getByLabel("Import local audio files").setInputFiles({
+        name: "QA_private_song.wav",
+        mimeType: "audio/wav",
+        buffer: await readFile(
+          path.join(root, "public/media/generated/palace-study.wav"),
+        ),
+      });
       const row = page
         .locator(".record-row")
         .filter({ hasText: "QA private song" });
@@ -346,15 +348,13 @@ try {
       await row
         .getByRole("button", { name: "Edit QA private song", exact: true })
         .click();
-      await page
-        .getByLabel("Import local album art")
-        .setInputFiles({
-          name: "QA_album.webp",
-          mimeType: "image/webp",
-          buffer: await readFile(
-            path.join(root, "public/media/generated/nocturne.webp"),
-          ),
-        });
+      await page.getByLabel("Import local album art").setInputFiles({
+        name: "QA_album.webp",
+        mimeType: "image/webp",
+        buffer: await readFile(
+          path.join(root, "public/media/generated/nocturne.webp"),
+        ),
+      });
       await page
         .getByRole("img", { name: "Current album artwork", exact: true })
         .waitFor();
@@ -484,15 +484,18 @@ try {
     "private images persist, full original is viewable, and image cinema enters 3D",
     async () => {
       await category("Wallpapers");
+      await page.getByLabel("Import files into a room").setInputFiles({
+        name: "QA_private_image.webp",
+        mimeType: "image/webp",
+        buffer: await readFile(
+          path.join(root, "public/media/generated/threshold.webp"),
+        ),
+      });
+      await page.getByLabel("Target gallery").selectOption("wallpapers");
+      await page.locator(".import-drafts input").fill("QA private image");
       await page
-        .getByLabel("Import local wallpaper images")
-        .setInputFiles({
-          name: "QA_private_image.webp",
-          mimeType: "image/webp",
-          buffer: await readFile(
-            path.join(root, "public/media/generated/threshold.webp"),
-          ),
-        });
+        .getByRole("button", { name: "CONFIRM PLACEMENT", exact: true })
+        .click();
       await page
         .getByRole("button", {
           name: "View QA private image fullscreen",
@@ -579,7 +582,7 @@ try {
     },
   );
   await check(
-    "all eight gallery rooms are reachable through the museum guide",
+    "all main gallery rooms are reachable through the museum guide",
     async () => {
       for (const room of rooms.filter(
         (value) => !value.hidden && value.id !== "cinema",
@@ -591,7 +594,7 @@ try {
         );
         await shot(room.id);
       }
-      await page.getByRole("button", { name: "Atrium", exact: true }).click();
+      await travel("atrium");
       await page
         .locator(".room-caption")
         .filter({ hasText: "THE ATRIUM" })
@@ -613,6 +616,7 @@ try {
   await check(
     "desktop exploration, bookmarks and comfort settings survive reload",
     async () => {
+      await page.locator(".guide-button").click();
       await page
         .getByRole("button", { name: "Bookmark room", exact: true })
         .click();
@@ -660,6 +664,7 @@ try {
       await page
         .getByRole("button", { name: "ENTER THE PALACE", exact: true })
         .click();
+      await page.locator(".guide-button").click();
       await page
         .getByRole("button", { name: "Unbookmark room", exact: true })
         .waitFor();
@@ -705,7 +710,7 @@ try {
         window.__PALACE_DEBUG__.camera.position.toArray(),
       );
       assert.ok(
-        boundary[0] <= 3.081 && boundary[0] > 3.07,
+        boundary[0] <= 3.351 && boundary[0] > 3.34,
         "walk collision must stop at the corridor wall",
       );
       assert.equal(boundary[1], 1.65);
@@ -769,7 +774,8 @@ try {
     });
     samples.sort((a, b) => a - b);
     return {
-      renderer: "headless Chromium / SwiftShader; not a hardware FPS guarantee",
+      renderer:
+        "headless installed Edge / D3D11; functional timing sample only",
       room: "Listening room",
       medianMs: Math.round(samples[37] * 10) / 10,
       p95Ms: Math.round(samples[71] * 10) / 10,
@@ -777,6 +783,7 @@ try {
   });
   // Keep just one WebGL context active while checking a small touch device.
   await page.goto(`${base}/?view=index`);
+  await category("Projects");
   await page.getByRole("heading", { name: "Projects.", exact: true }).waitFor();
   await check(
     "mobile tour and collection index work without horizontal overflow",

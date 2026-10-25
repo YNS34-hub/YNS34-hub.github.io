@@ -1,0 +1,20 @@
+{
+  "sha": "744a46ad61b14903acaec27089b78520849449ec",
+  "manifestCounts": {
+    "wallpapers": 0,
+    "visuals": 0,
+    "music": 0,
+    "projects": 0,
+    "research": 0
+  },
+  "privateAudio": 0,
+  "privateDocuments": 0,
+  "routes": {
+    "index.html": true,
+    "alpine-ride/index.html": true,
+    "cycling/index.html": true,
+    "museum/index.html": true,
+    "legacy/index.html": true
+  },
+  "passed": true
+}

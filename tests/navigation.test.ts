@@ -21,14 +21,15 @@ vi.stubGlobal("window", {
   history: { replaceState, pushState },
 });
 vi.stubGlobal("document", { exitPointerLock: vi.fn() });
-const { usePalaceStore, resolvePalaceRoute } = await import(
-  "../src/systems/store"
-);
+const { usePalaceStore, resolvePalaceRoute } =
+  await import("../src/systems/store");
 const initial = usePalaceStore.getState();
 const project = allContent.find((item) => item.category === "project")!;
 const research = allContent.find((item) => item.category === "research")!;
+const { roomViews } = await import("../src/world/visitView");
 
 beforeEach(() => {
+  roomViews.clear();
   storage.clear();
   location.href = "https://palace.test/";
   usePalaceStore.setState({
@@ -43,6 +44,51 @@ beforeEach(() => {
 });
 
 describe("shareable palace navigation", () => {
+  it("cancels unfinished threshold travel and memory reveal when browser history changes rooms", () => {
+    usePalaceStore.setState({ pendingDoor: "projects", memoryReveal: true });
+    usePalaceStore.getState().syncRoute("/music");
+    expect(usePalaceStore.getState()).toMatchObject({
+      roomId: "music",
+      pendingDoor: null,
+      memoryReveal: false,
+    });
+  });
+  it("returns cinema launched from the accessible index to the same index route", () => {
+    const state = usePalaceStore.getState();
+    state.update({ mode: "index", started: true });
+    state.enterRoom("wallpapers");
+    state.openCinema({
+      id: "local",
+      title: "Original",
+    } as import("../src/content/types").WallpaperItem);
+    expect(usePalaceStore.getState().mode).toBe("tour");
+    state.exitCinema();
+    expect(usePalaceStore.getState().mode).toBe("index");
+    expect(location.href).toBe("https://palace.test/wallpapers?view=index");
+  });
+  it("returns cinema to its actual source view, including browser Back", () => {
+    const view = {
+      roomId: "portraits",
+      position: [2, 1.65, 5] as [number, number, number],
+      quaternion: [0, 0.3, 0, 0.95] as [number, number, number, number],
+    };
+    roomViews.set("portraits", view);
+    usePalaceStore.getState().enterRoom("portraits");
+    usePalaceStore.getState().openCinema({
+      id: "local",
+      title: "Original",
+    } as import("../src/content/types").WallpaperItem);
+    expect(usePalaceStore.getState().roomId).toBe("cinema");
+    usePalaceStore.getState().syncRoute("/portraits");
+    expect(usePalaceStore.getState().returnView).toEqual(view);
+    usePalaceStore.getState().openCinema({
+      id: "local",
+      title: "Original",
+    } as import("../src/content/types").WallpaperItem);
+    usePalaceStore.getState().exitCinema();
+    expect(usePalaceStore.getState().roomId).toBe("portraits");
+    expect(usePalaceStore.getState().returnView).toEqual(view);
+  });
   it("resolves stable room paths, item paths and index links, including static trailing slashes", () => {
     expect(resolvePalaceRoute("/music/").roomId).toBe("music");
     expect(
@@ -154,7 +200,12 @@ describe("shareable palace navigation", () => {
     const state = usePalaceStore.getState();
     for (let i = 0; i < 12; i++) state.enterRoom(`room-${i}`);
     state.toggleBookmark("music");
-    state.update({ quality: "low", reducedMotion: true, tutorialDone: true });
+    state.update({
+      quality: "low",
+      reducedMotion: true,
+      tutorialDone: true,
+      indexTab: "Wallpapers",
+    });
     const saved = storage.get("memory-palace:v3")!;
     const serialized = JSON.parse(saved).state;
     expect(serialized.recent).toHaveLength(8);
@@ -174,6 +225,7 @@ describe("shareable palace navigation", () => {
       quality: "low",
       reducedMotion: true,
       tutorialDone: true,
+      indexTab: "Wallpapers",
     });
     expect(usePalaceStore.getState().visits["room-0"]).toBe(1);
   });

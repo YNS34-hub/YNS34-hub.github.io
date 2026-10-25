@@ -1,0 +1,15 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Animation",
+  "Description": "Local animation authoring and compatibility checks for The Memory Palace.",
+  "DisableEnginePluginsByDefault": true,
+  "Plugins": [
+    {"Name": "PythonScriptPlugin", "Enabled": true},
+    {"Name": "EditorScriptingUtilities", "Enabled": true},
+    {"Name": "ControlRig", "Enabled": true},
+    {"Name": "IKRig", "Enabled": true},
+    {"Name": "GLTFExporter", "Enabled": true},
+    {"Name": "InterchangeEditor", "Enabled": true}
+  ]
+}

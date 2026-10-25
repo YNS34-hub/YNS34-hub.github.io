@@ -1,0 +1,73 @@
+{
+  "baseline": "98ba16749fe6e8bb05d48db2e072089e273e5d59",
+  "head": "4117e2154b3fab8f4b9ec4f9d16fb691bfaf1463",
+  "phase": 3,
+  "quality": "medium",
+  "dpr": 1,
+  "checks": [
+    {
+      "width": 1920,
+      "name": "Physical threshold → walk → gaze pickup → real dribble → timed shot made → miss → recall → modal pause → physical return"
+    },
+    {
+      "width": 2560,
+      "name": "Physical threshold → walk → gaze pickup → real dribble → timed shot made → miss → recall → modal pause → physical return"
+    }
+  ],
+  "views": [
+    {
+      "file": "worlds-wing-1920.png",
+      "room": "worlds",
+      "width": 1920
+    },
+    {
+      "file": "court-entry-1920.png",
+      "room": "basketball",
+      "width": 1920
+    },
+    {
+      "file": "court-dribble-1920.png",
+      "room": "basketball",
+      "width": 1920
+    },
+    {
+      "file": "court-made-1920.png",
+      "room": "basketball",
+      "width": 1920
+    },
+    {
+      "file": "court-missed-1920.png",
+      "room": "basketball",
+      "width": 1920
+    },
+    {
+      "file": "worlds-wing-2560.png",
+      "room": "worlds",
+      "width": 2560
+    },
+    {
+      "file": "court-entry-2560.png",
+      "room": "basketball",
+      "width": 2560
+    },
+    {
+      "file": "court-dribble-2560.png",
+      "room": "basketball",
+      "width": 2560
+    },
+    {
+      "file": "court-made-2560.png",
+      "room": "basketball",
+      "width": 2560
+    },
+    {
+      "file": "court-missed-2560.png",
+      "room": "basketball",
+      "width": 2560
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "browser": "148.0.3967.70",
+  "passed": true
+}

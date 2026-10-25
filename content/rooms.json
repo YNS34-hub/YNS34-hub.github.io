@@ -205,5 +205,45 @@
     "subtitle": "Typography, people and warm visual references.",
     "type": "image-gallery",
     "color": "#57452e"
+  },
+  {
+    "title": "WORLDS BEYOND",
+    "subtitle": "A threshold from the archive into play.",
+    "id": "worlds",
+    "number": "W0",
+    "color": "#41595b",
+    "type": "black-box"
+  },
+  {
+    "title": "STREET BASKETBALL COURT",
+    "subtitle": "Daylight to after hours. A place to take your shot.",
+    "id": "basketball",
+    "number": "W1",
+    "color": "#ad7952",
+    "type": "white-cube"
+  },
+  {
+    "subtitle": "Golden forest, open water, a slower kind of journey.",
+    "type": "white-cube",
+    "number": "W2",
+    "title": "THE LONG WAY HOME",
+    "color": "#7e9b76",
+    "id": "cycling"
+  },
+  {
+    "id": "alpine-ride",
+    "number": "W3",
+    "title": "THE ALPINE DESCENT",
+    "subtitle": "An original alpine descent, inspired by the saved cycling film.",
+    "type": "white-cube",
+    "color": "#8da6a1"
+  },
+  {
+    "id": "private-gym",
+    "number": "G1",
+    "title": "PRIVATE GYM",
+    "subtitle": "私人健身房 · 训练、记录与自己的节奏",
+    "type": "installation",
+    "color": "#b8b39b"
   }
 ]

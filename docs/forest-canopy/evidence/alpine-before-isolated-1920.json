@@ -1,0 +1,74 @@
+{
+  "sha": "28d8fe7088ab3492d4c49dccc9e5742e60626486",
+  "dirty": false,
+  "at": "2026-10-13T01:23:49.055Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5193",
+  "quality": "medium",
+  "deviceScaleFactor": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Actual drawing DPR is recorded per frame. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "alpine-forest",
+      "width": 1920,
+      "progress": 0.89,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-forest.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -3688.958814347607,
+          342.2203395232925,
+          1175.2769750376517
+        ],
+        "quaternion": [
+          -0.022346500395875962,
+          0.8758815422657295,
+          0.0407528563313558,
+          0.48028258612935376
+        ],
+        "fov": 60,
+        "distance": 9039.456690764127,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.5,
+        "drawing": [
+          2880,
+          1620
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 139,
+        "triangles": 2837398,
+        "textures": 41,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 267.4356384277345,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "performance": {
+        "fps": 72.83066869533761,
+        "renderedFrames": 584,
+        "duplicateTicks": 0,
+        "p95Ms": 20.900000000001455,
+        "maxMs": 76.39999999999418,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 139,
+          "triangles": 2837398,
+          "textures": 41
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

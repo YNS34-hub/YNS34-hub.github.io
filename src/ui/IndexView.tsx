@@ -17,7 +17,8 @@ const tabs = [
 type Tab = (typeof tabs)[number];
 export default function IndexView() {
   const s = usePalaceStore();
-  const [tab, setTab] = useState<Tab>("Projects");
+  const tab = s.indexTab;
+  const setTab = (next: Tab) => s.update({ indexTab: next });
   const [query, setQuery] = useState("");
   const categories = {
     Projects: "project",
@@ -166,7 +167,7 @@ export default function IndexView() {
             </>
           )}
           {tab === "Music" && <MusicPanel />}
-          {tab === "Wallpapers" && <WallpaperPanel />}
+          {tab === "Wallpapers" && <WallpaperPanel galleryId="wallpapers" />}
           {tab === "About" && (
             <article className="index-about">
               <h2>{profile.name}</h2>

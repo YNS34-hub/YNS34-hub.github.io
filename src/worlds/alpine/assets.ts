@@ -1,0 +1,37 @@
+import { useEffect, useMemo } from "react";
+import { useTexture } from "@react-three/drei";
+import { useLoader } from "@react-three/fiber";
+import { FileLoader, NoColorSpace, RepeatWrapping, SRGBColorSpace, ClampToEdgeWrapping } from "three";
+import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
+import { setAlpineHeightfield, setAlpineDetailfield, type AlpineHeightfield } from "./route";
+import type {ImageAtlas} from "./projection";
+import type {AlpineSunField} from "./sunlight";
+import {scenicSky} from "../scenery/lighting";
+
+export const alpineSky = "/media/alpine/clear-daylight-2k.hdr";
+export const alpineBackdrop = "/media/alpine/clear-sky-8k.webp";
+class GeographyLoader extends FileLoader {constructor(){super();this.setResponseType("json");}}
+class ElevationLoader extends FileLoader {constructor(){super();this.setResponseType("arraybuffer");}}
+export interface AlpineGeography {
+  massif:Omit<AlpineHeightfield,"values">;detail:Omit<AlpineHeightfield,"values">;
+  imagery:ImageAtlas;nearImagery:ImageAtlas;
+  sun:AlpineSunField;
+}
+const terrainUrl="/media/alpine/geography.json",demUrls=["/media/alpine/massif-dem.bin","/media/alpine/detail-dem.bin"];
+const urls = ['road-color','road-normal','meadow-color','meadow-normal','rock-color','rock-normal','swissimage','swissimage-near','terrain-sun'].map(n=>"/media/alpine/"+n+".webp");
+export function preloadAlpineGeography(){useLoader.preload(GeographyLoader,terrainUrl);}
+export function preloadAlpineAssets() { useTexture.preload(urls);useTexture.preload(scenicSky); useLoader.preload(RGBELoader,alpineSky); preloadAlpineGeography();useLoader.preload(ElevationLoader,demUrls); }
+export function useAlpineGeography(){return useLoader(GeographyLoader,terrainUrl) as unknown as AlpineGeography;}
+export function useAlpineHeightfield() {
+  const meta=useAlpineGeography(),buffers=useLoader(ElevationLoader,demUrls) as unknown as ArrayBuffer[];
+  const fields=useMemo(()=>[meta.massif,meta.detail].map((f,i)=>({...f,values:new Int16Array(buffers[i])})),[meta,buffers]);
+  // 解码后的不可变高程只注册一次；骑行器挂载前已经可读取，不引入另一套玩家状态。
+  setAlpineHeightfield(fields[0]);setAlpineDetailfield(fields[1]);return fields[0];
+}
+export function useAlpineTextures() {
+  const originals = useTexture(urls), copies = useMemo(()=>originals.map((texture,i)=>{
+    const copy=texture.clone();const data=[1,3,5,8].includes(i);copy.colorSpace=data?NoColorSpace:SRGBColorSpace;copy.wrapS=copy.wrapT=i>=6?ClampToEdgeWrapping:RepeatWrapping;copy.anisotropy=data?4:8;copy.needsUpdate=true;return copy;
+  }),[originals]);
+  useEffect(()=>()=>copies.forEach(t=>t.dispose()),[copies]);
+  return useMemo(()=>({asphalt:copies[0],asphaltNormal:copies[1],meadow:copies[2],meadowNormal:copies[3],rock:copies[4],rockNormal:copies[5],imagery:copies[6],nearImagery:copies[7],sun:copies[8]}),[copies]);
+}

@@ -80,7 +80,10 @@
       "date": "2026",
       "fileName": "thumb-1920-1404380.jpg",
       "width": 1920,
-      "height": 1080
+      "height": 1080,
+      "roomIds": [
+        "glass-life"
+      ]
     },
     {
       "id": "personal-chatgpt-images-7468756d622d313932302d313339373632352e6a7067",
@@ -96,7 +99,10 @@
       "date": "2026",
       "fileName": "thumb-1920-1397625.jpg",
       "width": 1920,
-      "height": 1080
+      "height": 1080,
+      "roomIds": [
+        "cosmic"
+      ]
     },
     {
       "id": "personal-chatgpt-images-7468756d622d313932302d313430313433372e6a7067",
@@ -112,7 +118,10 @@
       "date": "2026",
       "fileName": "thumb-1920-1401437.jpg",
       "width": 1920,
-      "height": 1080
+      "height": 1080,
+      "roomIds": [
+        "imagined-worlds"
+      ]
     },
     {
       "id": "personal-chatgpt-images-7468756d622d313932302d313430343338342e6a7067",
@@ -128,7 +137,10 @@
       "date": "2026",
       "fileName": "thumb-1920-1404384.jpg",
       "width": 1920,
-      "height": 1080
+      "height": 1080,
+      "roomIds": [
+        "portraits"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30322e6a7067",
@@ -144,7 +156,10 @@
       "date": "2026",
       "fileName": "02.jpg",
       "width": 1000,
-      "height": 562
+      "height": 562,
+      "roomIds": [
+        "editorial"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30332e6a7067",
@@ -160,7 +175,10 @@
       "date": "2026",
       "fileName": "03.jpg",
       "width": 686,
-      "height": 386
+      "height": 386,
+      "roomIds": [
+        "portraits"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30342e6a7067",
@@ -176,7 +194,10 @@
       "date": "2026",
       "fileName": "04.jpg",
       "width": 720,
-      "height": 404
+      "height": 404,
+      "roomIds": [
+        "editorial"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30352e6a7067",
@@ -192,7 +213,10 @@
       "date": "2026",
       "fileName": "05.jpg",
       "width": 1199,
-      "height": 754
+      "height": 754,
+      "roomIds": [
+        "editorial"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30362e6a7067",
@@ -208,7 +232,10 @@
       "date": "2026",
       "fileName": "06.jpg",
       "width": 768,
-      "height": 514
+      "height": 514,
+      "roomIds": [
+        "portraits"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30372e6a7067",
@@ -224,7 +251,10 @@
       "date": "2026",
       "fileName": "07.jpg",
       "width": 900,
-      "height": 506
+      "height": 506,
+      "roomIds": [
+        "editorial"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30382e6a7067",
@@ -240,7 +270,10 @@
       "date": "2026",
       "fileName": "08.jpg",
       "width": 900,
-      "height": 506
+      "height": 506,
+      "roomIds": [
+        "portraits"
+      ]
     },
     {
       "id": "personal-chatgpt-images-30392e6a7067",
@@ -256,7 +289,10 @@
       "date": "2026",
       "fileName": "09.jpg",
       "width": 1200,
-      "height": 675
+      "height": 675,
+      "roomIds": [
+        "editorial"
+      ]
     }
   ],
   "music": [],

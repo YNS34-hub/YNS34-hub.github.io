@@ -1,0 +1,21 @@
+{
+  "localCounts": {
+    "wallpapers": 4,
+    "visuals": 22,
+    "music": 40,
+    "projects": 8,
+    "research": 0
+  },
+  "localAvatarRestored": true,
+  "publicManifestEmpty": true,
+  "publicAvatarNull": true,
+  "publicPrivateDirectoryFiles": [
+    "avatar.json",
+    "manifest.json"
+  ],
+  "publicPrivateAudioOrLrc": 0,
+  "retainedOriginalSynthStudy": {
+    "path": "media/generated/palace-study.wav",
+    "baselineSHA256": "ea2d60ecd0564b3849f260a88a56e1a08cf32944c4004b9735f8c4608635dd3a"
+  }
+}

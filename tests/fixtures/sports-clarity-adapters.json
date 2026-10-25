@@ -1,0 +1,29 @@
+{
+  "baseline": "56238d5f8e7bb42c6924917c7100e15567521fd8",
+  "scope": "Only the requested automatic/explicit quality selection, render pixel budget and retained MSAA context; undo all five exact World hunks before checking every existing gym/sports/entry adapter and the unchanged6380557 digests.",
+  "baselineWorldSha256": "cd85bf1479a686fafb14d355abd9699a0073fc37aeed00ce94486e24786eab17",
+  "files": {
+    "src/world/World.tsx": [
+      {
+        "before": "}\n\nfunction PerformanceMonitor() {\n  const count = useRef(0),\n    seconds = useRef(0),\n    stable = useRef(0),\n    bad = useRef(0);\n  useFrame((_, delta) => {\n    if (document.hidden) return;\n    count.current += 1;\n    seconds.current += delta;\n    if (seconds.current < 2) return;\n",
+        "after": "}\n\nfunction PerformanceMonitor() {\n  const settledAt=useRef(performance.now()),lastRoom=useRef('');\n  const count = useRef(0),\n    seconds = useRef(0),\n    stable = useRef(0),\n    bad = useRef(0);\n  useFrame((_, delta) => {\n    if (document.hidden) return;\n    const current=usePalaceStore.getState();\n    // Loading starts inside lazy resource renders; sample its store on the\n    // animation frame instead of subscribing this component during that render.\n    if(useProgress.getState().active||lastRoom.current!==current.roomId||!document.hasFocus()||current.overlay||current.focus||delta>.25){settledAt.current=performance.now();lastRoom.current=current.roomId;count.current=seconds.current=stable.current=bad.current=0;return;}\n    if(performance.now()-settledAt.current<3000)return;\n    count.current += 1;\n    seconds.current += delta;\n    if (seconds.current < 2) return;\n"
+      },
+      {
+        "before": "      // A conservative upward adjustment avoids oscillation on integrated GPUs.\n      if (\n        stable.current >= 6 &&\n        state.effectiveQuality === \"low\" &&\n        !matchMedia(\"(pointer: coarse)\").matches\n      ) {\n        state.update({ effectiveQuality: \"medium\" });\n        stable.current = 0;\n      }\n    }\n",
+        "after": "      // A conservative upward adjustment avoids oscillation on integrated GPUs.\n      if (\n        stable.current >= 6 &&\n        (state.effectiveQuality === \"low\" || stable.current>=10 && state.effectiveQuality === \"medium\" && !matchMedia(\"(pointer: coarse)\").matches)\n      ) {\n        state.update({ effectiveQuality: state.effectiveQuality === \"low\" ? \"medium\" : \"high\" });\n        stable.current = 0;\n      }\n    }\n"
+      },
+      {
+        "before": "    window.addEventListener(\"resize\",resize);return()=>window.removeEventListener(\"resize\",resize);\n  },[]);\n  useEffect(() => {\n    const chosen = coarse ? \"low\" : quality === \"auto\" ? effective : quality;\n    if (effective !== chosen)\n      usePalaceStore.getState().update({ effectiveQuality: chosen });\n  }, [quality, effective, coarse]);\n  const renderTier = coarse ? \"low\" : tier;\n  const nativeDpr = Math.min(\n    window.devicePixelRatio || 1,\n    coarse ? 0.8 : tier === \"high\" ? 1.6 : tier === \"medium\" ? 1.25 : 0.85,\n",
+        "after": "    window.addEventListener(\"resize\",resize);return()=>window.removeEventListener(\"resize\",resize);\n  },[]);\n  useEffect(() => {\n    const chosen = quality === \"auto\" ? effective : quality;\n    if (effective !== chosen)\n      usePalaceStore.getState().update({ effectiveQuality: chosen });\n  }, [quality, effective, coarse]);\n  useEffect(()=>{if(quality===\"auto\"&&[\"basketball\",\"private-gym\"].includes(roomId))usePalaceStore.getState().update({effectiveQuality:coarse?\"medium\":\"high\"});},[roomId,quality,coarse]);\n  const renderTier = tier;\n  const nativeDpr = Math.min(\n    window.devicePixelRatio || 1,\n    coarse ? 0.8 : tier === \"high\" ? 1.6 : tier === \"medium\" ? 1.25 : 0.85,\n"
+      },
+      {
+        "before": "  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。\n  const dpr=roomId===\"alpine-ride\"&&detailed&&!coarse&&renderTier!==\"low\"\n    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true)\n    :[\"basketball\",\"cycling\"].includes(roomId)&&!coarse?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;\n  return (\n    <Canvas\n      className=\"world-canvas\"\n",
+        "after": "  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。\n  const dpr=roomId===\"alpine-ride\"&&detailed&&!coarse&&renderTier!==\"low\"\n    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true)\n    :[\"basketball\",\"cycling\",\"private-gym\"].includes(roomId)?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;\n  return (\n    <Canvas\n      className=\"world-canvas\"\n"
+      },
+      {
+        "before": "        };\n      }}\n      gl={{\n        antialias: renderTier !== \"low\",\n        alpha: false,\n        powerPreference: \"high-performance\",\n        toneMapping: ACESFilmicToneMapping,\n",
+        "after": "        };\n      }}\n      gl={{\n        // WebGL antialias is a context creation option; retain it when automatic quality later recovers.\n        antialias: true,\n        alpha: false,\n        powerPreference: \"high-performance\",\n        toneMapping: ACESFilmicToneMapping,\n"
+      }
+    ]
+  }
+}

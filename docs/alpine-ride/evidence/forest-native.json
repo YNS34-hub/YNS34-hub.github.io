@@ -1,0 +1,15 @@
+{
+  "base": "http://127.0.0.1:5191",
+  "sha": "bbd959951885e214377def2c8563c583716f2781",
+  "checks": [
+    "Enter on foot and physically approach the waiting road bike",
+    "Native E mounts with a road cockpit and stationary start",
+    "Genuine pedal input, inertial coasting and native easier/harder gear feedback",
+    "Progressive braking, photo view, actual local PNG and single-level Escape",
+    "Original Guide owns Escape and blocks pedal input without opening underlying ride options",
+    "One Escape closes only the original listening panel and preserves underlying ride options",
+    "Sound switch, camera comfort, refresh restoration stopped on foot and museum return"
+  ],
+  "errors": [],
+  "passed": true
+}

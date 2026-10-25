@@ -1,0 +1,256 @@
+{
+  "sha": "28d8fe7088ab3492d4c49dccc9e5742e60626486",
+  "dirty": true,
+  "at": "2026-10-13T01:02:31.431Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5190",
+  "quality": "medium",
+  "deviceScaleFactor": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Actual drawing DPR is recorded per frame. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "forest-entry",
+      "width": 1920,
+      "progress": 0.045,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-forest-entry.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          -5.206077310338233,
+          21.386010129343028,
+          -156.13605506513284
+        ],
+        "quaternion": [
+          -0.008711880327178076,
+          -0.1648378838467825,
+          -0.0014560229155643457,
+          0.98628112381174
+        ],
+        "fov": 60,
+        "distance": 158.8374145214789,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 147,
+        "triangles": 1958612,
+        "textures": 44,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "performance": {
+        "fps": 76.92115581540384,
+        "renderedFrames": 616,
+        "duplicateTicks": 0,
+        "p95Ms": 14.200000000000728,
+        "maxMs": 69.5,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 147,
+          "triangles": 1958612,
+          "textures": 44
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      },
+      "nativePedaling": {
+        "fps": 70.9478169327638,
+        "p95Ms": 20.900000000001455,
+        "maxMs": 138.89999999999782,
+        "duplicateTicks": 0,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 168,
+          "triangles": 1988478,
+          "textures": 44
+        },
+        "startDistance": 158.8374145214789,
+        "endDistance": 241.58089305730584,
+        "endSpeed": 6.75425674133682,
+        "scope": "20-second native held-W, saved start distance, no speed / progress injection; no concurrent screenshots / recording / build; not whole-route or thermal benchmark"
+      }
+    },
+    {
+      "name": "lake-reveal",
+      "width": 1920,
+      "progress": 0.185,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-lake-reveal.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          244.38626014611853,
+          21.596557815378183,
+          -495.21011020896054
+        ],
+        "quaternion": [
+          -0.011533898128327488,
+          -0.28499065071513296,
+          -0.003429533925863371,
+          0.9584547649711914
+        ],
+        "fov": 60,
+        "distance": 652.9982596994132,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 149,
+        "triangles": 1523530,
+        "textures": 44,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "performance": {
+        "fps": 95.05537629713008,
+        "renderedFrames": 763,
+        "duplicateTicks": 0,
+        "p95Ms": 14.200000000000728,
+        "maxMs": 62.599999999998545,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 149,
+          "triangles": 1523530,
+          "textures": 44
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "overlook",
+      "width": 1920,
+      "progress": 0.487,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "1920-overlook.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          790.4901119890376,
+          56.248301207727934,
+          -655.8345262329177
+        ],
+        "quaternion": [
+          -0.01346040348102278,
+          0.9141373842627153,
+          0.03045444473716077,
+          0.4040348834286466
+        ],
+        "fov": 60,
+        "distance": 1718.9737971546717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 70,
+        "triangles": 1211412,
+        "textures": 47,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "performance": {
+        "fps": 99.22616075886171,
+        "renderedFrames": 795,
+        "duplicateTicks": 0,
+        "p95Ms": 14.100000000000364,
+        "maxMs": 62.600000000000364,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 70,
+          "triangles": 1211412,
+          "textures": 47
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "forest-surface",
+      "width": 1920,
+      "progress": 0.1,
+      "yaw": 0,
+      "pitch": -0.3,
+      "file": "1920-forest-surface.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          8.127700623029327,
+          24.16852419723228,
+          -335.1105877782508
+        ],
+        "quaternion": [
+          -0.023293145410275003,
+          -0.21891631766064457,
+          -0.005227578512712625,
+          0.9754515608997163
+        ],
+        "fov": 60,
+        "distance": 352.97203226995316,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 144,
+        "triangles": 1830962,
+        "textures": 44,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "performance": {
+        "fps": 66.56943042008471,
+        "renderedFrames": 534,
+        "duplicateTicks": 0,
+        "p95Ms": 20.900000000001455,
+        "maxMs": 76.39999999999964,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 144,
+          "triangles": 1830962,
+          "textures": 44
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

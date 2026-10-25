@@ -1,0 +1,89 @@
+import { describe, expect, it, vi } from "vitest";
+import { Bone, Skeleton, SkinnedMesh, BoxGeometry, Group, InstancedMesh, MeshBasicMaterial, PerspectiveCamera, Scene, type Material, type WebGLRenderer } from "three";
+import { warmPrograms } from "../src/worlds/warmPrograms";
+import { prepareCourtLighting } from "../src/worlds/court/lightingPrograms";
+
+describe("cancellable new-scene preparation", () => {
+  it("prepares all four court lighting topologies without adding live lights or rendering",()=>{
+    const scene=new Scene(),root=new Group(),material=new MeshBasicMaterial(),snapshots:unknown[]=[];scene.add(root);
+    const compile=vi.fn((source:Group,_camera:PerspectiveCamera,target:Scene)=>{
+      expect(source).toBe(root);expect(target).not.toBe(scene);expect(target.parent).toBeNull();expect(target.environment).toBe(scene.environment);
+      snapshots.push(target.children.map(light=>[light.type,(light as unknown as {castShadow:boolean}).castShadow]));return new Set([material]);
+    });
+    const render=vi.fn(),renderer={compile,render,shadowMap:{enabled:true}} as unknown as WebGLRenderer;
+    expect(prepareCourtLighting(renderer,root,new PerspectiveCamera(),scene).has(material)).toBe(true);
+    expect(snapshots).toEqual([
+      [["HemisphereLight",false],["DirectionalLight",true]],
+      [["HemisphereLight",false],["DirectionalLight",false],["SpotLight",true],["SpotLight",false]],
+      [["HemisphereLight",false],["SpotLight",true],["SpotLight",false]],
+      [["HemisphereLight",false],["DirectionalLight",true],["SpotLight",false],["SpotLight",false]]
+    ]);
+    expect(scene.children).toEqual([root]);expect(render).not.toHaveBeenCalled();material.dispose();
+  });
+  it("prepares the skinned depth variant without disposing the athlete's owned skeleton",()=>{
+    const scene=new Scene(),root=new Group(),geometry=new BoxGeometry(),material=new MeshBasicMaterial(),skeleton=new Skeleton([new Bone()]);
+    const athlete=new SkinnedMesh(geometry,material);athlete.bind(skeleton);athlete.castShadow=true;root.add(athlete);scene.add(root);
+    const dispose=vi.spyOn(skeleton,"dispose"),programs=new Map<Material,{currentProgram:{isReady:()=>boolean}}>();let depthSkinned=false;
+    const renderer={compile:(source:Group)=>{const materials=new Set<Material>();source.traverse(o=>{if(o instanceof SkinnedMesh){const m=o.material as Material;materials.add(m);programs.set(m,{currentProgram:{isReady:()=>true}});if(m.type==="MeshDepthMaterial"){depthSkinned=true;expect(o.skeleton).toBe(skeleton);expect(o.bindMatrix.equals(athlete.bindMatrix)).toBe(true);}}});return materials;},properties:{get:(m:Material)=>programs.get(m)},getContext:()=>({isContextLost:()=>false}),getRenderTarget:()=>null,getActiveCubeFace:()=>0,getActiveMipmapLevel:()=>0,setRenderTarget:vi.fn()} as unknown as WebGLRenderer;
+    const job=warmPrograms(renderer,root,new PerspectiveCamera(),scene);expect(job.ready()).toBe(true);expect(depthSkinned).toBe(true);job.dispose();expect(dispose).not.toHaveBeenCalled();geometry.dispose();material.dispose();skeleton.dispose();
+  });
+  it("includes future night skin-shadow programs in readiness without rendering a shadow target",()=>{
+    const scene=new Scene(),root=new Group(),geometry=new BoxGeometry(),material=new MeshBasicMaterial(),skeleton=new Skeleton([new Bone()]);root.name="basketball-practice-world";
+    const athlete=new SkinnedMesh(geometry,material);athlete.bind(skeleton);athlete.castShadow=true;root.add(athlete);scene.add(root);
+    let nightDepth=false;const programs=new Map<Material,{currentProgram:{isReady:()=>boolean}}>();
+    const renderer={shadowMap:{enabled:true},compile:(source:Group,_camera:PerspectiveCamera,target?:Scene)=>{
+      const result=new Set<Material>();source.traverse(o=>{if(o instanceof SkinnedMesh){const m=o.material as Material;result.add(m);programs.set(m,{currentProgram:{isReady:()=>true}});
+        if(m.type==="MeshDepthMaterial"&&target?.children.filter(o=>o.type==="SpotLight").length===2){nightDepth=true;expect(o.skeleton).toBe(skeleton);}
+      }});return result;
+    },properties:{get:(m:Material)=>programs.get(m)},getContext:()=>({isContextLost:()=>false}),getRenderTarget:()=>null,getActiveCubeFace:()=>0,getActiveMipmapLevel:()=>0,setRenderTarget:vi.fn()} as unknown as WebGLRenderer;
+    const job=warmPrograms(renderer,root,new PerspectiveCamera(),scene);expect(nightDepth).toBe(true);expect(job.ready()).toBe(true);job.dispose();material.dispose();geometry.dispose();skeleton.dispose();
+  });
+  it("keeps original materials and geometry intact, waits for actual readiness and can cancel pending programs", () => {
+    const scene = new Scene(), root = new Group(), geometry = new BoxGeometry(), material = new MeshBasicMaterial();
+    const object = new InstancedMesh(geometry, material, 1); object.castShadow = true; root.add(object); scene.add(root); root.visible = false;
+    const materialDispose = vi.spyOn(material, "dispose"), geometryDispose = vi.spyOn(geometry, "dispose");
+    let ready = false;
+    const poll = vi.fn(() => ready), programs = new Map<Material, { currentProgram: { isReady: typeof poll } }>();
+    const compile = vi.fn((source: Group) => {
+      expect(root.visible).toBe(true);
+      const list = new Set<Material>(); source.traverse(object => { if ("material" in object) { const m = object.material as Material; list.add(m); programs.set(m, { currentProgram: { isReady: poll } }); } }); return list;
+    });
+    const renderer = { compile, properties: { get: (m: Material) => programs.get(m) }, getContext: () => ({ isContextLost: () => false }),
+      getRenderTarget: () => null, getActiveCubeFace: () => 0, getActiveMipmapLevel: () => 0, setRenderTarget: vi.fn() } as unknown as WebGLRenderer;
+    const job = warmPrograms(renderer, root, new PerspectiveCamera(), scene);
+    expect(root.visible).toBe(false); expect(compile).toHaveBeenCalledTimes(3); expect(job.ready()).toBe(false);
+    expect(renderer.setRenderTarget).toHaveBeenLastCalledWith(null, 0, 0);
+    ready = true; expect(job.ready()).toBe(true);
+    job.dispose(); job.dispose(); const count = poll.mock.calls.length;
+    expect(job.ready()).toBe(false); expect(poll).toHaveBeenCalledTimes(count);
+    expect(materialDispose).not.toHaveBeenCalled(); expect(geometryDispose).not.toHaveBeenCalled();
+    const retainedDepth = [...programs.keys()].find(m => m !== material)!;
+    expect(retainedDepth.type).toBe("MeshDepthMaterial");
+    object.dispose(); material.dispose(); geometry.dispose();
+  });
+  it("detects released program snapshots without querying deleted GL programs and can prepare the replacement", () => {
+    const scene = new Scene(), root = new Group(), geometry = new BoxGeometry(), material = new MeshBasicMaterial();
+    root.add(new InstancedMesh(geometry, material, 1)); scene.add(root); root.visible = false;
+    const poll = vi.fn(() => true), original = { program: {} as WebGLProgram | undefined, isReady: poll };
+    let current = original;
+    const renderer = { compile: () => new Set([material]), properties: { get: () => ({ currentProgram: current }) },
+      getContext: () => ({ isContextLost: () => false }), getRenderTarget: () => null, getActiveCubeFace: () => 0,
+      getActiveMipmapLevel: () => 0, setRenderTarget: vi.fn() } as unknown as WebGLRenderer;
+    const first = warmPrograms(renderer, root, new PerspectiveCamera(), scene);
+    expect(first.stale()).toBe(false);
+    original.program = undefined;
+    expect(first.stale()).toBe(true); expect(first.ready()).toBe(false); expect(poll).not.toHaveBeenCalled();
+    first.dispose(); current = { program: {} as WebGLProgram, isReady: poll };
+    const replacement = warmPrograms(renderer, root, new PerspectiveCamera(), scene);
+    expect(replacement.stale()).toBe(false); expect(replacement.ready()).toBe(true); expect(root.visible).toBe(false);
+    replacement.dispose(); material.dispose(); geometry.dispose();
+  });
+  it("restores visibility and the existing render target when compilation fails", () => {
+    const scene = new Scene(), root = new Group(); root.visible = false; scene.add(root);
+    const previous = { name: "existing-view" }, setRenderTarget = vi.fn();
+    const renderer = { compile: () => { throw new Error("lost program"); }, getRenderTarget: () => previous,
+      getActiveCubeFace: () => 2, getActiveMipmapLevel: () => 3, setRenderTarget } as unknown as WebGLRenderer;
+    expect(() => warmPrograms(renderer, root, new PerspectiveCamera(), scene)).toThrow("lost program");
+    expect(root.visible).toBe(false); expect(setRenderTarget).toHaveBeenLastCalledWith(previous, 2, 3);
+  });
+});

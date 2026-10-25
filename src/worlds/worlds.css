@@ -1,0 +1,57 @@
+.activity-hud { position:fixed; top:130px; right:48px; z-index:14; color:#f3ecdd; width:235px; padding:14px 0 14px 18px; background:linear-gradient(90deg,#0b1c2266,#0b1c2226); font-family:"Space Grotesk",sans-serif; text-shadow:0 1px 5px #18292b99; pointer-events:auto; }
+.practice-score { display:flex; flex-direction:column; gap:8px; }
+.practice-score > span { font-size:9px; letter-spacing:.13em; opacity:.72; }
+.practice-score strong { font-size:42px; font-weight:500; line-height:1; font-variant-numeric:tabular-nums; }
+.practice-score strong small { font-size:20px; opacity:.55; }
+.shot-result { font-size:12px; min-height:16px; margin:20px 0 12px; letter-spacing:.04em; }
+.activity-actions { display:flex; flex-wrap:wrap; gap:8px 13px; }
+.activity-actions button { font:500 10px "Space Grotesk",sans-serif; color:inherit; padding:6px 0; background:transparent; border:0; border-bottom:1px solid #e9d8b44d; text-shadow:inherit; }
+.activity-actions button:hover,.activity-actions button:focus-visible { border-color:#fff0ce; }
+.activity-hud > small { display:block; margin-top:18px; font-size:10px; line-height:1.65; opacity:.65; max-width:225px; }
+.release-meter { position:relative; width:205px; height:3px; background:#132b3255; margin:12px 0 18px; }
+.release-zone { position:absolute; left:58%; width:12%; height:8px; top:-2px; background:#c5e3bf88; }
+.release-meter i { position:absolute; inset:0 auto 0 0; background:#f7e4b6; }
+.court-time { display:flex; gap:18px; margin-top:16px; }
+.court-time button { background:transparent; border:0; padding:5px 0; color:inherit; font:500 10px "Space Grotesk",sans-serif; text-shadow:inherit; opacity:.48; border-bottom:1px solid transparent; }
+.court-time button[aria-pressed="true"] { opacity:1; border-color:#e1c49c99; }
+.court-time button:focus-visible { outline:1px solid #e1c49c; outline-offset:5px; }
+.palace-app[data-activity-world="basketball"] .wordmark { color:#dbeaf2; text-shadow:0 1px 5px #111e2290; }
+.palace-app[data-activity-world="basketball"] .wordmark:hover { color:#e1edf4; }
+.scenic-eyebrow { font-size:9px; letter-spacing:.12em; opacity:.75; }
+.ride-hud h2 { font-size:19px; font-weight:500; line-height:1.2; margin:13px 0 22px; letter-spacing:.06em; }
+.ride-speed { display:flex; align-items:baseline; gap:11px; }
+.ride-speed strong { font-size:34px; font-weight:500; font-variant-numeric:tabular-nums; }
+.ride-speed span { font-size:8px; letter-spacing:.12em; opacity:.75; }
+.ride-progress { margin-top:14px; height:1px; background:#ded6b34d; width:205px; }
+.ride-progress i { display:block; height:1px; background:#e6d8ae; }
+.ride-hud > p { font-size:10px; opacity:.72; margin:12px 0 19px; }
+.palace-app[data-activity-photo="true"] .hud,.palace-app[data-activity-photo="true"] .interaction-hint { visibility:hidden; }
+.ride-photo-controls { position:fixed; bottom:28px; right:32px; display:flex; gap:24px; z-index:14; }
+.ride-photo-controls button { color:#ecdfbc; background:#132b3438; border:0; padding:9px 14px; font:500 10px "Space Grotesk",sans-serif; letter-spacing:.06em; }
+.palace-app[data-activity-world="cycling"] .room-caption,.palace-app[data-activity-world="basketball"] .room-caption,.palace-app[data-activity-world="cycling"] .explore-controls { color:#e4deca; text-shadow:0 1px 5px #182923; }
+@media(max-width:700px) { .activity-hud { top:120px; right:20px; width:190px; } .practice-score strong { font-size:30px; } .activity-hud > small { font-size:9px; } }
+/* 视角选择沿用活动区的小型文字控件，不改变馆标或全局导航。 */
+.perspective-controls { display:flex; gap:12px; align-items:center; }
+.perspective-controls button { border:0; background:transparent; color:inherit; padding:7px 0; font:500 10px var(--font-ui, "Space Grotesk"),sans-serif; letter-spacing:.04em; opacity:.55; cursor:pointer; }
+.perspective-controls button[aria-pressed="true"] { opacity:1; text-decoration:underline; text-underline-offset:5px; }
+.perspective-controls button:hover { opacity:1; }
+.perspective-controls button:focus-visible { outline:1px solid currentColor; outline-offset:4px; }
+.road-ui > .perspective-controls { position:fixed; bottom:28px; right:32px; pointer-events:auto; color:#f2f4ef; text-shadow:0 1px 3px #172720; }
+@media(max-width:700px) { .road-ui > .perspective-controls { bottom:92px; right:20px; } }
+/* 小屏保留所有原生动作入口，缩短面板，给近景人物的头和双手留出画面。 */
+@media(max-width:600px) {
+ .court-hud { top:96px; right:12px; left:12px; width:auto; padding:10px 12px; display:grid; grid-template-columns:78px minmax(0,1fr); gap:4px 10px; }
+ .court-hud .practice-score { grid-column:1; grid-row:1 / span 3; gap:6px; align-self:start; }
+ .court-hud .practice-score > span { font-size:7px; line-height:1.4; letter-spacing:.06em; }
+ .court-hud .practice-score strong { font-size:28px; }
+ .court-hud .practice-score strong small { font-size:14px; }
+ .court-hud .shot-result { grid-column:2; margin:0; font-size:10px; min-height:14px; }
+ .court-hud .release-meter { grid-column:2; width:100%; margin:5px 0; }
+ .court-hud .activity-actions { grid-column:2; gap:2px 10px; }
+ .court-hud .activity-actions button { font-size:10px; padding:5px 0; }
+ .court-hud .perspective-controls { grid-column:1 / -1; flex-wrap:wrap; gap:4px 13px; }
+ .court-hud .perspective-controls button { font-size:10px; padding:5px 0; }
+ .court-hud .court-time { grid-column:1 / -1; margin-top:0; }
+ .court-hud > small { display:none; }
+ .palace-app[data-activity-world="basketball"] .interaction-response { top:54px; left:12px; right:12px; transform:none; max-width:none; padding:5px 8px; font-size:10px; line-height:1.4; }
+}

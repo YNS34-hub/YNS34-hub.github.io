@@ -18,6 +18,10 @@ import { usePalaceStore } from "../systems/store";
 import { useAudioStore } from "../audio/player";
 import { useLibraryStore } from "../systems/library";
 import { PalaceMark } from "./primitives";
+import { useIdentityTone } from "../systems/identityTone";
+import { useMotionCue } from "../motion/useMotionCue";
+import NowPlayingSignal from "../motion/NowPlayingSignal";
+import { GlassButton, MuseumLabel, MuseumNavigation, MuseumTitle } from "../design-system/components";
 export default function Hud({ ready }: { ready: boolean }) {
   const s = usePalaceStore();
   const audio = useAudioStore(
@@ -28,9 +32,20 @@ export default function Hud({ ready }: { ready: boolean }) {
     })),
   );
   const tracks = useLibraryStore((l) => l.music);
+  const lightIdentity = useIdentityTone((tone) => tone.light);
+  const entranceInk = !s.started || lightIdentity;
   const room = roomInfo(s.roomId);
   const plan = resolveRoomPlan(s.roomId);
   const track = tracks.find((t) => t.id === audio.currentId);
+  const identityCue = useMotionCue<HTMLButtonElement>("museum-identity", "identity");
+  const welcomeEnabled = ready && !s.started;
+  const eyebrowCue = useMotionCue<HTMLParagraphElement>("welcome", "copy", welcomeEnabled);
+  const heroCue = useMotionCue<HTMLHeadingElement>("welcome", "exhibition", welcomeEnabled, 60);
+  const entryCue = useMotionCue<HTMLDivElement>("welcome", "copy", welcomeEnabled, 440);
+  const memoryCue = useMotionCue<HTMLElement>(String(s.memoryReveal), "copy", s.coreNear && !s.overlay && !s.focus);
+  const trackCue = useMotionCue<HTMLSpanElement>(`${audio.currentId}:${track?.title}`, "copy", !!track && s.started);
+  const playbackCue = useMotionCue<HTMLButtonElement>(String(audio.playing), "identity", !!track && s.started);
+  const roomCue = useMotionCue<HTMLDivElement>(s.roomId, "threshold", s.started && ready && s.roomId !== "cinema");
   const [tutorial, setTutorial] = useState(false);
   useEffect(() => {
     if (!s.started || s.tutorialDone) return;
@@ -46,19 +61,22 @@ export default function Hud({ ready }: { ready: boolean }) {
     s.enterRoom(continueLast ? s.lastRoom : s.roomId);
   };
   return (
-    <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`}>
-      <header className="hud-header">
+    <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`} data-threshold={s.pendingDoor ? "approach" : ready ? "arrived" : "loading"}>
+      {s.started && s.roomId !== "cinema" && <div key={s.roomId} className="threshold-continuity" aria-hidden="true"><i /><i /></div>}
+      <MuseumNavigation className="hud-header" data-tone={entranceInk ? "light" : "dark"}>
         <button
-          className="wordmark"
+          ref={identityCue}
+          className={`wordmark ${entranceInk ? "identity-is-light" : ""}`}
           onClick={() => s.setOverlay("about")}
           aria-label="About The Memory Palace"
         >
           <PalaceMark />
           <span>
-            THE MEMORY PALACE<small>JIE TIAN / A LIVING ARCHIVE</small>
+            THE MEMORY PALACE<small>JIE TIAN · LIVING ARCHIVE</small>
           </span>
         </button>
         <div className="hud-header-actions">
+          {s.started && <button className="guide-button quality-button" aria-label="画质设置" onClick={event => { if (event.detail > 0) event.currentTarget.blur(); s.setOverlay("settings"); }}><SlidersHorizontal size={17} /><span>画质</span></button>}
           <button
             className="sound-button"
             aria-label={s.mute ? "Unmute all sound" : "Mute all sound"}
@@ -69,6 +87,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           </button>
           <button
             className="guide-button"
+            aria-label="GUIDE"
             onClick={() => s.setOverlay("guide")}
           >
             <Map size={17} />
@@ -76,31 +95,20 @@ export default function Hud({ ready }: { ready: boolean }) {
             <small>M</small>
           </button>
         </div>
-      </header>
+      </MuseumNavigation>
       {!s.started && (
         <div className="welcome-caption">
-          <p className="eyebrow">
-            <span className="status-dot" /> A DIGITAL MUSEUM BY JIE TIAN
-          </p>
-          <h1>
-            THE MEMORY
-            <br />
-            <span>PALACE</span>
-            <sup>∞</sup>
-          </h1>
-          <p className="welcome-subtitle">
-            An infinite gallery of projects, research,
-            <br className="desktop-break" /> music, images and experiments.
-          </p>
-          <div className="welcome-actions">
-            <button
+          <MuseumTitle ref={heroCue} />
+          <MuseumLabel ref={eyebrowCue}>ARCHIVE</MuseumLabel>
+          <div className="welcome-actions" ref={entryCue}>
+            <GlassButton
               className="enter-button"
               disabled={!ready}
               onClick={() => start()}
             >
               {ready ? "ENTER THE PALACE" : "ARCHIVE INITIALIZING"}
               <ArrowRight size={22} />
-            </button>
+            </GlassButton>
             {s.lastRoom !== "atrium" && (
               <button className="continue-button" onClick={() => start(true)}>
                 CONTINUE EXPLORING ↗
@@ -117,7 +125,7 @@ export default function Hud({ ready }: { ready: boolean }) {
       )}
       {s.started && (
         <>
-          <div className="room-caption">
+          <div className="room-caption" ref={roomCue}>
             <p className="eyebrow">
               <span className="room-caption-number">{room?.number || "∞"}</span>{" "}
               {room?.title || "A SECRET MEMORY"}
@@ -194,8 +202,7 @@ export default function Hud({ ready }: { ready: boolean }) {
       )}
       {!s.started && (
         <div className="welcome-location">
-          <span>01 / THE ATRIUM</span>
-          <span>THIS PLACE CONTINUES TO GROW WITH ME.</span>
+          <span>01 / ATRIUM</span>
         </div>
       )}
       {s.pointerLocked && !s.overlay && !s.focus && (
@@ -211,11 +218,13 @@ export default function Hud({ ready }: { ready: boolean }) {
       {s.started && s.coreNear && !s.overlay && !s.focus && (
         <button
           className="core-information"
-          onClick={() => s.setOverlay("about")}
+          onClick={() => s.update({ memoryReveal: !s.memoryReveal })}
         >
-          <span className="eyebrow">THE KEEPER OF THIS PLACE</span>
-          <strong>Jie Tian</strong>
-          <span>Mathematics / AI / Creative coding</span>
+          <span className="eyebrow">MEMORY REVEAL / 记忆显影</span>
+          <strong ref={memoryCue}>
+            {s.memoryReveal ? "Return to stillness" : "Reveal the collection"}
+          </strong>
+          <span>Saved works or selected collection · ESC to skip</span>
           <ArrowRight size={18} />
         </button>
       )}
@@ -238,7 +247,7 @@ export default function Hud({ ready }: { ready: boolean }) {
         </div>
       )}
       {track && s.started && (
-        <div className="now-playing-tag">
+        <div className="now-playing-tag" data-playing={audio.playing}>
           <button
             className="now-playing-open"
             onClick={() => s.setOverlay("player")}
@@ -246,20 +255,23 @@ export default function Hud({ ready }: { ready: boolean }) {
             {track.cover && (
               <img src={track.displayCover || track.cover} alt="" />
             )}
-            <span>
+            <span ref={trackCue}>
               <small>
                 {audio.playing ? "NOW PLAYING" : "ON THE TURNTABLE"}
               </small>
               <strong>{track.title}</strong>
+              <em className="mini-artist">{track.artist}</em>
             </span>
           </button>
           <button
+            ref={playbackCue}
             className="now-playing-action"
             onClick={() => audio.toggle()}
             aria-label={audio.playing ? "Pause music" : "Play music"}
           >
             {audio.playing ? <Pause size={14} /> : <Play size={14} />}
           </button>
+          <NowPlayingSignal />
         </div>
       )}
     </div>

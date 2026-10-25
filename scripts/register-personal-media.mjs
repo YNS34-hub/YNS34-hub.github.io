@@ -9,8 +9,13 @@ import {
   realpath,
 } from "node:fs/promises";
 import { parseFile } from "music-metadata";
+import { createHash } from "node:crypto";
+import { decodeLyrics, parseLyrics, embeddedLyrics } from "../src/audio/lyrics.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+// 交互扩展开始 media-avatar-import
+import { registerPersonalAvatar } from "./register-personal-avatar.mjs";
+// 交互扩展结束
 const root = process.env.PALACE_MEDIA_ROOT
   ? path.resolve(process.env.PALACE_MEDIA_ROOT)
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -91,6 +96,11 @@ for (const folder of folders) {
       color: /^#[0-9a-f]{6}$/i.test(info.color || "") ? info.color : undefined,
     };
     if (folder === "music") {
+      // Safe URLs also work with dev servers that retain encoded URI delimiters.
+      // The resource ID stays based on the original relative path, preserving saved notes.
+      const audioName = `${createHash("sha256").update(key).digest("hex")}${path.extname(file).toLowerCase()}`;
+      await mkdir(path.join(output, "music", "audio"), { recursive: true });
+      await cp(path.join(dir, file), path.join(output, "music", "audio", audioName));
       let tags;
       try {
         tags = await parseFile(path.join(dir, file));
@@ -101,13 +111,23 @@ for (const folder of folders) {
       let coverUrl;
       if (cover && /^image\/(jpeg|png|webp)$/.test(cover.format)) {
         const ext = cover.format.split("/")[1];
-        const name = `${id}.${ext}`;
+        const coverId = id.length < 180 ? id : createHash("sha256").update(id).digest("hex");
+        const name = `${coverId}.${ext}`;
         await mkdir(path.join(output, "music", "artwork"), { recursive: true });
         await writeFile(
           path.join(output, "music", "artwork", name),
           cover.data,
         );
         coverUrl = `/personal-media/music/artwork/${name}`;
+      }
+      let lyrics = embeddedLyrics(tags?.common.lyrics);
+      const sidecar = path.join(dir, file.replace(/\.[^.]+$/, ".lrc"));
+      try {
+        const sidecarStat = await lstat(sidecar);
+        if (sidecarStat.isFile() && !sidecarStat.isSymbolicLink() && sidecarStat.size <= 2 * 1024 * 1024)
+          lyrics = parseLyrics(decodeLyrics(await readFile(sidecar)), "Local LRC") || lyrics;
+      } catch (error) {
+        if (error.code !== "ENOENT") console.warn(`Could not read local lyrics: ${file}`);
       }
       result.music.push({
         ...base,
@@ -118,14 +138,15 @@ for (const folder of folders) {
         ),
         cover: coverUrl,
         duration: tags?.format.duration,
+        lyrics,
         roomIds: Array.isArray(info.rooms)
           ? info.rooms.filter(
               (x) => typeof x === "string" && /^[a-z-]+$/.test(x),
             )
           : [],
         source: "static",
-        src,
-        year: String(info.year || tags?.common.year || "2026"),
+        src: `/personal-media/music/audio/${audioName}`,
+        year: String(info.year || tags?.common.year || ""),
       });
     } else {
       let projectUrl;
@@ -158,6 +179,21 @@ for (const folder of folders) {
       }
       const item = {
         ...base,
+        primary: !!info.primary,
+        roomIds: Array.isArray(info.roomIds || info.rooms)
+          ? (info.roomIds || info.rooms).filter((x) =>
+              [
+                "wallpapers",
+                "imagined-worlds",
+                "cosmic",
+                "glass-life",
+                "portraits",
+                "editorial",
+                "projects",
+                "research",
+              ].includes(x),
+            )
+          : undefined,
         projectUrl,
         github:
           typeof info.github === "string" &&
@@ -202,3 +238,6 @@ console.log(
   "Registered personal media:",
   Object.fromEntries(Object.entries(result).map(([k, v]) => [k, v.length])),
 );
+// 交互扩展开始 media-avatar-register
+await registerPersonalAvatar(root, output, publicBuild);
+// 交互扩展结束

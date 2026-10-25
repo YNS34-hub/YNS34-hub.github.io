@@ -1,0 +1,393 @@
+{
+  "scope": "Completed forest portion of the earlier paired run. The subsequent alpine portion hit the erroneous old 600-second budget; only this passed forest is reported here. Alpine was fully rerun separately.",
+  "sha": "79a6be3c26f933313603b36754604ffb630a007e",
+  "map": {
+    "room": "cycling",
+    "samples": [
+      {
+        "seconds": 1.008,
+        "distance": 0.24966599212737972,
+        "speed": 0.6011778595114339,
+        "cadence": 68.64651718398838,
+        "ended": false,
+        "recovered": false,
+        "standing": 0,
+        "phase": 5.357276225115681,
+        "sectors": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "contacts": {
+          "leftWristError": 4.8433272733001555e-08,
+          "leftSoleError": 4.813104011212821e-08,
+          "rightWristError": 3.257304785252039e-08,
+          "rightSoleError": 1.447756073930053e-08
+        }
+      },
+      {
+        "seconds": 31.18,
+        "distance": 194.44232611937318,
+        "speed": 8.31027389697484,
+        "cadence": 87.16156258792577,
+        "ended": false,
+        "recovered": false,
+        "standing": 0.9999999999999999,
+        "phase": 263.23811857248364,
+        "sectors": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "contacts": {
+          "leftWristError": 2.9666320900809175e-08,
+          "leftSoleError": 4.994845197402163e-08,
+          "rightWristError": 1.927376898921854e-08,
+          "rightSoleError": 8.103275593445932e-09
+        }
+      },
+      {
+        "seconds": 61.571,
+        "distance": 476.9251603069011,
+        "speed": 11.987243647693925,
+        "cadence": 107.99779607902894,
+        "ended": false,
+        "recovered": false,
+        "standing": 1.5214105270048975e-31,
+        "phase": 551.6527708529841,
+        "sectors": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "contacts": {
+          "leftWristError": 3.679410179572302e-08,
+          "leftSoleError": 4.991771080656924e-08,
+          "rightWristError": 5.0179436453447715e-08,
+          "rightSoleError": 1.4773384135243576e-08
+        }
+      },
+      {
+        "seconds": 91.947,
+        "distance": 804.5949634997129,
+        "speed": 9.045094973975443,
+        "cadence": 95.94954694888263,
+        "ended": false,
+        "recovered": false,
+        "standing": 6.13956578425754e-97,
+        "phase": 854.5090641387906,
+        "sectors": [
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "contacts": {
+          "leftWristError": 3.8049550627873266e-08,
+          "leftSoleError": 5.0290204222761924e-08,
+          "rightWristError": 5.332157962077498e-08,
+          "rightSoleError": 2.037021320359008e-08
+        }
+      },
+      {
+        "seconds": 122.232,
+        "distance": 969.6111166416432,
+        "speed": 4.086851141296841,
+        "cadence": 72.00078188710302,
+        "ended": false,
+        "recovered": false,
+        "standing": 0.9999999999999999,
+        "phase": 1131.03324287953,
+        "sectors": [
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9"
+        ],
+        "contacts": {
+          "leftWristError": 2.8380334086390836e-08,
+          "leftSoleError": 4.302480169726113e-08,
+          "rightWristError": 4.395774561003655e-08,
+          "rightSoleError": 1.508076010403238e-08
+        }
+      },
+      {
+        "seconds": 152.649,
+        "distance": 1127.51291633234,
+        "speed": 5.602633238275443,
+        "cadence": 88.41918387933534,
+        "ended": false,
+        "recovered": false,
+        "standing": 1.5040145246981742e-31,
+        "phase": 1393.8401057387393,
+        "sectors": [
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "contacts": {
+          "leftWristError": 3.60655380470964e-08,
+          "leftSoleError": 5.084820915296444e-08,
+          "rightWristError": 5.051550646608143e-08,
+          "rightSoleError": 1.5586353432369372e-08
+        }
+      },
+      {
+        "seconds": 183.142,
+        "distance": 1263.4603437999822,
+        "speed": 3.833732020135003,
+        "cadence": 75.61837879856236,
+        "ended": false,
+        "recovered": false,
+        "standing": 1.665714266824618e-97,
+        "phase": 1647.2251632887662,
+        "sectors": [
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10"
+        ],
+        "contacts": {
+          "leftWristError": 3.606314937402125e-08,
+          "leftSoleError": 3.8582633737496884e-08,
+          "rightWristError": 5.655060378179441e-08,
+          "rightSoleError": 1.9746345133303373e-08
+        }
+      },
+      {
+        "seconds": 213.614,
+        "distance": 1454.089471336009,
+        "speed": 8.58574043047114,
+        "cadence": 79.80283983543193,
+        "ended": false,
+        "recovered": false,
+        "standing": 0.9999999999999999,
+        "phase": 1899.082811529598,
+        "sectors": [
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12"
+        ],
+        "contacts": {
+          "leftWristError": 6.565768277937556e-08,
+          "leftSoleError": 0.013066683113152507,
+          "rightWristError": 4.154331178233207e-08,
+          "rightSoleError": 1.4514316155407674e-08
+        }
+      },
+      {
+        "seconds": 244.062,
+        "distance": 1762.2039981730593,
+        "speed": 13.063992285498642,
+        "cadence": 107.99977528432626,
+        "ended": false,
+        "recovered": false,
+        "standing": 5.524196918526363e-31,
+        "phase": 2197.5219716359898,
+        "sectors": [
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14"
+        ],
+        "contacts": {
+          "leftWristError": 3.7589972829764796e-08,
+          "leftSoleError": 5.0701212809604e-08,
+          "rightWristError": 4.4974070472000235e-08,
+          "rightSoleError": 6.133633287991984e-09
+        }
+      },
+      {
+        "seconds": 274.53,
+        "distance": 2218.9529513589073,
+        "speed": 15.27021116270703,
+        "cadence": 107.07128591495703,
+        "ended": false,
+        "recovered": false,
+        "standing": 5.138463065649795e-97,
+        "phase": 2538.8185794760852,
+        "sectors": [
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16"
+        ],
+        "contacts": {
+          "leftWristError": 4.2391660617268144e-08,
+          "leftSoleError": 4.763632797657764e-08,
+          "rightWristError": 4.707924482910269e-08,
+          "rightSoleError": 1.517832637923184e-08
+        }
+      },
+      {
+        "seconds": 305.015,
+        "distance": 2629.6305418406196,
+        "speed": 11.1629193027006,
+        "cadence": 98.15105582488562,
+        "ended": false,
+        "recovered": false,
+        "standing": 0.9999999999999999,
+        "phase": 2847.8582287311906,
+        "sectors": [
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19"
+        ],
+        "contacts": {
+          "leftWristError": 2.451626524983702e-08,
+          "leftSoleError": 0.012741166194569789,
+          "rightWristError": 4.1018700430316165e-08,
+          "rightSoleError": 2.0018616551857978e-08
+        }
+      },
+      {
+        "seconds": 335.635,
+        "distance": 2939.237923821192,
+        "speed": 10.59466195926378,
+        "cadence": 98.6736343959133,
+        "ended": false,
+        "recovered": false,
+        "standing": 2.3812793441401208e-31,
+        "phase": 3150.1380201503734,
+        "sectors": [
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21"
+        ],
+        "contacts": {
+          "leftWristError": 3.7541481596805666e-08,
+          "leftSoleError": 4.5412092140008696e-08,
+          "rightWristError": 4.8709966825598044e-08,
+          "rightSoleError": 1.8011127992830213e-08
+        }
+      },
+      {
+        "seconds": 366.266,
+        "distance": 3279.503569024367,
+        "speed": 10.972540183853956,
+        "cadence": 102.58344737614968,
+        "ended": false,
+        "recovered": false,
+        "standing": 8.388310365027484e-98,
+        "phase": 3483.16693227658,
+        "sectors": [
+          "18",
+          "19",
+          "20",
+          "21",
+          "22"
+        ],
+        "contacts": {
+          "leftWristError": 4.6932177524340215e-08,
+          "leftSoleError": 4.151876221251476e-08,
+          "rightWristError": 6.088401980006422e-08,
+          "rightSoleError": 1.901213280365436e-08
+        }
+      },
+      {
+        "seconds": 389.741,
+        "distance": 3529.720322699531,
+        "speed": 0,
+        "cadence": 0,
+        "ended": true,
+        "recovered": false,
+        "standing": 0.9999999999999999,
+        "phase": 3728.748438318237,
+        "sectors": [
+          "20",
+          "21",
+          "22"
+        ],
+        "contacts": {
+          "leftWristError": 3.359977018296681e-08,
+          "leftSoleError": 2.949926853319739e-08,
+          "rightWristError": 4.7269497495697644e-08,
+          "rightSoleError": 1.818693229763294e-08
+        }
+      }
+    ],
+    "contactMax": {
+      "leftWristError": 7.192467597145527e-08,
+      "leftSoleError": 0.013929983124693714,
+      "rightWristError": 8.293599147633175e-08,
+      "rightSoleError": 0.0024660383004928886
+    },
+    "sectors": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22"
+    ],
+    "seconds": 389.741,
+    "lastSample": {
+      "distance": 3529.720322699531,
+      "speed": 0,
+      "cadence": 0,
+      "ended": true,
+      "recovered": false,
+      "standing": 0.9999999999999999,
+      "phase": 3728.748438318237,
+      "sectors": [
+        "20",
+        "21",
+        "22"
+      ],
+      "contacts": {
+        "leftWristError": 3.359977018296681e-08,
+        "leftSoleError": 2.949926853319739e-08,
+        "rightWristError": 4.7269497495697644e-08,
+        "rightSoleError": 1.818693229763294e-08
+      }
+    },
+    "passed": true,
+    "returned": true
+  },
+  "passed": true
+}

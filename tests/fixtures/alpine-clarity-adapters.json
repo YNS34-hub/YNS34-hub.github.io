@@ -1,0 +1,59 @@
+{
+  "baseline": "8a66c0083483f5dd9bf33df1903f060401f04cea",
+  "files": {
+    "Hud.tsx": [
+      {
+        "before": "",
+        "after": "import AlpineVisualOptions from \"../alpine/VisualOptions\";\n"
+      },
+      {
+        "before": "      {map.id===\"alpine-ride\"&&<p className=\"alpine-attribution\">Terrain / imagery © swisstopo<br/><a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener noreferrer\">Road © OpenStreetMap contributors</a> · <a href=\"/media/alpine/SOURCES.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sources</a></p>}\n",
+        "after": "      {map.id===\"alpine-ride\"&&<><AlpineVisualOptions/><p className=\"alpine-attribution\">Terrain / imagery © swisstopo<br/><a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener noreferrer\">Road © OpenStreetMap contributors</a> · <a href=\"/media/alpine/SOURCES.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sources</a></p></>}\n"
+      }
+    ],
+    "RoadBike.tsx": [
+      {
+        "before": "import { BufferGeometry,Float32BufferAttribute,CatmullRomCurve3,TubeGeometry,Vector3,LatheGeometry,Vector2,Group,MeshStandardMaterial,CanvasTexture,RepeatWrapping,SRGBColorSpace } from \"three\";\n",
+        "after": "import { BufferGeometry,Float32BufferAttribute,CatmullRomCurve3,TubeGeometry,Vector3,LatheGeometry,Vector2,Group,MeshStandardMaterial,ShaderMaterial,CanvasTexture,RepeatWrapping,SRGBColorSpace } from \"three\";\n"
+      },
+      {
+        "before": "",
+        "after": "import {settleCranks} from \"../presence/riderPose\";\n"
+      },
+      {
+        "before": "",
+        "after": "  // 轮胎接地点的窄遮蔽补足阴影贴图分辨率；不替代真实主光阴影、不增加离屏通道。\n  const contact=useMemo(()=>new ShaderMaterial({transparent:true,depthWrite:false,toneMapped:false,\n    vertexShader:\"varying vec2 contactUV;void main(){contactUV=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}\",\n    fragmentShader:\"varying vec2 contactUV;void main(){vec2 p=(contactUV-.5)*2.;float a=.25*(1.-smoothstep(.05,1.,dot(p,p)));gl_FragColor=vec4(.014,.024,.027,a);}\",\n  }),[]);\n  useEffect(()=>()=>contact.dispose(),[contact]);\n"
+      },
+      {
+        "before": "    if(!palacePaused){pose.spin-=roadView.speed*dt/.345;pose.pedal+=roadView.cadence/60*Math.PI*2*dt;}\n",
+        "after": "    if(!palacePaused){pose.spin-=roadView.speed*dt/.345;pose.pedal+=roadView.cadence/60*Math.PI*2*dt;pose.pedal=settleCranks(pose.pedal,roadView.cadence,roadView.speed,dt);}\n"
+      },
+      {
+        "before": "",
+        "after": "    {[-.61,.54].map(z=><mesh key={\"contact\"+z} name=\"bike-wheel-contact\" position={[0,.002,z]} rotation={[-Math.PI/2,0,0]} material={contact} raycast={()=>{}}><planeGeometry args={[.14,.24]}/></mesh>)}\n"
+      }
+    ],
+    "World.tsx": [
+      {
+        "before": "import { Suspense, useEffect, useRef } from \"react\";\n",
+        "after": "import { Suspense, useEffect, useRef, useState } from \"react\";\n"
+      },
+      {
+        "before": "",
+        "after": "import {alpinePixelRatio} from \"../worlds/alpine/daylight\";\nimport {useAlpineVisuals} from \"../worlds/alpine/visualPreferences\";\n"
+      },
+      {
+        "before": "",
+        "after": "  const detailed=useAlpineVisuals(s=>s.detailed);\n  const [dimensions,setDimensions]=useState(()=>({width:window.innerWidth,height:window.innerHeight}));\n  useEffect(()=>{\n    const resize=()=>setDimensions({width:window.innerWidth,height:window.innerHeight});\n    window.addEventListener(\"resize\",resize);return()=>window.removeEventListener(\"resize\",resize);\n  },[]);\n"
+      },
+      {
+        "before": "  const dpr = Math.min(\n",
+        "after": "  const nativeDpr = Math.min(\n"
+      },
+      {
+        "before": "",
+        "after": "  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。\n  const dpr=roomId===\"alpine-ride\"&&detailed&&!coarse&&renderTier!==\"low\"\n    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true):nativeDpr;\n"
+      }
+    ]
+  }
+}

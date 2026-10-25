@@ -1,0 +1,300 @@
+{
+  "baseline": "8eadf70fa124490b4c9ff1e4d34bb19b10f37ee6",
+  "applicationSource": "03be3c228b677b2d21306d26fcfa9b83e010affb",
+  "checkedAt": "2026-10-09T05:45:30.980829+00:00",
+  "typescript": "PASS",
+  "lint": "PASS",
+  "unitTests": {
+    "passed": 112,
+    "files": 22,
+    "baselineTestsRetained": 99
+  },
+  "publicBuild": {
+    "passed": true,
+    "modules": 2388,
+    "shareableRoutes": 67,
+    "indexedRoutes": 53,
+    "legacyEntryPreserved": true
+  },
+  "journey": {
+    "source": "5809a1fc0ef4e7bd00aef1e25674053c81e7a85b",
+    "continuousNative": true,
+    "routeSeconds": 407.987,
+    "realAudioRms": 0.0024278786457190868
+  },
+  "flows": {
+    "journey": {
+      "source": "5809a1fc0ef4e7bd00aef1e25674053c81e7a85b",
+      "checks": [
+        "Enter from the museum on foot",
+        "Native approach and E mount",
+        "Low-speed steering has real authority",
+        "Genuine acceleration and cadence",
+        "Coasting preserves momentum and starts wheel-speed freehub",
+        "Real native Web Audio produces nonzero samples",
+        "Pedaling removes freehub",
+        "Shift easier",
+        "Shift harder",
+        "Progressive braking reaches a stop",
+        "Photo mode creates a local PNG and Escape handles only that layer",
+        "Comfort and sound-off acknowledge their state",
+        "Actual gradual stop at the lake viewpoint",
+        "Climb is a real positive grade and lower-gear effort",
+        "Gravity and wind contribute on descent",
+        "High-speed steering is smaller than low-speed authority",
+        "Continuous full route finishes without teleport or infinite loading",
+        "Bounded streaming traverses the full authored geography",
+        "Cinema restores road posture, distance, spatial position and head orientation",
+        "Explicit invalid-state recovery returns the last safe point stopped",
+        "Fresh re-entry restores progress on foot without stale riding controls"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "road": {
+      "source": "03be3c228b677b2d21306d26fcfa9b83e010affb",
+      "checks": [
+        "Enter on foot and physically approach the waiting road bike",
+        "Native E mounts with a road cockpit and stationary start",
+        "Genuine pedal input, inertial coasting and native easier/harder gear feedback",
+        "Progressive braking, photo view, actual local PNG and single-level Escape",
+        "Original Guide owns Escape and blocks pedal input without opening underlying ride options",
+        "One Escape closes only the original listening panel and preserves underlying ride options",
+        "Sound switch, camera comfort, refresh restoration stopped on foot and museum return"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "return": {
+      "source": null,
+      "checks": [
+        "Road Cinema return preserves position, orientation, riding posture and stopped momentum",
+        "Injected invalid distance recovers last safe point",
+        "Museum source restored and road controls/diagnostics released"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "quality": {
+      "source": null,
+      "checks": [
+        "v1 IndexedDB records retain blob, favorite and ID after placement migration",
+        "all main rooms enter, return, load real works and retain WASD control",
+        "memory revelation uses a real collection image, stays in place and is interruptible",
+        "batch import targets Portraits, persists, renders its stable ID, and isolates failure",
+        "Cinema restores exact view from every source; ESC first closes metadata; Back returns",
+        "modal suspends WASD; project viewing retains the room; exactly one web preview mounts on demand",
+        "kept website references appear in My Collection and disappear when unkept",
+        "stateful corridor door changes after a real visit, with five bounded resident segments",
+        "observatory bridge rails and Unfinished exit match their physical walking boundaries",
+        "actual local audio drives measured frequency bands and settles after pause",
+        "local audio placement and room soundtrack metadata survive refresh",
+        "accessible index Cinema returns to index without discarding navigation"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "interaction": {
+      "source": "04134f242a3503f51f47eea114936a243726a68b",
+      "checks": [
+        {
+          "width": 1920,
+          "name": "Real gaze → E opens existing project; modal blocks WASD; look-away clears dwell"
+        },
+        {
+          "width": 1920,
+          "name": "Gaze favorite persists; original Cinema exact camera return retained"
+        },
+        {
+          "width": 1920,
+          "name": "Existing real analyser + synchronized seven-line lyrics + E player + pause settling"
+        },
+        {
+          "width": 1920,
+          "name": "Reduced motion retains all controls without cover flight"
+        },
+        {
+          "width": 2560,
+          "name": "Real gaze → E opens existing project; modal blocks WASD; look-away clears dwell"
+        },
+        {
+          "width": 2560,
+          "name": "Gaze favorite persists; original Cinema exact camera return retained"
+        },
+        {
+          "width": 2560,
+          "name": "Existing real analyser + synchronized seven-line lyrics + E player + pause settling"
+        },
+        {
+          "width": 2560,
+          "name": "Reduced motion retains all controls without cover flight"
+        }
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "integration": {
+      "source": "bee50dd3b3eb41e2f336f1ead336dc76905776fe",
+      "checks": [
+        {
+          "width": 1920,
+          "name": "Actual Atrium E doorway / original threshold walk / new-world preview windows"
+        },
+        {
+          "width": 1920,
+          "name": "Native audio + original cover import / real cover continuity / cleanup / unchanged track and progress / reduced motion"
+        },
+        {
+          "width": 1920,
+          "name": "Native repeating original fixture survives museum / court / ride travel; effects share one existing context; native library and cover survive refresh"
+        },
+        {
+          "width": 2560,
+          "name": "Actual Atrium E doorway / original threshold walk / new-world preview windows"
+        },
+        {
+          "width": 2560,
+          "name": "Native audio + original cover import / real cover continuity / cleanup / unchanged track and progress / reduced motion"
+        },
+        {
+          "width": 2560,
+          "name": "Native repeating original fixture survives museum / court / ride travel; effects share one existing context; native library and cover survive refresh"
+        }
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "preparation": {
+      "source": "04134f242a3503f51f47eea114936a243726a68b",
+      "checks": [
+        "Pending preparations can be abandoned without readiness, visibility or camera ownership leaking into the next destination",
+        "medium preparation preserves native pickup/dribble, direct Guide transfer, real pedalling, brake and camera return",
+        "low preparation preserves native pickup/dribble, direct Guide transfer, real pedalling, brake and camera return",
+        "high preparation preserves native pickup/dribble, direct Guide transfer, real pedalling, brake and camera return",
+        "Three additional round trips settle to bounded GPU textures"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "accessibility": {
+      "source": null,
+      "checks": [
+        {
+          "name": "rapid native cues cancel superseded instances and finish without retained inline styles",
+          "passed": true
+        },
+        {
+          "name": "live OS reduced motion cancels existing cues and keeps genuine audio and lyric time",
+          "passed": true
+        },
+        {
+          "name": "application reduced setting cancels in-flight identity cues without owning playback",
+          "passed": true
+        },
+        {
+          "name": "paused disc retains orientation and resumes from the same native animation",
+          "passed": true
+        },
+        {
+          "name": "rapid Cinema navigation settles the original material and preserves exact return view",
+          "passed": true
+        },
+        {
+          "name": "keyboard focus and single Escape work immediately while guide animation is active",
+          "passed": true
+        }
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "production": {
+      "source": "03be3c228b677b2d21306d26fcfa9b83e010affb",
+      "checks": [
+        "Clean public personal-media catalog and independently generated activity deep links",
+        "Original Guide reaches court; native recall, pickup, dribble, timed shot and assist feedback",
+        "Guide cycling arrival honors genuine pedal input; brake, photo, local PNG, one-level Escape, refresh and return work without debug globals",
+        "Legacy /museum entry and actual Pointer Lock / single Escape remain available"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true
+    },
+    "publicBrowser": {
+      "source": null,
+      "checks": [
+        "production files have static deep links, SEO text, local assets, fallback and preserved legacy pages",
+        "static project remains readable without JavaScript or WebGL",
+        "initial desktop architecture renders at medium quality before entering",
+        "2D index is independently accessible, searchable and focus links reload",
+        "local audio import, metadata edits, legal NetEase links and playback survive navigation",
+        "private images persist, full original is viewable, and image cinema enters 3D",
+        "all main gallery rooms are reachable through the museum guide",
+        "desktop exploration, bookmarks and comfort settings survive reload",
+        "procedural and project direct links load, browser back restores the room",
+        "mobile tour and collection index work without horizontal overflow"
+      ],
+      "skipped": [
+        "first-person controls move smoothly and corridor walls contain the visitor"
+      ],
+      "errors": [],
+      "passed": true
+    },
+    "roadDevelopment": {
+      "source": "6a04460e6a3aab3f388198bd7798850e31a8e731",
+      "checks": [
+        "Enter on foot and physically approach the waiting road bike",
+        "Native E mounts with a road cockpit and stationary start",
+        "Genuine pedal input, inertial coasting and native easier/harder gear feedback",
+        "Progressive braking, photo view, actual local PNG and single-level Escape",
+        "Original Guide owns Escape and blocks pedal input without opening underlying ride options",
+        "One Escape closes only the original listening panel and preserves underlying ride options",
+        "Sound switch, camera comfort, refresh restoration stopped on foot and museum return"
+      ],
+      "skipped": [],
+      "errors": [],
+      "passed": true,
+      "workingTreeIncludesFinalEscapeGate": true
+    }
+  },
+  "privacy": {
+    "source": "03be3c228b677b2d21306d26fcfa9b83e010affb",
+    "checkedAt": "2026-10-09T05:39:45.2182616Z",
+    "catalog": {
+      "wallpapers": 0,
+      "visuals": 0,
+      "music": 0,
+      "projects": 0,
+      "research": 0
+    },
+    "personalMediaFileCount": 1,
+    "commercialAudioOrLyricsCount": 0,
+    "allowedOriginalAudio": {
+      "sha256": "EA2D60ECD0564B3849F260A88A56E1A08CF32944C4004B9735F8C4608635DD3A",
+      "path": "media/generated/palace-study.wav",
+      "origin": "Existing self-composed synthetic Palace Study; no audio samples"
+    },
+    "allowedPublicText": [
+      "robots.txt",
+      "OFL-Space-Grotesk.txt",
+      "THREE-LICENSE.txt"
+    ],
+    "passed": true
+  },
+  "firstConcurrentAccessibilityRun": {
+    "passed": false,
+    "observation": "OS reduced-motion attribute preceded final cue cleanup at the immediate assertion; unmodified standalone rerun passed all six checks."
+  },
+  "scope": "Browser flows and screenshot timing are functional evidence. Only the separately recorded visible Edge performance report claims actual GTX 1650 measurement.",
+  "concurrentRegistrationAttempt": {
+    "passed": false,
+    "observation": "One unchanged registration unit exceeded its existing 5-second limit with browser QA running. The isolated unchanged full suite passed 112 tests; no timeout or test assertion was relaxed."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "base": "http://127.0.0.1:5191",
+  "sha": "fd3fd50b895bf299b594433776c39e54c627767c",
+  "checks": [
+    "Enter on foot and physically approach the waiting road bike",
+    "Native E mounts with a road cockpit and stationary start",
+    "Genuine pedal input, inertial coasting and native easier/harder gear feedback",
+    "Progressive braking, photo view, actual local PNG and single-level Escape",
+    "Original Guide owns Escape and blocks pedal input without opening underlying ride options",
+    "One Escape closes only the original listening panel and preserves underlying ride options",
+    "Native camera buttons preserve third-person avatar and return to first person",
+    "Original forest map and independent per-map progress survive native switching in both directions",
+    "Sound switch, camera comfort, refresh restoration stopped on foot and museum return"
+  ],
+  "errors": [],
+  "passed": true
+}

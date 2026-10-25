@@ -1,0 +1,21 @@
+{
+  "generator": "scripts/prepare-athlete-detail.mjs",
+  "source": "Microsoft Rocketbox Sports_Male_04, same MIT source as the base athlete",
+  "sourceHashes": {
+    "athlete.gltf": "09231194190cf50a5dc827c0b2af39173019472c724dd416d4feee65b27447bd",
+    "athlete.bin": "83cb79ee30746c3f1f142407fbe6c0becd5849823037c828fdbc15e7f0d34c3c",
+    "head-color.webp": "6a6a5f6c8ff1c09b80aa2b9ea9f1b41dc7918654100e36efc7c16219cea80ed4"
+  },
+  "baseTriangles": 7520,
+  "bodyTriangles": 120320,
+  "hairTriangles": 19200,
+  "totalTriangles": 139520,
+  "geometryLevels": 2,
+  "maximumCurvedMidpointCentimetres": [
+    0.22,
+    0.11
+  ],
+  "skeletonAndAnimationsUnchanged": true,
+  "privateMediaRead": false,
+  "bytes": 8311456
+}

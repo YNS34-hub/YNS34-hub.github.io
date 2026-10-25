@@ -7,6 +7,8 @@ import {
   type ReactNode,
 } from "react";
 import { usePalaceStore } from "./systems/store";
+import { useLibraryStore } from "./systems/library";
+import { useAudioStore } from "./audio/player";
 import { resolveRoomPlan } from "./world/roomPlan";
 import Hud from "./ui/Hud";
 import Guide from "./ui/Guide";
@@ -17,9 +19,15 @@ import IndexView from "./ui/IndexView";
 import MusicPanel from "./ui/MusicPanel";
 import WallpaperPanel from "./ui/WallpaperPanel";
 import CinemaControls from "./ui/CinemaControls";
+import LyricsProjection from "./ui/LyricsProjection";
 import { Dialog } from "./ui/primitives";
 import { AudioSystem } from "./audio/AudioSystem";
+// 交互扩展开始 app-import
+import InteractionHud from "./interaction/InteractionHud";
+const ActivityHud = lazy(() => import("./worlds/ActivityHud"));
+// 交互扩展结束
 const World = lazy(() => import("./world/World"));
+const FitnessHud=lazy(()=>import('./fitness/FitnessHud'));
 class WorldBoundary extends Component<
   { children: ReactNode; onError: () => void },
   { failed: boolean }
@@ -49,6 +57,18 @@ function RouteSync() {
   return null;
 }
 export default function App() {
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const host = window as Window & { __PALACE_DEV__?: unknown };
+    host.__PALACE_DEV__ = {
+      state: usePalaceStore,
+      library: useLibraryStore,
+      audio: useAudioStore,
+    };
+    return () => {
+      delete host.__PALACE_DEV__;
+    };
+  }, []);
   const s = usePalaceStore();
   const [ready, setReady] = useState(false);
   const [contextError, setContextError] = useState(false);
@@ -60,8 +80,12 @@ export default function App() {
         s.setOverlay(s.overlay === "guide" ? null : "guide");
       }
       if (e.key === "Escape") {
+        if (e.defaultPrevented || s.roomId === "cinema") return;
         if (s.focus) s.focusItem(null);
-        else s.setOverlay(null);
+        else if (s.overlay) s.setOverlay(null);
+        else if (s.memoryReveal) s.update({ memoryReveal: false });
+        else if (s.pendingDoor) s.update({ pendingDoor: null });
+        else if (document.pointerLockElement) document.exitPointerLock();
       }
     };
     window.addEventListener("keydown", keys);
@@ -72,10 +96,12 @@ export default function App() {
       ? "reduced"
       : "full";
   }, [s.reducedMotion]);
+  useEffect(() => {
+    setReady(false);
+  }, [s.roomId]);
   const plan = resolveRoomPlan(s.roomId);
   const dark = plan.dark;
-  const visualCollection =
-    plan.type === "image-gallery" || s.roomId === "cinema";
+  const visualCollection = plan.type !== "listening";
   useEffect(() => {
     const title =
       s.focus?.title ||
@@ -112,6 +138,10 @@ export default function App() {
     >
       <RouteSync />
       <AudioSystem />
+      {/* 交互扩展开始 app-hud */}
+      <InteractionHud />
+      {["basketball", "cycling", "alpine-ride"].includes(s.roomId) && <Suspense fallback={null}><ActivityHud /></Suspense>}
+      {/* 交互扩展结束 */}
       {s.mode === "index" ? (
         <IndexView />
       ) : (
@@ -137,10 +167,17 @@ export default function App() {
                 <World onReady={() => setReady(true)} />
               </Suspense>
             </WorldBoundary>
+            {s.roomId === "music" && <LyricsProjection />}
           </div>
           <div className="world-reveal" aria-hidden="true" />
+          {!ready && (
+            <div className="room-loading" role="status">
+              Preparing visible works…
+            </div>
+          )}
           <Hud ready={ready} />
           {s.roomId === "cinema" && <CinemaControls />}
+          {s.roomId === "private-gym" && <Suspense fallback={null}><FitnessHud/></Suspense>}
         </>
       )}
       {s.overlay === "guide" && <Guide />}

@@ -11,6 +11,16 @@
 
 原学术页面、非线性玻璃研究和五步人工主导数学审阅流程继续保留。旧页面位于 `/legacy/`，既有 `/Benjamin/`、`/douyin/`、`/douyin-mindazhiguang/` 保留。
 
+## 2026-10-26 整合更新
+
+本次整合保留之前的展馆、音乐与骑行改造，并加入五种篮球场、左右手运球与双手收球、投篮／上篮／扣篮／运球动作包、动作近景、高精度人物与原生画质设置。当前肩臂修复改善双手持球时的跨胸和扭折，并平滑人物体型调整的区域交界。动作是原创程序实现，未包含 2K 游戏动画文件或官方动作捕捉。
+
+私人健身房提供俯卧撑、徒手深蹲、平板支撑、哑铃弯举、哑铃肩推、卧推、负重深蹲，支持暂停、变速、重置、近景观察以及本机训练照片／视频。湖岸、地表过渡和倒影成果一并保留。
+
+实现与验证范围见 [篮球动作记录](docs/basketball-motion-quality.md)、[私人健身房](docs/private-gym.md)、[湖岸记录](docs/lake-shore/README.md) 与 [后续地景改造](docs/scenery-refinement.md)。同目录新增的 [Unreal 运动工程](unreal-sports/SOURCE-ARCHIVE.md) 和 [动作实验室](unreal-motion-lab/SOURCE-ARCHIVE.md) 同步为源码归档；原本机私人角色和游戏运行包不进入公开仓库。
+
+GitHub Pages 使用 `main` 的公开构建发布。其他分支的源码更新不会自动改变线上网站；本机私人素材与浏览器中的导入记录也不会随代码提交上传。
+
 ## 运行
 
 需要 Node.js 22.12+。Windows Steam 导入脚本需要 PowerShell 7 (`pwsh`)。
@@ -61,7 +71,7 @@ personal-media/
 
 运行 `npm run sync:github`，使用已经登录的 GitHub CLI (`gh`) 检查 YNS34-hub 当前公开仓库、README 和 `docs/public/assets/screenshots/preview/images`。审计快照位于 `content/public-project-audit.json`。运行和 build 不需要联网或 GitHub token。
 
-Hero 展品使用真实项目截图：The Memory Palace、VOID//ECHO、Big Mouth Burger、Giannis Editorial、Sci-Fi Portfolio；Nonlinear Glass Study 使用原有真实玻璃研究素材并链接保留页面。有真实 demo 才显示 **ENTER PROJECT**，公开源码显示 **SOURCE**。截图来源见 [项目视觉说明](public/media/projects/README.md)。
+Hero 展品使用真实项目截图：The Memory Palace、Big Mouth Burger、Giannis Editorial、Sci-Fi Portfolio；Nonlinear Glass Study 使用原有真实玻璃研究素材并链接保留页面。有真实 demo 才显示 **ENTER PROJECT**，公开源码显示 **SOURCE**。截图来源见 [项目视觉说明](public/media/projects/README.md)。`content/curation.json` 保留用户明确撤下的项目 ID，后续 GitHub 扫描不会重新展出它们。
 
 Research Vault 单独展示数学与 Reviewer-First Audit；后者只展示已经公开的合成数据演示图，不暴露私人仓库、评审或论文。fork 明确标为 REFERENCE；未经过策展的新原创仓库先进入 Archive / PROTOTYPE，不会自动成为 Hero。
 
@@ -79,11 +89,15 @@ Research Vault 单独展示数学与 Reviewer-First Audit；后者只展示已�
 
 **IMPORT MUSIC / RECONNECT LIBRARY** 在本机读取音频标签、专辑、封面和时长。IndexedDB 保存 Blob 和 metadata，刷新后恢复；存储受限时显示明确提示。清除浏览器数据后通过 Reconnect 重新导入原文件。声音需用户手势启动，可独立调节音乐、环境与空间提示音。
 
+音乐室的墙面跟随当前歌曲显示标题、歌手和歌词。音频内嵌歌词与同名 `.lrc` 自动读取；在播放器 **IMPORT LYRICS** 可绑定本地 LRC / TXT，并在 Record Notes 调整时间偏移。带时间戳的歌词按原生播放器进度滚动，拖动进度立即定位；无时间戳的文字保留手动阅读，缺少歌词或纯音乐提示不伪造内容。歌词与音频都只留在本机。低频照明、中频鳍片、高频细节来自真实分析，暂停后回到静止。
+
+小型 UI 使用自托管 Space Grotesk；展品标题使用编辑字体，大幅入口标题保留 Palace Sans。馆标采用折叠门洞与玻璃核心轮廓，透明底、13 / 8 px 层级与固定字距；只随建筑背景改变字色。
+
 ## 探索与舒适度
 
 WASD / 方向键移动，鼠标拖动查看，Shift 加速，M 打开 Guide，ESC 关闭详情。触控使用 Tour；`/?view=index` 提供可读索引。设置包含画质、Reduce Motion、音量和灵敏度。每个主房间有独立 URL，收藏展翼也生成分享路径。自动质量调节、有限纹理分辨率与五个驻留长廊区段限制资源占用。
 
-房间背景、fog、ambient/key light 和图像主色通过逐帧缓动适应。玻璃生命体的光影、音乐室低频进入提示、壁纸降光、Cosmic 顶棚消失、Archive 干燥近声和 Unfinished UI 消隐构成克制的空间事件。Reduce Motion 保留作品与导航。
+房间背景、fog、ambient/key light 和图像主色通过逐帧缓动适应。玻璃生命体的光影、音乐室低频进入提示、壁纸降光、Cosmic 开放远景、Archive 干燥近声和 Unfinished UI 消隐构成克制的空间变化。Reduce Motion 保留作品与导航。
 
 ## 私人构建与公开发布
 
@@ -115,8 +129,45 @@ npm run build:public
 
 `npm test` 验证内容、路由、碰撞、音频与私人媒体扫描 / 公开排除。`scripts/verify-personal-world.mjs` 在 dev 服务器验证原生导览、每个房间的 WASD、影院键盘控制、收藏、图片和音频导入及刷新恢复。`npm run qa:visual` 截取八个主空间；环境变量 `PALACE_URL`、`PALACE_BROWSER`、`PALACE_ARTIFACTS` 控制地址、浏览器和输出位置。
 
-截图浏览器使用 SwiftShader，不代表独立显卡 FPS。构建生成静态作品页、SEO、sitemap 和 GitHub Pages 404 fallback。旧版本视觉记录保留在 docs，属于上一轮设计。
+旧的 `qa:visual` 记录使用 SwiftShader，不代表独立显卡 FPS。本轮 `qa:quality` 和 `qa:performance` 使用已安装 Edge，并记录实际 renderer；性能验收来自可见桌面浏览器。构建生成静态作品页、SEO、sitemap 和 GitHub Pages 404 fallback。旧版本视觉记录保留在 docs，属于上一轮设计。
 
-核心文件：`src/rooms/PersonalRooms.tsx`（私人世界）、`src/world/artDirection.ts`（房间照明）、`scripts/register-personal-media.mjs`（自动注册）、`src/systems/library.ts`（本地收藏）、`src/ui/CinemaControls.tsx`（影院）、`content/`（公开策展）。
+核心文件：`src/world/World.tsx`（当前渲染入口）、`src/rooms/`（独立建筑与展陈）、`src/world/artDirection.ts`（房间照明）、`scripts/register-personal-media.mjs`（自动注册）、`src/systems/library.ts`（本地收藏）、`src/ui/LyricsProjection.tsx`（空间歌词）、`src/ui/CinemaControls.tsx`（影院）、`content/`（公开策展）。
 
 This place continues to grow with me.
+
+
+## 空间与导入（quality-leap 分支）
+
+中庭使用低入口框景、闭合的双凹腔玻璃实体与收藏显影；聆听室由弧形声学构件、厚玻璃鳍片和静止聆听点组成；回廊保持五段常驻，同时改变横截面、侧向开口和光井。回廊 −003 的门在实际访问后开放更大的内部空间；这是有限访问状态与独立内室的转换，没有实现 portal 渲染。
+
+屏幕保持原始 sRGB；摄影印刷品接受受限的照明，保留肤色和暗部；投影仅用于短暂显影。玻璃使用同一闭合实体和 PMREM 环境，在中低画质保留轮廓。没有全馆实时镜面。
+
+Guide → **Arrange / import works** 可预览批量素材，确认目标房间、类别和主展品，再进入实际展位。图片可调整顺序、转移展厅、移除与恢复。资源引用共享稳定 ID，旧 IndexedDB v1 收藏仍保留。影院返回原房间、位置和朝向；二维入口也返回原索引分类。网站预览只在主动激活后装载一个 sandbox iframe，关闭后卸载；受限的网站保留截图与外部入口。
+
+```bash
+npm run qa:quality      # 同机位截图；PALACE_PHASE / PALACE_ARTIFACTS 控制输出
+npm run test:quality    # 本机开发预览：导入、返回、回廊和真实音频流程
+npm run qa:performance # 可见桌面浏览器；实际 renderer 写入报告
+```
+
+这些脚本默认连接 `http://127.0.0.1:5190`；先用 `npm run dev -- --port 5190 --strictPort` 启动。Windows 默认使用已安装 Edge；其他环境通过 `PALACE_BROWSER` 指定浏览器。`PALACE_TEST_TRACK` 可选本机已有合法歌曲；默认使用仓库自带 Palace Study，不下载音频。性能报告使用实际 GPU 名称与帧时间，截图的短时 headless 数据不作为目标硬件验收成绩。
+
+本轮同机位对比、实际测试、GTX 1650 采样及未测范围见 [空间重构验证记录](docs/quality-leap/README.md)。
+
+从固定 `6380557` 派生的增量动效分支，只调整原组件的时间、真实音频响应与交互反馈。八阶段提交、同机位对比、回归测试和 GTX 1650 前后采样见 [动效验证记录](docs/motion-layer/README.md)。
+
+## 活动目的地与公路骑行
+
+第一轮新增靠近/注视/操作反馈、街头篮球练习场和 Worlds 翼，保留原馆的建筑、音频、歌词和私人素材边界，见 [交互与活动验证记录](docs/interaction-worlds/README.md)。
+
+第二轮从已完成的第一轮派生，`/cycling` 现在进入 **THE LONG WAY HOME**：先步行靠近原创弯把公路车，再按 E 上车。约 3.53 km 连续铺装路线经过森林、湖岸、真实爬坡、山脊、草甸与下坡。W 踩踏，松开滑行并听真实轮速棘轮声；Q/E 换挡，S/Space 制动，P 静止照片；Ride options 可选连续踩踏、下个观景停点、低动态与返回。旧骑行 URL、原馆和篮球仍保留。实际截图、原生录像、测试和性能范围见 [公路骑行验证记录](docs/road-cycling/README.md)。
+
+新增独立地图 **THE ALPINE DESCENT** 位于 `/alpine-ride/`，原 `/cycling/` 继续保留。Worlds 翼或骑行选项可在停车后选择地图；两图使用独立进度，共享现有骑行控制与声音。新路线依据 Furka Pass 的开放地形/道路资料，约 10.17 km，参考指定视频的高山草甸、山壁和深谷构图，不宣称是视频的确切地点。来源、截图、验证与未测范围见 [高山地图记录](docs/alpine-ride/README.md)。
+
+最新画面精度更新使用 swisstopo 实测高程、对应航拍、真实扫描岩石/草叶和分离的 8K 天空；同路段前后对照、实际 GTX 1650 样本及具体限制见 [画面精度验收](docs/alpine-fidelity/README.md)。
+
+街头篮球场按指定视频的公园构图增量更新：铜棕球场、真实树木、旁观者、完整篮架与可切换昼夜照明，保留原自由练投和馆内能力。同机位 1080p / 1440p 对照、原生操作、公开隐私与实际 GTX 1650 短样本见 [球场画面验收](docs/court-fidelity/README.md)。
+
+入口的字体、真实天空、厚玻璃与单一地面反射在独立分支更新，前后画面和实际硬件结果见 [入口验收](docs/museum-entry/README.md)。
+
+当前篮球场使用 **5 / 小键盘 5** 投篮与近篮上篮，**Enter / 小键盘 Enter** 加速助跑，**Enter + 5** 扣篮；原 Space 投篮和 Shift 篮球加速别名已撤销。E 运球、X 换手、R 找回球，鼠标操作保留。两张骑行地图新增 **C 坐 / 站姿切换**，保留原踩踏、刹车、换挡、视角和进度。原始 2K 人物贴图、真实压弯与接触校准、完整骑行、公开隔离及具体局限见 [运动细节验收](docs/sports-detail/README.md)。

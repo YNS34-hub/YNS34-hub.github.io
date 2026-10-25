@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from "react";
+import { lazy,Suspense, useEffect, useRef, useState } from "react";
 import {
   Canvas,
   events as pointerEvents,
@@ -20,21 +20,33 @@ import GalleryRoom from "../rooms/Galleries";
 import Corridor from "../rooms/Corridor";
 import { VisualLab } from "../rooms/VisualLab";
 import { WallpaperCinema } from "../rooms/Wallpapers";
-import {
-  PersonalProjects,
-  PersonalResearch,
-  PersonalMusic,
-  PersonalWallpaper,
-  ImaginedWorlds,
-  PersonalArchive,
-  MyCollection,
-} from "../rooms/PersonalRooms";
+import { PersonalProjects, PersonalResearch } from "../rooms/PersonalRooms";
 import { useLibraryStore } from "../systems/library";
 import { nearestImageAtmosphere } from "./imageAtmosphere";
 import Player from "./Player";
 import { setWalkTarget } from "./walkTarget";
 import { resolveRoomPlan } from "./roomPlan";
 import { roomLighting } from "./artDirection";
+import ListeningRoom from "../rooms/ListeningRoom";
+import { WallpaperVault, ImageRoom } from "../rooms/ImageRooms";
+import { ArchiveRoom, CollectionRoom } from "../rooms/ArchiveRooms";
+import { textureStatus } from "./textureCache";
+import { audioSignal } from "../audio/signal";
+import IdentityContrast from "./IdentityContrast";
+import { useProgress } from "@react-three/drei";
+// 交互扩展开始 world-import
+import InteractionFrame from "../interaction/InteractionFrame";
+import ListeningAttention from "../interaction/ListeningAttention";
+import WorldsBoundary, { MuseumWorldsEntry } from "../worlds/WorldsBoundary";
+import WorldsEnvironment from "../worlds/OutdoorEnvironment";
+import AdventureCamera from "../worlds/presence/CameraRig";
+import { isAdventureRoom } from "../worlds/presence/state";
+import {alpinePixelRatio} from "../worlds/alpine/daylight";
+import {sportPixelRatio} from "../worlds/presence/clarity";
+import {useAlpineVisuals} from "../worlds/alpine/visualPreferences";
+import {loadGymRoom} from '../fitness/preload';
+const PrivateGym=lazy(loadGymRoom);
+// 交互扩展结束
 
 function Environment({
   roomId,
@@ -44,6 +56,7 @@ function Environment({
   onReady?: () => void;
 }) {
   const { gl, scene } = useThree();
+  const { active: assetLoading } = useProgress();
   const tier = usePalaceStore((s) => s.effectiveQuality);
   const plan = resolveRoomPlan(roomId);
   const lighting = roomLighting(plan, roomId);
@@ -95,7 +108,6 @@ function Environment({
     scene.environment = target.texture;
     environment.dispose();
     generator.dispose();
-    ready.current?.();
     const lost = (event: Event) => {
       event.preventDefault();
       usePalaceStore.getState().update({ mode: "index" });
@@ -107,6 +119,26 @@ function Environment({
       gl.domElement.removeEventListener("webglcontextlost", lost);
     };
   }, [gl, scene]);
+  const readyAt = useRef(0),
+    sent = useRef("");
+  useEffect(() => {
+    readyAt.current = performance.now();
+    sent.current = "";
+  }, [roomId]);
+  useFrame(() => {
+    if (sent.current === roomId) return;
+    const status = textureStatus();
+    if (
+      useLibraryStore.getState().ready &&
+      !status.pending &&
+      !assetLoading &&
+      performance.now() - readyAt.current > 650 &&
+      sent.current !== roomId
+    ) {
+      sent.current = roomId;
+      ready.current?.();
+    }
+  });
   const color = lighting.background;
   return (
     <>
@@ -122,7 +154,13 @@ function Environment({
       <hemisphereLight ref={sky} args={["#b5cfde", "#22364a", 0.5]} />
       <directionalLight
         ref={key}
-        position={[12, 24, 4]}
+        position={
+          roomId === "music"
+            ? [-8, 13, 5]
+            : roomId === "atrium"
+              ? [-12, 24, 6]
+              : [10, 16, 5]
+        }
         color="#d4e4f0"
         intensity={1}
         castShadow={plan.type !== "listening"}
@@ -143,12 +181,18 @@ function Environment({
 }
 
 function PerformanceMonitor() {
+  const settledAt=useRef(performance.now()),lastRoom=useRef('');
   const count = useRef(0),
     seconds = useRef(0),
     stable = useRef(0),
     bad = useRef(0);
   useFrame((_, delta) => {
     if (document.hidden) return;
+    const current=usePalaceStore.getState();
+    // Loading starts inside lazy resource renders; sample its store on the
+    // animation frame instead of subscribing this component during that render.
+    if(useProgress.getState().active||lastRoom.current!==current.roomId||!document.hasFocus()||current.overlay||current.focus||delta>.25){settledAt.current=performance.now();lastRoom.current=current.roomId;count.current=seconds.current=stable.current=bad.current=0;return;}
+    if(performance.now()-settledAt.current<3000)return;
     count.current += 1;
     seconds.current += delta;
     if (seconds.current < 2) return;
@@ -168,10 +212,9 @@ function PerformanceMonitor() {
       // A conservative upward adjustment avoids oscillation on integrated GPUs.
       if (
         stable.current >= 6 &&
-        state.effectiveQuality === "low" &&
-        !matchMedia("(pointer: coarse)").matches
+        (state.effectiveQuality === "low" || stable.current>=10 && state.effectiveQuality === "medium" && !matchMedia("(pointer: coarse)").matches)
       ) {
-        state.update({ effectiveQuality: "medium" });
+        state.update({ effectiveQuality: state.effectiveQuality === "low" ? "medium" : "high" });
         stable.current = 0;
       }
     }
@@ -195,8 +238,8 @@ function Scene({
   const baseRoom = roomId.split("-page-")[0];
   useEffect(() => {
     gl.transmissionResolutionScale =
-      tier === "high" ? 0.8 : tier === "medium" ? 0.6 : 0.35;
-  }, [gl, tier]);
+      roomId === "atrium" && tier !== "low" ? 1 : tier === "high" ? 0.8 : tier === "medium" ? 0.6 : 0.35;
+  }, [gl, tier, roomId]);
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     const debug = window as Window & { __PALACE_DEBUG__?: unknown };
@@ -206,6 +249,8 @@ function Scene({
       scene,
       roomId,
       residentCorridorChunks: roomId === "corridor" ? 5 : 0,
+      textureStatus,
+      audioSignal,
     };
     return () => {
       delete debug.__PALACE_DEBUG__;
@@ -213,9 +258,21 @@ function Scene({
   }, [camera, gl, roomId, scene]);
   return (
     <>
+      {/* 交互扩展开始 world-environment-open */}
+      <WorldsEnvironment roomId={roomId} onReady={onReady}>
+      {/* 交互扩展结束 */}
       <Environment roomId={roomId} onReady={onReady} />
+      {/* 交互扩展开始 world-environment-close */}
+      </WorldsEnvironment>
+      {/* 交互扩展结束 */}
       <Player roomId={roomId} />
       <PerformanceMonitor />
+      <IdentityContrast />
+      {/* 交互扩展开始 world-interaction */}
+      <InteractionFrame />
+      <ListeningAttention key={"listening-attention:" + roomId} roomId={roomId} />
+      <MuseumWorldsEntry key={"worlds-entry:" + roomId} roomId={roomId} />
+      {/* 交互扩展结束 */}
       <group
         key={roomId}
         onClick={(event) => {
@@ -229,8 +286,13 @@ function Scene({
           }
         }}
       >
+        {/* 交互扩展开始 world-boundary-open */}
+        <WorldsBoundary roomId={roomId}>
+        {/* 交互扩展结束 */}
         {roomId === "atrium" ? (
           <Atrium />
+        ) : roomId === "private-gym" ? (
+          <Suspense fallback={null}><PrivateGym/></Suspense>
         ) : roomId === "corridor" ? (
           <Corridor />
         ) : ["liquid-web", "editorial", "experiments"].includes(baseRoom) ? (
@@ -242,21 +304,27 @@ function Scene({
         ) : ["imagined-worlds", "cosmic", "glass-life", "portraits"].includes(
             baseRoom,
           ) ? (
-          <ImaginedWorlds roomId={roomId} />
+          <ImageRoom roomId={roomId} />
         ) : roomId === "archive" || roomId === "unfinished" ? (
-          <PersonalArchive unfinished={roomId === "unfinished"} />
+          <ArchiveRoom unfinished={roomId === "unfinished"} />
         ) : roomId === "my-collection" ? (
-          <MyCollection />
+          <CollectionRoom />
         ) : plan.type === "listening" ? (
-          <PersonalMusic />
+          <ListeningRoom />
         ) : roomId === "cinema" ? (
           <WallpaperCinema />
         ) : plan.type === "image-gallery" || roomId.startsWith("wallpapers") ? (
-          <PersonalWallpaper />
+          <WallpaperVault />
         ) : (
           <GalleryRoom roomId={roomId} />
         )}
+        {/* 交互扩展开始 world-boundary-close */}
+        </WorldsBoundary>
+        {/* 交互扩展结束 */}
       </group>
+      {/* 交互扩展开始 world-presence-camera */}
+      {isAdventureRoom(roomId) && <AdventureCamera key={"presence-camera:" + roomId} roomId={roomId} />}
+      {/* 交互扩展结束 */}
     </>
   );
 }
@@ -270,22 +338,33 @@ export default function World({ onReady }: { onReady?: () => void }) {
   const effective = usePalaceStore((s) => s.effectiveQuality);
   const tier = quality === "auto" ? effective : quality;
   const coarse = matchMedia("(pointer: coarse)").matches;
+  const detailed=useAlpineVisuals(s=>s.detailed);
+  const [dimensions,setDimensions]=useState(()=>({width:window.innerWidth,height:window.innerHeight}));
+  useEffect(()=>{
+    const resize=()=>setDimensions({width:window.innerWidth,height:window.innerHeight});
+    window.addEventListener("resize",resize);return()=>window.removeEventListener("resize",resize);
+  },[]);
   useEffect(() => {
-    const chosen = coarse ? "low" : quality === "auto" ? effective : quality;
+    const chosen = quality === "auto" ? effective : quality;
     if (effective !== chosen)
       usePalaceStore.getState().update({ effectiveQuality: chosen });
   }, [quality, effective, coarse]);
-  const renderTier = coarse ? "low" : tier;
-  const dpr = Math.min(
+  useEffect(()=>{if(quality==="auto"&&["basketball","private-gym"].includes(roomId))usePalaceStore.getState().update({effectiveQuality:coarse?"medium":"high"});},[roomId,quality,coarse]);
+  const renderTier = tier;
+  const nativeDpr = Math.min(
     window.devicePixelRatio || 1,
     coarse ? 0.8 : tier === "high" ? 1.6 : tier === "medium" ? 1.25 : 0.85,
   );
+  // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。
+  const dpr=roomId==="alpine-ride"&&detailed&&!coarse&&renderTier!=="low"
+    ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true)
+    :["basketball","cycling","private-gym"].includes(roomId)?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;
   return (
     <Canvas
       className="world-canvas"
       dpr={dpr}
       shadows={renderTier !== "low"}
-      camera={{ fov: 60, near: 0.12, far: 200, position: [8.2, 1.65, 19.7] }}
+      camera={{ fov: 60, near: 0.12, far: 200, position: [0, 1.65, 23] }}
       events={(state) => {
         const normal = pointerEvents(state);
         return {
@@ -299,7 +378,8 @@ export default function World({ onReady }: { onReady?: () => void }) {
         };
       }}
       gl={{
-        antialias: renderTier !== "low",
+        // WebGL antialias is a context creation option; retain it when automatic quality later recovers.
+        antialias: true,
         alpha: false,
         powerPreference: "high-performance",
         toneMapping: ACESFilmicToneMapping,

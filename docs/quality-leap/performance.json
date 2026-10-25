@@ -1,0 +1,624 @@
+{
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "scope": "Visible installed Edge on the local GTX 1650; requestAnimationFrame wall timings, renderer.info and estimated uncompressed scene texture bytes. Not GPU timer-query timings.",
+  "samples": [
+    {
+      "label": "atrium / still",
+      "movement": false,
+      "frames": 493,
+      "elapsedMs": 5002.4000000059605,
+      "fps": 98.55269470642344,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 34.70000000000073,
+      "peak": {
+        "calls": 250,
+        "triangles": 61654,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 34.91287231445313
+      },
+      "last": {
+        "room": "atrium",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 250,
+        "triangles": 61654,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 34.91287231445313,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 2,
+          "changed": 4
+        }
+      }
+    },
+    {
+      "label": "atrium / walking",
+      "movement": true,
+      "frames": 748,
+      "elapsedMs": 7003.79999999404,
+      "fps": 106.79916616702883,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 55.5,
+      "peak": {
+        "calls": 250,
+        "triangles": 61654,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 34.91287231445313
+      },
+      "last": {
+        "room": "atrium",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 168,
+        "triangles": 54918,
+        "textures": 38,
+        "lights": 6,
+        "textureMB": 34.91287231445313,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 2,
+          "changed": 4
+        }
+      }
+    },
+    {
+      "label": "music / still",
+      "movement": false,
+      "frames": 719,
+      "elapsedMs": 5002.900000017882,
+      "fps": 143.71664434576547,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 13.899999999999636,
+      "peak": {
+        "calls": 64,
+        "triangles": 5118,
+        "textures": 10,
+        "lights": 6,
+        "textureMB": 9.744272867838541
+      },
+      "last": {
+        "room": "music",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 64,
+        "triangles": 5118,
+        "textures": 10,
+        "lights": 6,
+        "textureMB": 9.744272867838541,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 0,
+          "changed": 0
+        }
+      }
+    },
+    {
+      "label": "music / walking",
+      "movement": true,
+      "frames": 1005,
+      "elapsedMs": 7002.60000001192,
+      "fps": 143.51812184021495,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 13.899999999999636,
+      "peak": {
+        "calls": 64,
+        "triangles": 5118,
+        "textures": 10,
+        "lights": 6,
+        "textureMB": 9.744272867838541
+      },
+      "last": {
+        "room": "music",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 60,
+        "triangles": 4898,
+        "textures": 10,
+        "lights": 6,
+        "textureMB": 9.744272867838541,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 0,
+          "changed": 0
+        }
+      }
+    },
+    {
+      "label": "corridor / still",
+      "movement": false,
+      "frames": 714,
+      "elapsedMs": 5002.599999988079,
+      "fps": 142.72578259339173,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 27.800000000000182,
+      "peak": {
+        "calls": 80,
+        "triangles": 7920,
+        "textures": 32,
+        "lights": 5,
+        "textureMB": 54.19374593098958
+      },
+      "last": {
+        "room": "corridor",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 80,
+        "triangles": 7920,
+        "textures": 32,
+        "lights": 5,
+        "textureMB": 54.19374593098958,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 4,
+          "changed": 8
+        }
+      }
+    },
+    {
+      "label": "corridor / walking",
+      "movement": true,
+      "frames": 973,
+      "elapsedMs": 7001.999999982119,
+      "fps": 138.96029705833828,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 83.19999999999891,
+      "peak": {
+        "calls": 85,
+        "triangles": 7930,
+        "textures": 53,
+        "lights": 5,
+        "textureMB": 63.206207275390604
+      },
+      "last": {
+        "room": "corridor",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 84,
+        "triangles": 7928,
+        "textures": 44,
+        "lights": 5,
+        "textureMB": 63.206207275390604,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 5,
+          "changed": 10
+        }
+      }
+    },
+    {
+      "label": "projects / still",
+      "movement": false,
+      "frames": 721,
+      "elapsedMs": 5003.8,
+      "fps": 144.09049122666772,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999909,
+      "maxMs": 7.600000000000364,
+      "peak": {
+        "calls": 39,
+        "triangles": 2516,
+        "textures": 18,
+        "lights": 5,
+        "textureMB": 61.58045450846353
+      },
+      "last": {
+        "room": "projects",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 39,
+        "triangles": 2516,
+        "textures": 18,
+        "lights": 5,
+        "textureMB": 61.58045450846353,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 6,
+          "changed": 12
+        }
+      }
+    },
+    {
+      "label": "research / still",
+      "movement": false,
+      "frames": 719,
+      "elapsedMs": 5003.000000011922,
+      "fps": 143.71377173661537,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999909,
+      "maxMs": 14,
+      "peak": {
+        "calls": 67,
+        "triangles": 46612,
+        "textures": 15,
+        "lights": 4,
+        "textureMB": 25.01621500651042
+      },
+      "last": {
+        "room": "research",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 67,
+        "triangles": 46612,
+        "textures": 15,
+        "lights": 4,
+        "textureMB": 25.01621500651042,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 1,
+          "changed": 2
+        }
+      }
+    },
+    {
+      "label": "wallpapers / still",
+      "movement": false,
+      "frames": 719,
+      "elapsedMs": 5005.599999982119,
+      "fps": 143.63912418143047,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999909,
+      "maxMs": 13.900000000000546,
+      "peak": {
+        "calls": 33,
+        "triangles": 2398,
+        "textures": 13,
+        "lights": 5,
+        "textureMB": 42.45479329427083
+      },
+      "last": {
+        "room": "wallpapers",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 33,
+        "triangles": 2398,
+        "textures": 13,
+        "lights": 5,
+        "textureMB": 42.45479329427083,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 4,
+          "changed": 8
+        }
+      }
+    },
+    {
+      "label": "imagined-worlds / still",
+      "movement": false,
+      "frames": 719,
+      "elapsedMs": 5001.299999988079,
+      "fps": 143.7626217186959,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999454,
+      "maxMs": 13.800000000000182,
+      "peak": {
+        "calls": 63,
+        "triangles": 3836,
+        "textures": 27,
+        "lights": 5,
+        "textureMB": 53.82508341471352
+      },
+      "last": {
+        "room": "imagined-worlds",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 63,
+        "triangles": 3836,
+        "textures": 27,
+        "lights": 5,
+        "textureMB": 53.82508341471352,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 5,
+          "changed": 10
+        }
+      }
+    },
+    {
+      "label": "glass-life / still",
+      "movement": false,
+      "frames": 719,
+      "elapsedMs": 5003.5999999940395,
+      "fps": 143.69653849245674,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 13.900000000000546,
+      "peak": {
+        "calls": 31,
+        "triangles": 42392,
+        "textures": 9,
+        "lights": 5,
+        "textureMB": 13.072377522786459
+      },
+      "last": {
+        "room": "glass-life",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 31,
+        "triangles": 42392,
+        "textures": 9,
+        "lights": 5,
+        "textureMB": 13.072377522786459,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 1,
+          "changed": 2
+        }
+      }
+    },
+    {
+      "label": "portraits / still",
+      "movement": false,
+      "frames": 717,
+      "elapsedMs": 5002.900000011921,
+      "fps": 143.31687621145565,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999454,
+      "maxMs": 27.5,
+      "peak": {
+        "calls": 35,
+        "triangles": 2402,
+        "textures": 15,
+        "lights": 5,
+        "textureMB": 27.12966918945313
+      },
+      "last": {
+        "room": "portraits",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 35,
+        "triangles": 2402,
+        "textures": 15,
+        "lights": 5,
+        "textureMB": 27.12966918945313,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 4,
+          "changed": 8
+        }
+      }
+    },
+    {
+      "label": "editorial / still",
+      "movement": false,
+      "frames": 719,
+      "elapsedMs": 5000.199999988079,
+      "fps": 143.79424823041361,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999909,
+      "maxMs": 13.900000000000546,
+      "peak": {
+        "calls": 52,
+        "triangles": 3708,
+        "textures": 20,
+        "lights": 4,
+        "textureMB": 35.27071126302082
+      },
+      "last": {
+        "room": "editorial",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 52,
+        "triangles": 3708,
+        "textures": 20,
+        "lights": 4,
+        "textureMB": 35.27071126302082,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 5,
+          "changed": 10
+        }
+      }
+    },
+    {
+      "label": "liquid-web / still",
+      "movement": false,
+      "frames": 715,
+      "elapsedMs": 5004.200000023842,
+      "fps": 142.87998081543373,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.199999999999818,
+      "maxMs": 20.900000000000546,
+      "peak": {
+        "calls": 55,
+        "triangles": 3820,
+        "textures": 21,
+        "lights": 4,
+        "textureMB": 62.567148844401025
+      },
+      "last": {
+        "room": "liquid-web",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 55,
+        "triangles": 3820,
+        "textures": 21,
+        "lights": 4,
+        "textureMB": 62.567148844401025,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 5,
+          "changed": 10
+        }
+      }
+    },
+    {
+      "label": "archive / still",
+      "movement": false,
+      "frames": 720,
+      "elapsedMs": 5002.100000011921,
+      "fps": 143.93954539059277,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.100000000000364,
+      "maxMs": 13.799999999999272,
+      "peak": {
+        "calls": 58,
+        "triangles": 3932,
+        "textures": 23,
+        "lights": 5,
+        "textureMB": 46.68606567382812
+      },
+      "last": {
+        "room": "archive",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 58,
+        "triangles": 3932,
+        "textures": 23,
+        "lights": 5,
+        "textureMB": 46.68606567382812,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 4,
+          "changed": 8
+        }
+      }
+    },
+    {
+      "label": "unfinished / still",
+      "movement": false,
+      "frames": 721,
+      "elapsedMs": 5004.500000017882,
+      "fps": 144.07033669645796,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999454,
+      "maxMs": 7.300000000000182,
+      "peak": {
+        "calls": 39,
+        "triangles": 2728,
+        "textures": 15,
+        "lights": 5,
+        "textureMB": 29.228983561197925
+      },
+      "last": {
+        "room": "unfinished",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 39,
+        "triangles": 2728,
+        "textures": 15,
+        "lights": 5,
+        "textureMB": 29.228983561197925,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 3,
+          "changed": 6
+        }
+      }
+    },
+    {
+      "label": "my-collection / still",
+      "movement": false,
+      "frames": 720,
+      "elapsedMs": 5000.6,
+      "fps": 143.9827220733512,
+      "medianMs": 6.900000000000546,
+      "p95Ms": 7.099999999999909,
+      "maxMs": 13.900000000000546,
+      "peak": {
+        "calls": 33,
+        "triangles": 2080,
+        "textures": 16,
+        "lights": 4,
+        "textureMB": 38.03405761718749
+      },
+      "last": {
+        "room": "my-collection",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 33,
+        "triangles": 2080,
+        "textures": 16,
+        "lights": 4,
+        "textureMB": 38.03405761718749,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 4,
+          "changed": 8
+        }
+      }
+    },
+    {
+      "label": "room switches / mixed gallery and five corridor chunks",
+      "movement": false,
+      "frames": 1221,
+      "elapsedMs": 12000.90000000596,
+      "fps": 101.7423693222503,
+      "medianMs": 7,
+      "p95Ms": 13.900000000001455,
+      "maxMs": 340.10000000000036,
+      "peak": {
+        "calls": 250,
+        "triangles": 61654,
+        "textures": 80,
+        "lights": 6,
+        "textureMB": 61.58045450846353
+      },
+      "last": {
+        "room": "corridor",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 80,
+        "triangles": 7920,
+        "textures": 49,
+        "lights": 5,
+        "textureMB": 54.19374593098958,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 21,
+          "changed": 42
+        }
+      }
+    },
+    {
+      "label": "corridor streaming / bounded cache",
+      "movement": true,
+      "frames": 1599,
+      "elapsedMs": 12000.800000005962,
+      "fps": 133.24111725878322,
+      "medianMs": 7,
+      "p95Ms": 13.69999999999709,
+      "maxMs": 83.29999999999927,
+      "peak": {
+        "calls": 85,
+        "triangles": 7930,
+        "textures": 70,
+        "lights": 5,
+        "textureMB": 63.206207275390604
+      },
+      "last": {
+        "room": "corridor",
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 59,
+        "triangles": 6500,
+        "textures": 60,
+        "lights": 5,
+        "textureMB": 63.206207275390604,
+        "cache": {
+          "pending": 0,
+          "failed": 0,
+          "count": 21,
+          "changed": 42
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "meetsMean45": true,
+  "meetsP95Frame22ms": true
+}

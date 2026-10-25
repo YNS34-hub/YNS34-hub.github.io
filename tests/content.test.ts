@@ -16,6 +16,13 @@ import {
 } from "../src/content/catalog";
 
 describe("the local museum catalog", () => {
+  it("keeps explicitly withdrawn projects outside every museum catalog", async () => {
+    const curation = JSON.parse(await readFile(resolve(process.cwd(), "content/curation.json"), "utf8"));
+    expect(curation.excludedProjectIds).toContain("void-echo");
+    for (const id of curation.excludedProjectIds) {
+      expect(allContent.some((item) => item.id === id)).toBe(false);
+    }
+  });
   it("keeps every exhibit and room address stable and unique", () => {
     expect(new Set(allContent.map((item) => item.id)).size).toBe(
       allContent.length,

@@ -1,0 +1,272 @@
+{
+  "sha": "183f5a959e27e19860185edd16793c910612e897",
+  "dirty": false,
+  "when": "2026-10-10T12:24:06.825Z",
+  "browser": "148.0.3967.70",
+  "headed": true,
+  "viewport": [
+    1920,
+    1080
+  ],
+  "dpr": 1,
+  "quality": "medium",
+  "build": "Vite development; actual NVIDIA renderer must be verified. Native play is measured; pose staging is declared.",
+  "scope": "RAF wall intervals, not GPU timer queries. Renderer.info draw/triangle counts cover the main pass, not all shadow/transmission passes. Texture storage is a material/sampler estimate, not total VRAM. Short desktop samples only.",
+  "samples": [
+    {
+      "label": "day / entry",
+      "fps": 120.41721316590359,
+      "frames": 964,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 55.5,
+      "peak": {
+        "calls": 96,
+        "triangles": 1125487,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "day / sideline",
+      "fps": 131.40801438992708,
+      "frames": 1052,
+      "medianMs": 7,
+      "p95Ms": 13.900000000001455,
+      "maxMs": 41.599999999998545,
+      "peak": {
+        "calls": 69,
+        "triangles": 1118041,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "day / hoop",
+      "fps": 128.95647718885263,
+      "frames": 1032,
+      "medianMs": 7,
+      "p95Ms": 13.900000000001455,
+      "maxMs": 41.39999999999782,
+      "peak": {
+        "calls": 88,
+        "triangles": 1123653,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "day / native dribble and walk",
+      "fps": 130.86041555664212,
+      "frames": 786,
+      "medianMs": 7,
+      "p95Ms": 13.80000000000291,
+      "maxMs": 41.400000000001455,
+      "peak": {
+        "calls": 90,
+        "triangles": 1125233,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "day / native shot",
+      "fps": 127.13911985730113,
+      "frames": 763,
+      "medianMs": 7,
+      "p95Ms": 13.900000000001455,
+      "maxMs": 34.69999999999709,
+      "peak": {
+        "calls": 91,
+        "triangles": 1125235,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "night / entry",
+      "fps": 122.10210585510664,
+      "frames": 977,
+      "medianMs": 7,
+      "p95Ms": 13.900000000008731,
+      "maxMs": 41.599999999998545,
+      "peak": {
+        "calls": 96,
+        "triangles": 1125487,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 3,
+      "activeLights": 3,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "night / sideline",
+      "fps": 123.36883155839905,
+      "frames": 987,
+      "medianMs": 7,
+      "p95Ms": 14,
+      "maxMs": 41.60000000000582,
+      "peak": {
+        "calls": 69,
+        "triangles": 1118041,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 3,
+      "activeLights": 3,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "night / hoop",
+      "fps": 124.81259370310191,
+      "frames": 999,
+      "medianMs": 7,
+      "p95Ms": 13.900000000008731,
+      "maxMs": 48.79999999998836,
+      "peak": {
+        "calls": 88,
+        "triangles": 1123653,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 3,
+      "activeLights": 3,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "night / native dribble and walk",
+      "fps": 125.25400579629796,
+      "frames": 752,
+      "medianMs": 7,
+      "p95Ms": 13.900000000008731,
+      "maxMs": 41.60000000000582,
+      "peak": {
+        "calls": 90,
+        "triangles": 1125233,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 3,
+      "activeLights": 3,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "night / native shot",
+      "fps": 124.55456755577354,
+      "frames": 748,
+      "medianMs": 7,
+      "p95Ms": 13.900000000008731,
+      "maxMs": 34.69999999999709,
+      "peak": {
+        "calls": 91,
+        "triangles": 1125235,
+        "textures": 50
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 3,
+      "activeLights": 3,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "night to day / transition",
+      "fps": 117.525362047842,
+      "frames": 943,
+      "medianMs": 7,
+      "p95Ms": 14.099999999991269,
+      "maxMs": 41.70000000001164,
+      "peak": {
+        "calls": 91,
+        "triangles": 1125235,
+        "textures": 51
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "basketball",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 213.16080729166686,
+      "backgroundMiB": 42.666666666666664
+    },
+    {
+      "label": "worlds / after court",
+      "fps": 142.59648070380612,
+      "frames": 1141,
+      "medianMs": 6.900000000001455,
+      "p95Ms": 7.300000000001091,
+      "maxMs": 20.80000000000109,
+      "peak": {
+        "calls": 30,
+        "triangles": 3032,
+        "textures": 12
+      },
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "room": "worlds",
+      "effectiveQuality": "medium",
+      "lights": 2,
+      "activeLights": 2,
+      "shadows": 1,
+      "materialMiB": 21.880625406901043,
+      "backgroundMiB": 0
+    }
+  ],
+  "errors": [],
+  "readyMs": 8956,
+  "passed": true
+}

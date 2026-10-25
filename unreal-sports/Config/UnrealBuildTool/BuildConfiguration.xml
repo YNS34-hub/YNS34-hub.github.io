@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration xmlns="https://www.unrealengine.com/BuildConfiguration">
+  <BuildConfiguration>
+    <MaxParallelActions>2</MaxParallelActions>
+    <bAllowUBAExecutor>false</bAllowUBAExecutor>
+    <bAllowUBALocalExecutor>false</bAllowUBALocalExecutor>
+    <bAllowXGEExecutor>false</bAllowXGEExecutor>
+    <bAllowFASTBuild>false</bAllowFASTBuild>
+  </BuildConfiguration>
+</Configuration>

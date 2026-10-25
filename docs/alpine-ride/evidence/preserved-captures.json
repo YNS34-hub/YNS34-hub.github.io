@@ -1,0 +1,44 @@
+{
+  "sha": "bbd959951885e214377def2c8563c583716f2781",
+  "dirty": true,
+  "scope": "Static camera staging through valid saved route positions; approach and mount use native input. Separate journeys verify continuous travel.",
+  "frames": [
+    {
+      "name": "forest-road",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.045,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "158.84",
+        "grade": "0.0173",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "0,1,2,3",
+        "photo": "false",
+        "map": "cycling"
+      }
+    },
+    {
+      "name": "first-lake-reveal",
+      "width": 1920,
+      "height": 1080,
+      "progress": 0.185,
+      "actual": {
+        "state": "stopped",
+        "speed": "0.000",
+        "distance": "653.00",
+        "grade": "0.0109",
+        "cadence": "0.0",
+        "gear": "7",
+        "mounted": "true",
+        "sectors": "2,3,4,5,6,7",
+        "photo": "false",
+        "map": "cycling"
+      }
+    }
+  ],
+  "errors": []
+}

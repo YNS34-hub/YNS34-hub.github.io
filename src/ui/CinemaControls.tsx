@@ -2,10 +2,19 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Heart, Info, X } from "lucide-react";
 import { useLibraryStore } from "../systems/library";
 import { usePalaceStore } from "../systems/store";
+import { useMotionCue } from "../motion/useMotionCue";
 export default function CinemaControls() {
   const library = useLibraryStore();
   const image = usePalaceStore((s) => s.cinemaImage);
   const [metadata, setMetadata] = useState(false);
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const wake = () => { setIdle(false); clearTimeout(timer); timer = setTimeout(() => setIdle(true), 3200); };
+    // 先于原 Cinema 的捕获键处理唤醒，避免其 stopImmediatePropagation 吞掉显示反馈。
+    window.addEventListener("pointermove", wake); window.addEventListener("keydown", wake, true); window.addEventListener("pointerdown", wake); wake();
+    return () => { clearTimeout(timer); window.removeEventListener("pointermove", wake); window.removeEventListener("keydown", wake, true); window.removeEventListener("pointerdown", wake); };
+  }, []);
   const images = [
     ...library.wallpapers,
     ...library.personal.visuals,
@@ -13,20 +22,10 @@ export default function CinemaControls() {
     ...library.personal.research,
   ];
   const selected = image || images[0];
-  const exit = () =>
-    usePalaceStore
-      .getState()
-      .enterRoom(
-        library.personal.projects.some((x) => x.id === selected?.id)
-          ? selected?.category === "liquid-web"
-            ? "liquid-web"
-            : "projects"
-          : library.personal.research.some((x) => x.id === selected?.id)
-            ? "research"
-            : library.personal.visuals.some((x) => x.id === selected?.id)
-              ? "imagined-worlds"
-              : "wallpapers",
-      );
+  const controlsCue = useMotionCue<HTMLElement>("cinema-controls", "identity");
+  const titleCue = useMotionCue<HTMLSpanElement>(selected?.id || "empty", "copy");
+  const metadataCue = useMotionCue<HTMLDivElement>(String(metadata), "identity", metadata);
+  const exit = () => usePalaceStore.getState().exitCinema();
   const move = (direction: number) => {
     const index = images.findIndex((x) => x.id === selected?.id);
     if (images.length)
@@ -41,24 +40,29 @@ export default function CinemaControls() {
     const key = (event: KeyboardEvent) => {
       if ((event.target as HTMLElement)?.closest("input,textarea,select"))
         return;
+      const state = usePalaceStore.getState();
+      if (state.overlay || state.focus) return;
       if (["ArrowLeft", "ArrowRight", "Escape", "i", "I"].includes(event.key)) {
         event.preventDefault();
         event.stopImmediatePropagation();
       }
       if (event.key === "ArrowLeft") move(-1);
       if (event.key === "ArrowRight") move(1);
-      if (event.key === "Escape") exit();
+      if (event.key === "Escape") {
+        if (metadata) setMetadata(false);
+        else exit();
+      }
       if (event.key.toLowerCase() === "i") setMetadata((v) => !v);
     };
     window.addEventListener("keydown", key, true);
     return () => window.removeEventListener("keydown", key, true);
   });
   return (
-    <aside className="cinema-controls" aria-label="Wallpaper cinema controls">
+    <aside className="cinema-controls" ref={controlsCue} data-idle={idle && !metadata} aria-label="Wallpaper cinema controls">
       <button aria-label="Previous image" onClick={() => move(-1)}>
         <ChevronLeft size={20} />
       </button>
-      <span>{selected?.title || "Wallpaper Cinema"}</span>
+      <span ref={titleCue}><small className="cinema-index">{String(Math.max(0, images.findIndex(x => x.id === selected?.id)) + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}</small>{selected?.title || "Wallpaper Cinema"}</span>
       <button aria-label="Next image" onClick={() => move(1)}>
         <ChevronRight size={20} />
       </button>
@@ -79,7 +83,7 @@ export default function CinemaControls() {
         <X size={20} />
       </button>
       {metadata && (
-        <div className="cinema-metadata">
+        <div className="cinema-metadata" ref={metadataCue}>
           <strong>{selected?.title}</strong>
           <p>
             {selected?.date} / {selected?.category}

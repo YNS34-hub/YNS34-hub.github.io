@@ -1,0 +1,8 @@
+:root { --museum-arrival: 2000ms; --museum-hover: 240ms; --museum-ease: cubic-bezier(.16,1,.3,1); }
+.museum-glass-button { transition: background-color var(--museum-hover), border-color var(--museum-hover), color var(--museum-hover); }
+.palace-app .enter-button:hover { transform: none; }
+.museum-navigation button { transition: opacity var(--museum-hover), color var(--museum-hover); }
+.museum-navigation button:hover { opacity: 1; }
+.palace-app.world-ready .world-reveal { opacity: 0; }
+html[data-motion="reduced"] .museum-glass-button, html[data-motion="reduced"] .museum-navigation button { transition: none; }
+@media (prefers-reduced-motion: reduce) { .museum-glass-button, .museum-navigation button { transition: none; } }

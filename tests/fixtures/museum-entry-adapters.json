@@ -1,0 +1,70 @@
+{
+  "baseline": "4dfaab7044b71286afa6a15cb959949cfdf6271c",
+  "scope": "Explicit atrium appearance, atrium lighting / transmission resolution, and presentation wrappers only. Reverse these hunks then retain every original fixed source digest.",
+  "files": {
+    "src/ui/primitives.tsx": [
+      {
+        "before": "import { X, ArrowUpRight } from \"lucide-react\";\nimport { useEffect, useRef, type ReactNode } from \"react\";\nexport function PalaceMark() {\n  return (\n    <span className=\"brand-symbol\" aria-hidden=\"true\">\n",
+        "after": "import { X, ArrowUpRight } from \"lucide-react\";\nimport { useEffect, useRef, type ReactNode } from \"react\";\nimport { MuseumPanel } from \"../design-system/components\";\nexport function PalaceMark() {\n  return (\n    <span className=\"brand-symbol\" aria-hidden=\"true\">\n"
+      },
+      {
+        "before": "        if (e.target === e.currentTarget) onClose();\n      }}\n    >\n      <div\n        ref={ref}\n        role=\"dialog\"\n        aria-modal=\"true\"\n        aria-label={label}\n        className={`panel ${className}`}\n      >\n        <CloseButton onClick={onClose} />\n        {children}\n      </div>\n    </div>\n  );\n}\n",
+        "after": "        if (e.target === e.currentTarget) onClose();\n      }}\n    >\n      <MuseumPanel\n        ref={ref}\n        role=\"dialog\"\n        aria-modal=\"true\"\n        aria-label={label}\n        className={className}\n      >\n        <CloseButton onClick={onClose} />\n        {children}\n      </MuseumPanel>\n    </div>\n  );\n}\n"
+      }
+    ],
+    "src/rooms/Atrium.tsx": [
+      {
+        "before": "import { useFrame } from \"@react-three/fiber\";\nimport { Group, Vector3, MeshBasicMaterial } from \"three\";\nimport {\n  Block,\n  ContactShadow,\n  Door,\n  Floor,\n  Label,\n  Picture,\n  useImageTexture,\n",
+        "after": "import { useFrame } from \"@react-three/fiber\";\nimport { Group, Vector3, MeshBasicMaterial } from \"three\";\nimport {\n  ContactShadow,\n  Door,\n  Label,\n  Picture,\n  useImageTexture,\n"
+      },
+      {
+        "before": "import { useLibraryStore } from \"../systems/library\";\nimport { projects } from \"../content/catalog\";\nimport { VisualWall } from \"./PersonalRooms\";\n\nfunction MemoryReveal() {\n  const library = useLibraryStore();\n",
+        "after": "import { useLibraryStore } from \"../systems/library\";\nimport { projects } from \"../content/catalog\";\nimport { VisualWall } from \"./PersonalRooms\";\nimport { AtriumSurfaces, EntryBlock as Block } from \"./atrium/surfaces\";\nimport AtriumAtmosphere from \"./atrium/environment\";\nimport EntryFloor from \"./atrium/EntryFloor\";\nimport { EntryCameraReveal, OpticalCore } from \"./atrium/optics\";\nimport { entryScreens } from \"./atrium/exhibits\";\n\nfunction MemoryReveal() {\n  const library = useLibraryStore();\n"
+      },
+      {
+        "before": "        }}\n      >\n        <Suspense fallback={null}>\n          <GlassSculpture radius={2.7} />\n        </Suspense>\n      </group>\n      <MemoryReveal />\n",
+        "after": "        }}\n      >\n        <Suspense fallback={null}>\n          <OpticalCore><GlassSculpture radius={2.7} /></OpticalCore>\n        </Suspense>\n      </group>\n      <MemoryReveal />\n"
+      },
+      {
+        "before": "  const images = useLibraryStore((s) => s.wallpapers);\n  const hero = projects.find((x) => x.id === \"giannis-fansite\");\n  return (\n    <group>\n      <Floor width={42} depth={54} color=\"#bfced5\" />\n      <Block position={[0, -0.22, 0]} scale={[42, 0.38, 54]} color=\"#b1c7d1\" />\n      {[-1, 1].map((side) => (\n        <group key={side}>\n          <Block\n            position={[side * 7.3, 2.8, 21]}\n            scale={[7.4, 5.6, 12]}\n            color=\"#1d344c\"\n            castShadow\n          />\n          <Block\n",
+        "after": "  const images = useLibraryStore((s) => s.wallpapers);\n  const hero = projects.find((x) => x.id === \"giannis-fansite\");\n  return (\n    <AtriumSurfaces><group>\n      <AtriumAtmosphere />\n      <EntryCameraReveal />\n      <EntryFloor />\n      <Block position={[0, -0.22, 0]} scale={[42, 0.38, 54]} color=\"#b1c7d1\" />\n      {[-1, 1].map((side) => (\n        <group key={side}>\n          <Block\n            position={[side * 7.3, 2.8, 21]}\n            scale={[7.4, 5.6, 12]}\n            color=\"#0b1d31\"\n            castShadow\n          />\n          <Block\n"
+      },
+      {
+        "before": "      <Block\n        position={[0, 5.5, 21]}\n        scale={[21.5, 0.6, 12]}\n        color=\"#233b54\"\n        castShadow\n      />\n      <Block\n",
+        "after": "      <Block\n        position={[0, 5.5, 21]}\n        scale={[21.5, 0.6, 12]}\n        color=\"#101e30\"\n        castShadow\n      />\n      <Block\n"
+      },
+      {
+        "before": "      <Block\n        position={[0, 7.3, -25.5]}\n        scale={[42, 14.6, 0.8]}\n        color=\"#2a4864\"\n      />\n      <Block\n        position={[-9, 5.4, -24.92]}\n",
+        "after": "      <Block\n        position={[0, 7.3, -25.5]}\n        scale={[42, 14.6, 0.8]}\n        color=\"#19314c\"\n      />\n      <Block\n        position={[-9, 5.4, -24.92]}\n"
+      },
+      {
+        "before": "          key={side}\n          position={[side * 4.5, 5.3, -24.5]}\n          scale={[1, 10.6, 2.2]}\n          color=\"#bdd8e8\"\n          castShadow\n        />\n      ))}\n      <Block\n        position={[0, 10.55, -24.5]}\n        scale={[10, 0.8, 2.2]}\n        color=\"#bdd8e8\"\n      />\n      <group position={[0, 0, -25]}>\n        {Array.from({ length: 5 }, (_, i) => (\n",
+        "after": "          key={side}\n          position={[side * 4.5, 5.3, -24.5]}\n          scale={[1, 10.6, 2.2]}\n            color=\"#e6f0f7\"\n          castShadow\n        />\n      ))}\n      <Block\n        position={[0, 10.55, -24.5]}\n        scale={[10, 0.8, 2.2]}\n        color=\"#e6f0f7\"\n      />\n      <group position={[0, 0, -25]}>\n        {Array.from({ length: 5 }, (_, i) => (\n"
+      },
+      {
+        "before": "          <Block\n            position={[i % 2 ? -2 : 2, 14, -8 + z]}\n            scale={[26, 0.55, 5]}\n            color=\"#b7d1df\"\n            castShadow\n          />\n          <Block\n",
+        "after": "          <Block\n            position={[i % 2 ? -2 : 2, 14, -8 + z]}\n            scale={[26, 0.55, 5]}\n            color=\"#d9e8f1\"\n            emissive=\"#c6dff2\"\n            emissiveIntensity={0.12}\n            castShadow\n          />\n          <Block\n"
+      },
+      {
+        "before": "        </group>\n      ))}\n      <Core />\n      {hero && (\n        <group\n          position={[-12.2, 4.8, -8.5]}\n",
+        "after": "        </group>\n      ))}\n      <Core />\n      {entryScreens.map(screen=><group key={`screen-support-${screen.x}`} position={[screen.x,0,screen.z]} rotation={[0,screen.yaw,0]}>\n        {[-2.6,2.6].map(offset=><Block key={offset} position={[offset,screen.height/2,0]} scale={[.22,screen.height,.33]} color=\"#8797a2\" roughness={.24} metalness={.75} castShadow />)}\n      </group>)}\n      {hero && (\n        <group\n          position={[-12.2, 4.8, -8.5]}\n"
+      },
+      {
+        "before": "          color=\"#8aa8bc\"\n        />\n      ))}\n    </group>\n  );\n}\n",
+        "after": "          color=\"#8aa8bc\"\n        />\n      ))}\n    </group></AtriumSurfaces>\n  );\n}\n"
+      }
+    ],
+    "src/world/artDirection.ts": [
+      {
+        "before": "    }\n  > = {\n    atrium: {\n      background: \"#b7d9ec\",\n      sky: \"#e2f4ff\",\n      ground: \"#304965\",\n      key: \"#f1f8ff\",\n      keyIntensity: 1.75,\n      environment: 0.65,\n      hemisphere: 0.68,\n      dark: false,\n    },\n    corridor: {\n",
+        "after": "    }\n  > = {\n    atrium: {\n      background: \"#86b2d8\",\n      sky: \"#d9ebfb\",\n      ground: \"#789cb6\",\n      key: \"#fff0df\",\n      keyIntensity: 2.4,\n      environment: 0.72,\n      hemisphere: 0.5,\n      dark: false,\n    },\n    corridor: {\n"
+      }
+    ],
+    "src/world/World.tsx": [
+      {
+        "before": "  const baseRoom = roomId.split(\"-page-\")[0];\n  useEffect(() => {\n    gl.transmissionResolutionScale =\n      tier === \"high\" ? 0.8 : tier === \"medium\" ? 0.6 : 0.35;\n  }, [gl, tier]);\n  useEffect(() => {\n    if (!import.meta.env.DEV) return;\n    const debug = window as Window & { __PALACE_DEBUG__?: unknown };\n",
+        "after": "  const baseRoom = roomId.split(\"-page-\")[0];\n  useEffect(() => {\n    gl.transmissionResolutionScale =\n      roomId === \"atrium\" && tier !== \"low\" ? 1 : tier === \"high\" ? 0.8 : tier === \"medium\" ? 0.6 : 0.35;\n  }, [gl, tier, roomId]);\n  useEffect(() => {\n    if (!import.meta.env.DEV) return;\n    const debug = window as Window & { __PALACE_DEBUG__?: unknown };\n"
+      }
+    ]
+  }
+}

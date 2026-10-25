@@ -1,0 +1,515 @@
+{
+  "sha": "48303b694e149f18b3d580fbc0d2ce1bc99cf730",
+  "dirty": false,
+  "at": "2026-10-11T17:35:46.559Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5190",
+  "quality": "medium",
+  "dpr": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "forest-entry",
+      "width": 1920,
+      "progress": 0.045,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-forest-entry.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          -5.206077310338233,
+          21.386010129343028,
+          -156.13605506513284
+        ],
+        "quaternion": [
+          -0.008711880327178076,
+          -0.1648378838467825,
+          -0.0014560229155643457,
+          0.98628112381174
+        ],
+        "fov": 60,
+        "distance": 158.8374145214789,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 77,
+        "triangles": 2187436,
+        "textures": 18
+      }
+    },
+    {
+      "name": "lake-reveal",
+      "width": 1920,
+      "progress": 0.185,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-lake-reveal.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          244.38626014611853,
+          21.596557815378183,
+          -495.21011020896054
+        ],
+        "quaternion": [
+          -0.011533898128327488,
+          -0.28499065071513296,
+          -0.003429533925863371,
+          0.9584547649711914
+        ],
+        "fov": 60,
+        "distance": 652.9982596994132,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 86,
+        "triangles": 1677421,
+        "textures": 18
+      }
+    },
+    {
+      "name": "overlook",
+      "width": 1920,
+      "progress": 0.487,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "1920-overlook.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          790.4901119890376,
+          56.248301207727934,
+          -655.8345262329177
+        ],
+        "quaternion": [
+          -0.013460403481022584,
+          0.914137384262718,
+          0.03045444473716086,
+          0.4040348834286407
+        ],
+        "fov": 60,
+        "distance": 1718.9737971546717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 47,
+        "triangles": 354239,
+        "textures": 21
+      }
+    },
+    {
+      "name": "forest-surface",
+      "width": 1920,
+      "progress": 0.1,
+      "yaw": 0,
+      "pitch": -0.3,
+      "file": "1920-forest-surface.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          8.127700623029327,
+          24.16852419723228,
+          -335.1105877782508
+        ],
+        "quaternion": [
+          -0.023293145410275003,
+          -0.21891631766064457,
+          -0.005227578512712625,
+          0.9754515608997163
+        ],
+        "fov": 60,
+        "distance": 352.97203226995316,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 84,
+        "triangles": 1672501,
+        "textures": 18
+      }
+    },
+    {
+      "name": "lake-edge",
+      "width": 1920,
+      "progress": 0.233,
+      "yaw": "lake",
+      "pitch": -0.16,
+      "file": "1920-lake-edge.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          339.1560342055342,
+          25.14495767336427,
+          -631.4246688647314
+        ],
+        "quaternion": [
+          0.006092531202586931,
+          -0.584636271070548,
+          0.004390591610587087,
+          0.8112607683831254
+        ],
+        "fov": 60,
+        "distance": 822.4248351889908,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 78,
+        "triangles": 1935623,
+        "textures": 17
+      }
+    },
+    {
+      "name": "alpine-pass",
+      "width": 1920,
+      "progress": 0.12,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-pass.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1073.4814546617997,
+          894.3778629698539,
+          -237.75081224909417
+        ],
+        "quaternion": [
+          -0.04808993226702262,
+          0.5315838486178996,
+          0.030249540050165474,
+          0.8450981810593895
+        ],
+        "fov": 60,
+        "distance": 1218.8031493165115,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 120,
+        "triangles": 2404885,
+        "textures": 38
+      }
+    },
+    {
+      "name": "alpine-valley",
+      "width": 1920,
+      "progress": 0.43,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "1920-alpine-valley.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1522.6426489436535,
+          627.5320975043168,
+          -23.70269114978529
+        ],
+        "quaternion": [
+          -0.03267595025169192,
+          -0.7187852158076466,
+          -0.03386059133865284,
+          0.6936379143081068
+        ],
+        "fov": 60,
+        "distance": 4367.3779517175,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 75,
+        "triangles": 2117850,
+        "textures": 41
+      }
+    },
+    {
+      "name": "alpine-surface",
+      "width": 1920,
+      "progress": 0.61,
+      "yaw": 0,
+      "pitch": -0.3,
+      "file": "1920-alpine-surface.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1956.5622518486384,
+          525.0769989231478,
+          271.94873122200323
+        ],
+        "quaternion": [
+          -0.027050076453920272,
+          0.8277384641131925,
+          0.04005230286667812,
+          0.55902874830052
+        ],
+        "fov": 60,
+        "distance": 6195.582675692267,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 123,
+        "triangles": 2450263,
+        "textures": 42
+      }
+    },
+    {
+      "name": "forest-entry",
+      "width": 2560,
+      "progress": 0.045,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-forest-entry.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          -5.206077310338233,
+          21.386010129343028,
+          -156.13605506513284
+        ],
+        "quaternion": [
+          -0.008711880327178076,
+          -0.1648378838467825,
+          -0.0014560229155643457,
+          0.98628112381174
+        ],
+        "fov": 60,
+        "distance": 158.8374145214789,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 77,
+        "triangles": 2187436,
+        "textures": 18
+      }
+    },
+    {
+      "name": "lake-reveal",
+      "width": 2560,
+      "progress": 0.185,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-lake-reveal.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          244.38626014611853,
+          21.596557815378183,
+          -495.21011020896054
+        ],
+        "quaternion": [
+          -0.011533898128327488,
+          -0.28499065071513296,
+          -0.003429533925863371,
+          0.9584547649711914
+        ],
+        "fov": 60,
+        "distance": 652.9982596994132,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 86,
+        "triangles": 1677421,
+        "textures": 18
+      }
+    },
+    {
+      "name": "overlook",
+      "width": 2560,
+      "progress": 0.487,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "2560-overlook.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          790.4901119890376,
+          56.248301207727934,
+          -655.8345262329177
+        ],
+        "quaternion": [
+          -0.013460403481022584,
+          0.914137384262718,
+          0.03045444473716086,
+          0.4040348834286407
+        ],
+        "fov": 60,
+        "distance": 1718.9737971546717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 47,
+        "triangles": 354239,
+        "textures": 21
+      }
+    },
+    {
+      "name": "forest-surface",
+      "width": 2560,
+      "progress": 0.1,
+      "yaw": 0,
+      "pitch": -0.3,
+      "file": "2560-forest-surface.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          8.127700623029327,
+          24.16852419723228,
+          -335.1105877782508
+        ],
+        "quaternion": [
+          -0.023293145410275003,
+          -0.21891631766064457,
+          -0.005227578512712625,
+          0.9754515608997163
+        ],
+        "fov": 60,
+        "distance": 352.97203226995316,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 84,
+        "triangles": 1672501,
+        "textures": 18
+      }
+    },
+    {
+      "name": "lake-edge",
+      "width": 2560,
+      "progress": 0.233,
+      "yaw": "lake",
+      "pitch": -0.16,
+      "file": "2560-lake-edge.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          339.1560342055342,
+          25.14495767336427,
+          -631.4246688647314
+        ],
+        "quaternion": [
+          0.006092531202586926,
+          -0.5846362710705488,
+          0.004390591610587093,
+          0.8112607683831249
+        ],
+        "fov": 60,
+        "distance": 822.4248351889908,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 78,
+        "triangles": 1935623,
+        "textures": 17
+      }
+    },
+    {
+      "name": "alpine-pass",
+      "width": 2560,
+      "progress": 0.12,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-alpine-pass.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1073.4814546617997,
+          894.3778629698539,
+          -237.75081224909417
+        ],
+        "quaternion": [
+          -0.04808993226702262,
+          0.5315838486178996,
+          0.030249540050165474,
+          0.8450981810593895
+        ],
+        "fov": 60,
+        "distance": 1218.8031493165115,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 120,
+        "triangles": 2404885,
+        "textures": 38
+      }
+    },
+    {
+      "name": "alpine-valley",
+      "width": 2560,
+      "progress": 0.43,
+      "yaw": 0,
+      "pitch": 0,
+      "file": "2560-alpine-valley.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1522.6426489436535,
+          627.5320975043168,
+          -23.70269114978529
+        ],
+        "quaternion": [
+          -0.03267595025169192,
+          -0.7187852158076466,
+          -0.03386059133865284,
+          0.6936379143081068
+        ],
+        "fov": 60,
+        "distance": 4367.3779517175,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 75,
+        "triangles": 2117850,
+        "textures": 41
+      }
+    },
+    {
+      "name": "alpine-surface",
+      "width": 2560,
+      "progress": 0.61,
+      "yaw": 0,
+      "pitch": -0.3,
+      "file": "2560-alpine-surface.png",
+      "state": {
+        "room": "alpine-ride",
+        "position": [
+          -1956.5622518486384,
+          525.0769989231478,
+          271.94873122200323
+        ],
+        "quaternion": [
+          -0.027050076453920272,
+          0.8277384641131925,
+          0.04005230286667812,
+          0.55902874830052
+        ],
+        "fov": 60,
+        "distance": 6195.582675692267,
+        "length": 10156.692910970929,
+        "mounted": true,
+        "speed": 0,
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 123,
+        "triangles": 2450263,
+        "textures": 42
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}
