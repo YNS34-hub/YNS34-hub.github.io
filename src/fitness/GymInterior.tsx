@@ -55,7 +55,7 @@ export default function GymInterior(){
   {[2.1,4.0,5.9].map(y=><Block key={y} position={[-12.31,y,0]} scale={[.13,.075,8.5]} color="#5c6b61" metalness={.35} roughness={.45}/>)}
   <rectAreaLight position={[-12.20,4,0]} rotation={[0,Math.PI/2,0]} width={8} height={3.8} intensity={4} color="#e6efdf"/>
   <primitive object={target}/>
-  <spotLight name="gym-training-key" position={[-2,6.2,-.6]} target={target} intensity={58} distance={17} angle={.64} penumbra={.65} decay={2} color="#fff0d8" castShadow={tier!=='low'} shadow-mapSize={tier==='high'?[1024,1024]:[512,512]} shadow-bias={-.0001} shadow-normalBias={.006} shadow-camera-near={.5} shadow-camera-far={18}/>
+  <spotLight key={'gym-key-'+tier} name="gym-training-key" position={[-2,6.2,-.6]} target={target} intensity={58} distance={17} angle={.64} penumbra={.65} decay={2} color="#fff0d8" castShadow={tier!=='low'} shadow-mapSize={tier==='high'?[2048,2048]:[1024,1024]} shadow-bias={-.0001} shadow-normalBias={.006} shadow-camera-near={.5} shadow-camera-far={18}/>
   <Block position={[12.40,3.15,-3]} scale={[.08,5.25,7.0]} color="#42524a" roughness={.92}/>
   <Label text="私人训练室" position={[-12.30,3.35,7.2]} rotation={[0,Math.PI/2,0]} size={.32} color="#4f5d50" maxWidth={4}/>
   <Label text="动作练习 · 训练影像" position={[-12.29,2.83,7.2]} rotation={[0,Math.PI/2,0]} size={.13} color="#6b7466" maxWidth={4}/>

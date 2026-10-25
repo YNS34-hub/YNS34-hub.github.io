@@ -56,6 +56,17 @@ const additions: Record<string, string[]> = {
   "scripts/register-personal-media.mjs": ["media-avatar-import", "media-avatar-register"],
 };
 function withoutAdditions(file: string, source: string) {
+  if(file==='src/world/World.tsx'){
+    const clarity=JSON.parse(readFileSync('tests/fixtures/sports-clarity-adapters.json','utf8')) as {baseline:string;baselineWorldSha256:string;files:Record<string,{before:string;after:string}[]>};
+    expect(clarity.baseline).toBe('56238d5f8e7bb42c6924917c7100e15567521fd8');
+    expect(Object.keys(clarity.files)).toEqual(['src/world/World.tsx']);
+    expect(clarity.files[file]).toHaveLength(5);
+    source=source.replace(/\r\n/g,'\n');
+    for(const patch of clarity.files[file]){expect(source.split(patch.after),file+' exact clarity adapter').toHaveLength(2);source=source.replace(patch.after,patch.before);}
+    expect(digest(source)).toBe('cd85bf1479a686fafb14d355abd9699a0073fc37aeed00ce94486e24786eab17');
+    expect(clarity.baselineWorldSha256).toBe('cd85bf1479a686fafb14d355abd9699a0073fc37aeed00ce94486e24786eab17');
+  }
+
   const gym=JSON.parse(readFileSync('tests/fixtures/private-gym-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
   expect(gym.baseline).toBe('5f90eafbe5e329e59bcdef3b9c10b1c2e288ec3d');
   expect(Object.keys(gym.files).every(name=>['src/App.tsx','src/world/World.tsx','src/world/Player.tsx','src/world/collision.ts','src/world/artDirection.ts','src/rooms/Atrium.tsx'].includes(name))).toBe(true);

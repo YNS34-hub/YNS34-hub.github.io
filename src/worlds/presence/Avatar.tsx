@@ -7,7 +7,7 @@ import { usePalaceStore } from "../../systems/store";
 import { useActivity } from "../activity";
 import { roadView, useRoadRide } from "../road/state";
 import { getRideMap } from "../road/maps";
-import { ATHLETE } from "./assets";
+import { ATHLETE,ATHLETE_DETAIL } from "./assets";
 import { pedalPoint } from "./math";
 import { presence, usePerspective, type AdventureRoom } from "./state";
 import { LimbIK } from "./ik";
@@ -49,7 +49,8 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
   const continuity=useMemo(createAnimationContinuity,[]),restoredMixer=useRef<AnimationMixer|null>(null);
   const torsoTarget=useMemo(createCourtTorso,[]);
   const courtClipWeights=useMemo(()=>({idle:1,walk:0,run:0}),[]);
-  const gltf = useGLTF(ATHLETE), root = useRef<Group>(null), helmet = useRef<Group>(null), cap = useRef<Group>(null), pack = useRef<Group>(null);
+  const quality=usePalaceStore(s=>s.effectiveQuality);
+  const gltf = useGLTF(roomId==="basketball"&&quality!=="low"?ATHLETE_DETAIL:ATHLETE), root = useRef<Group>(null), helmet = useRef<Group>(null), cap = useRef<Group>(null), pack = useRef<Group>(null);
   const profile = useAppearance(s => s.personal && s.profile ? s.profile : neutralProfile), outfitId = useAppearance(s => s.selected[roomId]), outfit = outfits[outfitId];
   const rig = useMemo(() => {
     const object = clone(gltf.scene), bones = new Map<string, Bone>(), materials: Mesh["material"][] = [], geometries: BufferGeometry[] = [], textures=new Map<Texture,Texture>();
@@ -69,7 +70,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     });
     const basketballAppearance=roomId==="basketball"?installBasketballAppearance(object,{outfitId,personalHead:!!headMap}):null;
     const outline=createRiderOutline(roomId==="basketball"?.28:1.1),skinned:SkinnedMesh[]=[];
-    object.traverse(child=>{if(child instanceof SkinnedMesh)skinned.push(child);});
+    object.traverse(child=>{if(child instanceof SkinnedMesh&&!(Array.isArray(child.material)?child.material:[child.material]).every(material=>material.name==='m026_hair'))skinned.push(child);});
     // 先收集再添加壳体，避免 traverse 把新壳体再次当作主体而无限递归。
     if(outline)for(const mesh of skinned)outline.attach(mesh);
     const mixer = new AnimationMixer(object);

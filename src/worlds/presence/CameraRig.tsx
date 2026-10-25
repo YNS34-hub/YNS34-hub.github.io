@@ -41,8 +41,9 @@ export default function AdventureCamera({ roomId }: { roomId: AdventureRoom }) {
     if (appearance.wardrobe === roomId && mode === "third") {
       // 只转展示镜头；原逻辑眼位 / 朝向 / 控制 / Cinema 返回快照完全不动。
       scratch.direction.y = 0; scratch.direction.normalize().applyAxisAngle(scratch.up, appearance.previewAngle);
-      scratch.position.copy(body.position).addScaledVector(scratch.direction, -3.3); scratch.position.y = body.position.y + .28;
-      scratch.target.copy(body.position); scratch.target.y -= .53;
+      const face=appearance.previewFraming==='face',portrait=window.innerWidth<700;
+      scratch.position.copy(body.position).addScaledVector(scratch.direction, face?-1.05:portrait?-4.2:-3.3); scratch.position.y = body.position.y + (face?.08:.28);
+      scratch.target.copy(body.position); scratch.target.y += face?(portrait?-.20:.02):portrait?-1.65:-.53;
     }
     if (mode === "third") {
       const ground = roomId === "basketball" ? 0 : getRideMap(roomId).ground(scratch.position.x, scratch.position.z);

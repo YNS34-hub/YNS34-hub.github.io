@@ -9,7 +9,8 @@
 .palace-app .athlete-wardrobe .panel-description { color:#c3cecf; line-height:1.7; font-size:12px; }
 .athlete-wardrobe .eyebrow { color:#a0b8be; }
 .athlete-wardrobe .primary-button { background:#c9dce1; color:#122b38; padding:13px 18px; font-size:12px; }
-.wardrobe-view { display:flex; gap:20px; font-size:11px; margin-top:18px; }
+.wardrobe-view { display:flex; flex-wrap:wrap; gap:14px; font-size:11px; margin-top:18px; }
+.wardrobe-view button[aria-pressed=true] { text-decoration:underline; text-underline-offset:5px; }
 .athlete-wardrobe fieldset { border:0; margin:28px 0; padding:0; }
 .athlete-wardrobe legend { margin-bottom:12px; font-size:11px; letter-spacing:.14em; opacity:.65; }
 .athlete-profile-choice button { margin:0 18px 8px 0; padding:8px 0; opacity:.58; }
@@ -21,7 +22,7 @@
 .outfit-swatch { display:block; width:24px; height:36px; flex:0 0 24px; border-radius:3px; }
 .athlete-outfits small { display:block; margin-top:6px; font-size:10px; opacity:.56; }
 .athlete-private-note { font-size:11px; line-height:1.8; opacity:.6; margin:20px 0; }
-@media(max-width:700px) { .palace-app .dialog-backdrop:has(.athlete-wardrobe) { padding:20px; } .palace-app .panel.athlete-wardrobe { width:100%; } .athlete-outfits { grid-template-columns:1fr; } }
+@media(max-width:700px) { .palace-app .dialog-backdrop:has(.athlete-wardrobe) { padding:12px; align-items:flex-end; } .palace-app .panel.athlete-wardrobe { width:100%; max-height:43dvh; padding:18px; overflow:auto; } .athlete-outfits { grid-template-columns:1fr; } }
 .court-motion-packs { margin-top:30px; padding-top:26px; border-top:1px solid rgba(160,184,190,.22); }
 .court-motion-packs h3 { margin:10px 0 12px; font-size:20px; font-weight:500; }
 .court-motion-packs .eyebrow { margin-top:0; font-size:10px; }

@@ -50,8 +50,8 @@ describe('cycling balance and standing posture',()=>{
 });
 describe('sport clarity budget',()=>{
  it('supersamples 1080p without lowering 1440p / 4K below native or spending unbounded pixels',()=>{
-  expect(sportPixelRatio(1,1920,1080,'medium')).toBe(1.25);expect(sportPixelRatio(1,1920,1080,'high')).toBe(1.5);
-  expect(sportPixelRatio(2,2560,1440,'high')**2*2560*1440).toBeLessThanOrEqual(4_700_001);
+  expect(sportPixelRatio(1,1920,1080,'medium')).toBe(1.5);expect(sportPixelRatio(1,1920,1080,'high')).toBe(2);
+  expect(sportPixelRatio(2,2560,1440,'high')**2*2560*1440).toBeLessThanOrEqual(8_294_401);
   expect(sportPixelRatio(1,3840,2160,'high')).toBe(1);expect(sportPixelRatio(2,1920,1080,'low')).toBe(.85);
  });
 });

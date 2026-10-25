@@ -76,6 +76,7 @@ export default function Hud({ ready }: { ready: boolean }) {
           </span>
         </button>
         <div className="hud-header-actions">
+          {s.started && <button className="guide-button quality-button" aria-label="画质设置" onClick={event => { if (event.detail > 0) event.currentTarget.blur(); s.setOverlay("settings"); }}><SlidersHorizontal size={17} /><span>画质</span></button>}
           <button
             className="sound-button"
             aria-label={s.mute ? "Unmute all sound" : "Mute all sound"}

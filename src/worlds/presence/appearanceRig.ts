@@ -53,10 +53,11 @@ export function dressAthlete(mesh: Mesh, profile: AvatarProfile, outfitId: Outfi
   const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
   for (const value of materials) {
     if (!(value instanceof MeshStandardMaterial)) continue;
-    const head = /head/.test(value.name), shirtless = outfit.style === "training" || outfit.style === "denim";
+    if(value.name==='m026_hair'){value.color.set(profile.hair);value.roughness=.58;continue;}
+    const head = /head/.test(value.name);
     value.roughness = head ? .56 : outfit.style === "urban" ? .82 : .66;
     value.onBeforeCompile = shader => {
-      Object.assign(shader.uniforms, { athleteSkin: { value: new Color(profile.skin) }, athleteHair: { value: new Color(profile.hair) }, athleteTop: { value: new Color(outfit.top) }, athleteBottom: { value: new Color(outfit.bottom) }, athleteStyle: { value: shirtless ? 1 : outfit.style === "urban" ? 2 : 0 }, athleteDenim: { value: outfit.style === "denim" ? 1 : 0 } });
+      Object.assign(shader.uniforms, { athleteSkin: { value: new Color(profile.skin) }, athleteHair: { value: new Color(profile.hair) }, athleteTop: { value: new Color(outfit.top) }, athleteBottom: { value: new Color(outfit.bottom) }, athleteStyle: { value: outfit.style === "urban" ? 2 : 0 }, athleteDenim: { value: outfit.style === "denim" ? 1 : 0 } });
       shader.vertexShader = "attribute float athleteSleeve;\nvarying float vAthleteSleeve;\nvarying vec3 vAthleteRest;\n" + shader.vertexShader;
       shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvAthleteRest = position * 0.01;\nvAthleteSleeve = athleteSleeve;");
       shader.fragmentShader = "varying float vAthleteSleeve;\nvarying vec3 vAthleteRest;\nuniform vec3 athleteSkin, athleteHair, athleteTop, athleteBottom;\nuniform float athleteStyle, athleteDenim;\n" + shader.fragmentShader;

@@ -31,7 +31,7 @@ function decorateMaterial(source: MeshStandardMaterial, options: BasketballAppea
     shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvBasketballRest = position * .01;");
     shader.fragmentShader = surfaceFunctions + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace("#include <alphamap_fragment>", `#include <alphamap_fragment>
-      float basketballFabric = 0., basketballSkin = 0., basketballShoe = 0., basketballHairSurface = 0.;
+      float basketballFabric = 0., basketballSkin = 0., basketballShoe = 0., basketballHairSurface = 0., basketballEye = 0.;
       float basketballWeave = 0., basketballSeam = 0., basketballDetail = 0.;
       #ifdef USE_MAP
         vec3 basketballAtlas = texture2D(map, vMapUv).rgb;
@@ -41,11 +41,15 @@ function decorateMaterial(source: MeshStandardMaterial, options: BasketballAppea
           bool basketballFace = basketballAtlas.r > basketballAtlas.b * 1.15;
           basketballHairSurface = float(basketballHair);
           basketballSkin = float(basketballFace && !basketballHair);
+          basketballEye = float(vMapUv.y>.80 && !basketballHair && !basketballFace);
+          vec3 basketballChroma = clamp(basketballAtlas/max(basketballLum,.02),vec3(.65),vec3(1.4));
+          diffuseColor.rgb = mix(diffuseColor.rgb,diffuseColor.rgb*mix(vec3(1.),basketballChroma,.35),basketballSkin);
+          diffuseColor.rgb = mix(diffuseColor.rgb,basketballAtlas,basketballPersonalHead);
         ` : `
           bool basketballJersey = basketballAtlas.b > basketballAtlas.r*1.18 && basketballAtlas.b > basketballAtlas.g*1.10;
           bool basketballShorts = (vMapUv.x < .31 || vMapUv.x > .69) && vMapUv.y < .194;
           bool basketballTorso = abs(vBasketballRest.x)<.25 && vBasketballRest.z>.98 && vBasketballRest.z<1.56;
-          bool basketballBareTorso = (basketballStyle==1. || basketballStyle==2.) && basketballTorso;
+          bool basketballBareTorso = false;
           bool basketballLongLeg = basketballStyle>=2. && vBasketballRest.z>.17 && vBasketballRest.z<.90;
           bool basketballSleeve = basketballStyle==3. && vAthleteSleeve>.04;
           basketballShoe = float(vBasketballRest.z < .165);
@@ -72,10 +76,14 @@ function decorateMaterial(source: MeshStandardMaterial, options: BasketballAppea
       roughnessFactor = mix(roughnessFactor, .72, basketballShoe);
       roughnessFactor = mix(roughnessFactor, .83, basketballHairSurface);
       float basketballSkinRoughness = mix(.52,.57,basketballPersonalHead) + .018*sin(vBasketballRest.z*17.)*sin(vBasketballRest.x*13.);
-      roughnessFactor = mix(roughnessFactor,clamp(basketballSkinRoughness,.49,.60),basketballSkin);`);
+      roughnessFactor = mix(roughnessFactor,clamp(basketballSkinRoughness,.49,.60),basketballSkin);
+      roughnessFactor = mix(roughnessFactor,.16,basketballEye);`);
     if (!head) shader.fragmentShader = shader.fragmentShader.replace("#include <clearcoat_normal_fragment_begin>", `
       // 微量表面高度的屏幕导数，跟随蒙皮后的曲面；不修改原法线贴图和人脸。
       float basketballHeight = basketballFabric*basketballWeave*.000065;
+      // Filter pores in bind space, below the cloth and shoe masks.
+      float basketballPores = sin(vBasketballRest.x*12391.)*sin(vBasketballRest.z*14207.)*basketballDetail;
+      basketballHeight += basketballSkin*basketballPores*.000014;
       vec3 basketballDx = dFdx(-vViewPosition), basketballDy = dFdy(-vViewPosition);
       vec3 basketballR1 = cross(basketballDy,normal), basketballR2 = cross(normal,basketballDx);
       float basketballDet = dot(basketballDx,basketballR1);
@@ -85,7 +93,7 @@ function decorateMaterial(source: MeshStandardMaterial, options: BasketballAppea
       }
       #include <clearcoat_normal_fragment_begin>`);
   };
-  material.customProgramCacheKey = () => previousKey.call(source) + "|basketball-surface-v1|" + Number(head);
+  material.customProgramCacheKey = () => previousKey.call(source) + "|basketball-surface-v2|" + Number(head);
   material.needsUpdate = true;
   return material;
 }

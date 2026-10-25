@@ -181,12 +181,17 @@ function Environment({
 }
 
 function PerformanceMonitor() {
+  const {active:loading}=useProgress();
+  const settledAt=useRef(performance.now()),lastRoom=useRef('');
   const count = useRef(0),
     seconds = useRef(0),
     stable = useRef(0),
     bad = useRef(0);
   useFrame((_, delta) => {
     if (document.hidden) return;
+    const current=usePalaceStore.getState();
+    if(loading||lastRoom.current!==current.roomId||!document.hasFocus()||current.overlay||current.focus||delta>.25){settledAt.current=performance.now();lastRoom.current=current.roomId;count.current=seconds.current=stable.current=bad.current=0;return;}
+    if(performance.now()-settledAt.current<3000)return;
     count.current += 1;
     seconds.current += delta;
     if (seconds.current < 2) return;
@@ -206,10 +211,9 @@ function PerformanceMonitor() {
       // A conservative upward adjustment avoids oscillation on integrated GPUs.
       if (
         stable.current >= 6 &&
-        state.effectiveQuality === "low" &&
-        !matchMedia("(pointer: coarse)").matches
+        (state.effectiveQuality === "low" || stable.current>=10 && state.effectiveQuality === "medium" && !matchMedia("(pointer: coarse)").matches)
       ) {
-        state.update({ effectiveQuality: "medium" });
+        state.update({ effectiveQuality: state.effectiveQuality === "low" ? "medium" : "high" });
         stable.current = 0;
       }
     }
@@ -340,11 +344,12 @@ export default function World({ onReady }: { onReady?: () => void }) {
     window.addEventListener("resize",resize);return()=>window.removeEventListener("resize",resize);
   },[]);
   useEffect(() => {
-    const chosen = coarse ? "low" : quality === "auto" ? effective : quality;
+    const chosen = quality === "auto" ? effective : quality;
     if (effective !== chosen)
       usePalaceStore.getState().update({ effectiveQuality: chosen });
   }, [quality, effective, coarse]);
-  const renderTier = coarse ? "low" : tier;
+  useEffect(()=>{if(quality==="auto"&&["basketball","private-gym"].includes(roomId))usePalaceStore.getState().update({effectiveQuality:coarse?"medium":"high"});},[roomId,quality,coarse]);
+  const renderTier = tier;
   const nativeDpr = Math.min(
     window.devicePixelRatio || 1,
     coarse ? 0.8 : tier === "high" ? 1.6 : tier === "medium" ? 1.25 : 0.85,
@@ -352,7 +357,7 @@ export default function World({ onReady }: { onReady?: () => void }) {
   // DPR 由 Canvas 的原配置统一持有，避免子组件 setDpr 被 Canvas 重配置覆盖；其他房间照旧。
   const dpr=roomId==="alpine-ride"&&detailed&&!coarse&&renderTier!=="low"
     ?alpinePixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,true)
-    :["basketball","cycling"].includes(roomId)&&!coarse?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;
+    :["basketball","cycling","private-gym"].includes(roomId)?sportPixelRatio(window.devicePixelRatio,dimensions.width,dimensions.height,renderTier):nativeDpr;
   return (
     <Canvas
       className="world-canvas"
@@ -372,7 +377,8 @@ export default function World({ onReady }: { onReady?: () => void }) {
         };
       }}
       gl={{
-        antialias: renderTier !== "low",
+        // WebGL antialias is a context creation option; retain it when automatic quality later recovers.
+        antialias: true,
         alpha: false,
         powerPreference: "high-performance",
         toneMapping: ACESFilmicToneMapping,

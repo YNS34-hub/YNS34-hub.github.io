@@ -21,6 +21,11 @@ function compile(material: MeshStandardMaterial) {
 }
 
 describe("court-only athlete surface detail", () => {
+  it("renders the training torso as cloth and keeps scalp ribbons on their own hair material",()=>{
+    const a=fixture();dressAthlete(a.mesh,neutralProfile,'training-blue');
+    const shader=compile(a.mesh.material as MeshStandardMaterial);expect(shader.uniforms.athleteStyle.value).toBe(0);expect(shader.uniforms.athleteTop.value.getHexString()).toBe('536b65');
+    const hair=new MeshStandardMaterial();hair.name='m026_hair';a.mesh.material=hair;dressAthlete(a.mesh,neutralProfile,'training-blue');expect(hair.color.getHexString()).toBe(neutralProfile.hair.slice(1));expect(hair.roughness).toBe(.58);
+  });
   it("decorates separate material copies and restores the exact original identity on removal", () => {
     const a = fixture(), beforeCompile = a.material.onBeforeCompile, beforeKey = a.material.customProgramCacheKey;
     const roughness = a.material.roughness, normalScale = a.material.normalScale.clone();
