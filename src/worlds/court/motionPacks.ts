@@ -24,8 +24,8 @@ export const motionPacks = {
     "high-release": { title: "高点投篮", description: "将球举过眉线，充分伸展后从更高位置拨球。", chargeDuration: 1.52, liftStart: .08, liftEnd: .61, releaseHeight: 2.12, releaseX: .10, releaseZ: -.24, jump: .34, crouch: .11, guidePeel: .74, wristRate: 10.5, torsoPitch: -.10 },
   } satisfies Record<string, ShotMotionPack>,
   hands: {
-    natural: { title: "自然双手", description: "双手接稳球，顺势收球与举球。", spread: .11, holdX: .23, holdY: 1.13, holdZ: -.35, gatherTime: .16 },
-    protect: { title: "护球收球", description: "将球收近身体，双手护球后起步。", spread: .10, holdX: .12, holdY: 1.13, holdZ: -.34, gatherTime: .22 },
+    natural: { title: "自然双手", description: "双手接稳球，顺势收球与举球。", spread: .14, holdX: .045, holdY: 1.13, holdZ: -.29, gatherTime: .16 },
+    protect: { title: "护球收球", description: "将球收近身体，双手护球后起步。", spread: .135, holdX: 0, holdY: 1.13, holdZ: -.28, gatherTime: .22 },
   } satisfies Record<string, HandMotionPack>,
   dribble: {
     balanced: { title: "均衡运球", description: "平稳的腰侧节奏，适合移动与左右换手。", period: .65, sprintPeriod: .43, height: .95, spread: .31, front: .40, torso: -.08, twist: .025 },

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { validateAvatarProfile } from "../src/worlds/presence/avatarProfile.mjs";
 import { gripPoint, riderPosture } from "../src/worlds/presence/riderPose";
 import { reshapeAthlete, reshapeAthletePoint, sleeveCoverage } from "../src/worlds/presence/appearanceRig";
-import { BufferGeometry, Float32BufferAttribute, Vector3 } from "three";
+import { BufferGeometry, Float32BufferAttribute, Matrix3, Vector3 } from "three";
 import { mkdtemp, mkdir, readFile, writeFile, readdir, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -49,6 +49,29 @@ describe("local avatar and wardrobe", () => {
     const chest = reshapeAthletePoint(20, -8, 134, profile), waist = reshapeAthletePoint(18, -6, 105, profile), head = reshapeAthletePoint(0, -6, 180, profile);
     expect(chest[0]).toBeGreaterThan(20); expect(waist[0]).toBeLessThan(18); expect(head[2]).toBeLessThan(180);
     for (let h = 0; h < 185; h += 4) expect(reshapeAthletePoint(12, -9, h, profile).every(Number.isFinite)).toBe(true);
+  });
+  it("keeps personal torso and upper-arm shaping continuous across every former hard region edge",()=>{
+    const profile=validateAvatarProfile({version:1,chest:1.15,waist:.90,shoulders:1.12,arms:1.18})!,epsilon=.0001;
+    for(const sign of [-1,1]){
+      for(const edge of [24,29,56]){
+        const a=reshapeAthletePoint(sign*(edge-epsilon),-8,140,profile),b=reshapeAthletePoint(sign*(edge+epsilon),-8,140,profile);
+        expect(Math.hypot(...a.map((v,i)=>v-b[i])),`arm boundary x=${sign*edge}`).toBeLessThan(.001);
+      }
+      for(const [x,edge]of [[10,94],[10,153],[36,128],[36,158]]){
+        const a=reshapeAthletePoint(sign*x,-8,edge-epsilon,profile),b=reshapeAthletePoint(sign*x,-8,edge+epsilon,profile);
+        expect(Math.hypot(...a.map((v,i)=>v-b[i])),`body boundary z=${edge}`).toBeLessThan(.001);
+      }
+    }
+  });
+  it("keeps a positive bounded body-shaping Jacobian instead of turning adjacent arm triangles inside out",()=>{
+    const profile=validateAvatarProfile({version:1,chest:1.15,waist:.90,shoulders:1.12,arms:1.18})!,epsilon=.025,jacobian=new Matrix3();
+    let minimum=Infinity,maximum=0;
+    for(let x=20;x<=62;x+=.5)for(let z=120;z<=162;z+=1)for(const y of [-10,-3,4]){
+      const p=reshapeAthletePoint(x,y,z,profile),a=reshapeAthletePoint(x+epsilon,y,z,profile),b=reshapeAthletePoint(x,y+epsilon,z,profile),c=reshapeAthletePoint(x,y,z+epsilon,profile);
+      jacobian.set((a[0]-p[0])/epsilon,(b[0]-p[0])/epsilon,(c[0]-p[0])/epsilon,(a[1]-p[1])/epsilon,(b[1]-p[1])/epsilon,(c[1]-p[1])/epsilon,(a[2]-p[2])/epsilon,(b[2]-p[2])/epsilon,(c[2]-p[2])/epsilon);
+      const determinant=jacobian.determinant();minimum=Math.min(minimum,determinant);maximum=Math.max(maximum,determinant);
+    }
+    expect(minimum).toBeGreaterThan(.2);expect(maximum).toBeLessThan(3);
   });
   it("preserves authored smooth normals on split triangles and owns the deformed geometry", () => {
     const source = new BufferGeometry(); source.setAttribute("position", new Float32BufferAttribute([1,0,80,2,0,80,1,0,81], 3)); source.setAttribute("normal", new Float32BufferAttribute([.6,.8,0,.6,.8,0,.6,.8,0], 3));

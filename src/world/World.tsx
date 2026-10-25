@@ -181,7 +181,6 @@ function Environment({
 }
 
 function PerformanceMonitor() {
-  const {active:loading}=useProgress();
   const settledAt=useRef(performance.now()),lastRoom=useRef('');
   const count = useRef(0),
     seconds = useRef(0),
@@ -190,7 +189,9 @@ function PerformanceMonitor() {
   useFrame((_, delta) => {
     if (document.hidden) return;
     const current=usePalaceStore.getState();
-    if(loading||lastRoom.current!==current.roomId||!document.hasFocus()||current.overlay||current.focus||delta>.25){settledAt.current=performance.now();lastRoom.current=current.roomId;count.current=seconds.current=stable.current=bad.current=0;return;}
+    // Loading starts inside lazy resource renders; sample its store on the
+    // animation frame instead of subscribing this component during that render.
+    if(useProgress.getState().active||lastRoom.current!==current.roomId||!document.hasFocus()||current.overlay||current.focus||delta>.25){settledAt.current=performance.now();lastRoom.current=current.roomId;count.current=seconds.current=stable.current=bad.current=0;return;}
     if(performance.now()-settledAt.current<3000)return;
     count.current += 1;
     seconds.current += delta;

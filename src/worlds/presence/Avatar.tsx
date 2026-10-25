@@ -292,7 +292,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
               hand.getWorldPosition(rig.head);hand.getWorldQuaternion(rig.guideRest);
               if(guideRelease)shotGuideTarget(rig.target,side<0?presence.shotReleaseLeftWrist:presence.shotReleaseRightWrist,presence.releaseBody,presence.camera.position,presence.shotJump,presence.jump,presence.shotReleaseStance,courtStance,rig.head,presence.shot);
             }
-            rig.pole.set(side*(authoredAction?(dominant?.20:.36):.50),authoredAction?1.12:1.02,-.32);root.current.localToWorld(rig.pole);limb(side,"arm");
+            rig.pole.set(side*(authoredAction?(dominant?.20:.36):roomId==="basketball"?.70:.50),authoredAction?1.12:1.02,-.32);root.current.localToWorld(rig.pole);limb(side,"arm");
             if(guideRelease){
               const t=Math.min(1,Math.max(0,(.65-presence.shot)/.24)),fade=t*t*(3-2*t);
               const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
@@ -452,7 +452,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     const a = rig.bones.get(prefix + (kind === "arm" ? "UpperArm" : "Thigh"));
     const b = rig.bones.get(prefix + (kind === "arm" ? "Forearm" : "Calf"));
     const c = rig.bones.get(prefix + (kind === "arm" ? "Hand" : "Foot"));
-    if (a && b && c) rig.ik.solve(a, b, c, rig.target, rig.pole);
+    if (a && b && c) rig.ik.solve(a, b, c, rig.target, rig.pole, roomId==="basketball"&&kind==="arm");
   }
   return <><group ref={root} name="visitor-athlete" visible={false}>
     <primitive object={rig.object} dispose={null} />

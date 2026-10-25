@@ -3,17 +3,22 @@ import { outfits, type OutfitId } from "./appearance";
 import type { AvatarProfile } from "./avatarProfile.mjs";
 
 const bell = (v: number, middle: number, spread: number) => Math.exp(-(((v - middle) / spread) ** 2));
+const smoothRange=(value:number,lower:number,upper:number)=>{const t=Math.max(0,Math.min(1,(value-lower)/(upper-lower)));return t*t*(3-2*t);};
 export function reshapeAthletePoint(x: number, y: number, z: number, profile: AvatarProfile) {
   // 授权网格的绑定坐标是厘米 / Z 向上；仅改变低幅度外形，不改变骨长、蒙皮权重或 IK 链。
-  const h = z / 100, torso = Math.abs(x) < 29 ? 1 : 0;
+  const h = z / 100,sourceX=Math.abs(x),torso=1-smoothRange(sourceX,20,34);
   x *= 1 + torso * ((profile.chest - 1) * bell(h, 1.34, .15) + (profile.waist - 1) * bell(h, 1.05, .12) + (profile.shoulders - 1) * bell(h, 1.47, .10));
-  if (torso && h > .94 && h < 1.53) {
+  const torsoFront=torso*smoothRange(h,.90,1.00)*(1-smoothRange(h,1.48,1.58));
+  if (torsoFront>0) {
     const front = Math.max(0, Math.min(1, (-y - 1) / 5));
-    y *= 1 + (profile.waist - 1) * bell(h, 1.05, .12);
-    y -= front * (profile.chest - 1) * 25 * bell(h, 1.36, .075) * bell(Math.abs(x), 10.5, 9);
-    y -= front * (profile.chest - 1) * 8 * (bell(h, 1.23, .035) + bell(h, 1.155, .035) + bell(h, 1.09, .035)) * bell(Math.abs(x), 4, 4);
+    y *= 1 + torsoFront*(profile.waist - 1) * bell(h, 1.05, .12);
+    y -= torsoFront*front * (profile.chest - 1) * 25 * bell(h, 1.36, .075) * bell(Math.abs(x), 10.5, 9);
+    y -= torsoFront*front * (profile.chest - 1) * 8 * (bell(h, 1.23, .035) + bell(h, 1.155, .035) + bell(h, 1.09, .035)) * bell(Math.abs(x), 4, 4);
   }
-  if (Math.abs(x) > 24 && Math.abs(x) < 56 && h > 1.28 && h < 1.58) { const growth = 1 + (profile.arms - 1) * bell(h, 1.445, .10); y = -3 + (y + 3) * growth; z = 144.5 + (z - 144.5) * growth; }
+  // Blend in original bind coordinates; testing already-deformed X made the
+  // arm region jump across the torso mask and fold otherwise connected faces.
+  const arm=smoothRange(sourceX,22,30)*(1-smoothRange(sourceX,50,60))*smoothRange(h,1.23,1.31)*(1-smoothRange(h,1.55,1.63));
+  if(arm>0){const growth=1+arm*(profile.arms-1)*bell(h,1.445,.10);y=-3+(y+3)*growth;z=144.5+(z-144.5)*growth;}
   if (h > 1.56 && Math.abs(x) < 13) {
     x *= 1 + (profile.jaw - 1) * (bell(h, 1.63, .08) + .6 * bell(h, 1.69, .055));
     if (y < -10 && Math.abs(x) < 3.6) y = -10 + (y + 10) * (1 + (profile.nose - 1) * bell(h, 1.688, .032));
