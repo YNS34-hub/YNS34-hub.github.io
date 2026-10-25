@@ -11,6 +11,16 @@
 
 原学术页面、非线性玻璃研究和五步人工主导数学审阅流程继续保留。旧页面位于 `/legacy/`，既有 `/Benjamin/`、`/douyin/`、`/douyin-mindazhiguang/` 保留。
 
+## 2026-10-26 整合更新
+
+本次整合保留之前的展馆、音乐与骑行改造，并加入五种篮球场、左右手运球与双手收球、投篮／上篮／扣篮／运球动作包、动作近景、高精度人物与原生画质设置。当前肩臂修复改善双手持球时的跨胸和扭折，并平滑人物体型调整的区域交界。动作是原创程序实现，未包含 2K 游戏动画文件或官方动作捕捉。
+
+私人健身房提供俯卧撑、徒手深蹲、平板支撑、哑铃弯举、哑铃肩推、卧推、负重深蹲，支持暂停、变速、重置、近景观察以及本机训练照片／视频。湖岸、地表过渡和倒影成果一并保留。
+
+实现与验证范围见 [篮球动作记录](docs/basketball-motion-quality.md)、[私人健身房](docs/private-gym.md)、[湖岸记录](docs/lake-shore/README.md) 与 [后续地景改造](docs/scenery-refinement.md)。同目录新增的 [Unreal 运动工程](unreal-sports/SOURCE-ARCHIVE.md) 和 [动作实验室](unreal-motion-lab/SOURCE-ARCHIVE.md) 同步为源码归档；原本机私人角色和游戏运行包不进入公开仓库。
+
+GitHub Pages 使用 `main` 的公开构建发布。其他分支的源码更新不会自动改变线上网站；本机私人素材与浏览器中的导入记录也不会随代码提交上传。
+
 ## 运行
 
 需要 Node.js 22.12+。Windows Steam 导入脚本需要 PowerShell 7 (`pwsh`)。

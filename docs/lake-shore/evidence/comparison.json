@@ -1,0 +1,74 @@
+{
+  "matchedCameras": true,
+  "frames": [
+    {
+      "name": "lake-reveal",
+      "positionError": 0.0,
+      "quaternionDotError": 1.1102230246251565e-16,
+      "beforeFPS": 75.01183741628712,
+      "afterFPS": 81.2886308297434,
+      "p95Ms": 14,
+      "maxMs": 83.20000000000073,
+      "callsDelta": 0,
+      "trianglesDelta": -19834,
+      "textureDelta": 0
+    },
+    {
+      "name": "shore-road",
+      "positionError": 0.0,
+      "quaternionDotError": 0.0,
+      "beforeFPS": 82.93631987225972,
+      "afterFPS": 74.33924139038253,
+      "p95Ms": 20.899999999999636,
+      "maxMs": 97.69999999999891,
+      "callsDelta": 0,
+      "trianglesDelta": -19834,
+      "textureDelta": 0
+    },
+    {
+      "name": "overlook",
+      "positionError": 0.0,
+      "quaternionDotError": 2.220446049250313e-16,
+      "beforeFPS": 82.51791835462761,
+      "afterFPS": 83.08279587336675,
+      "p95Ms": 14,
+      "maxMs": 69.60000000000036,
+      "callsDelta": 0,
+      "trianglesDelta": -19834,
+      "textureDelta": 0
+    },
+    {
+      "name": "waterline",
+      "positionError": 0.0,
+      "quaternionDotError": 0.0,
+      "beforeFPS": 77.88414733078743,
+      "afterFPS": 75.97494947481555,
+      "p95Ms": 20.799999999999272,
+      "maxMs": 76.5,
+      "callsDelta": 0,
+      "trianglesDelta": -19834,
+      "textureDelta": 0
+    },
+    {
+      "name": "last-light",
+      "positionError": 0.0,
+      "quaternionDotError": 0.0,
+      "beforeFPS": 71.10689736909767,
+      "afterFPS": 81.33834004909183,
+      "p95Ms": 14.099999999998545,
+      "maxMs": 69.5,
+      "callsDelta": 0,
+      "trianglesDelta": -19834,
+      "textureDelta": 0
+    }
+  ],
+  "waterTrianglesBefore": 24391,
+  "waterTrianglesAfter": 1081,
+  "baselineColdLoadWarnings": [
+    "Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render PreparedRoadEnvironment Geography Geography",
+    "Cannot update a component (`%s`) while rendering a different component (`%s`). To locate the bad setState() call inside `%s`, follow the stack trace as described in https://react.dev/link/setstate-in-render PreparedRoadEnvironment Geography Geography"
+  ],
+  "finalErrors": [],
+  "finalUploads": [],
+  "scope": "Original PNGs retained locally. WebP is a format conversion. Pair/contact images only resize and label actual browser renders; no recolouring."
+}

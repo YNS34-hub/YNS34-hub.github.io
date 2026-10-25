@@ -1,0 +1,12 @@
+# Only authored project configuration and tools belong in the public archive.
+*
+!/.gitignore
+!/*.uproject
+!/*.md
+!/Config/
+!/Config/**
+!/Scripts/
+!/Scripts/**
+**/__pycache__/
+*.pyc
+*.pyo

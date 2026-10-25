@@ -1,0 +1,18 @@
+# Public source archive. Rebuild local assets; never add a personal game package.
+*
+!/.gitignore
+!/.clang-format
+!/*.uproject
+!/*.md
+!/*.cmd
+!/Config/
+!/Config/**
+!/Source/
+!/Source/**
+!/Scripts/
+!/Scripts/**
+!/Docs/
+!/Docs/**
+**/__pycache__/
+*.pyc
+*.pyo

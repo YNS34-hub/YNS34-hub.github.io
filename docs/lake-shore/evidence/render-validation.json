@@ -1,0 +1,660 @@
+{
+  "sha": "6f345d86f9abf7a79963799be5e37669912d13b5",
+  "dirty": true,
+  "at": "2026-10-16T05:34:57.030Z",
+  "browser": "148.0.3967.70",
+  "args": [
+    "--use-angle=d3d11",
+    "--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,Translate,AutoDeElevate,OptimizationHints,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion,CalculateNativeWinOcclusion"
+  ],
+  "base": "http://127.0.0.1:5196",
+  "quality": "medium",
+  "deviceScaleFactor": 1,
+  "scope": "Visible native Edge, same saved route distances and first-person camera. Actual drawing DPR is recorded per frame. Native approach/mount; look direction staged only for reproducible scenic photography. Reduced motion freezes existing ambient clocks. Neutral public profile and empty private catalog. No speed / physics / scoring injection.",
+  "frames": [
+    {
+      "name": "lake-reveal",
+      "width": 1920,
+      "progress": 0.185,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "1920-lake-reveal.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          244.38626014611853,
+          21.596557815378183,
+          -495.21011020896054
+        ],
+        "quaternion": [
+          -0.046784302183675505,
+          -0.7579260319169983,
+          -0.05469051298476237,
+          0.6483581625931791
+        ],
+        "fov": 60,
+        "distance": 652.9982596994132,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 103,
+        "triangles": 1441304,
+        "textures": 46,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 136,
+        "shaderPrograms": 80,
+        "glError": 0
+      },
+      "performance": {
+        "fps": 81.2886308297434,
+        "renderedFrames": 651,
+        "duplicateTicks": 0,
+        "p95Ms": 14,
+        "maxMs": 83.20000000000073,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 103,
+          "triangles": 1441304,
+          "textures": 46
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "shore-road",
+      "width": 1920,
+      "progress": 0.233,
+      "yaw": "lake",
+      "pitch": -0.14,
+      "file": "1920-shore-road.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          339.1560342055342,
+          25.14495767336427,
+          -631.4246688647314
+        ],
+        "quaternion": [
+          -0.024011999035835705,
+          -0.9213221201184222,
+          -0.05764865089071895,
+          0.38375201358856575
+        ],
+        "fov": 60,
+        "distance": 822.4248351889908,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 56,
+        "triangles": 1325002,
+        "textures": 45,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 137,
+        "shaderPrograms": 80,
+        "glError": 0
+      },
+      "performance": {
+        "fps": 74.33924139038253,
+        "renderedFrames": 596,
+        "duplicateTicks": 0,
+        "p95Ms": 20.899999999999636,
+        "maxMs": 97.69999999999891,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 56,
+          "triangles": 1325002,
+          "textures": 45
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "overlook",
+      "width": 1920,
+      "progress": 0.487,
+      "yaw": "lake",
+      "pitch": -0.22,
+      "file": "1920-overlook.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          790.4901119890376,
+          56.248301207727934,
+          -655.8345262329177
+        ],
+        "quaternion": [
+          -0.0637218568019381,
+          0.8857639678739885,
+          0.1278083881479231,
+          0.4416183126874055
+        ],
+        "fov": 60,
+        "distance": 1718.9737971546717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 63,
+        "triangles": 1190870,
+        "textures": 49,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 142,
+        "shaderPrograms": 76,
+        "glError": 0
+      },
+      "performance": {
+        "fps": 83.08279587336675,
+        "renderedFrames": 666,
+        "duplicateTicks": 0,
+        "p95Ms": 14,
+        "maxMs": 69.60000000000036,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 63,
+          "triangles": 1190870,
+          "textures": 49
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      },
+      "bankDetail": {
+        "position": [
+          595.4139120660641,
+          14.569279013491252,
+          -662.8785647983572
+        ],
+        "quaternion": [
+          -0.005464222565491259,
+          0.9942040646707986,
+          0.08769978663199746,
+          0.061944874594429496
+        ],
+        "target": [
+          593.6760904627727,
+          12.08,
+          -648.9868415044266
+        ],
+        "fov": 60,
+        "shore": [
+          594.79326149346,
+          12.08,
+          -657.9172350505248
+        ],
+        "scope": "Staged diagnostic bank camera, one actual GPU draw into the existing canvas; not a native walking claim.",
+        "file": "1920-bank-detail.png"
+      }
+    },
+    {
+      "name": "waterline",
+      "width": 1920,
+      "progress": 0.7,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "1920-waterline.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          802.2456820722517,
+          17.125886500937614,
+          -354.98421898851774
+        ],
+        "quaternion": [
+          -0.0641133571565392,
+          0.5791162322479211,
+          0.04575754459219831,
+          0.8114309053110949
+        ],
+        "fov": 60,
+        "distance": 2470.8042258896717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 121,
+        "triangles": 1331279,
+        "textures": 49,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 162,
+        "shaderPrograms": 80,
+        "glError": 0
+      },
+      "performance": {
+        "fps": 75.97494947481555,
+        "renderedFrames": 609,
+        "duplicateTicks": 0,
+        "p95Ms": 20.799999999999272,
+        "maxMs": 76.5,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 121,
+          "triangles": 1331279,
+          "textures": 49
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "last-light",
+      "width": 1920,
+      "progress": 0.83,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "1920-last-light.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          395.5425643292082,
+          20.925286913116768,
+          -182.56505865778578
+        ],
+        "quaternion": [
+          -0.07947476879427964,
+          -0.21396518510698928,
+          -0.017468693807905625,
+          0.9734462005801211
+        ],
+        "fov": 60,
+        "distance": 2929.6678678406106,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1.25,
+        "drawing": [
+          2400,
+          1350
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 101,
+        "triangles": 1559187,
+        "textures": 49,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 162,
+        "shaderPrograms": 80,
+        "glError": 0
+      },
+      "performance": {
+        "fps": 81.33834004909183,
+        "renderedFrames": 652,
+        "duplicateTicks": 0,
+        "p95Ms": 14.099999999998545,
+        "maxMs": 69.5,
+        "hidden": 0,
+        "unfocused": 0,
+        "peak": {
+          "calls": 101,
+          "triangles": 1559187,
+          "textures": 49
+        },
+        "scope": "8-second rendered-frame wall intervals; duplicate RAF excluded; stationary scenic view; main-pass counts, not a whole-route / thermal benchmark"
+      }
+    },
+    {
+      "name": "lake-reveal",
+      "width": 2560,
+      "progress": 0.185,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "2560-lake-reveal.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          244.38626014611853,
+          21.596557815378183,
+          -495.21011020896054
+        ],
+        "quaternion": [
+          -0.046784302183675505,
+          -0.7579260319169983,
+          -0.05469051298476237,
+          0.6483581625931791
+        ],
+        "fov": 60,
+        "distance": 652.9982596994132,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 103,
+        "triangles": 1441304,
+        "textures": 46,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 146,
+        "shaderPrograms": 81,
+        "glError": 0
+      }
+    },
+    {
+      "name": "shore-road",
+      "width": 2560,
+      "progress": 0.233,
+      "yaw": "lake",
+      "pitch": -0.14,
+      "file": "2560-shore-road.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          339.1560342055342,
+          25.14495767336427,
+          -631.4246688647314
+        ],
+        "quaternion": [
+          -0.024011999035835705,
+          -0.9213221201184222,
+          -0.05764865089071895,
+          0.38375201358856575
+        ],
+        "fov": 60,
+        "distance": 822.4248351889908,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 56,
+        "triangles": 1325002,
+        "textures": 45,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 147,
+        "shaderPrograms": 81,
+        "glError": 0
+      }
+    },
+    {
+      "name": "overlook",
+      "width": 2560,
+      "progress": 0.487,
+      "yaw": "lake",
+      "pitch": -0.22,
+      "file": "2560-overlook.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          790.4901119890376,
+          56.248301207727934,
+          -655.8345262329177
+        ],
+        "quaternion": [
+          -0.0637218568019381,
+          0.8857639678739885,
+          0.1278083881479231,
+          0.4416183126874055
+        ],
+        "fov": 60,
+        "distance": 1718.9737971546717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 63,
+        "triangles": 1190870,
+        "textures": 49,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 152,
+        "shaderPrograms": 77,
+        "glError": 0
+      },
+      "bankDetail": {
+        "position": [
+          595.4139120660641,
+          14.569279013491252,
+          -662.8785647983572
+        ],
+        "quaternion": [
+          -0.005464222565491259,
+          0.9942040646707986,
+          0.08769978663199746,
+          0.061944874594429496
+        ],
+        "target": [
+          593.6760904627727,
+          12.08,
+          -648.9868415044266
+        ],
+        "fov": 60,
+        "shore": [
+          594.79326149346,
+          12.08,
+          -657.9172350505248
+        ],
+        "scope": "Staged diagnostic bank camera, one actual GPU draw into the existing canvas; not a native walking claim.",
+        "file": "2560-bank-detail.png"
+      }
+    },
+    {
+      "name": "waterline",
+      "width": 2560,
+      "progress": 0.7,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "2560-waterline.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          802.2456820722517,
+          17.125886500937614,
+          -354.98421898851774
+        ],
+        "quaternion": [
+          -0.0641133571565392,
+          0.5791162322479211,
+          0.04575754459219831,
+          0.8114309053110949
+        ],
+        "fov": 60,
+        "distance": 2470.8042258896717,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 121,
+        "triangles": 1331279,
+        "textures": 49,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 172,
+        "shaderPrograms": 81,
+        "glError": 0
+      }
+    },
+    {
+      "name": "last-light",
+      "width": 2560,
+      "progress": 0.83,
+      "yaw": "lake",
+      "pitch": -0.12,
+      "file": "2560-last-light.png",
+      "state": {
+        "room": "cycling",
+        "position": [
+          395.5425643292082,
+          20.925286913116768,
+          -182.56505865778578
+        ],
+        "quaternion": [
+          -0.07947476879427964,
+          -0.21396518510698928,
+          -0.017468693807905625,
+          0.9734462005801211
+        ],
+        "fov": 60,
+        "distance": 2929.6678678406106,
+        "length": 3529.720322699531,
+        "mounted": true,
+        "speed": 0,
+        "dpr": 1,
+        "drawing": [
+          2560,
+          1440
+        ],
+        "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1650 (0x00001F99) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+        "calls": 101,
+        "triangles": 1559187,
+        "textures": 49,
+        "lights": 2,
+        "shadowLights": 1,
+        "materialTextureMiB": 187.19148763020834,
+        "textureScope": "RGBA8 with mip estimate for unique material source/sampler sets, not total VRAM; HDR, framebuffers and bone textures excluded"
+      },
+      "lake": {
+        "triangles": 1081,
+        "vertices": 3043,
+        "waterLevel": 12.079999923706055,
+        "opaque": true,
+        "depthWrite": true,
+        "geometries": 172,
+        "shaderPrograms": 81,
+        "glError": 0
+      }
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "sourceHashes": {
+    "src/worlds/road/Lake.tsx": "b5d5b40a9468cb0e9dd80c8ab7841828f390a697c8422accdeee9488abad0af0",
+    "src/worlds/road/lakeMesh.ts": "d144de9cdca8987a85cebebed9c96be8dc602a889cfda75e495094171a8b181e",
+    "src/worlds/road/lakeShore.ts": "81bceaabf71764099d0b31a2be1bb6c4f550b59b668414b1481303b72a3ab7f7",
+    "src/worlds/road/Landscape.tsx": "c159f1ca72fe552e836aac97eeddb0d92646da578c6d89079af795b9cf59e033",
+    "src/worlds/road/valleyFloor.ts": "d312bfd852816d52ced3bcb4e313399562a2cdbac7258d765c97cdebfd3c2a21",
+    "src/worlds/road/route.ts": "c87e0255fdc4063a7be4fec35ec663d85712987e13dab625e426917870cd5dbd",
+    "src/worlds/road/textures.ts": "783ef7c02064237371cdc90d2934c8c5f00cd59ec77d1be9001e6c9a0cef543a",
+    "src/worlds/alpine/assets.ts": "43f171816a00d72a946200ed5dcb319a291d552db66b2bf74a4bdcdc0b260f3c",
+    "src/worlds/scenery/terrainFinish.ts": "e1687d3aae0b2a0e96a7241f83cada80e63552f5bcbe7ce2e350c4e522d247e9",
+    "src/worlds/scenery/earthSampling.ts": "493212a97af4167e16b29d6eea423c47d64b5eda1d10104519f61311830591e2"
+  },
+  "stage": "after",
+  "blockedExternal": [],
+  "passed": true
+}
