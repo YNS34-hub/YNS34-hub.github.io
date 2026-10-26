@@ -24,6 +24,7 @@ import {createBasketballFootwork,sampleShotFootwork,shotFootSettleTarget} from "
 import {sampleDribblePalmNormal,advanceDribbleHandRotation,sampleDribbleElbowPole} from "./dribblePalm";
 import {sampleShotHandRotation} from "./shotHandRotation";
 import {createCourtWristFrame,advanceCourtHandRotation} from './courtHandRotation';
+import {advanceCourtFingerGrip} from './courtFingerGrip';
 import {blendDribbleArmTarget,blendDribbleArmRotation} from "./dribbleArm";
 import {captureAnimationContinuity,createAnimationContinuity,restoreAnimationContinuity} from "./animationContinuity";
 import {blendShotGather} from "./shotGather";
@@ -387,9 +388,9 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       hand.quaternion.copy(rig.parent.invert().multiply(rig.world));hand.updateWorldMatrix(true,true);
     }
     // 在原骨骼与 IK 上补掌面朝向 / 指节小幅握持；没有独立动作钟，也不改变球的物理坐标。
+    if(roomId==="basketball")advanceCourtFingerGrip(presence.courtFingerGrip,presence,dt);
     for (const side of [-1,1]) {
-      const catching=presence.dribbling?Math.max(0,1-Math.min(presence.dribblePhase,1-presence.dribblePhase)/.15):0;
-      const grip = riding ? .68 : roomId==="basketball"?(presence.held&&!presence.dribbling?.30:catching*.19+(presence.shot>0?.05:0)):presence.held&&!presence.dribbling?.20:0;
+      const grip = riding ? .68 : roomId==="basketball"?(side<0?presence.courtFingerGrip.left:presence.courtFingerGrip.right):presence.held&&!presence.dribbling?.20:0;
       for (let finger=1;finger<=4;finger++) for (let joint=0;joint<=2;joint++) {
         const bone = rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Finger"+finger+(joint||""));
         if (bone) bone.quaternion.multiply(rig.tilt.setFromAxisAngle(rig.axis.set(0,0,1),grip*(joint===0?.26:joint===1?.42:.30)*(riding?1:1+finger*.07)));
