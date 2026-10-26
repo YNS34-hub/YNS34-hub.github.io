@@ -22,7 +22,8 @@ import {useCourtPackages} from "../court/packagePreferences";
 import {installBasketballAppearance} from "./basketballAppearance";
 import {createBasketballFootwork,sampleShotFootwork,shotFootSettleTarget} from "./basketballFootwork";
 import {sampleDribblePalmNormal,advanceDribbleHandRotation,sampleDribbleElbowPole} from "./dribblePalm";
-import {sampleShotHandRotation,advanceShotHandRotation} from "./shotHandRotation";
+import {sampleShotHandRotation} from "./shotHandRotation";
+import {createCourtWristFrame,advanceCourtHandRotation} from './courtHandRotation';
 import {blendDribbleArmTarget,blendDribbleArmRotation} from "./dribbleArm";
 import {captureAnimationContinuity,createAnimationContinuity,restoreAnimationContinuity} from "./animationContinuity";
 import {blendShotGather} from "./shotGather";
@@ -82,10 +83,11 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     const soles=new Map([-1,1].map(side=>[side,new Vector3(0,-.112,-.064).applyQuaternion(feet.get(side)!.clone().invert())]));
     const hips=new Map([-1,1].map(side=>[side,{position:new Vector3(),quaternion:new Quaternion()}]));
     const animatedArms=new Map([-1,1].map(side=>[side,{wrist:new Vector3(),elbow:new Vector3(),rotation:new Quaternion()}]));
+    const wristFrames=new Map([-1,1].map(side=>[side,createCourtWristFrame()]));
     const dribbleArmEntry={left:new Vector3(),right:new Vector3(),leftElbow:new Vector3(),rightElbow:new Vector3(),origin:new Vector3(),elapsed:0};
     const headBase=bones.get("Bip01_Head")!.getWorldQuaternion(new Quaternion()).invert();
     const spineBase = bones.get("Bip01_Spine2")!.getWorldQuaternion(new Quaternion()).invert();
-    return { dribbleArmEntry,animatedArms,basketballAppearance, shotFeet:createBasketballFootwork(),shotFadeActive:false,shotFadeLeft:new Vector3(),shotFadeRight:new Vector3(),shotFadeOrigin:new Vector3(),shotFadeRemaining:0,leftGait:createCourtLocomotion(),rightGait:createCourtLocomotion(),gaitActive:false, object, bones, materials, geometries, textures, mixer, actions, seatedBase, animatedBase, feet, soles, outline, guideRest:new Quaternion(),dribbleOrientationActive:false,dribbleLeftRotation:new Quaternion(),dribbleRightRotation:new Quaternion(),footWorld:new Quaternion(), contact:new Vector3(), hips, headBase, spineBase, helmetOffset:new Vector3(), yaw: 0, effort: 0, ik: new LimbIK(), target: new Vector3(), pole: new Vector3(), point: new Vector3(), tangent: new Vector3(), direction: new Vector3(), head: new Vector3(), tilt: new Quaternion(), world: new Quaternion(), parent: new Quaternion(), axis: new Vector3(1, 0, 0), palm: new Vector3(), fingers: new Vector3(), width: new Vector3(), handMatrix: new Matrix4() };
+    return { wristFrames,dribbleArmEntry,animatedArms,basketballAppearance, shotFeet:createBasketballFootwork(),shotFadeActive:false,shotFadeLeft:new Vector3(),shotFadeRight:new Vector3(),shotFadeOrigin:new Vector3(),shotFadeRemaining:0,leftGait:createCourtLocomotion(),rightGait:createCourtLocomotion(),gaitActive:false, object, bones, materials, geometries, textures, mixer, actions, seatedBase, animatedBase, feet, soles, outline, guideRest:new Quaternion(),dribbleOrientationActive:false,dribbleLeftRotation:new Quaternion(),dribbleRightRotation:new Quaternion(),footWorld:new Quaternion(), contact:new Vector3(), hips, headBase, spineBase, helmetOffset:new Vector3(), yaw: 0, effort: 0, ik: new LimbIK(), target: new Vector3(), pole: new Vector3(), point: new Vector3(), tangent: new Vector3(), direction: new Vector3(), head: new Vector3(), tilt: new Quaternion(), world: new Quaternion(), parent: new Quaternion(), axis: new Vector3(1, 0, 0), palm: new Vector3(), fingers: new Vector3(), width: new Vector3(), handMatrix: new Matrix4() };
   }, [gltf, profile, outfitId, headMap,roomId]);
   useEffect(() => {
     // StrictMode 会重播 effect；清理后的同一实例必须重新激活动作，不能留下静止绑定姿态。
@@ -374,13 +376,15 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
         if(ordinary)rig.gaitActive=true;
       }
     }
-    // Preserve the previous rendered world wrist through gather, release and
-    // idle recovery. IK positions remain exact; paused/remounted rigs keep Q.
-    if(roomId==="basketball"&&!(presence.dribbling&&presence.held))for(const side of[-1,1]as const){
+    // Contact/release keeps its world target; empty hands follow their actual
+    // forearms so turning the body cannot countertwist an otherwise idle wrist.
+    if(roomId==="basketball")for(const side of[-1,1]as const){
       const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
+      const frame=rig.wristFrames.get(side)!;hand.parent!.getWorldQuaternion(rig.parent);
+      if(presence.dribbling&&presence.held){frame.parent.copy(rig.parent);frame.ready=true;frame.free=false;continue;}
       hand.getWorldQuaternion(rig.guideRest);rig.world.copy(side<0?presence.leftWristRotation:presence.rightWristRotation);
-      advanceShotHandRotation(rig.world,rig.guideRest,dt);
-      hand.parent!.getWorldQuaternion(rig.parent);hand.quaternion.copy(rig.parent.invert().multiply(rig.world));hand.updateWorldMatrix(true,true);
+      advanceCourtHandRotation(rig.world,rig.guideRest,rig.parent,frame,!presence.held&&!authoredAction&&presence.finish==="idle",dt);
+      hand.quaternion.copy(rig.parent.invert().multiply(rig.world));hand.updateWorldMatrix(true,true);
     }
     // 在原骨骼与 IK 上补掌面朝向 / 指节小幅握持；没有独立动作钟，也不改变球的物理坐标。
     for (const side of [-1,1]) {
