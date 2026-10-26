@@ -3,6 +3,20 @@ export type CourtFootPoint = { x: number; y: number; z: number };
 export type CourtLocomotion = CourtFootPoint & { initialized: boolean };
 export type CourtClipWeights={idle:number;walk:number;run:number};
 
+export function createCourtTravel(){return {direction:1 as 1|-1,playback:1,initialized:false};}
+/** Reverse the existing gait for backpedaling; retain its phase and ease joint velocity. */
+export function advanceCourtTravel(out:ReturnType<typeof createCourtTravel>,velocity:{x:number;z:number},facing:{x:number;z:number},dt:number,authored=false){
+ if(authored||!Number.isFinite(dt)||dt<=0)return out;
+ const speed=Math.hypot(velocity.x,velocity.z),length=Math.hypot(facing.x,facing.z);
+ if(!Number.isFinite(speed)||!Number.isFinite(length)||speed<=.3||length<1e-6)return out;
+ const forward=(velocity.x*facing.x+velocity.z*facing.z)/(speed*length);
+ // A dead band keeps pure strafes and tiny projection noise from flipping the gait.
+ if(forward>.2)out.direction=1;else if(forward<-.2)out.direction=-1;
+ if(!out.initialized){out.playback=out.direction;out.initialized=true;}
+ else out.playback+=(out.direction-out.playback)*(1-Math.exp(-18*Math.min(.06,dt)));
+ return out;
+}
+
 /** Blend the actual walk/run clips over a speed range instead of switching at 3.5m/s. */
 export function sampleCourtClipWeights(out:CourtClipWeights,speed:number,authored=false):CourtClipWeights{
  const s=Number.isFinite(speed)?Math.max(0,speed):0;

@@ -28,7 +28,7 @@ import {advanceCourtFingerGrip} from './courtFingerGrip';
 import {blendDribbleArmTarget,blendDribbleArmRotation} from "./dribbleArm";
 import {captureAnimationContinuity,createAnimationContinuity,restoreAnimationContinuity} from "./animationContinuity";
 import {blendShotGather} from "./shotGather";
-import {createCourtLocomotion,sampleCourtLocomotion,dribbleLegWindow,sampleDribbleKneePole,sampleCourtClipWeights} from "./courtLocomotion";
+import {createCourtLocomotion,sampleCourtLocomotion,dribbleLegWindow,sampleDribbleKneePole,sampleCourtClipWeights,advanceCourtTravel} from "./courtLocomotion";
 import {dribbleRecoveryWindow} from "./dribblePose";
 import {advanceCourtTorso,createCourtTorso} from './courtTorso';
 import CourtFootContact from './CourtFootContact';
@@ -116,13 +116,17 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     // 换装使用原 settings 门控暂停物理；允许以零时间恢复新网格的当前 IK，避免换装时出现 T-pose。
     const dt = blocked ? 0 : Math.min(rawDelta, .06), speed = presence.speed;
     const authoredAction = !!presence.finishPose || presence.charge > 0 || presence.shot > 0;
-    if(roomId==="basketball")sampleCourtClipWeights(courtClipWeights,speed,authoredAction);
+    if(roomId==="basketball"){
+      sampleCourtClipWeights(courtClipWeights,speed,authoredAction);
+      presence.camera.getWorldDirection(rig.direction);
+      advanceCourtTravel(presence.courtTravel,presence.velocity,rig.direction,dt,authoredAction);
+    }
     if(roomId==="basketball"&&restoredMixer.current!==rig.mixer){restoreAnimationContinuity(continuity,rig.mixer,rig.actions,rig.animatedBase);restoredMixer.current=rig.mixer;}
     for (const action of rig.actions) {
       const clipName=action.getClip().name;
       const weight = roomId==="basketball"?(clipName==="idle"?courtClipWeights.idle:clipName==="walk"?courtClipWeights.walk:courtClipWeights.run):riding || authoredAction ? Number(clipName === "idle") : clipName === "idle" ? Number(speed < .12) : clipName === "walk" ? Number(speed >= .12 && speed < 3.5) : Number(speed >= 3.5);
       action.setEffectiveWeight(riding ? weight : action.getEffectiveWeight()+(weight-action.getEffectiveWeight())*(1-Math.exp(-dt*14)));
-      if (action.getClip().name !== "idle") action.setEffectiveTimeScale(Math.min(1.55, Math.max(.45, speed / (action.getClip().name === "run" ? 5.4 : 1.9))));
+      if (clipName !== "idle") action.setEffectiveTimeScale(Math.min(1.55, Math.max(.45, speed / (clipName === "run" ? 5.4 : 1.9)))*(roomId==="basketball"?presence.courtTravel.playback:1));
     }
     // 恒定时间的 Mixer 会跳过相同值，不能依赖它擦掉上一帧 IK；显式恢复骑姿基准后再解算。
     for(const [name,pose] of riding?rig.seatedBase:rig.animatedBase){const bone=rig.bones.get(name)!;bone.position.copy(pose.position);bone.quaternion.copy(pose.quaternion);}
@@ -191,7 +195,8 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       presence.courtStance=courtStance;
       root.current.position.set(presence.camera.position.x,presence.camera.position.y-(roomId==="basketball"?1.65:1.77)+presence.jump-courtStance,presence.camera.position.z);
       const facing = Math.atan2(-rig.direction.x, -rig.direction.z);
-      const moving = speed > .3 && !authoredAction ? Math.atan2(-presence.velocity.x, -presence.velocity.z) : facing;
+      const travelDirection=roomId==="basketball"?presence.courtTravel.direction:1;
+      const moving = speed > .3 && !authoredAction ? Math.atan2(-presence.velocity.x*travelDirection, -presence.velocity.z*travelDirection) : facing;
       const heading = facing + Math.max(-.65, Math.min(.65, Math.atan2(Math.sin(moving - facing), Math.cos(moving - facing))));
       rig.yaw = blocked ? heading : rig.yaw + Math.atan2(Math.sin(heading - rig.yaw), Math.cos(heading - rig.yaw)) * (1 - Math.exp(-dt * 18));
       if(roomId==="basketball"&&(presence.held||authoredAction)){

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import {createCourtTorso} from './courtTorso';
 import {createCourtFingerGrip} from './courtFingerGrip';
+import {createCourtTravel} from './courtLocomotion';
 import { PerspectiveCamera, Quaternion, Vector3, type Camera } from "three";
 import type { FinishPose } from "../court/finishing";
 import type {MotionPackSelection} from "../court/motionPacks";
@@ -25,7 +26,7 @@ export const usePerspective = create<{ views: Record<AdventureRoom, ViewMode>; s
 export const presence = {
   roomId: "", camera: new PerspectiveCamera(60, 1, .1, 200), previous: new Vector3(), velocity: new Vector3(), speed: 0,
   sprinting: false, jump: 0, finishLocked: false, ball: new Vector3(), held: false, dribbling: false, hand: 1,
-  finish: "idle" as "idle" | "layup" | "dunk", shot: 0, charge: 0,shotGatherDuration:.16,shotBallTarget:new Vector3(),courtTorso:createCourtTorso(),courtFingerGrip:createCourtFingerGrip(),
+  finish: "idle" as "idle" | "layup" | "dunk", shot: 0, charge: 0,shotGatherDuration:.16,shotBallTarget:new Vector3(),courtTorso:createCourtTorso(),courtFingerGrip:createCourtFingerGrip(),courtTravel:createCourtTravel(),
   leftWristRotation:new Quaternion(),rightWristRotation:new Quaternion(),shotReleaseLeftRotation:new Quaternion(),shotReleaseRightRotation:new Quaternion(),shotReleaseLeftWrist:new Vector3(),shotReleaseRightWrist:new Vector3(),shotGuideAtRelease:1,
   releaseHand: new Vector3(),releaseBody:new Vector3(),shotReleaseStance:0,shotReleasePitch:0, turboHeld: false, shotJump: 0, finishPose: null as FinishPose | null,
   dribbleContactPalm:new Vector3(),dribbleLeftInfluence:0,dribbleRightInfluence:1,
