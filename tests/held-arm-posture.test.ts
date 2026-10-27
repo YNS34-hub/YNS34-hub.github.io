@@ -3,13 +3,21 @@ import {Quaternion,Vector3} from 'three';
 import {motionPacks} from '../src/worlds/court/motionPacks';
 import {LimbIK} from '../src/worlds/presence/ik';
 import {loadAthleteMotion} from './fixtures/athleteMotion';
+import {heldElbowPole} from '../src/worlds/presence/heldBallPose';
+
+
+const carryPole=(rig:ReturnType<typeof loadAthleteMotion>,side:number,target:Vector3)=>{
+ const prefix='Bip01_'+(side<0?'L':'R')+'_',shoulder=rig.bones.get(prefix+'UpperArm')!.getWorldPosition(new Vector3()),elbow=rig.bones.get(prefix+'Forearm')!.getWorldPosition(new Vector3()),wrist=rig.bones.get(prefix+'Hand')!.getWorldPosition(new Vector3());
+ const right=rig.bones.get('Bip01_R_UpperArm')!.getWorldPosition(new Vector3()).sub(rig.bones.get('Bip01_L_UpperArm')!.getWorldPosition(new Vector3())).normalize();
+ return heldElbowPole(new Vector3(),shoulder,target,right,side,shoulder.distanceTo(elbow),elbow.distanceTo(wrist));
+};
 
 describe('stable two-hand hold with the production shoulder chain',()=>{
  for(const [id,pack] of Object.entries(motionPacks.hands))for(const hand of [-1,1])it(`${id}/${hand} keeps each elbow outside the chest while retaining both wrist contacts`,()=>{
   const athlete=loadAthleteMotion(),ik=new LimbIK();athlete.mixer.setTime(.1);athlete.model.rotation.y=Math.PI;athlete.root.position.y=-.08;athlete.root.updateWorldMatrix(true,true);
   try{for(const side of [-1,1]){
    const prefix='Bip01_'+(side<0?'L':'R')+'_',top=athlete.bones.get(prefix+'UpperArm')!,middle=athlete.bones.get(prefix+'Forearm')!,end=athlete.bones.get(prefix+'Hand')!;
-   const target=new Vector3(hand*pack.holdX+side*pack.spread,pack.holdY-.045,pack.holdZ),pole=athlete.root.localToWorld(new Vector3(side*.70,1.02,-.32)),shoulder=top.getWorldPosition(new Vector3());
+   const target=new Vector3(hand*pack.holdX+side*pack.spread,pack.holdY-.045,pack.holdZ),shoulder=top.getWorldPosition(new Vector3()),pole=carryPole(athlete,side,target);
    const first=middle.getWorldPosition(new Vector3()).sub(shoulder),second=end.getWorldPosition(new Vector3()).sub(middle.getWorldPosition(new Vector3()));
    const hinge=new Vector3().crossVectors(first,second).normalize().applyQuaternion(top.getWorldQuaternion(new Quaternion()).invert());
    ik.solve(top,middle,end,target,pole,true);
@@ -33,7 +41,7 @@ describe('stable two-hand hold with the production shoulder chain',()=>{
    athlete.root.updateWorldMatrix(true,true);
    for(const side of [-1,1]){
     const prefix='Bip01_'+(side<0?'L':'R')+'_',top=athlete.bones.get(prefix+'UpperArm')!,middle=athlete.bones.get(prefix+'Forearm')!,end=athlete.bones.get(prefix+'Hand')!;
-    ik.solve(top,middle,end,new Vector3(.045+side*.14,1.085,-.29),athlete.root.localToWorld(new Vector3(side*.70,1.02,-.32)),true);
+    ik.solve(top,middle,end,new Vector3(motionPacks.hands.natural.holdX+side*motionPacks.hands.natural.spread,motionPacks.hands.natural.holdY-.045,motionPacks.hands.natural.holdZ),carryPole(athlete,side,new Vector3(motionPacks.hands.natural.holdX+side*motionPacks.hands.natural.spread,motionPacks.hands.natural.holdY-.045,motionPacks.hands.natural.holdZ)),true);
     const rotation=top.getWorldQuaternion(new Quaternion()),last=previous.get(side);if(last)maximum=Math.max(maximum,last.angleTo(rotation)/dt);previous.set(side,rotation);
    }
   }expect(maximum,'upper-arm surface rotation must not flip between frames').toBeLessThan(12);}finally{athlete.dispose();}

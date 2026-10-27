@@ -27,6 +27,7 @@ sourceFiles.push('src/worlds/presence/math.ts','src/worlds/presence/CameraRig.ts
 sourceFiles.push('src/worlds/court/ballSpin.ts','src/worlds/worlds.css');
 sourceFiles.push('src/world/World.tsx','src/worlds/presence/clarity.ts','src/worlds/presence/appearanceRig.ts','src/worlds/presence/appearance.ts','src/worlds/presence/assets.ts','public/media/presence/athlete.gltf','public/media/presence/athlete.bin','public/media/presence/athlete-detail.gltf','public/media/presence/athlete-detail.bin','public/media/presence/body-color.webp','public/media/presence/body-normal.webp','public/media/presence/head-color.webp','public/media/presence/head-normal.webp');
 sourceFiles.push('src/ui/Hud.tsx');
+sourceFiles.push('src/worlds/presence/heldBallPose.ts');
 const sourceHashes=Object.fromEntries(await Promise.all(sourceFiles.map(async file=>[file,await sourceHash(file)])));
 
 await mkdir(out, { recursive: true });
