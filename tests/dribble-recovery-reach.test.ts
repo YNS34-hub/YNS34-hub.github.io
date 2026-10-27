@@ -4,6 +4,7 @@ import {DribbleMotion} from '../src/worlds/presence/dribbleMotion';
 import {dribbleRecoveryWindow} from '../src/worlds/presence/dribblePose';
 import {sampleDribbleElbowPole} from '../src/worlds/presence/dribblePalm';
 import {motionPacks} from '../src/worlds/court/motionPacks';
+import {sampleDribbleHandRotation,dribbleWristTarget} from '../src/worlds/presence/dribblePalm';
 import {LimbIK} from '../src/worlds/presence/ik';
 import {loadAthleteMotion} from './fixtures/athleteMotion';
 
@@ -26,7 +27,7 @@ describe('the whole recovery arc fits the actual athlete skeleton',()=>{
      for(const[name,angle,axis]of [['Bip01_Spine',pose.torso,new Vector3(1,0,0)],['Bip01_Spine1',pose.twist,new Vector3(0,1,0)]]as const){
       const bone=rig.bones.get(name)!;bone.getWorldQuaternion(world);world.premultiply(tilt.setFromAxisAngle(axis,angle));bone.parent!.getWorldQuaternion(parent);bone.quaternion.copy(parent.invert().multiply(world));bone.updateWorldMatrix(true,true);
      }
-     target.set(pose.contactPalm.x,pose.contactPalm.y,pose.contactPalm.z);sampleDribbleElbowPole(pole,side,pose.phase,false,dribbleRecoveryWindow(pose.phase));rig.root.localToWorld(pole);
+     const rotation=sampleDribbleHandRotation(new Quaternion(),side,pose.phase,0,new Vector3(0,0,-1));dribbleWristTarget(target,new Vector3(pose.contactPalm.x,pose.contactPalm.y,pose.contactPalm.z),rotation);sampleDribbleElbowPole(pole,side,pose.phase,false,dribbleRecoveryWindow(pose.phase),upper.getWorldPosition(new Vector3()),0);
      solver.solve(upper,lower,hand,target,pole);const error=hand.getWorldPosition(new Vector3()).distanceTo(target);
      if(error>maximum){maximum=error;worst={clip,clipPhase:gait,bounce:pose.phase};}
     }

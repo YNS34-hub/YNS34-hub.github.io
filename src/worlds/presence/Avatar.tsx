@@ -21,7 +21,7 @@ import {motionPacks} from "../court/motionPacks";
 import {useCourtPackages} from "../court/packagePreferences";
 import {installBasketballAppearance} from "./basketballAppearance";
 import {createBasketballFootwork,sampleShotFootwork,shotFootSettleTarget} from "./basketballFootwork";
-import {sampleDribblePalmNormal,advanceDribbleHandRotation,sampleDribbleElbowPole} from "./dribblePalm";
+import {sampleDribbleHandRotation,dribbleWristTarget,dribblePalmPoint,advanceDribbleHandRotation,sampleDribbleElbowPole} from "./dribblePalm";
 import {sampleShotHandRotation} from "./shotHandRotation";
 import {createCourtWristFrame,advanceCourtHandRotation} from './courtHandRotation';
 import {advanceCourtFingerGrip} from './courtFingerGrip';
@@ -237,8 +237,14 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
       if(roomId==="basketball"&&(presence.held||authoredAction)){
         const look=Math.max(-.20,Math.min(.26,Math.asin(Math.max(-1,Math.min(1,rig.direction.y)))));
         // Eyes remain on the play; the head follows the aimed rim rather than the bouncing ball.
-        rotateBody("Bip01_Neck",look*.22,1,0,0);rotateBody("Bip01_Head",look*.52,1,0,0);
+        const counterPitch=authoredAction?0:-torso.pitch;
+        rotateBody("Bip01_Neck",look*.22+counterPitch*.35,1,0,0);rotateBody("Bip01_Head",look*.52+counterPitch*.50,1,0,0);
         rotateBody("Bip01_Neck",-torso.roll*.25,0,0,1);rotateBody("Bip01_Head",-torso.roll*.55,0,0,1);
+      }
+      let armFacing=facing;
+      if(roomId==="basketball"&&presence.dribbling&&presence.held){
+        rig.bones.get('Bip01_L_UpperArm')!.getWorldPosition(rig.head);rig.bones.get('Bip01_R_UpperArm')!.getWorldPosition(rig.point);
+        armFacing=Math.atan2(rig.head.z-rig.point.z,rig.point.x-rig.head.x);
       }
       if(!presence.dribbling||!presence.held)rig.dribbleOrientationActive=false;
       if (presence.held || presence.finish !== "idle" || presence.shot>0) {
@@ -259,14 +265,19 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
           }
           for(const side of [-1,1]as const){
             const base=rig.animatedArms.get(side)!,influence=side<0?presence.dribbleLeftInfluence:presence.dribbleRightInfluence;
-            blendDribbleArmTarget(rig.target,base.wrist,presence.dribbleContactPalm,influence);
+            orientPalm(side,true,dt,armFacing);
+            const rotation=side<0?rig.dribbleLeftRotation:rig.dribbleRightRotation;
+            dribbleWristTarget(rig.head,presence.dribbleContactPalm,rotation);
+            blendDribbleArmTarget(rig.target,base.wrist,rig.head,influence);
             rig.head.copy(side===-1?rig.dribbleArmEntry.left:rig.dribbleArmEntry.right).add(presence.camera.position).sub(rig.dribbleArmEntry.origin);rig.target.lerp(rig.head,1-armBlend);
-            sampleDribbleElbowPole(rig.pole,side,presence.dribblePhase,presence.dribbleMove==="between-legs"||presence.dribbleMove==="behind-back",dribbleRecoveryWindow(presence.dribblePhase));root.current.localToWorld(rig.pole);
+            rig.bones.get("Bip01_"+(side===1?"R":"L")+"_UpperArm")!.getWorldPosition(rig.point);
+            sampleDribbleElbowPole(rig.pole,side,presence.dribblePhase,presence.dribbleMove==="between-legs"||presence.dribbleMove==="behind-back",dribbleRecoveryWindow(presence.dribblePhase),rig.point,armFacing);
             rig.head.copy(rig.pole);blendDribbleArmTarget(rig.pole,base.elbow,rig.head,influence);
             rig.head.copy(side<0?rig.dribbleArmEntry.leftElbow:rig.dribbleArmEntry.rightElbow).add(presence.camera.position).sub(rig.dribbleArmEntry.origin);rig.pole.lerp(rig.head,1-armBlend);
             if(influence>0||armBlend<1)limb(side,"arm");
-            (side<0?presence.dribbleLeftPalm:presence.dribbleRightPalm).copy(rig.target);
-            orientPalm(side,true,dt);
+            const handBone=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!;
+            handBone.parent!.getWorldQuaternion(rig.parent);handBone.quaternion.copy(rig.parent.invert().multiply(rotation));handBone.updateWorldMatrix(true,true);
+            handBone.getWorldPosition(rig.point);dribblePalmPoint(side<0?presence.dribbleLeftPalm:presence.dribbleRightPalm,rig.point,rotation);
             if(import.meta.env.DEV){const key=side<0?"basketballLeftAnimatedArm":"basketballRightAnimatedArm";root.current.userData[key]=base;}
             if(import.meta.env.DEV){rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand")!.getWorldPosition(rig.point);root.current.userData[side===1?"basketballRightWristError":"basketballLeftWristError"]=rig.point.distanceTo(rig.target);}
           }
@@ -335,7 +346,7 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
             rig.target.set(goal.x,goal.y,goal.z);
             const anchor=presence.shotLanded?presence.shotLandOrigin:presence.shotFootOrigin;
             const drift=Math.hypot(presence.camera.position.x-anchor.x,presence.camera.position.z-anchor.z);
-            const blend=Math.max(0,Math.min(1,(drift-.18)/.26));
+            const blend=Math.max(0,Math.min(1,(drift-.18)/.26))*shotFeet.plantDriftWeight;
             if(blend>0){
               rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Foot")!.getWorldPosition(rig.head);
               rig.head.y+=courtStance-Math.min(0,presence.jump);rig.target.lerp(rig.head,blend);
@@ -420,10 +431,11 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     bone.getWorldQuaternion(rig.world); rig.world.premultiply(rig.tilt.setFromAxisAngle(rig.axis, angle));
     bone.parent.getWorldQuaternion(rig.parent); bone.quaternion.copy(rig.parent.invert().multiply(rig.world)); bone.updateWorldMatrix(true, true);
   }
-  function orientPalm(side: -1|1, dribble: boolean,dt=0) {
+  function orientPalm(side: -1|1, dribble: boolean,dt=0,frameYaw=0) {
     const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand"); if (!hand?.parent || !root.current) return;
+    if(dribble){sampleDribbleHandRotation(rig.world,side,presence.dribblePhase,frameYaw,rig.direction);applyHandRotation(side,true,dt);return;}
     hand.getWorldPosition(rig.point);
-    if (dribble){sampleDribblePalmNormal(rig.palm,side,presence.dribblePhase,1);rig.palm.transformDirection(root.current.matrixWorld);} else {
+    {
       if(presence.held)rig.palm.subVectors(presence.ball,rig.point);
       else if(presence.finishPose)rig.palm.set(presence.finishPose.ball.x,presence.finishPose.ball.y,presence.finishPose.ball.z).sub(rig.point);
       else rig.palm.set(0,1,0);
@@ -442,6 +454,10 @@ function SportAvatar({ roomId, headMap }: { roomId: AdventureRoom; headMap?: Tex
     const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand");if(!hand?.parent)return;
     rig.fingers.addScaledVector(rig.palm,-rig.fingers.dot(rig.palm)).normalize(); rig.width.crossVectors(rig.fingers,rig.palm).normalize(); rig.palm.crossVectors(rig.width,rig.fingers);
     rig.handMatrix.makeBasis(rig.fingers,rig.palm,rig.width); rig.world.setFromRotationMatrix(rig.handMatrix);
+    applyHandRotation(side,dribble,dt);
+  }
+  function applyHandRotation(side:-1|1,dribble=false,dt=0){
+    const hand=rig.bones.get("Bip01_"+(side===1?"R":"L")+"_Hand");if(!hand?.parent)return;
     if(dribble){
       const previous=side<0?rig.dribbleLeftRotation:rig.dribbleRightRotation,base=rig.animatedArms.get(side)!;
       rig.guideRest.copy(rig.world);blendDribbleArmRotation(rig.world,base.rotation,rig.guideRest,side<0?presence.dribbleLeftInfluence:presence.dribbleRightInfluence);
