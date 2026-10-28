@@ -14,7 +14,7 @@ export interface ShotFootworkInput {
 export interface BasketballFootwork {
   left: Point; right: Point; leftToe: number; rightToe: number;
   leftPlanted: boolean; rightPlanted: boolean; phase: ShotFootworkPhase;
-  weightShift: number; kneeLoad: number;
+  weightShift: number; kneeLoad: number; plantDriftWeight: number;
 }
 
 const finite = (v: number, fallback = 0) => Number.isFinite(v) ? v : fallback;
@@ -28,7 +28,7 @@ const high = { width: .195, stagger: .18 };
 /** Allocate once for an avatar. Sampling below only writes these existing points. */
 export function createBasketballFootwork(): BasketballFootwork {
   return { left: { x: 0, y: 0, z: 0 }, right: { x: 0, y: 0, z: 0 },
-    leftToe: 0, rightToe: 0, leftPlanted: true, rightPlanted: true, phase: 'load', weightShift: 0, kneeLoad: 0 };
+    leftToe: 0, rightToe: 0, leftPlanted: true, rightPlanted: true, phase: 'load', weightShift: 0, kneeLoad: 0, plantDriftWeight: 1 };
 }
 
 /** Grounded recovery starts at the last rendered ankle, avoiding stacked fades. */
@@ -72,6 +72,9 @@ export function sampleShotFootwork(out: BasketballFootwork, input: ShotFootworkI
   const tuck = inAir ? Math.sin(Math.PI * air) : 0;
   const liftBlend = inAir ? smooth((elapsed - takeoff) / .07) : 0;
   const landBlend = inAir ? smooth((air - .70) / .30) : elapsed >= landing && !aborted ? 1 : 0;
+  // The airborne targets already follow the moving body. Retire the loading
+  // animation blend before a new landing anchor resets the measured drift.
+  out.plantDriftWeight = inAir ? 1 - smooth((elapsed - takeoff) / .14) : 1;
   // The follow-through lasts .65 s regardless of the release charge. Spend the
   // available grounded time on the two real steps first, shortening the waiting
   // period before speeding those steps up; finish .03 s before the clock ends.

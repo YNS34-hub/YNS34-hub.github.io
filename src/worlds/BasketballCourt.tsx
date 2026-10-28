@@ -104,6 +104,7 @@ function PracticeBall() {
         state.current.shotSeed.copy(presence.ball);state.current.shotStart.copy(camera.position);
         presence.shotStance=presence.courtStance;presence.shotGather=0;
         presence.shotLeftSeed.copy(presence.leftWrist);presence.shotRightSeed.copy(presence.rightWrist);presence.shotOrigin.copy(camera.position);
+        presence.shotLeftElbowSeed.copy(presence.leftElbow);presence.shotRightElbowSeed.copy(presence.rightElbow);
         presence.shotFootOrigin.copy(camera.position);presence.shotLeftFootSeed.copy(presence.leftFoot);presence.shotRightFootSeed.copy(presence.rightFoot);
         camera.getWorldDirection(scratch.current.forward);presence.shotFacing=Math.atan2(-scratch.current.forward.x,-scratch.current.forward.z);
         const rest=prepareShot(0,motionPacks.shot[state.current.shotPack]);
@@ -179,11 +180,12 @@ function PracticeBall() {
     const dribblePeriod = sprintDribble ? motionPacks.dribble[packs.dribble].sprintPeriod : motionPacks.dribble[packs.dribble].period;
     if(local.dribblePeriod!==dribblePeriod){local.dribbleTime=local.dribbleTime/local.dribblePeriod*dribblePeriod;local.dribblePeriod=dribblePeriod;}
     if (simulation.mode === "held" && !movement) {
-      if(!local.dribble&&!local.charging&&(local.holdPack!==packs.hands||local.holdHand!==presence.hand)){local.holdElapsed=0;local.holdSeed.set(simulation.position.x,simulation.position.y,simulation.position.z);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdOrigin.copy(camera.position);}
+      if(!local.dribble&&!local.charging&&(local.holdPack!==packs.hands||local.holdHand!==presence.hand)){local.holdElapsed=0;local.holdSeed.set(simulation.position.x,simulation.position.y,simulation.position.z);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdLeftElbowSeed.copy(presence.leftElbow);presence.holdRightElbowSeed.copy(presence.rightElbow);presence.holdOrigin.copy(camera.position);}
       const prep = prepareShot(local.charging ? local.charge : 0,motionPacks.shot[local.shotPack]),hold=motionPacks.hands[packs.hands];
       const hand = scratch.current.hand.set((local.charging ? prep.x : hold.holdX)*presence.hand, (local.charging ? prep.y : hold.holdY) - 1.65 + presence.jump, local.charging ? prep.z : hold.holdZ);
       camera.getWorldDirection(scratch.current.forward); const yaw = Math.atan2(-scratch.current.forward.x, -scratch.current.forward.z);
       hand.applyAxisAngle(scratch.current.up, yaw).add(camera.position);
+      if(!local.charging&&!local.dribble)hand.add(presence.courtCarryOffset);
       if(local.charging){
         presence.shotBallTarget.copy(hand);
         blendShotGather(hand,local.shotSeed,local.shotStart,camera.position,local.charge*motionPacks.shot[local.shotPack].chargeDuration,presence.shotGatherDuration);
@@ -202,7 +204,7 @@ function PracticeBall() {
         presence.dribbleLeftInfluence=pose.leftInfluence;presence.dribbleRightInfluence=pose.rightInfluence;
         presence.dribblePalm.copy(presence.hand<0?presence.dribbleLeftPalm:presence.dribbleRightPalm);
         presence.dribblePhase=t;presence.dribbleLeftWeight=pose.leftWeight;presence.dribbleRightWeight=pose.rightWeight;presence.crossover=pose.crossover;presence.dribbleTorso=pose.torso;presence.dribbleTwist=pose.twist;presence.dribbleCrouch=pose.crouch;
-        if(local.dribbleStop&&t<before){local.dribble=false;local.dribbleStop=false;local.holdElapsed=0;local.holdSeed.copy(hand);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdOrigin.copy(camera.position);}
+        if(local.dribbleStop&&t<before){local.dribble=false;local.dribbleStop=false;local.holdElapsed=0;local.holdSeed.copy(hand);local.holdStart.copy(camera.position);local.holdPack=packs.hands;local.holdHand=presence.hand;presence.holdLeftSeed.copy(presence.leftWrist);presence.holdRightSeed.copy(presence.rightWrist);presence.holdLeftElbowSeed.copy(presence.leftElbow);presence.holdRightElbowSeed.copy(presence.rightElbow);presence.holdOrigin.copy(camera.position);}
       }
       if(!local.dribble&&!local.charging){local.holdElapsed=Math.min(.22,local.holdElapsed+dt);const h=local.holdElapsed/.22,s=h*h*(3-2*h);presence.holdBlend=s;if(s<1){scratch.current.aim.copy(local.holdSeed).add(camera.position).sub(local.holdStart);hand.lerp(scratch.current.aim,1-s);}}else presence.holdBlend=1;
       Object.assign(simulation.position, { x: hand.x, y: hand.y, z: hand.z });

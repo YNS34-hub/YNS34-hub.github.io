@@ -10,3 +10,9 @@
 **/__pycache__/
 *.pyc
 *.pyo
+
+# Root-motion compatibility experiments remain local
+RootMotionSource*/
+RootMotionSource*-protection.json
+RootMotionSource*-receipt.json
+ExportsRootMotion*/

@@ -5,9 +5,9 @@ import {loadAthleteMotion} from './fixtures/athleteMotion';
 const rotationError=(a:Quaternion,b:Quaternion)=>{const x=a.toArray(),y=b.toArray();return Math.min(Math.hypot(...x.map((v,i)=>v-y[i])),Math.hypot(...x.map((v,i)=>v+y[i])));};
 
 describe('outfit rebuild keeps the actual athlete mixer phase',()=>{
- for(const elapsed of [.173,.613,1.237])it(`restores all three actual clips and shoulder/elbow/wrist poses after ${elapsed}s`,()=>{
+ for(const direction of [1,-1])for(const elapsed of [.173,.613,1.237])it(`restores all three actual clips and shoulder/elbow/wrist poses after ${elapsed}s, playback ${direction}`,()=>{
   const old=loadAthleteMotion(),fresh=loadAthleteMotion(),state=createAnimationContinuity();
-  old.actions.forEach((action,i)=>{action.setEffectiveWeight([.2,.3,.5][i]);action.setEffectiveTimeScale([.65,1.1,1.45][i]);});old.mixer.update(elapsed);
+  old.actions.forEach((action,i)=>{action.setEffectiveWeight([.2,.3,.5][i]);action.setEffectiveTimeScale([.65,1.1*direction,1.45*direction][i]);});old.mixer.update(elapsed);
   const base=new Map([...old.bones].map(([name,bone])=>[name,{position:bone.position.clone(),quaternion:bone.quaternion.clone()}]));
   captureAnimationContinuity(state,old.mixer,old.actions,base);
   const savedReferences=[...state.bones.values()];captureAnimationContinuity(state,old.mixer,old.actions,base);[...state.bones.values()].forEach((pose,i)=>expect(pose).toBe(savedReferences[i]));

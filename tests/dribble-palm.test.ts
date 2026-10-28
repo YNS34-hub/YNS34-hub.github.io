@@ -58,14 +58,15 @@ describe('released arms use a natural low elbow plane',()=>{
   const a=new Vector3(side*.18,1.3,0),b=new Vector3(side*.35,1.15,-.20),c=new Vector3(side*.34,1.02,-.13);
   shoulder.position.copy(a).sub(root.position);elbow.position.copy(b).sub(a);wrist.position.copy(c).sub(b);
   root.add(shoulder);shoulder.add(elbow);elbow.add(wrist);root.updateMatrixWorld(true);
-  const pole=sampleDribbleElbowPole(new Vector3(),side,.5,true);root.localToWorld(pole);
+  const pole=sampleDribbleElbowPole(new Vector3(),side,.5,true,0,a,0);
   new LimbIK().solve(shoulder,elbow,wrist,c,pole);
   expect(wrist.getWorldPosition(new Vector3()).distanceTo(c)).toBeLessThan(1e-8);
   const actual=elbow.getWorldPosition(new Vector3());expect(actual.y).toBeLessThan(a.y-.10);expect(actual.x*side).toBeGreaterThan(.20);
  });
- it('preserves original arm planes at contact and for ordinary dribbles',()=>{
-  for(const phase of [0,1])expect(sampleDribbleElbowPole(new Vector3(),1,phase,true).toArray()).toEqual([.48,1.04,-.28]);
-  expect(sampleDribbleElbowPole(new Vector3(),-1,.5,false).toArray()).toEqual([-.48,1.04,-.28]);
+ it('returns to the same shoulder-relative plane at each catch',()=>{
+  const shoulder=new Vector3(.20,1.5,-3),first=sampleDribbleElbowPole(new Vector3(),1,0,true,0,shoulder,0);
+  expect(sampleDribbleElbowPole(new Vector3(),1,1,true,0,shoulder,0).distanceTo(first)).toBeLessThan(1e-12);
+  expect(first.y).toBeLessThan(shoulder.y-.5);
   for(let p=0;p<=1;p+=.001)expect(dribbleContact(p)).toBeGreaterThanOrEqual(0);
  });
 });

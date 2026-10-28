@@ -2,6 +2,7 @@ import {describe,expect,it} from 'vitest';
 import {Bone,Group,Quaternion,Vector3} from 'three';
 import {DribbleMotion} from '../src/worlds/presence/dribbleMotion';
 import {motionPacks} from '../src/worlds/court/motionPacks';
+import {sampleDribbleHandRotation,dribbleWristTarget} from '../src/worlds/presence/dribblePalm';
 import {LimbIK} from '../src/worlds/presence/ik';
 import {loadAthleteMotion} from './fixtures/athleteMotion';
 
@@ -39,7 +40,7 @@ describe('running posture keeps the real ball contact within the actual arm reac
      rig.model.rotation.y=Math.PI;rig.root.position.set(0,-pose.crouch,0);rig.root.updateWorldMatrix(true,true);
      spine.getWorldQuaternion(world);world.premultiply(tilt.setFromAxisAngle(axis,pose.torso));spine.parent!.getWorldQuaternion(parent);spine.quaternion.copy(parent.invert().multiply(world));spine.updateWorldMatrix(true,true);
      spine1.getWorldQuaternion(world);world.premultiply(tilt.setFromAxisAngle(new Vector3(0,1,0),pose.twist));spine1.parent!.getWorldQuaternion(parent);spine1.quaternion.copy(parent.invert().multiply(world));spine1.updateWorldMatrix(true,true);
-     const target=new Vector3(pose.contactPalm.x,pose.contactPalm.y,pose.contactPalm.z),pole=new Vector3(side*.48,1.04,-.28);rig.root.localToWorld(pole);solver.solve(upper,lower,hand,target,pole);
+     const rotation=sampleDribbleHandRotation(new Quaternion(),side,pose.phase,0,new Vector3(0,0,-1)),target=dribbleWristTarget(new Vector3(),new Vector3(pose.contactPalm.x,pose.contactPalm.y,pose.contactPalm.z),rotation),pole=new Vector3(side*.48,1.04,-.28);rig.root.localToWorld(pole);solver.solve(upper,lower,hand,target,pole);
      const error=hand.getWorldPosition(new Vector3()).distanceTo(target);if(error>maximum){maximum=error;worst={clipPhase:i/120,bouncePhase:pose.phase};}
     }
    }

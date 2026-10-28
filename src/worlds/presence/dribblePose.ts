@@ -15,8 +15,11 @@ export function dribblePose(phase:number,speed:number,side=1,result:DribblePose=
  // 接球和下压仍跟同一真实球；球离手后，腕部下送并收向髋旁，再提前迎接回弹。
  // 回收时同时缩短前伸距离，避免单纯降低腕高把前臂拉出实际骨长。
  const recover=options.height===undefined?0:dribbleRecoveryWindow(p);
- const depth=(.17+.14*clamp((height-.68)/.22))*(1-.50*running),catchHeight=.12+height+.075;
- const palmY=Math.max(y+.075,options.height===undefined?Math.min(palmFloor+.025*Math.cos(2*Math.PI*p),catchHeight):catchHeight-depth*recover);
+ const contactLift=options.height===undefined?.075:.115;
+ const depth=(.17+.14*clamp((height-.68)/.22))*(1-.50*running),catchHeight=.12+height+contactLift;
+ const palmY=Math.max(y+contactLift,options.height===undefined?Math.min(palmFloor+.025*Math.cos(2*Math.PI*p),catchHeight):catchHeight-depth*recover);
+ // This is the palm-pad contact point. Avatar derives the wrist from the real
+ // hand frame, keeping the hand's length and thickness outside the sphere.
  const palmZ=z+(options.height===undefined?0:(running*.10+.045)*Math.sin(Math.PI*p)**2+.19*recover);
  const palmX=x-side*.04*recover;
  Object.assign(result.ball,{x,y,z});Object.assign(result.palm,{x:palmX,y:palmY,z:palmZ});result.push=clamp(1-p/.23);

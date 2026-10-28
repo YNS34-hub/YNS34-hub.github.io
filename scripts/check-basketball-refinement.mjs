@@ -19,7 +19,7 @@ assert.ok(["all","shots","moves","finishes","free-arms"].includes(refinementStag
 assert.ok(!freeFocused||refinementStage==="free-arms");
 const collectFailures=process.env.PALACE_REFINEMENT_COLLECT_FAILURES==="1";
 const personal = process.env.PALACE_PERSONAL==="1";
-const sourceFiles=["src/worlds/presence/ik.ts","src/worlds/basketballPhysics.ts","src/worlds/activity.ts","src/worlds/ActivityHud.tsx","src/worlds/BasketballCourt.tsx","src/worlds/CourtArchitecture.tsx","src/worlds/court/Environment.tsx","src/worlds/court/finishing.ts","src/worlds/court/CourtVenue.tsx","src/worlds/court/courtSets.ts","src/worlds/court/motionPacks.ts","src/worlds/court/packagePreferences.ts","src/worlds/presence/Avatar.tsx","src/worlds/presence/Wardrobe.tsx","src/worlds/presence/dribblePose.ts","src/worlds/presence/dribbleMotion.ts","src/worlds/presence/shotPose.ts","src/worlds/presence/state.ts","src/worlds/presence/wardrobe.css","src/worlds/worldConfig.ts"];
+const sourceFiles=["src/worlds/presence/ik.ts","src/worlds/presence/courtHandRotation.ts","src/worlds/presence/courtFingerGrip.ts","src/worlds/basketballPhysics.ts","src/worlds/activity.ts","src/worlds/ActivityHud.tsx","src/worlds/BasketballCourt.tsx","src/worlds/CourtArchitecture.tsx","src/worlds/court/Environment.tsx","src/worlds/court/finishing.ts","src/worlds/court/CourtVenue.tsx","src/worlds/court/courtSets.ts","src/worlds/court/motionPacks.ts","src/worlds/court/packagePreferences.ts","src/worlds/presence/Avatar.tsx","src/worlds/presence/Wardrobe.tsx","src/worlds/presence/dribblePose.ts","src/worlds/presence/dribbleMotion.ts","src/worlds/presence/shotPose.ts","src/worlds/presence/state.ts","src/worlds/presence/wardrobe.css","src/worlds/worldConfig.ts"];
 const sourceHash=async file=>createHash("sha256").update(await readFile(file)).digest("hex");
 sourceFiles.push("src/world/Player.tsx","src/worlds/court/controls.ts","src/worlds/presence/dribblePalm.ts","src/worlds/presence/courtLocomotion.ts","src/worlds/presence/basketballFootwork.ts","src/worlds/presence/shotHandRotation.ts","src/worlds/presence/shotGather.ts","src/worlds/presence/dribbleArm.ts","src/worlds/presence/animationContinuity.ts","src/worlds/presence/basketballAppearance.ts","src/worlds/court/basketballSurface.ts");
 sourceFiles.push('src/worlds/presence/courtTorso.ts');
@@ -27,6 +27,7 @@ sourceFiles.push('src/worlds/presence/math.ts','src/worlds/presence/CameraRig.ts
 sourceFiles.push('src/worlds/court/ballSpin.ts','src/worlds/worlds.css');
 sourceFiles.push('src/world/World.tsx','src/worlds/presence/clarity.ts','src/worlds/presence/appearanceRig.ts','src/worlds/presence/appearance.ts','src/worlds/presence/assets.ts','public/media/presence/athlete.gltf','public/media/presence/athlete.bin','public/media/presence/athlete-detail.gltf','public/media/presence/athlete-detail.bin','public/media/presence/body-color.webp','public/media/presence/body-normal.webp','public/media/presence/head-color.webp','public/media/presence/head-normal.webp');
 sourceFiles.push('src/ui/Hud.tsx');
+sourceFiles.push('src/worlds/presence/heldBallPose.ts');
 const sourceHashes=Object.fromEntries(await Promise.all(sourceFiles.map(async file=>[file,await sourceHash(file)])));
 
 await mkdir(out, { recursive: true });

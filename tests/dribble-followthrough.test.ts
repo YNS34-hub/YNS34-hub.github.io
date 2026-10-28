@@ -10,7 +10,8 @@ describe('the dribbling hand follows the push and recovers before the next catch
   expect(Math.abs(released.palm.x)).toBeLessThan(Math.abs(released.ball.x)-.025);
   for(const phase of [0,1]){
    const pose=dribblePose(phase,0,side,undefined,pack.period,pack);
-   expect(pose.palm.x).toBeCloseTo(pose.ball.x,12);expect(pose.palm.z).toBeCloseTo(pose.ball.z,12);expect(pose.palm.y-pose.ball.y).toBeCloseTo(.075,12);
+   expect(pose.palm.x).toBeCloseTo(pose.ball.x,12);expect(pose.palm.z).toBeCloseTo(pose.ball.z,12);expect(pose.palm.y-pose.ball.y).toBeCloseTo(.115,12);
+   expect(Math.hypot(pose.palm.y-pose.ball.y,pose.palm.z-pose.ball.z)).toBeLessThan(.12);
   }
  });
  for(const speed of [0,3,6.2])it(`keeps both recoveries mirrored and continuous at ${speed}m/s`,()=>{
