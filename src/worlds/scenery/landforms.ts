@@ -23,9 +23,10 @@ export function createValleyRidges(samples:RidgeSamples,imagery?:ImageAtlas){
     for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){
       const u=i/cols,v=j/rows,lx=(u-.5)*chain.span,lz=v*chain.depth;
       // 地质褶皱来自不同的现有实测 DEM 窗口。仅远景重新布置和缩放；边缘沉入地表，避免裸露切面。
-      const edge=smooth(0,.065,u)*smooth(0,.065,1-u),cross=smooth(0,.13,v)*smooth(0,.13,1-v);
+      const edge=smooth(0,.14,u)*smooth(0,.14,1-u),cross=smooth(0,.42,v)*smooth(0,.28,1-v);
       const measured=levels[j*(cols+1)+i]/65535;
-      // 边界埋入原地表，内部主要保留 DEM 的实际峰谷；不让整段正弦圆包络盖过地貌差异。
+      // 扩大外围坡脚到山体深度的42%，避免把裁窗边缘在百米内拔成数百米高的直墙。
+      // DEM峰谷、原采样网格和UV保持；道路、湖岸、行走高度不使用此远景网格。
       const h=-24+chain.height*cross*edge*(.05+.95*measured);
       p.push(chain.x+lx*cs+lz*sn,h,chain.z-lx*sn+lz*cs);uv.push(lx/3.2,lz/3.2);
       if(imagery&&sourceWindow)imageUV.push(...atlasUV(imagery,sourceWindow[0]+u*sourceWindow[2],sourceWindow[1]+v*sourceWindow[3]));

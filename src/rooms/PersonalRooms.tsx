@@ -28,26 +28,34 @@ function Heading({
   title,
   subtitle,
   color = "#d5e5ef",
+  elevation = 8.7,
+  subtitleColor = "#92a9b5",
+  position,
+  centered = false,
 }: {
   title: string;
   subtitle: string;
   color?: string;
+  elevation?: number;
+  subtitleColor?: string;
+  position?: [number, number, number];
+  centered?: boolean;
 }) {
   return (
-    <group position={[-10.7, 8.7, -16.45]}>
+    <group position={position || [-10.7, elevation, -16.45]}>
       <Label
         text={title}
-        align="left"
+        align={centered ? "center" : "left"}
         size={0.64}
         color={color}
         maxWidth={24}
       />
       <Label
         text={subtitle}
-        align="left"
+        align={centered ? "center" : "left"}
         position={[0, -0.86, 0]}
         size={0.16}
-        color="#92a9b5"
+        color={subtitleColor}
         maxWidth={23}
       />
     </group>
@@ -72,6 +80,7 @@ export function ProjectScreen({
   rotation = [0, 0, 0],
   medium = "screen",
   tint = "#497cb0",
+  curated = false,
 }: {
   item: ContentItem;
   position: [number, number, number];
@@ -80,6 +89,7 @@ export function ProjectScreen({
   rotation?: [number, number, number];
   tint?: string;
   medium?: "screen" | "print" | "projection";
+  curated?: boolean;
 }) {
   const hovered = useRef(false);
   const frame = useRef<Group>(null);
@@ -105,9 +115,9 @@ export function ProjectScreen({
     >
       <Block
         scale={[width + 0.2, height + 0.2, 0.18]}
-        color="#0c1723"
-        metalness={0.7}
-        roughness={0.2}
+        color={curated ? "#202724" : "#0c1723"}
+        metalness={curated ? .3 : .7}
+        roughness={curated ? .5 : .2}
       />
       <Picture
         src={item.cover}
@@ -122,21 +132,24 @@ export function ProjectScreen({
         scale={[width, 0.035, 0.22]}
         color={tint}
         emissive={tint}
-        emissiveIntensity={0.9}
+        emissiveIntensity={curated ? .22 : .9}
       />
+      {curated && <Block position={[0, -height / 2 - .58, .12]} scale={[Math.min(width, 5.2), .76, .07]} color="#303940" roughness={.64} metalness={.18} />}
       <Label
         text={item.title.toUpperCase()}
-        position={[-width / 2, -height / 2 - 0.5, 0.2]}
-        align="left"
+        position={[curated ? 0 : -width / 2, -height / 2 - 0.5, 0.2]}
+        align={curated ? "center" : "left"}
         size={0.2}
-        color="#d7e7ee"
+        color={curated ? "#d6dfe3" : "#d7e7ee"}
+        maxWidth={curated ? Math.min(width, 5.2) - .36 : undefined}
       />
       <Label
         text={item.status}
-        position={[-width / 2, -height / 2 - 0.83, 0.2]}
-        align="left"
+        position={[curated ? 0 : -width / 2, -height / 2 - 0.83, 0.2]}
+        align={curated ? "center" : "left"}
         size={0.11}
-        color="#90a6b5"
+        color={curated ? "#9baeb9" : "#90a6b5"}
+        maxWidth={curated ? Math.min(width, 5.2) - .36 : undefined}
       />
     </group>
   );
@@ -164,13 +177,19 @@ export function PersonalProjects() {
       <Heading
         title="WORKS I HAVE BUILT"
         subtitle="JIE TIAN / ORIGINAL WORLDS, CODE AND VISUAL EXPERIMENTS"
+        elevation={8.95}
+        color="#d4d9cd"
+        subtitleColor="#adb8aa"
+        position={[-2.5, 8.95, -7.8]}
+        centered
       />
       {hero && (
         <ProjectScreen
           item={hero}
-          position={[-2.5, 4.8, -8]}
-          width={15.5}
-          height={8.4}
+          position={[-2.5, 4.4, -8]}
+          width={11.6}
+          height={6.28}
+          curated
         />
       )}
       {works
@@ -179,15 +198,16 @@ export function PersonalProjects() {
           <ProjectScreen
             key={work.id}
             item={work}
+            curated
             position={
               i === 0
-                ? [10.3, 3.8, 0.3]
+                ? [10.3, 4.6, 0.3]
                 : i === 1
                   ? [-10.6, 4.6, 4]
                   : [7.2, 4.6, -13.8]
             }
             width={i === 1 ? 5.4 : 6.8}
-            height={i === 1 ? 7.6 : 4.2}
+            height={i === 1 ? 6 : 4.2}
             rotation={[0, i === 0 ? -0.9 : i === 1 ? 0.85 : -0.15, 0]}
             tint={i === 0 ? "#ca7546" : "#477ac6"}
           />
@@ -195,30 +215,25 @@ export function PersonalProjects() {
       {[-7.6, 2.6].map((x) => (
         <Block
           key={x}
-          position={[x, 8.9, -8]}
-          scale={[0.035, 4.3, 0.035]}
-          color="#8c9caa"
+          position={[x, 8.65, -8]}
+          scale={[0.025, 2.25, 0.025]}
+          color="#939b90"
           metalness={0.8}
         />
       ))}
       <Block
         position={[-2.5, 0.13, -8]}
         scale={[16, 0.26, 2.2]}
-        color="#1e2a3c"
-        roughness={0.2}
+        color="#353d37"
+        roughness={0.72}
       />
       <pointLight
         position={[6, 6, -1]}
-        color="#ffab6d"
-        intensity={65}
+        color="#f6dfb8"
+        intensity={45}
         distance={22}
       />
-      <pointLight
-        position={[-8, 5, 3]}
-        color="#416fb5"
-        intensity={90}
-        distance={26}
-      />
+      <rectAreaLight position={[0, 10, -1]} rotation={[-Math.PI / 2, 0, 0]} color="#e0e8f0" intensity={1.8} width={5.1} height={27} />
       {personal.slice(0, 2).map((work, i) => (
         <VisualWall
           key={work.id}
@@ -230,6 +245,7 @@ export function PersonalProjects() {
       ))}
       <ProjectScreen
         item={projects.find((p) => p.id === "the-memory-palace")!}
+        curated
         position={[-12.3, 4.5, -5]}
         rotation={[0, Math.PI / 2, 0]}
         width={8}
@@ -237,6 +253,7 @@ export function PersonalProjects() {
       />
       <ProjectScreen
         item={experiments.find((p) => p.id === "nonlinear-glass-study")!}
+        curated
         position={[11.8, 4.3, 8]}
         rotation={[0, -Math.PI / 2, 0]}
         width={6}
@@ -283,6 +300,10 @@ export function PersonalResearch() {
       <Heading
         title="RESEARCH VAULT"
         subtitle="NONLINEAR ANALYSIS / EVIDENCE / HUMAN JUDGMENT"
+        position={[7.2, 7.6, -16.34]}
+        color="#d6e2e6"
+        subtitleColor="#a6b9c4"
+        centered
       />
       <group position={[-3.4, 4, -4]} ref={object}>
         {Array.from({ length: 13 }, (_, i) => (
@@ -300,18 +321,18 @@ export function PersonalResearch() {
               ]}
             />
             <meshStandardMaterial
-              color="#91c7e4"
-              emissive="#39799b"
-              emissiveIntensity={0.6}
-              metalness={0.45}
-              roughness={0.25}
+              color="#c8c9ad"
+              emissive="#657269"
+              emissiveIntensity={0.1}
+              metalness={0.65}
+              roughness={0.35}
             />
           </mesh>
         ))}
         <mesh rotation={[0.4, 0.3, 0.1]}>
           <torusKnotGeometry args={[1.4, 0.09, 160, 12, 2, 3]} />
           <meshPhysicalMaterial
-            color="#a4e5ff"
+            color="#d4e8e2"
             transmission={0.7}
             roughness={0.12}
             thickness={0.7}
@@ -321,29 +342,33 @@ export function PersonalResearch() {
       <Block
         position={[-3.4, 0.2, -4]}
         scale={[7, 0.4, 7]}
-        color="#112a3a"
-        metalness={0.55}
-        roughness={0.23}
+        color="#363f38"
+        metalness={0.12}
+        roughness={0.65}
       />
       <Label
         text="−div(a(x,u,∇u)) = H(x,u,∇u)"
-        position={[-3, 6.6, -14.8]}
-        size={0.5}
-        color="#d0e8f4"
+        position={[-13.29, 5.3, -2]}
+        rotation={[0, Math.PI / 2, 0]}
+        size={0.28}
+        color="#dce0cb"
       />
       <Label
         text="ORLICZ GROWTH · REARRANGEMENT · COMPARISON"
-        position={[-3, 5.7, -14.8]}
-        size={0.18}
-        color="#759cb1"
+        position={[-13.29, 4.75, -2]}
+        rotation={[0, Math.PI / 2, 0]}
+        size={0.14}
+        color="#aab9a4"
       />
       {audit && (
         <ProjectScreen
           item={audit}
-          position={[8, 4, -7]}
-          width={8.4}
-          height={5.2}
-          rotation={[0, -0.25, 0]}
+          curated
+          position={[7.6, 4.1, -15.7]}
+          width={7.4}
+          height={4.55}
+          medium="print"
+          rotation={[0, 0, 0]}
         />
       )}
       {research
@@ -362,23 +387,23 @@ export function PersonalResearch() {
             <Label
               text={work.title.toUpperCase()}
               size={0.23}
-              color="#b8d4e5"
+              color="#d0dbc5"
               maxWidth={6}
             />
             <Label
               text={work.equation || work.subtitle}
               position={[0, -0.6, 0]}
               size={0.18}
-              color="#749ab3"
+              color="#a8b79f"
               maxWidth={6}
             />
           </group>
         ))}
       <pointLight
-        position={[-3, 6, -4]}
-        intensity={75}
+        position={[7.5, 4.35, 4]}
+        intensity={92}
         distance={22}
-        color="#6eabc9"
+        color="#f2ddbd"
       />
       {personal.slice(0, 2).map((work, i) => (
         <VisualWall
@@ -410,6 +435,7 @@ export function VisualWall({
   rotation = [0, 0, 0],
   medium = "screen",
   atmosphere = true,
+  catalogue = false,
 }: {
   item: WallpaperItem;
   position: [number, number, number];
@@ -418,6 +444,7 @@ export function VisualWall({
   rotation?: [number, number, number];
   medium?: "screen" | "print" | "projection";
   atmosphere?: boolean;
+  catalogue?: boolean;
 }) {
   const texture = useImageTexture(item.displaySrc || item.src);
   const atmosphereId = useId();
@@ -497,8 +524,9 @@ export function VisualWall({
     >
       <Block
         scale={[actualWidth + 0.16, actualHeight + 0.16, 0.24]}
-        color="#12212b"
-        metalness={0.6}
+        color={catalogue ? "#202823" : "#12212b"}
+        metalness={catalogue ? .15 : .6}
+        roughness={catalogue ? .68 : .76}
       />
       <Picture
         texture={texture}
@@ -509,20 +537,22 @@ export function VisualWall({
       />
       <WorkAttention width={actualWidth} height={actualHeight} hovered={hovered} warm={medium === "print"} attention={attention} />
       <PosterCaption enabled={item.category === "editorial"} width={actualWidth} height={actualHeight} hovered={hovered} attention={attention}>
+      {catalogue && <Block position={[0, -actualHeight / 2 - .45, .1]} scale={[Math.min(actualWidth, 4.4), .85, .06]} color="#303940" roughness={.68} metalness={.14} />}
       <Label
         text={item.title.toUpperCase()}
-        align="left"
-        position={[-actualWidth / 2, -actualHeight / 2 - 0.34, 0.14]}
+        align={catalogue ? "center" : "left"}
+        position={[catalogue ? 0 : -actualWidth / 2, -actualHeight / 2 - 0.34, 0.14]}
         size={0.18}
-        color="#b4cbd5"
+        color={catalogue ? "#d2dce1" : "#b4cbd5"}
+        maxWidth={catalogue ? Math.min(actualWidth, 4.4) - .3 : undefined}
       />
       <Label
         text={`${item.date} / ${item.source?.startsWith("http") ? "COLLECTED VISUAL / ORIGINAL CREATOR" : item.source || "PERSONAL COLLECTION"}`}
-        align="left"
-        position={[-actualWidth / 2, -actualHeight / 2 - 0.63, 0.14]}
+        align={catalogue ? "center" : "left"}
+        position={[catalogue ? 0 : -actualWidth / 2, -actualHeight / 2 - 0.63, 0.14]}
         size={0.1}
-        color="#8ea7b5"
-        maxWidth={width}
+        color={catalogue ? "#9aadb7" : "#8ea7b5"}
+        maxWidth={catalogue ? Math.min(actualWidth, 4.4) - .3 : width}
       />
       </PosterCaption>
     </group>

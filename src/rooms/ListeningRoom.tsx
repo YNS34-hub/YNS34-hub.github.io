@@ -10,7 +10,6 @@ import {
 import {
   Block,
   Door,
-  Floor,
   Label,
   Picture,
   ContactShadow,
@@ -22,12 +21,16 @@ import { audioSignal } from "../audio/signal";
 import LyricsWall from "./LyricsWall";
 import { measuredEnergy, settleMotion } from "../motion/tokens";
 import { useQuietMotion } from "../motion/useMotionCue";
+import GalleryFloor from "./reference/GalleryFloor";
+import { ArchitecturalSurfaces, useArchitecturalSurfaces } from "./reference/ArchitecturalSurfaces";
+import ListeningArchitecture from "./reference/ListeningArchitecture";
 
 const bands = ["bass", "mid", "treble"] as const;
 // 三个现有频段采用不同包络：低频较慢，中频跟随，高频快速归位；幅度和构件保持不变。
 const responses = { bass: [0.24, 0.55], mid: [0.16, 0.42], treble: [0.08, 0.24] } as const;
 
 function AcousticWall() {
+  const surfaces = useArchitecturalSurfaces();
   const ribs = useRef<InstancedMesh>(null);
   const dummy = useMemo(() => new Object3D(), []);
   useEffect(() => {
@@ -36,7 +39,7 @@ function AcousticWall() {
       const theta = -Math.PI * 0.88 + (i / 57) * Math.PI * 1.76;
       dummy.position.set(Math.sin(theta) * 12, 4.4, -4 - Math.cos(theta) * 12);
       dummy.rotation.set(0, theta, 0);
-      dummy.scale.set(0.28, 8.8, 0.68);
+      dummy.scale.set(1, 1, 1);
       dummy.updateMatrix();
       ribs.current.setMatrixAt(i, dummy.matrix);
     }
@@ -46,16 +49,15 @@ function AcousticWall() {
   return (
     <instancedMesh
       ref={ribs}
-      args={[undefined, undefined, 58]}
+      args={[surfaces.geometry(.28, 8.8, .68, .025), surfaces.material("timber", "#b69a7d", .76, .015), 58]}
       castShadow
       receiveShadow
-    >
-      <boxGeometry />
-      <meshStandardMaterial color="#38445a" roughness={0.83} metalness={0.05} />
-    </instancedMesh>
+      dispose={null}
+    />
   );
 }
 function Instrument() {
+  const surfaces = useArchitecturalSurfaces();
   const fins = useRef<Group>(null);
   const baseLight = useRef<PointLight>(null);
   const rim = useRef<MeshStandardMaterial>(null);
@@ -92,16 +94,16 @@ function Instrument() {
       <Block
         position={[0, 0.24, 0]}
         scale={[7.6, 0.48, 3.2]}
-        color="#1a2840"
-        roughness={0.27}
-        metalness={0.5}
+        color="#303b45"
+        roughness={0.62}
+        metalness={0.14}
       />
       <Block
         position={[0, 0.49, 0]}
         scale={[7.3, 0.035, 2.9]}
-        color="#708caa"
-        roughness={0.25}
-        metalness={0.6}
+        color="#6e7d88"
+        roughness={0.42}
+        metalness={0.4}
       />
       <group ref={fins} name="audio-fins">
         {Array.from({ length: 7 }, (_, i) => {
@@ -113,27 +115,26 @@ function Instrument() {
               rotation={[0, (i - 3) * 0.08, (i - 3) * 0.055]}
             >
               <Block
-                position={[0, h / 2 + 0.58, 0]}
-                scale={[0.08, h, 0.42]}
-                color="#748eaa"
-                metalness={0.7}
-                roughness={0.24}
+                position={[-.14, h / 2 + 0.58, 0]}
+                scale={[0.025, h, 0.3]}
+                color="#9faab2"
+                metalness={0.5}
+                roughness={0.5}
               />
-              <mesh position={[0.12, h / 2 + 0.58, 0]}>
-                <boxGeometry args={[0.28, h, 1.04]} />
+              <mesh position={[0.12, h / 2 + 0.58, 0]} geometry={surfaces.geometry(.54, h, .62, .028)}>
                 <meshPhysicalMaterial
-                  color="#c4e6fa"
-                  roughness={0.08}
+                  color="#e3f2f9"
+                  roughness={0.045}
                   metalness={0}
                   transmission={0.92}
                   thickness={0.7}
                   ior={1.46}
-                  attenuationColor="#64a6e4"
-                  attenuationDistance={7}
-                  envMapIntensity={1.5}
+                  attenuationColor="#bddce9"
+                  attenuationDistance={14}
+                  envMapIntensity={0.65}
                 />
               </mesh>
-              <mesh position={[0.275, h / 2 + 0.58, 0.48]}>
+              <mesh position={[0.405, h / 2 + 0.58, 0.29]}>
                 <boxGeometry args={[0.014, h, 0.024]} />
                 <meshStandardMaterial
                   ref={i === 3 ? rim : undefined}
@@ -153,7 +154,7 @@ function Instrument() {
         position={[0, 1, 2.6]}
         intensity={48}
         distance={15}
-        color="#598ed6"
+        color="#b8d2d0"
       />
     </group>
   );
@@ -178,45 +179,16 @@ export default function ListeningRoom() {
   const tracks = useLibraryStore((s) => s.music),
     id = useAudioStore((s) => s.currentId);
   const track = tracks.find((x) => x.id === id);
+  const keyTarget = useMemo(() => { const target = new Object3D(); target.position.set(0, 3, -5); return target; }, []);
   return (
-    <group>
-      <Floor width={28} depth={34} color="#17233b" />
+    <ArchitecturalSurfaces radiance="music"><group>
+      <GalleryFloor color="#757c83" />
       <AcousticWall />
-      <Block
-        position={[0, 9.5, -5]}
-        scale={[26, 0.65, 24]}
-        color="#0c172d"
-        castShadow
-      />
-      {/* Suspended amber canopy, open along its center. It has a weight and a front edge. */}
-      {[-1, 1].map((side) => (
-        <group key={side}>
-          <Block
-            position={[side * 5.2, 8.5, -5]}
-            scale={[5.8, 0.36, 22]}
-            color="#524534"
-            metalness={0.28}
-            roughness={0.55}
-          />
-          <Block
-            position={[side * 2.25, 8.31, -5]}
-            scale={[0.1, 0.06, 20.8]}
-            color="#e0be91"
-            emissive="#dfb981"
-            emissiveIntensity={0.65}
-          />
-        </group>
-      ))}
+      <ListeningArchitecture />
       <Instrument />
       <RhythmDetails />
       <LyricsWall />
       {/* The listening datum is below eye height, separate from the sculpture's stage. */}
-      <Block
-        position={[-4, 0.32, 6.5]}
-        scale={[4.8, 0.64, 1.25]}
-        color="#233349"
-        roughness={0.7}
-      />
       <ContactShadow
         position={[-4, 0.02, 6.5]}
         width={6}
@@ -233,7 +205,7 @@ export default function ListeningRoom() {
           />
         ) : (
           <>
-            <Block scale={[3.8, 3.8, 0.12]} color="#283951" />
+            <Block scale={[3.8, 3.8, 0.12]} color="#394337" />
             <Label
               text={track ? "LOCAL AUDIO\nNO ARTWORK" : "梁博\nLISTENING SHELF"}
               position={[0, 0.3, 0.08]}
@@ -264,18 +236,19 @@ export default function ListeningRoom() {
       </group>
       <spotLight
         position={[-4, 8, 3]}
-        target-position={[0, 3, -5]}
-        color="#d7e7fa"
-        intensity={220}
+        target={keyTarget}
+        color="#e1ebf4"
+        intensity={320}
         angle={0.5}
         penumbra={0.7}
         distance={26}
       />
+      <primitive object={keyTarget} />
       <pointLight
-        position={[7, 5, -9]}
-        intensity={85}
+        position={[-7, 5, -9]}
+        intensity={30}
         distance={22}
-        color="#e9be83"
+        color="#e7c89f"
       />
       <Door
         id="atrium"
@@ -284,6 +257,6 @@ export default function ListeningRoom() {
         rotation={[0, Math.PI, 0]}
         dark
       />
-    </group>
+    </group></ArchitecturalSurfaces>
   );
 }

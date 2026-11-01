@@ -11,6 +11,10 @@
 
 原学术页面、非线性玻璃研究和五步人工主导数学审阅流程继续保留。旧页面位于 `/legacy/`，既有 `/Benjamin/`、`/douyin/`、`/douyin-mindazhiguang/` 保留。
 
+## 2026-11-01 视觉升级
+
+Memory Palace 参考板保持文档用途，实际升级中庭建筑与玻璃、研究室家具和采光、项目与图片展陈、听音空间及运动环境材质。保留现有房间、控制、导入、音频和存档；[参考清单与场景映射](docs/design-references/memory-palace/README.md)、[15 组发布前后对照](docs/design-references/memory-palace/review-release.html) 和 [验证与性能限制](docs/design-references/memory-palace/RELEASE_20261101.md) 可随源码查看。
+
 ## 2026-10-26 整合更新
 
 本次整合保留之前的展馆、音乐与骑行改造，并加入五种篮球场、左右手运球与双手收球、投篮／上篮／扣篮／运球动作包、动作近景、高精度人物与原生画质设置。当前肩臂修复改善双手持球时的跨胸和扭折，并平滑人物体型调整的区域交界。动作是原创程序实现，未包含 2K 游戏动画文件或官方动作捕捉。

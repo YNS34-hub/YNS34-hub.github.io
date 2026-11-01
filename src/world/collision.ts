@@ -1,6 +1,8 @@
 import { MathUtils, Vector3 } from "three";
 import { resolveRoomPlan } from "./roomPlan";
 import { corridorClearWidth, corridorProfile } from "./spatialLayout";
+import { studyFurnitureFootprints } from "../rooms/reference/studyPlan";
+import { entrySupportFootprints } from "../rooms/atrium/exhibits";
 // 交互扩展开始 collision-import
 import { worldBounds, worldFootprints } from "../worlds/worldConfig";
 // 交互扩展结束
@@ -35,7 +37,7 @@ export function roomFootprints(roomId: string): Footprint[] {
   if (extension) return extension;
   // 交互扩展结束
   const plan = resolveRoomPlan(roomId);
-  if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }];
+  if (roomId === "atrium") return [{ x: 0, z: 0, radius: 3.8 }, ...entrySupportFootprints()];
   if (roomId === "private-gym") return [{x:0,z:-4,halfWidth:1.8,halfDepth:1.95},{x:-9,z:-6,halfWidth:.65,halfDepth:2.6},{x:-9,z:5,halfWidth:2,halfDepth:.6},{x:8,z:7,radius:.85}];
   if (["cosmic", "imagined-worlds"].includes(roomId.split("-page-")[0]))
     return [-1, 1].flatMap((side) => [
@@ -65,7 +67,7 @@ export function roomFootprints(roomId: string): Footprint[] {
       halfDepth: 1.7,
     }));
   if (roomId === "research")
-    return [{ x: -3.4, z: -4, halfWidth: 3.8, halfDepth: 3.8 }];
+    return [{ x: -3.4, z: -4, halfWidth: 3.8, halfDepth: 3.8 }, ...studyFurnitureFootprints()];
   if (roomId === "my-collection")
     return [{ x: 0, z: -2, halfWidth: 4.8, halfDepth: 2 }];
   if (

@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Group, Vector3, MeshBasicMaterial } from "three";
+import { Group, Object3D, Vector3, MeshBasicMaterial } from "three";
 import {
   ContactShadow,
   Door,
@@ -13,11 +13,14 @@ import { usePalaceStore } from "../systems/store";
 import { useLibraryStore } from "../systems/library";
 import { projects } from "../content/catalog";
 import { VisualWall } from "./PersonalRooms";
-import { AtriumSurfaces, EntryBlock as Block } from "./atrium/surfaces";
+import { AtriumSurfaces, EntryBlock as Block, useEntrySurfaces } from "./atrium/surfaces";
 import AtriumAtmosphere from "./atrium/environment";
 import EntryFloor from "./atrium/EntryFloor";
 import { EntryCameraReveal, OpticalCore } from "./atrium/optics";
 import { entryScreens } from "./atrium/exhibits";
+import AtriumSkylight from "./atrium/AtriumSkylight";
+import RearDaylight from "./atrium/RearDaylight";
+import "./atrium/presentation.css";
 
 function MemoryReveal() {
   const library = useLibraryStore();
@@ -93,6 +96,7 @@ function MemoryReveal() {
   );
 }
 function Core() {
+  const surfaces = useEntrySurfaces();
   const direction = useMemo(() => new Vector3(), []),
     toward = useMemo(() => new Vector3(), []);
   useFrame(({ camera }) => {
@@ -107,13 +111,8 @@ function Core() {
   return (
     <group>
       <ContactShadow width={9} depth={9} opacity={0.37} />
-      <mesh position={[0, 0.16, 0]} receiveShadow>
+      <mesh position={[0, 0.16, 0]} material={surfaces.get("#849099", .52, .04, 1)} receiveShadow>
         <cylinderGeometry args={[3.5, 3.56, 0.3, 80]} />
-        <meshStandardMaterial
-          color="#d3d5cb"
-          roughness={0.25}
-          metalness={0.12}
-        />
       </mesh>
       <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[3.7, 3.74, 96]} />
@@ -142,6 +141,7 @@ function Core() {
 export default function Atrium() {
   const images = useLibraryStore((s) => s.wallpapers);
   const hero = projects.find((x) => x.id === "giannis-fansite");
+  const coreLightTarget = useMemo(() => { const target = new Object3D(); target.position.set(0, 3.7, 0); return target; }, []);
   return (
     <AtriumSurfaces><group>
       <AtriumAtmosphere />
@@ -210,29 +210,20 @@ export default function Atrium() {
         emissive="#cae5f5"
         emissiveIntensity={0.4}
       />
-      <Block
-        position={[0, 7.3, -25.5]}
-        scale={[42, 14.6, 0.8]}
-        color="#19314c"
-      />
-      <Block
-        position={[-9, 5.4, -24.92]}
-        scale={[8.2, 8.8, 0.26]}
-        color="#18334b"
-        roughness={0.5}
-      />
+      <RearDaylight />
       <Label
-        text={"THE MEMORY\nPALACE"}
-        position={[-9, 6.1, -24.7]}
-        size={0.7}
-        color="#dceffc"
-        maxWidth={8}
+        text="THE MEMORY PALACE"
+        position={[-11.9, 13.45, -24.94]}
+        size={0.42}
+        color="#d7d6cc"
+        maxWidth={15}
       />
       <Label
         text="JIE TIAN / COLLECTED WORLDS"
-        position={[-9, 3.9, -24.7]}
+        position={[10.8, 13.45, -24.94]}
         size={0.16}
-        color="#acc9dd"
+        color="#bcb6a7"
+        maxWidth={12}
       />
       {[-1, 1].map((side) => (
         <Block
@@ -277,61 +268,43 @@ export default function Atrium() {
           dark
         />
       </group>
-      {[-17, -7, 3].map((z, i) => (
-        <group key={z}>
-          <Block
-            position={[i % 2 ? -2 : 2, 14, -8 + z]}
-            scale={[26, 0.55, 5]}
-            color="#d9e8f1"
-            emissive="#c6dff2"
-            emissiveIntensity={0.12}
-            castShadow
-          />
-          <Block
-            position={[0, 14.7, z]}
-            scale={[29, 0.04, 4.4]}
-            color="#d8f2ff"
-            emissive="#e2f4ff"
-            emissiveIntensity={0.7}
-          />
-        </group>
-      ))}
+      <AtriumSkylight />
       <Core />
       {entryScreens.map(screen=><group key={`screen-support-${screen.x}`} position={[screen.x,0,screen.z]} rotation={[0,screen.yaw,0]}>
         {[-2.6,2.6].map(offset=><Block key={offset} position={[offset,screen.height/2,0]} scale={[.22,screen.height,.33]} color="#8797a2" roughness={.24} metalness={.75} castShadow />)}
       </group>)}
       {hero && (
         <group
-          position={[-12.2, 4.8, -8.5]}
-          rotation={[0, 0.28, 0]}
+          position={[entryScreens[0].x, 4.2, entryScreens[0].z]}
+          rotation={[0, entryScreens[0].yaw, 0]}
           onClick={(e) => {
             e.stopPropagation();
             usePalaceStore.getState().focusItem(hero);
           }}
         >
-          <Block scale={[9.8, 5.7, 0.35]} color="#11243a" />
+          <Block scale={[8, 4.6, 0.25]} color="#11243a" />
           <Picture
             src={hero.cover}
-            width={9.5}
-            height={5.35}
+            width={7.7}
+            height={4.33}
             position={[0, 0, 0.2]}
           />
           <Label
             text={hero.title.toUpperCase()}
-            position={[-4.7, -3.1, 0.2]}
+            position={[-3.75, -2.65, 0.2]}
             align="left"
-            size={0.22}
-            color="#315972"
+            size={0.18}
+            color="#c0cdd5"
           />
         </group>
       )}
       {images[0] && (
         <VisualWall
           item={images[0]}
-          position={[12.5, 4.6, -10]}
-          width={10.2}
-          height={5.74}
-          rotation={[0, -0.28, 0]}
+          position={[entryScreens[1].x, 4.2, entryScreens[1].z]}
+          width={8}
+          height={4.5}
+          rotation={[0, entryScreens[1].yaw, 0]}
           atmosphere={false}
         />
       )}
@@ -350,13 +323,14 @@ export default function Atrium() {
       />
       <spotLight
         position={[-6, 12, 7]}
-        target-position={[0, 3, 0]}
-        intensity={180}
+        target={coreLightTarget}
+        intensity={220}
         angle={0.47}
         penumbra={0.8}
         distance={28}
         color="#ddf4ff"
       />
+      <primitive object={coreLightTarget} />
       <pointLight
         position={[7, 5, -3]}
         intensity={16}
@@ -378,6 +352,7 @@ export default function Atrium() {
           title={String(title)}
           position={[Number(side) * 19.95, 0, Number(z)]}
           rotation={[0, (-Number(side) * Math.PI) / 2, 0]}
+          dark
         />
       ))}
       <Door

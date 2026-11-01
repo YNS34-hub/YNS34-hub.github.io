@@ -7,6 +7,8 @@ import { GlassSculpture } from "../world/GlassSculpture";
 import { Block, Door, Label, ContactShadow } from "../world/primitives";
 import { ImageArchitecture, ObservatoryArchitecture } from "./Architecture";
 import { VisualWall } from "./PersonalRooms";
+import { archiveLayout } from "./reference/curationLayout";
+import ArchiveArchitecture from "./reference/ArchiveArchitecture";
 
 function RoomLinks({
   base,
@@ -56,10 +58,10 @@ export function WallpaperVault() {
       base,
     ),
     selected = works.slice(page * 5, page * 5 + 5),
-    placements = imageLayout(selected);
+    placements = archiveLayout(selected);
   return (
     <group>
-      <ImageArchitecture placements={placements} />
+      <ArchiveArchitecture placements={placements} />
       {placements.map((p, i) => (
         <VisualWall
           key={p.id}
@@ -68,21 +70,16 @@ export function WallpaperVault() {
           rotation={p.rotation}
           width={p.width}
           height={p.height}
+          medium="print"
+          atmosphere={false}
+          catalogue
         />
       ))}
-      <spotLight
-        position={[-7, 9, 8]}
-        target-position={[0, 3, -10]}
-        color="#edf5ff"
-        intensity={125}
-        angle={0.65}
-        penumbra={1}
-        distance={28}
-      />
+      <rectAreaLight position={[0, 9.9, -2]} rotation={[-Math.PI / 2, 0, 0]} color="#dce8f2" intensity={2.2} width={5.1} height={27} />
       <pointLight
         position={[8, 4, 4]}
-        color="#9abdd5"
-        intensity={45}
+        color="#e4ddc5"
+        intensity={30}
         distance={20}
       />
       <RoomLinks base={base} page={page} count={works.length} />

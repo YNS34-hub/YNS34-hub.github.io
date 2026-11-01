@@ -1,0 +1,124 @@
+{
+  "checkedAt": "2026-11-01T06:17:00.202Z",
+  "checks": [
+    {
+      "name": "routing-original-glass-and-complete-original-atrium-and-lighting-protected",
+      "passed": true,
+      "files": 5,
+      "authorizedVisualDifferenceIsPreciselyReversible": true
+    },
+    {
+      "name": "isolated-private-media-manifests-empty",
+      "passed": true
+    },
+    {
+      "name": "enter-palace-using-visible-control",
+      "passed": true
+    },
+    {
+      "name": "existing-atrium-doors-and-worlds-portal-remain",
+      "passed": true,
+      "ids": [
+        "archive",
+        "corridor",
+        "imagined-worlds",
+        "liquid-web",
+        "music",
+        "my-collection",
+        "private-gym",
+        "projects",
+        "research",
+        "wallpapers"
+      ],
+      "worldPortal": true
+    },
+    {
+      "name": "actual-3d-original-glass-click-opens-memory-reveal",
+      "passed": true,
+      "point": {
+        "x": 842.1038884344459,
+        "y": 276.6482680809818
+      }
+    },
+    {
+      "name": "escape-closes-original-memory-reveal",
+      "passed": true
+    },
+    {
+      "name": "actual-3d-ribbon-click-opens-memory-reveal",
+      "passed": true,
+      "point": {
+        "x": 661.3848284682624,
+        "y": 153.87243063535146
+      }
+    },
+    {
+      "name": "escape-closes-ribbon-memory-reveal",
+      "passed": true
+    },
+    {
+      "name": "guide-preserves-all-visible-room-targets",
+      "passed": true,
+      "count": 21
+    },
+    {
+      "name": "guide-opens-actual-glass-life-route",
+      "passed": true
+    },
+    {
+      "name": "guide-atrium-title-returns-to-root",
+      "passed": true
+    },
+    {
+      "name": "mobile-visible-controls-and-no-overflow",
+      "passed": true,
+      "viewport": [
+        390,
+        844
+      ],
+      "quality": "medium",
+      "enterBounds": {
+        "x": 24,
+        "y": 730,
+        "width": 245,
+        "height": 48
+      },
+      "render": {
+        "frame": 168,
+        "calls": 143,
+        "triangles": 68188,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "name": "quality-low-renders-and-enters-without-crash",
+      "passed": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "quality": "low",
+      "enterBounds": {
+        "x": 662.53125,
+        "y": 687.3125,
+        "width": 290,
+        "height": 48
+      },
+      "render": {
+        "frame": 175,
+        "calls": 279,
+        "triangles": 78848,
+        "points": 0,
+        "lines": 0
+      }
+    },
+    {
+      "name": "no-browser-errors-and-no-uploads",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

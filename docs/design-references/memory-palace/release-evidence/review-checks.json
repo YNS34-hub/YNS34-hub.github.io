@@ -1,0 +1,307 @@
+{
+  "checkedAt": "2026-11-01T11:18:11.933Z",
+  "views": [
+    {
+      "title": "welcome",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "auxiliary",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "glass-closeup",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "mobile-welcome",
+      "mobile": true,
+      "width": 390,
+      "height": 844,
+      "images": [
+        {
+          "width": 390,
+          "height": 844,
+          "naturalWidth": 390,
+          "naturalHeight": 844
+        },
+        {
+          "width": 390,
+          "height": 844,
+          "naturalWidth": 390,
+          "naturalHeight": 844
+        }
+      ]
+    },
+    {
+      "title": "glass-life",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "projects",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "research",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "music",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "wallpapers",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "basketball",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "cycling",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "research-detail",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "music-detail",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "basketball-detail",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    },
+    {
+      "title": "cycling-detail",
+      "mobile": false,
+      "width": 1452,
+      "height": 817,
+      "images": [
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        },
+        {
+          "width": 1452,
+          "height": 817,
+          "naturalWidth": 1920,
+          "naturalHeight": 1080
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

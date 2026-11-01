@@ -49,7 +49,9 @@ describe("owned optical resources", () => {
     const original=new MeshPhysicalMaterial({transmission:1,thickness:3.8,ior:1.46,roughness:.025});
     const finish=finishMemoryGlass(original);
     expect(finish).not.toBe(original);expect(original.roughness).toBe(.025);
-    expect(finish.transmission).toBe(1);expect(finish.ior).toBe(original.ior);expect(finish.thickness).toBe(original.thickness);
+    expect(finish.transmission).toBe(1);expect(finish.ior).toBe(original.ior);
+    // 0.48倍展品校准光程；原GLB材质与其厚度仍不能被此房间的饰面修改。
+    expect(finish.thickness).toBe(1.2);expect(original.thickness).toBe(3.8);
     let originalDisposed=false;original.addEventListener("dispose",()=>{originalDisposed=true;});finish.dispose();
     expect(originalDisposed).toBe(false);original.dispose();
   });

@@ -55,7 +55,30 @@ const additions: Record<string, string[]> = {
   "src/world/collision.ts": ["collision-import", "collision-world-bounds", "collision-world-footprints"],
   "scripts/register-personal-media.mjs": ["media-avatar-import", "media-avatar-register"],
 };
+function withoutReferenceVisuals(file: string, source: string) {
+  // 本轮授权的展陈变化逐符号精确撤销；原固定摘要、运动和音频断言继续执行。
+  const fixture = JSON.parse(readFileSync("tests/fixtures/reference-visual-adapters.json", "utf8")) as { baselineSha256: Record<string, string>; files: Record<string, { before: string; after: string }[]> };
+  const baseline = {
+    "src/rooms/Architecture.tsx": "6b484ba4ceebf35c7ce058e7665e16496452e687c67c0b4068644ecb15d60248",
+    "src/rooms/PersonalRooms.tsx": "48eca513fb696b1ccf569817c0ef8bfb043dd5e29fe4141ea6b89f1c7fd1d14c",
+    "src/rooms/ListeningRoom.tsx": "bd18ca6034c39e614e38d263d6e574471a87c1113dbf0bedf1936e472f013155",
+    "src/world/collision.ts": "e7e1ccced4aa9776b7e2e6b1f58e01efb4ca87f887569e7e1ebc51357ac8d307",
+    "src/world/Player.tsx": "fdecb7356a9bfbd04f77108fc6a04c08ec2e265dcd0180e0a65b749e62f8cde9",
+    "src/rooms/Atrium.tsx": "c3f07ec299be916bbd745763ccdbc4f70ea13dd93131eb56423543072e743548",
+    "src/world/artDirection.ts": "92fbe4edbc2c7fd3bb9ee1a783410416dd9be4d98721fc57c01317445dd3513a"
+};
+  expect(fixture.baselineSha256).toEqual(baseline);
+  expect(Object.keys(fixture.files)).toEqual(Object.keys(baseline));
+  source = source.replace(/\r\n/g, "\n");
+  for (const patch of fixture.files[file] || []) {
+    expect(source.split(patch.after), file + " exact reference visual adapter").toHaveLength(2);
+    source = source.replace(patch.after, patch.before);
+  }
+  if (file in baseline) expect(digest(source), file + " original source preserved").toBe(baseline[file as keyof typeof baseline]);
+  return source;
+}
 function withoutAdditions(file: string, source: string) {
+  source = withoutReferenceVisuals(file, source);
   if(file==='src/world/World.tsx'){
     const clarity=JSON.parse(readFileSync('tests/fixtures/sports-clarity-adapters.json','utf8')) as {baseline:string;baselineWorldSha256:string;files:Record<string,{before:string;after:string}[]>};
     expect(clarity.baseline).toBe('56238d5f8e7bb42c6924917c7100e15567521fd8');
@@ -154,6 +177,6 @@ describe("6380557 preservation boundary", () => {
     for (const [file, expected] of Object.entries(locked)) expect(digest(withoutAdditions(file, readFileSync(file, "utf8"))), file).toBe(expected);
   });
   it("preserves room geometry, physical proportions, materials and lights around new motion wrappers", () => {
-    for (const [file, expected] of Object.entries(rooms)) expect(digest(architecture(readFileSync(file, "utf8"))), file).toBe(expected);
+    for (const [file, expected] of Object.entries(rooms)) expect(digest(architecture(withoutReferenceVisuals(file, readFileSync(file, "utf8")))), file).toBe(expected);
   });
 });

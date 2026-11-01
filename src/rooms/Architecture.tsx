@@ -1,6 +1,7 @@
 import { Block, Floor, Label } from "../world/primitives";
 import { museum } from "../world/artDirection";
 import type { ArtPlacement } from "../world/spatialLayout";
+import { ProjectGalleryArchitecture, ResearchGalleryArchitecture } from "./reference/GalleryArchitecture";
 
 /** A load-bearing museum shell: recessed roof, deep reveals, and open sight lines. */
 export function RoomShell({
@@ -146,58 +147,7 @@ export function RoomShell({
 }
 
 /** An asymmetric long wall and two shifted roof fields frame one dominant screen. */
-export function ProjectArchitecture() {
-  return (
-    <group>
-      <Floor width={28} depth={34} color="#23364d" />
-      <Block
-        position={[-13.8, 5.4, 0]}
-        scale={[0.7, 10.8, 34]}
-        color="#536879"
-      />
-      <Block
-        position={[13.8, 6.6, -4]}
-        scale={[0.7, 13.2, 26]}
-        color="#1c3049"
-      />
-      <Block
-        position={[0, 5.7, -16.8]}
-        scale={[28, 11.4, 0.8]}
-        color="#334b60"
-      />
-      <Block
-        position={[-5, 10.9, -4]}
-        scale={[18, 0.65, 27]}
-        color="#142e48"
-        castShadow
-      />
-      <Block
-        position={[9, 13.3, -4]}
-        scale={[9, 0.7, 27]}
-        color="#314d65"
-        castShadow
-      />
-      <Block
-        position={[4.2, 12.2, -4]}
-        scale={[0.06, 0.1, 28]}
-        color="#d2ebf4"
-        emissive="#bfdfed"
-        emissiveIntensity={0.6}
-      />
-      <Block
-        position={[6.8, 4.2, -10]}
-        scale={[0.45, 8.4, 8.5]}
-        color="#48607a"
-      />
-      <Block position={[-8, 0.12, 2]} scale={[4, 0.24, 9]} color="#263e50" />
-      <Block
-        position={[-13.38, 0.16, 0]}
-        scale={[0.06, 0.12, 33]}
-        color="#0f2236"
-      />
-    </group>
-  );
-}
+export function ProjectArchitecture() { return <ProjectGalleryArchitecture />; }
 
 /** Individual image walls are sized from the selected works, rather than a fixed five-slot cube. */
 export function ImageArchitecture({
@@ -395,44 +345,7 @@ export function ObservatoryArchitecture() {
   );
 }
 
-export function ResearchArchitecture() {
-  return (
-    <group>
-      <Floor width={28} depth={34} color="#26343d" />
-      {[-1, 1].map((side) => (
-        <Block
-          key={side}
-          position={[side * 13.8, 4.5, 0]}
-          scale={[0.7, 9, 34]}
-          color="#374753"
-        />
-      ))}
-      <Block position={[0, 4.5, -16.8]} scale={[28, 9, 0.7]} color="#253b4b" />
-      {[-8, 0, 8].map((x) => (
-        <group key={x}>
-          <Block
-            position={[x, 9.2, 0]}
-            scale={[7.4, 0.6, 34]}
-            color="#132733"
-            castShadow
-          />
-          <Block
-            position={[x + 3.85, 9.65, 0]}
-            scale={[0.2, 0.04, 33]}
-            color="#cfe7ef"
-            emissive="#ccdde2"
-            emissiveIntensity={0.5}
-          />
-        </group>
-      ))}
-      <Block
-        position={[0, 0.012, 0]}
-        scale={[0.008, 0.006, 31]}
-        color="#7f9eaf"
-      />
-    </group>
-  );
-}
+export function ResearchArchitecture() { return <ResearchGalleryArchitecture />; }
 
 export function ArchiveArchitecture({
   unfinished = false,

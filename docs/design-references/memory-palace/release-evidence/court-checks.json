@@ -1,0 +1,29 @@
+{
+  "sha": "5d10ed9beea679fc75e10fc45d2302835eebfc6b",
+  "scope": "Native lighting/player input; declared debug camera staging and read-only scene diagnostics.",
+  "checks": [
+    "Day → night retains the held ball, live dribble and counters",
+    "Night lighting preference restores after refresh",
+    "Reduced motion settles the lighting immediately; gameplay remains available",
+    "Three consecutive returns restore the museum environment without growing GPU resource counts"
+  ],
+  "errors": [],
+  "cycles": [
+    {
+      "geometries": 99,
+      "textures": 57,
+      "prepared": true
+    },
+    {
+      "geometries": 99,
+      "textures": 57,
+      "prepared": true
+    },
+    {
+      "geometries": 99,
+      "textures": 57,
+      "prepared": true
+    }
+  ],
+  "passed": true
+}
