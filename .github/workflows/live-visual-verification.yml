@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps --no-shell chromium
       - name: Select cloud browser without changing product checks
         run: |
           node --input-type=module <<'NODE'
@@ -30,7 +30,9 @@ jobs:
           const source = readFileSync(file, 'utf8');
           const original = "return chromium.launch({ channel: 'msedge', headless: true, args: ['--use-angle=d3d11', '--disable-features=CalculateNativeWinOcclusion'] });";
           if (!source.includes(original)) throw new Error('Unexpected browser launcher');
-          const replacement = "return chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--disable-dev-shm-usage'] });";
+          // Full Chromium's headless mode matches the branded Edge path used locally.
+          // https://playwright.dev/docs/browsers#chromium-new-headless-mode
+          const replacement = "return chromium.launch({ channel: 'chromium', headless: true, args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--disable-dev-shm-usage'] });";
           writeFileSync(file, source.replace(original, replacement));
           mkdirSync('qa-artifacts/live-cloud', { recursive: true });
           const hash = value => createHash('sha256').update(value).digest('hex');
@@ -39,7 +41,7 @@ jobs:
             origin: 'https://yns34-hub.github.io',
             originalHelperSHA256: hash(source),
             publicTestSHA256: hash(readFileSync('scripts/check-reference-public.mjs')),
-            browser: 'Chromium / SwiftShader on isolated Ubuntu runner',
+            browser: 'Full Chromium new headless / SwiftShader on isolated Ubuntu runner',
             performanceBenchmark: false,
             adaptation: 'Browser launcher only; original ready timeout and all 9 viewport assertions unchanged',
             productAssetsIntercepted: false
