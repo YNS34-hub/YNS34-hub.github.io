@@ -61,7 +61,7 @@ export default function Hud({ ready }: { ready: boolean }) {
     s.enterRoom(continueLast ? s.lastRoom : s.roomId);
   };
   return (
-    <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`} data-threshold={s.pendingDoor ? "approach" : ready ? "arrived" : "loading"}>
+    <div className={`hud ${s.started ? "is-exploring" : "is-welcome"}`} data-room={s.roomId} data-threshold={s.pendingDoor ? "approach" : ready ? "arrived" : "loading"}>
       {s.started && s.roomId !== "cinema" && <div key={s.roomId} className="threshold-continuity" aria-hidden="true"><i /><i /></div>}
       <MuseumNavigation className="hud-header" data-tone={entranceInk ? "light" : "dark"}>
         <button

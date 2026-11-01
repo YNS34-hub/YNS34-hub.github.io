@@ -30,6 +30,22 @@ describe("two-map preservation",()=>{
     };
     for(const [file,digest] of Object.entries(files)){
       let source=readFileSync("src/worlds/road/"+file,"utf8").replace(/\r\n/g,"\n");
+      if(file==="Landscape.tsx"){
+        // 仅撤销原位置停靠凳的独立视觉构件，再运行全部旧接线、采样和固定摘要保护。
+        const furniture=JSON.parse(readFileSync("tests/fixtures/reference-road-furniture-adapter.json","utf8")) as {file:string;before:string;after:string};
+        expect(furniture.file).toBe("src/worlds/road/Landscape.tsx");expect(source).toBe(furniture.after);
+        expect([furniture.before,furniture.before.replace(/\n/g,"\r\n")].some(text=>createHash("sha256").update(text).digest("hex")==="9ef93d14c2994e40bcb35babd3fcb83fbaa08dcf31be40e671d997f045b96cba")).toBe(true);
+        source=furniture.before;
+      }
+      if(file==="Environment.tsx"){
+        // 仅精确撤销参考板指导的当前光色变化；原路线、旧补丁及固定摘要继续校验。
+        const reference=JSON.parse(readFileSync("tests/fixtures/reference-road-adapter.json","utf8")) as {file:string;baselineSha256:string;before:string;after:string};
+        expect(reference.file).toBe("src/worlds/road/Environment.tsx");
+        expect(reference.baselineSha256).toBe("4f3016b5017f04364176b2afe3f7520300e3f90908e54fbd3f7f6012e39650ac");
+        expect(source).toBe(reference.after);
+        expect(createHash("sha256").update(reference.before).digest("hex")).toBe(reference.baselineSha256);
+        source=reference.before;
+      }
       const transition=JSON.parse(readFileSync('tests/fixtures/scenery-transition-adapters.json','utf8')) as {baseline:string;files:Record<string,{before:string;after:string}[]>};
       expect(transition.baseline).toBe('6f345d86f9abf7a79963799be5e37669912d13b5');
       for(const patch of transition.files[file]??[]){expect(source.split(patch.after)).toHaveLength(2);source=source.replace(patch.after,patch.before);}

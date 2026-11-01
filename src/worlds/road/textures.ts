@@ -9,6 +9,7 @@ import {preloadAlpineGrass} from "../alpine/Grass";
 import type {RidgeSamples} from "../scenery/landforms";
 import {preloadForestTrees} from "../scenery/ForestTrees";
 import {preloadAlpineGeography} from "../alpine/assets";
+import {stopBenchTextureUrls} from './StopBench';
 
 export const roadTextureUrls=["asphalt","asphalt-normal","bark","pine","ground","grass","ridge-rock","ridge-normal","meadow","meadow-normal"].map(name=>"/media/road/"+name+".webp").concat('/media/alpine/swissimage.webp');
 export interface PineShape {height:number;position:number[];normal:number[];uv:number[];index:number[];crown:number[][]}
@@ -16,7 +17,7 @@ const json=(loader:FileLoader)=>loader.setResponseType("json"),shapeUrl="/media/
 const ridgeUrl="/media/road/ridge-samples.json";
 export function useRidgeSamples(){return useLoader(FileLoader,ridgeUrl,json) as unknown as RidgeSamples;}
 export function usePineShape(){return useLoader(FileLoader,shapeUrl,json) as unknown as PineShape;}
-export function primeRoadTextures(){preloadAlpineGeography();useTexture.preload(roadTextureUrls);useTexture.preload(scenicSky);useLoader.preload(RGBELoader,scenicHDR);useLoader.preload(FileLoader,shapeUrl,json);useLoader.preload(FileLoader,ridgeUrl,json);preloadAlpineScans();preloadAlpineGrass();preloadForestTrees();}
+export function primeRoadTextures(){preloadAlpineGeography();useTexture.preload(roadTextureUrls);useTexture.preload(stopBenchTextureUrls);useTexture.preload(scenicSky);useLoader.preload(RGBELoader,scenicHDR);useLoader.preload(FileLoader,shapeUrl,json);useLoader.preload(FileLoader,ridgeUrl,json);preloadAlpineScans();preloadAlpineGrass();preloadForestTrees();}
 // 解码缓存由 drei 管理，各路线挂载只拥有克隆的 sampler。卸载不会销毁另一处仍在用的原纹理。
 export function useRoadTextures(){
   const originals=useTexture(roadTextureUrls);

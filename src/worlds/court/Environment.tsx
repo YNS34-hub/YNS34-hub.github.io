@@ -18,7 +18,7 @@ export default function CourtEnvironment({ onReady }: { onReady?: () => void }) 
   const sent = useRef(false), readyAt = useRef(performance.now()), { active } = useProgress(), time = useCourtTime(s => s.time), quiet = useQuietMotion(), quality = usePalaceStore(s => s.effectiveQuality);
   const [lightingMode, setLightingMode] = useState<"day" | "night" | "transition">(time);
   useEffect(() => { setLightingMode(current => current === time ? current : "transition"); }, [time]);
-  const colors = useMemo(() => ({ day: new Color("#bdc6c8"), night: new Color("#090f19"), sky: new Color("#c8d9eb"), ground: new Color("#716953"), nightSky: new Color("#53718a"), nightGround: new Color("#292829") }), []);
+  const colors = useMemo(() => ({ day: new Color("#bdc6c8"), night: new Color("#090f19"), sky: new Color("#d1dce2"), ground: new Color("#777866"), nightSky: new Color("#53718a"), nightGround: new Color("#292829") }), []);
   // 在首个渲染帧之前保存外部曝光；普通 effect 可能晚于 useFrame，误把球场自己的 1.08 当作还原值。
   useLayoutEffect(() => {
     const far = camera.far, exposure = gl.toneMappingExposure; camera.far = 650; camera.updateProjectionMatrix();
@@ -44,8 +44,8 @@ export default function CourtEnvironment({ onReady }: { onReady?: () => void }) 
     scene.backgroundIntensity = indoor?0:.9-n*.895; scene.environmentIntensity=indoor?.24:.42-n*.38; gl.toneMappingExposure = 1.08;
     if (scene.fog) scene.fog.color.copy(colors.day).lerp(colors.night, n);
     // 每次明确切换时只启用一盏主光阴影，不能每帧切换着色器拓扑或让所有表面采样两份阴影。
-    if (sun.current) sun.current.intensity = indoor?0:1.7*(1-n);
-    if (hemisphere.current) { hemisphere.current.color.copy(colors.sky).lerp(colors.nightSky, n); hemisphere.current.groundColor.lerpColors(colors.ground, colors.nightGround, n); hemisphere.current.intensity = .55 - n * .39; }
+    if (sun.current) sun.current.intensity = indoor?0:1.5*(1-n);
+    if (hemisphere.current) { hemisphere.current.color.copy(colors.sky).lerp(colors.nightSky, n); hemisphere.current.groundColor.lerpColors(colors.ground, colors.nightGround, n); hemisphere.current.intensity = .9 - n * .74; }
     if (left.current) left.current.intensity = 950 * n;
     if (right.current) right.current.intensity = 800 * n;
     // 与原世界入口相同，等房间提交稳定且关键内容/着色器就绪，避免早到的 ready 被路由重置覆盖。

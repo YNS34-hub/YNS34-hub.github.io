@@ -12,18 +12,19 @@ const entrySky='/media/road/sky-4k.webp',entryDaylight='/media/alpine/daylight-2
 if(typeof window!=='undefined'){useTexture.preload(entrySky);useLoader.preload(RGBELoader,entryDaylight);useGLTF.preload('/assets/memory-glass.glb');}
 
 export function createEntryRadiance() {
-  const scene=new Scene();scene.background=new Color("#668fb8");
+  const scene=new Scene();scene.background=new Color("#9caeaa");
   const geometry=new BoxGeometry(1,1,1),materials=new Set<MeshBasicMaterial>();
   const block=(position:[number,number,number],scale:[number,number,number],color:string,energy=1)=>{
     const material=new MeshBasicMaterial({color,toneMapped:false});material.color.multiplyScalar(energy);materials.add(material);
     const mesh=new Mesh(geometry,material);mesh.position.set(...position);mesh.scale.set(...scale);scene.add(mesh);
   };
   // 相对玻璃中心的展厅光场：亮屋顶带、深门洞与少量暖侧光；不是均匀灰色产品摄影棚。
-  block([0,-4,0],[44,.2,52],"#91a7b9");block([0,4,-23],[44,16,.2],"#152b45");
-  for(const z of [-14,-4,6])block([0,10,z],[25,.12,3.4],"#eef8ff",4);
-  for(const side of [-1,1]){block([side*17,4,0],[.3,14,44],"#a3c5dd",1.4);block([side*7,0,14],[6,10,.4],"#0a182b");}
-  block([-8,3,5],[.2,5,2.6],"#ffe3be",3);
-  block([0,4,10],[8,.8,.1],"#edf8ff",6);
+  block([0,-4,0],[44,.2,52],"#7d8992");block([0,4,-23],[44,16,.2],"#252f38");
+  for(const side of [-1,1])block([side*8,3.3,-22.85],[15,9,.08],"#cce3f6",2.6);
+  for(const z of [-14,-4,6])block([0,10,z],[25,.12,3.4],"#eef4ef",3);
+  for(const side of [-1,1]){block([side*17,4,0],[.3,14,44],"#63727e",1.15);block([side*7,0,14],[6,10,.4],"#252e36");}
+  block([-8,3,5],[.2,5,2.6],"#ffe3be",2.2);
+  block([0,4,10],[8,.8,.1],"#edf5f1",3.2);
   let released=false;
   return {scene,dispose(){if(released)return;released=true;geometry.dispose();materials.forEach(m=>m.dispose());}};
 }
@@ -43,7 +44,7 @@ export default function AtriumAtmosphere() {
   return <><mesh name="atrium-roof-sky" position={[0,4,-10]} rotation={[0,Math.PI*.45,0]} raycast={()=>{}}>
     <sphereGeometry args={[80,48,24]}/><meshBasicMaterial map={sky} side={BackSide} fog={false} toneMapped={false}/>
   </mesh>
-    {/* 两处屏幕下的暖光有明确归属；只补软侧光，不增加阴影相机或全屏光效。 */}
-    {[-1,1].map(side=><rectAreaLight key={side} position={[side*12.2,1.2,-8.5]} rotation={[-Math.PI/2,0,0]} color="#ffe3bf" intensity={12} width={6.4} height={2}/>) }
+    {/* 复用原来的两处面光预算，为实体后窗提供大面积柔光。 */}
+    {[-1,1].map(side=><rectAreaLight key={side} position={[side*8,7,-24.9]} rotation={[0,Math.PI,0]} color="#d9eafa" intensity={2.8} width={15} height={9}/>) }
   </>;
 }

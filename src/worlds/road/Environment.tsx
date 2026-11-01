@@ -22,7 +22,7 @@ function PreparedRoadEnvironment({onReady}:{onReady?:()=>void}){
     hdr.mapping=EquirectangularReflectionMapping;
     const generator=new PMREMGenerator(gl),target=generator.fromEquirectangular(hdr);generator.dispose();
     // 静态摄影与反射使用相同方位；低角度太阳仍沿原方向，不改变玩家镜头或路线。
-    scene.background=background;scene.backgroundIntensity=.96;scene.environment=target.texture;scene.environmentIntensity=.72;
+    scene.background=background;scene.backgroundIntensity=.92;scene.environment=target.texture;scene.environmentIntensity=.46;
     scene.backgroundRotation.set(0,forestSkyRotation,0);scene.environmentRotation.set(0,forestSkyRotation,0);
     return()=>{target.dispose();scene.background=null;scene.backgroundIntensity=1;scene.backgroundRotation.set(0,0,0);scene.environmentRotation.set(0,0,0);scene.environment=null;camera.far=far;if(camera instanceof PerspectiveCamera)camera.fov=60;camera.updateProjectionMatrix();};
   },[camera,gl,scene,hdr,background]);
@@ -30,7 +30,8 @@ function PreparedRoadEnvironment({onReady}:{onReady?:()=>void}){
     if(sun.current){sun.current.position.set(camera.position.x+forestSun[0],camera.position.y+forestSun[1],camera.position.z+forestSun[2]);sun.current.target.position.copy(camera.position);sun.current.target.updateMatrixWorld();}
     if(!sent.current&&scene.getObjectByName("long-way-home-road-world")&&scene.getObjectByName("prepared-world:cycling")?.userData.prepared&&useLibraryStore.getState().ready&&!active&&!textureStatus().pending){sent.current=true;onReady?.();}
   });
-  return <><fog attach="fog" args={["#bdcedb",400,3600]}/>
-    <hemisphereLight args={["#c2d8eb","#77735c",1.02]}/><directionalLight ref={sun} position={forestSun} color="#ffe3b9" intensity={2.5} castShadow={quality!=="low"} shadow-mapSize={quality==="high"?[2048,2048]:[1024,1024]} shadow-camera-left={-38} shadow-camera-right={38} shadow-camera-top={38} shadow-camera-bottom={-38} shadow-camera-far={170} shadow-normalBias={.035} shadow-bias={-.00012}/>
+  // 路面近景保持清晰，数百米外逐渐融入中性空气层；不改动任何地形或道路采样。
+  return <><fog attach="fog" args={["#9eafb9",420,4300]}/>
+    <hemisphereLight args={["#cbd9df","#62675b",.68]}/><directionalLight ref={sun} position={forestSun} color="#fff0dc" intensity={1.95} castShadow={quality!=="low"} shadow-mapSize={quality==="high"?[2048,2048]:[1024,1024]} shadow-camera-left={-38} shadow-camera-right={38} shadow-camera-top={38} shadow-camera-bottom={-38} shadow-camera-far={170} shadow-normalBias={.035} shadow-bias={-.00012}/>
   </>;
 }

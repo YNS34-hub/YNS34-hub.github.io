@@ -25,6 +25,7 @@ import {useAlpineGeography} from '../alpine/assets';
 import {terrainSkirtHeight,terrainSkirtWeight} from './terrainTransition';
 import {pastureSampling} from '../scenery/pastureSampling';
 import {lakeBankShader} from './lakeShore';
+import StopBench, { useStopBenchFinish } from './StopBench';
 
 function seeded(initial:number){let seed=initial;return()=>{seed=Math.imul(seed,1664525)+1013904223|0;return(seed>>>0)/4294967296;};}
 export function makeTerrain(start:number,end:number,farGround:(x:number,z:number)=>number){
@@ -172,6 +173,7 @@ function GroundedStopApron({distance,side,origin,yaw,maps}:{distance:number;side
   return <mesh name="grounded-scenic-stop-apron" geometry={geometry} receiveShadow><meshStandardMaterial color="#c9c3ad" map={maps.asphalt} normalMap={maps.normal} normalScale={[.12,.12]} roughness={.96}/></mesh>;
 }
 function RoadStops({maps}:{maps:Maps}){
+  const finish=useStopBenchFinish();
   return <>{roadStops.map((stop,i)=>{
     const p=new Vector3(),t=new Vector3();roadSample(stop.distance,p,t);const nx=-t.z,nz=t.x,r=Math.hypot(nx,nz),side=(nx*(lake.x-p.x)+nz*(lake.z-p.z)>=0?1:-1) as -1|1;
     const x=p.x+nx/r*4.7*side,z=p.z+nz/r*4.7*side,y=stopGroundHeight(x,z,stop.distance)+.045,yaw=Math.atan2(t.x,t.z);
@@ -179,8 +181,7 @@ function RoadStops({maps}:{maps:Maps}){
     const benchX=-.30*side,feet=[-.65,.65].map(dx=>({x:benchX+dx,y:groundAt(benchX+dx,1.5)})),seatY=Math.max(...feet.map(f=>f.y))+.49,signX=-1.6*side,signY=groundAt(signX,1.9);
     return <group key={i} name={"road-scenic-stop:"+i} position={[x,y,z]} rotation={[0,yaw,0]}>
       <GroundedStopApron distance={stop.distance} side={side} origin={[x,y,z]} yaw={yaw} maps={maps}/>
-      <Block position={[benchX,seatY,1.5]} scale={[1.8,.1,.46]} color="#887a5a" roughness={.72}/>
-      {feet.map(foot=>{const height=seatY-.03-foot.y;return <Block key={foot.x} position={[foot.x,foot.y+height*.5,1.5]} scale={[.07,height,.40]} color="#596260" metalness={.3}/>;})}
+      <StopBench x={benchX} seatY={seatY} feet={feet} finish={finish}/>
       <Block position={[signX,signY+.55,1.9]} scale={[.075,1.1,.075]} color="#626c66"/>
       <Label text={stop.title} position={[signX,signY+1.15,1.92]} size={.13} color="#e4d7bb" maxWidth={2}/>
     </group>;

@@ -8,8 +8,7 @@ import { keepClear, roomFootprints, tourWaypoint } from "./collision";
 import { resolveRoomPlan } from "./roomPlan";
 import { roomViews } from "./visitView";
 import { useLibraryStore } from "../systems/library";
-import { imageLayout } from "./spatialLayout";
-import { worksForRoom } from "../systems/mediaPlacement";
+import { imageWallFootprints } from "../rooms/reference/imageWallFootprints";
 // 交互扩展开始 player-import
 import { setWorldView } from "../worlds/worldConfig";
 import { applyRoadLook } from "../worlds/road/state";
@@ -37,25 +36,10 @@ export default function Player({ roomId }: { roomId: string }) {
   const footstepsAt = useRef(0);
   const library = useLibraryStore();
   const footprints = useMemo(() => {
-    const base = roomId.split("-page-")[0],
-      page = Math.max(0, (Number(roomId.split("-page-")[1]) || 1) - 1);
+    const base = roomId.split("-page-")[0];
     const photos =
       base === "wallpapers" ? library.wallpapers : library.personal.visuals;
-    const imageRoom = ["wallpapers", "portraits", "editorial"].includes(base);
-    const walls = imageRoom
-      ? imageLayout(
-          worksForRoom(photos, base).slice(page * 5, page * 5 + 5),
-          base !== "wallpapers",
-          base === "editorial",
-        ).map((p) => ({
-          x: p.position[0],
-          z: p.position[2] - 0.3,
-          halfWidth:
-            (Math.abs(Math.cos(p.rotation[1])) * (p.width + 0.65)) / 2 + 0.6,
-          halfDepth:
-            (Math.abs(Math.sin(p.rotation[1])) * (p.width + 0.65)) / 2 + 0.6,
-        }))
-      : [];
+    const walls = imageWallFootprints(roomId, photos);
     return [...roomFootprints(roomId), ...walls];
   }, [roomId, library.wallpapers, library.personal.visuals]);
   const travelSequence = usePalaceStore((s) => s.travelSequence);

@@ -29,7 +29,7 @@ export default function CourtTrees() {
     const patches = [[.49, .51, .997, .995], [.001, .19, .51, .62], [.28, .001, .998, .4]];
     for (let n = 0; n < Math.min(budget, shape.crown.length); n++) {
       const i = Math.floor(n * stride); center.set(...shape.crown[i]);
-      const a = i * 2.399963, b = (i * 41 % 100) / 100 * .9 - .45, size = .72 + i % 7 * .055;
+      const a = i * 2.399963, b = (i * 41 % 100) / 100 * .9 - .45, size = .61 + i % 7 * .047;
       right.set(Math.cos(a), 0, -Math.sin(a)).multiplyScalar(size * .5); up.set(Math.sin(a) * Math.sin(b), Math.cos(b), Math.cos(a) * Math.sin(b)).multiplyScalar(size * .5);
       const start = position.length / 3, tile = patches[i % 3];
       for (const [x, y] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { p.copy(center).addScaledVector(right, x).addScaledVector(up, y); position.push(p.x, p.y, p.z); }
@@ -40,7 +40,7 @@ export default function CourtTrees() {
   }, [shape, tier]);
   const motion = useMemo(() => ({ time: { value: 0 }, amplitude: { value: 0 } }), []);
   const leaves = useMemo(() => {
-    const m = new MeshStandardMaterial({ map: maps[4], alphaTest: .48, side: DoubleSide, roughness: .93, color: "#c9d9ab" });
+    const m = new MeshStandardMaterial({ map: maps[4], alphaTest: .48, alphaToCoverage: true, side: DoubleSide, roughness: .93, color: "#d5dfc3" });
     const d = new MeshDepthMaterial({ depthPacking: RGBADepthPacking, map: maps[4], alphaTest: .48, side: DoubleSide });
     const patch = (shader: WebGLProgramParametersWithUniforms) => {
       shader.uniforms.courtWindTime = motion.time; shader.uniforms.courtWindAmplitude = motion.amplitude;

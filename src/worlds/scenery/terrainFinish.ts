@@ -27,7 +27,7 @@ export function valleyTerrainMaterial(maps:GroundMaps,mountain=false){
     `+shader.fragmentShader.replace("#include <map_fragment>",`
       vec3 vp=valleyPosition,vn=normalize(valleyNormal),vw=pow(abs(vn),vec3(4.));vw/=max(.001,vw.x+vw.y+vw.z);
       float vd=distance(cameraPosition,vp),vm=valleyNoise(vp.xz*.006),vs=1.-abs(vn.y);
-      float stoneMask=${mountain?"max(smoothstep(.045,.20,vs+(valleyNoise(vp.xz*.035)-.5)*.055),smoothstep(65.,145.,vp.y))":"smoothstep(.27,.62,vs+(valleyNoise(vp.xz*.035)-.5)*.12)"};
+      float stoneMask=${mountain?"max(smoothstep(.28,.64,vs+(valleyNoise(vp.xz*.035)-.5)*.055),smoothstep(360.,720.,vp.y))":"smoothstep(.27,.62,vs+(valleyNoise(vp.xz*.035)-.5)*.12)"};
       // 远处也取相同的实拍草地，以自动 mip 保留平均色，避免在固定距离突然换成一片单色平地。
       vec3 pasture=worldPasture(map,vp.xz),stone=vec3(.11,.129,.133);
       // 远景显式使用低频 mip，毫米纹理不能在数百米处变成摩尔纹。
@@ -44,8 +44,11 @@ export function valleyTerrainMaterial(maps:GroundMaps,mountain=false){
       float imageEdge=min(min(ridgeAerialUV.x,ridgeAerialUV.y),min(1.-ridgeAerialUV.x,1.-ridgeAerialUV.y));
       float imageCoverage=smoothstep(.008,.045,imageEdge);
       vec3 sourceLandscape=texture2D(valleyAerial,ridgeAerialUV).rgb;
+      // 原航拍含冰川与正午亮岩；这里只借用同窗宏观纹理，原创低海拔湖谷不用整面雪白反照率。
+      float aerialLuma=dot(sourceLandscape,vec3(.2126,.7152,.0722));
+      sourceLandscape=mix(sourceLandscape,vec3(aerialLuma)*vec3(.83,.94,.91),.32)*.48;
       // 航拍承担宏观地貌，近尺度岩石仍来自实拍 PBR；不将低分辨率航拍放大成整面白色贴纸。
-      valleySurface=mix(valleySurface,sourceLandscape,imageCoverage*.40);
+      valleySurface=mix(valleySurface,sourceLandscape,imageCoverage*.46);
       `:''}
       vec2 bankZones=lakeBankZones(vp);float shoreWet=bankZones.x;
       diffuseColor.rgb*=lakeBankColor(valleySurface,bankZones);
@@ -58,5 +61,5 @@ export function valleyTerrainMaterial(maps:GroundMaps,mountain=false){
         normal=normalize((viewMatrix*vec4(normalize(vn+detail),0.)).xyz);
       }
     `).replace("#include <roughnessmap_fragment>","#include <roughnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.86,shoreWet);");
-  };m.customProgramCacheKey=()=>"photographed-valley-bank-pasture-v10:"+mountain+':'+photographedRidge;return m;
+  };m.customProgramCacheKey=()=>"photographed-valley-bank-pasture-v12:"+mountain+':'+photographedRidge;return m;
 }

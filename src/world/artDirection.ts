@@ -1,4 +1,5 @@
 import type { RoomPlan } from "./roomPlan";
+import { referenceRoomLighting } from "../rooms/reference/referenceLighting";
 
 /** One material and lighting language, with a different curatorial temperature per room. */
 export const museum = {
@@ -183,6 +184,8 @@ export function roomLighting(plan: RoomPlan, roomId: string) {
     },
   };
   const baseRoom = roomId.split("-page-")[0];
+  const curated = referenceRoomLighting(roomId);
+  if (curated) return curated;
   const theme = themes[baseRoom === "cosmic" ? "imagined-worlds" : baseRoom];
   if (theme) return theme;
   const listening = plan.type === "listening";

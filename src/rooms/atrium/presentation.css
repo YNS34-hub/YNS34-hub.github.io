@@ -1,0 +1,102 @@
+/* 只校准深色石材入口的文字对比；控件、响应式尺寸与动效仍由原 HUD 持有。 */
+.palace-app .hud[data-room="atrium"].is-welcome::before {
+  content: "";
+  position: absolute;
+  inset: 72% 0 0;
+  background: linear-gradient(transparent, rgb(14 25 34 / 68%));
+  pointer-events: none;
+}
+.palace-app .hud[data-room="atrium"].is-welcome .welcome-caption {
+  z-index: 1;
+  left: 22vw;
+  top: auto;
+  bottom: 28px;
+  max-width: 73.5vw;
+  display: grid;
+  grid-template-columns: max-content max-content;
+  align-items: center;
+  gap: 18px 24px;
+}
+.hud[data-room="atrium"].is-welcome .welcome-caption h1,
+.hud[data-room="atrium"].is-welcome .welcome-caption .museum-title {
+  color: #edf3f4;
+  text-shadow: 0 2px 20px rgb(12 23 31 / 40%);
+}
+.palace-app .hud[data-room="atrium"].is-welcome .welcome-caption .museum-title {
+  grid-column: 1 / -1;
+  font-size: clamp(64px, 5.2vw, 132px);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+.palace-app .hud[data-room="atrium"] .welcome-caption .museum-title span {
+  display: inline;
+}
+.palace-app .hud[data-room="atrium"] .welcome-caption .museum-title span + span::before {
+  content: " ";
+  white-space: pre;
+}
+.palace-app .hud[data-room="atrium"] .welcome-caption .museum-label {
+  margin: 0;
+  opacity: 1;
+}
+.palace-app .hud[data-room="atrium"] .welcome-actions {
+  margin-top: 0;
+}
+.palace-app .hud[data-room="atrium"].is-welcome .welcome-caption .museum-label,
+.hud[data-room="atrium"].is-welcome .index-entry,
+.hud[data-room="atrium"].is-welcome .continue-button {
+  color: #e2ebee;
+}
+.hud[data-room="atrium"].is-welcome .enter-button {
+  background: #243540;
+  color: #eff5f5;
+  border: 1px solid #afc2ce;
+}
+.palace-app .hud[data-room="atrium"] .hud-header .wordmark,
+.palace-app .hud[data-room="atrium"] .hud-header-actions {
+  color: #e2ecf0;
+  background: rgb(23 35 44 / 76%);
+  border-color: rgb(191 209 222 / 25%);
+  backdrop-filter: blur(6px);
+}
+.palace-app .hud[data-room="atrium"] .hud-header-actions .guide-button,
+.palace-app .hud[data-room="atrium"] .hud-header-actions .sound-button {
+  color: #e2ecf0;
+}
+.hud[data-room="atrium"] .hud-header button:focus-visible {
+  outline: 2px solid #eaf3f7;
+  outline-offset: 4px;
+}
+@media (max-width: 800px) {
+  .palace-app .hud[data-room="atrium"].is-welcome .welcome-caption {
+    left: 24px;
+    right: 24px;
+    bottom: 66px;
+    max-width: none;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .palace-app .hud[data-room="atrium"].is-welcome .welcome-caption .museum-title {
+    font-size: clamp(40px, 10vw, 64px);
+  }
+  .palace-app .hud[data-room="atrium"] .welcome-caption .museum-label {
+    display: none;
+  }
+  .palace-app .hud[data-room="atrium"] .wordmark > span:not(.brand-symbol) {
+    display: none;
+  }
+}
+@media (min-width: 801px) and (max-height: 900px) {
+  .palace-app .hud[data-room="atrium"].is-welcome .welcome-caption {
+    right: 4.5vw;
+    max-width: none;
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+  .palace-app .hud[data-room="atrium"].is-welcome .welcome-caption .museum-title {
+    grid-column: auto;
+    font-size: clamp(32px, 4vw, 64px);
+  }
+  .palace-app .hud[data-room="atrium"] .welcome-caption .museum-label {
+    display: none;
+  }
+}
