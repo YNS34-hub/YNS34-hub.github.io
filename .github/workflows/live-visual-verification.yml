@@ -1,0 +1,60 @@
+name: Verify published visual release
+
+on:
+  push:
+    branches: [codex/memory-palace-live-qa-20261101]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Select cloud browser without changing product checks
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+          import { createHash } from 'node:crypto';
+          const file = 'scripts/capture-reference-atrium.mjs';
+          const source = readFileSync(file, 'utf8');
+          const original = "return chromium.launch({ channel: 'msedge', headless: true, args: ['--use-angle=d3d11', '--disable-features=CalculateNativeWinOcclusion'] });";
+          if (!source.includes(original)) throw new Error('Unexpected browser launcher');
+          const replacement = "return chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--disable-dev-shm-usage'] });";
+          writeFileSync(file, source.replace(original, replacement));
+          mkdirSync('qa-artifacts/live-cloud', { recursive: true });
+          const hash = value => createHash('sha256').update(value).digest('hex');
+          writeFileSync('qa-artifacts/live-cloud/environment.json', JSON.stringify({
+            deployedCommit: '4c34352a6d97b05eb152781074ecaad5b8555b88',
+            origin: 'https://yns34-hub.github.io',
+            originalHelperSHA256: hash(source),
+            publicTestSHA256: hash(readFileSync('scripts/check-reference-public.mjs')),
+            browser: 'Chromium / SwiftShader on isolated Ubuntu runner',
+            performanceBenchmark: false,
+            adaptation: 'Browser launcher only; original ready timeout and all 9 viewport assertions unchanged',
+            productAssetsIntercepted: false
+          }, null, 2));
+          NODE
+      - name: Check actual production museum
+        env:
+          PALACE_PUBLIC_URL: https://yns34-hub.github.io
+          PALACE_PUBLIC_ARTIFACTS: qa-artifacts/live-cloud
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: node scripts/check-reference-public.mjs
+      - name: Retain screenshots and raw results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-palace-live-4c34352
+          path: qa-artifacts/live-cloud
+          retention-days: 7
