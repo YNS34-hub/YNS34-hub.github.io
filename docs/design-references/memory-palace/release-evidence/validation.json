@@ -1,0 +1,1445 @@
+{
+  "at": "2026-11-01T11:16:50.671Z",
+  "baseline": "a86b3d243d24b6a669407f1a05b662ad2a9f3fe0",
+  "sourceHead": "5d10ed9beea679fc75e10fc45d2302835eebfc6b",
+  "comparisons": [
+    {
+      "name": "welcome",
+      "part": "atrium",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.65,
+          23
+        ],
+        "quaternion": [
+          0.03845611658914412,
+          0,
+          0,
+          0.9992602899629717
+        ],
+        "fov": 48,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/atrium/before/welcome.png",
+          "sha256": "76906c66a6ab0941fad6c4ea0719eb61c24a03f5e79adf0cd0c3a0089d2be57b",
+          "bytes": 962946
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/atrium/after/welcome.png",
+          "sha256": "9b1ee08c04c3fbc95e5fb6da88a01a23e62229cab5b892da5e3a8f964efe8fe2",
+          "bytes": 1739636
+        }
+      ]
+    },
+    {
+      "name": "auxiliary",
+      "part": "atrium",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.72,
+          16.5
+        ],
+        "quaternion": [
+          0.05066114190271407,
+          0,
+          0,
+          0.9987158998940154
+        ],
+        "fov": 48,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/atrium/before/auxiliary.png",
+          "sha256": "0cb8a487616cf2df909bc87e1c3fe6f2a8962d76ad85a89ec89d3270fe2ef67b",
+          "bytes": 874882
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/atrium/after/auxiliary.png",
+          "sha256": "1e63950d5df014a8425a2e081ebb22befdbac07992510b3b4bf4e2c26a45e2b3",
+          "bytes": 1606655
+        }
+      ]
+    },
+    {
+      "name": "glass-closeup",
+      "part": "atrium",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          4.8,
+          2.6,
+          8.8
+        ],
+        "quaternion": [
+          0.05292893339616334,
+          0.24671857728699687,
+          -0.013496561202319039,
+          0.9675465438245008
+        ],
+        "fov": 48,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/atrium/before/glass-closeup.png",
+          "sha256": "6f87aff92fe987fd9bab566df84209514a6b52c68184bef87d3936c29d99014b",
+          "bytes": 770615
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/atrium/after/glass-closeup.png",
+          "sha256": "d58e6ce6462404f348ccfd088a32ed201add6791b05ab6786c4c80a3ace252c6",
+          "bytes": 1498787
+        }
+      ]
+    },
+    {
+      "name": "mobile-welcome",
+      "part": "atrium",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.65,
+          23
+        ],
+        "quaternion": [
+          0.03845611658914412,
+          0,
+          0,
+          0.9992602899629717
+        ],
+        "fov": 48,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          390,
+          844
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/atrium/before/mobile-welcome.png",
+          "sha256": "3c7f312edee6cac54fd4a3edbc155d27123e99ad38872425a49bcaacca107e73",
+          "bytes": 141705
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/atrium/after/mobile-welcome.png",
+          "sha256": "b70c500d2186be09a749da737eb59eb0b44628eb369cbee90af167bde13b866d",
+          "bytes": 255989
+        }
+      ]
+    },
+    {
+      "name": "glass-life",
+      "part": "atrium",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.65,
+          13.8
+        ],
+        "quaternion": [
+          0.03434277490580371,
+          0,
+          0,
+          0.9994101129225024
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/atrium/before/glass-life.png",
+          "sha256": "76143f58f6d8d0c0c0476ac3ab57bf0238116751f0a7e0b39b0d5b10337d29c3",
+          "bytes": 353027
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/atrium/after/glass-life.png",
+          "sha256": "02d4555f0a4c4b7328718cd0580edec7bf50e0c1055847f72f501bddfda88d46",
+          "bytes": 352390
+        }
+      ]
+    },
+    {
+      "name": "projects",
+      "part": "rooms",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.65,
+          13.8
+        ],
+        "quaternion": [
+          0.0343427749058037,
+          0,
+          0,
+          0.9994101129225026
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/rooms/before/projects.png",
+          "sha256": "8698542dc1ede29b9a2c1a6f9fb749cbe2e9ae07de9596ac53542dec4584fcc0",
+          "bytes": 692411
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/rooms/after/projects.png",
+          "sha256": "01d88f509ab8878680930d2743299071cfbd381e4d3f43473af29689daa5cd9b",
+          "bytes": 1226835
+        }
+      ]
+    },
+    {
+      "name": "research",
+      "part": "rooms",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.65,
+          13.8
+        ],
+        "quaternion": [
+          0.0343427749058037,
+          0,
+          0,
+          0.9994101129225026
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/rooms/before/research.png",
+          "sha256": "639e1620ad2de34253f069f63e5b57fd9f5f6d8397cea0d6eacb95fd1ecf69e8",
+          "bytes": 394978
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/rooms/after/research.png",
+          "sha256": "728c9553f7aec15d31fe629a2c18386c35b3fbbc74f308e6923ab523eff2f5bd",
+          "bytes": 1521711
+        }
+      ]
+    },
+    {
+      "name": "music",
+      "part": "rooms",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          1.5,
+          1.65,
+          10.8
+        ],
+        "quaternion": [
+          0.02910244502157555,
+          0.039781886475379835,
+          -0.0011591599189735324,
+          0.9987838132201124
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/rooms/before/music.png",
+          "sha256": "4a4433d705ff510d474c8544b55c07ec78830483609f1a07b7d07abc274956da",
+          "bytes": 503704
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/rooms/after/music.png",
+          "sha256": "2b09a930dcad526ee950858bdcbed10bcebf9791c70987607eb1ee9e5d73dcea",
+          "bytes": 1153295
+        }
+      ]
+    },
+    {
+      "name": "wallpapers",
+      "part": "rooms",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0,
+          1.65,
+          13.8
+        ],
+        "quaternion": [
+          0.0343427749058037,
+          0,
+          0,
+          0.9994101129225026
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/rooms/before/wallpapers.png",
+          "sha256": "2740620f5ad08b9442cdc332729d9b2cb9fa98069b0e5861e0b109734762c90d",
+          "bytes": 912831
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/rooms/after/wallpapers.png",
+          "sha256": "4bf7904ba4cdef882ee6eb3eff26159acd8b7122ec3a8161ad8dd12bd8e342ae",
+          "bytes": 1392888
+        }
+      ]
+    },
+    {
+      "name": "basketball",
+      "part": "rooms",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          2,
+          1.65,
+          9
+        ],
+        "quaternion": [
+          0.017665166007222937,
+          0.047227220636988435,
+          -0.0008353395725170425,
+          0.9987276073828344
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1.5,
+        "exposure": 1.08,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/rooms/before/basketball.png",
+          "sha256": "3877a48e86de1faf8a6aac9b2c6219ede7f43d79fccf67e7fa81bffe04e0a1ae",
+          "bytes": 2662761
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/rooms/after/basketball.png",
+          "sha256": "9c4bd4e224795bd1348910842d43e5594aa8063bb6f3c6734a5d5106db18beed",
+          "bytes": 2791638
+        }
+      ]
+    },
+    {
+      "name": "cycling",
+      "part": "rooms",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          0.2,
+          19.64268769980582,
+          7.5
+        ],
+        "quaternion": [
+          -0.038690894520345305,
+          -0.1361485653093061,
+          -0.005321358046847582,
+          0.9899183127884696
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1.5,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/rooms/before/cycling.png",
+          "sha256": "56846e6f92e3511d8d12807d0f3ea4ff9d38bbfc0f385c2bd6fe79acf117a8ee",
+          "bytes": 2756293
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/rooms/after/cycling.png",
+          "sha256": "020ee98b58013cc5da4fa471e9c4677abc5689802b4030121ec8852a73ae7195",
+          "bytes": 2654097
+        }
+      ]
+    },
+    {
+      "name": "research-detail",
+      "part": "details",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          3.8,
+          1.65,
+          8.8
+        ],
+        "quaternion": [
+          -0.04519831515680199,
+          -0.27981212807398015,
+          -0.013189115428066379,
+          0.9588995424568321
+        ],
+        "fov": 50,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/details/before/research-detail.png",
+          "sha256": "c8577cb98fcf8568dce14f710cba0b5121a1a23c8497ad9efbec5d6e2d058624",
+          "bytes": 308176
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/details/after/research-detail.png",
+          "sha256": "3c04a95cbcc7ce9aaa94342d6cd47335fffd53f314d1d80620939e2597b2d2fb",
+          "bytes": 1525460
+        }
+      ]
+    },
+    {
+      "name": "music-detail",
+      "part": "details",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          5,
+          1.65,
+          4
+        ],
+        "quaternion": [
+          0.06306095776750414,
+          0.250308494266328,
+          -0.016340735520617333,
+          0.965972025302086
+        ],
+        "fov": 50,
+        "quality": "medium",
+        "dpr": 1,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/details/before/music-detail.png",
+          "sha256": "d95e7fae1856974de972cad01d2f9f61e4b18d053490581e1794bb911e5c53fa",
+          "bytes": 598014
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/details/after/music-detail.png",
+          "sha256": "fa1370b3d1adbcaf54f9cae89e17702ee6546f4de4a43a033d2d508f56aad9df",
+          "bytes": 1088656
+        }
+      ]
+    },
+    {
+      "name": "basketball-detail",
+      "part": "details",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          2,
+          1.65,
+          3
+        ],
+        "quaternion": [
+          -0.20380924466360292,
+          0.28313762919140156,
+          0.06170847402869851,
+          0.9351400638185562
+        ],
+        "fov": 48,
+        "quality": "medium",
+        "dpr": 1.5,
+        "exposure": 1.08,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/details/before/basketball-detail.png",
+          "sha256": "f0ac4cd7f0ddd9ea7489caa02d2af696ebaa75ce348dfb0b6014becab0ee2e0f",
+          "bytes": 1926884
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/details/after/basketball-detail.png",
+          "sha256": "9c4b2521dd67cae0a13e47ccad600fb0b27d6f0ce2a6e5a4da50cfc56983bc18",
+          "bytes": 1695251
+        }
+      ]
+    },
+    {
+      "name": "cycling-detail",
+      "part": "details",
+      "fields": [
+        "position",
+        "quaternion",
+        "fov",
+        "quality",
+        "dpr",
+        "exposure",
+        "viewport"
+      ],
+      "beforeCamera": {
+        "position": [
+          329.4379928272541,
+          24.63985558573432,
+          -627.2785589304948
+        ],
+        "quaternion": [
+          -0.026076221690281873,
+          -0.9137603376853431,
+          -0.05941426209942211,
+          0.4010386781779385
+        ],
+        "fov": 60,
+        "quality": "medium",
+        "dpr": 1.5,
+        "exposure": 1,
+        "viewport": [
+          1920,
+          1080
+        ]
+      },
+      "images": [
+        {
+          "phase": "before",
+          "path": "release-evidence/details/before/cycling-detail.png",
+          "sha256": "c1a6efc539646dd5c2a813b68eac8fd7664ea034a129c745d08b737c53c405c0",
+          "bytes": 2669831
+        },
+        {
+          "phase": "after",
+          "path": "release-evidence/details/after/cycling-detail.png",
+          "sha256": "3a62281f452cd01e4ccbfacdefe03c35f0af660c314efea792d14a63bf41fe5d",
+          "bytes": 2508792
+        }
+      ]
+    }
+  ],
+  "performance": [
+    {
+      "room": "projects",
+      "method": "one 8-second static sample per version; shared device, not GPU timer",
+      "before": {
+        "fps": 144.00259779187692,
+        "p95": 7.100000000000364,
+        "render": {
+          "frame": 78,
+          "calls": 34,
+          "triangles": 2294,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 37,
+          "textures": 15
+        }
+      },
+      "after": {
+        "fps": 144.0007993105946,
+        "p95": 7.100000000000364,
+        "render": {
+          "frame": 181,
+          "calls": 59,
+          "triangles": 5722,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 59,
+          "textures": 33
+        }
+      }
+    },
+    {
+      "room": "research",
+      "method": "one 8-second static sample per version; shared device, not GPU timer",
+      "before": {
+        "fps": 144.00079931059463,
+        "p95": 7.099999999999909,
+        "render": {
+          "frame": 79,
+          "calls": 67,
+          "triangles": 46612,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 42,
+          "textures": 15
+        }
+      },
+      "after": {
+        "fps": 129.26351022243315,
+        "p95": 13.899999999999636,
+        "render": {
+          "frame": 185,
+          "calls": 123,
+          "triangles": 61064,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 75,
+          "textures": 32
+        }
+      }
+    },
+    {
+      "room": "music",
+      "method": "one 8-second static sample per version; shared device, not GPU timer",
+      "before": {
+        "fps": 143.99640008999776,
+        "p95": 7.100000000000364,
+        "render": {
+          "frame": 79,
+          "calls": 72,
+          "triangles": 5558,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 42,
+          "textures": 8
+        }
+      },
+      "after": {
+        "fps": 144,
+        "p95": 7.099999999999454,
+        "render": {
+          "frame": 278,
+          "calls": 96,
+          "triangles": 26726,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 50,
+          "textures": 20
+        }
+      }
+    },
+    {
+      "room": "wallpapers",
+      "method": "one 8-second static sample per version; shared device, not GPU timer",
+      "before": {
+        "fps": 144,
+        "p95": 7.099999999999909,
+        "render": {
+          "frame": 80,
+          "calls": 33,
+          "triangles": 2398,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 36,
+          "textures": 13
+        }
+      },
+      "after": {
+        "fps": 143.99820002249973,
+        "p95": 7.099999999998545,
+        "render": {
+          "frame": 186,
+          "calls": 44,
+          "triangles": 3114,
+          "points": 0,
+          "lines": 0
+        },
+        "memory": {
+          "geometries": 43,
+          "textures": 21
+        }
+      }
+    },
+    {
+      "room": "basketball",
+      "method": "one 8-second static sample per version; shared device, not GPU timer",
+      "before": {
+        "fps": 94.99881251484356,
+        "p95": 14,
+        "render": {
+          "frame": 284,
+          "calls": 98,
+          "triangles": 1129803,
+          "points": 0,
+          "lines": 1090
+        },
+        "memory": {
+          "geometries": 99,
+          "textures": 54
+        }
+      },
+      "after": {
+        "fps": 100.91296256978355,
+        "p95": 14,
+        "render": {
+          "frame": 187,
+          "calls": 98,
+          "triangles": 1129803,
+          "points": 0,
+          "lines": 1090
+        },
+        "memory": {
+          "geometries": 99,
+          "textures": 54
+        }
+      }
+    },
+    {
+      "room": "cycling",
+      "method": "one 8-second static sample per version; shared device, not GPU timer",
+      "before": {
+        "fps": 51.625,
+        "p95": 21,
+        "render": {
+          "frame": 307,
+          "calls": 211,
+          "triangles": 1699271,
+          "points": 0,
+          "lines": 56
+        },
+        "memory": {
+          "geometries": 156,
+          "textures": 48
+        }
+      },
+      "after": {
+        "fps": 53.03351718285957,
+        "p95": 21,
+        "render": {
+          "frame": 258,
+          "calls": 214,
+          "triangles": 1699595,
+          "points": 0,
+          "lines": 56
+        },
+        "memory": {
+          "geometries": 151,
+          "textures": 54
+        }
+      }
+    }
+  ],
+  "browser": [
+    {
+      "name": "atrium",
+      "checks": 14,
+      "passed": true
+    },
+    {
+      "name": "exhibits",
+      "checks": 17,
+      "passed": true
+    },
+    {
+      "name": "research",
+      "checks": 7,
+      "passed": true
+    },
+    {
+      "name": "music",
+      "checks": 10,
+      "passed": true
+    },
+    {
+      "name": "court",
+      "checks": 4,
+      "passed": true
+    },
+    {
+      "name": "public",
+      "checks": 9,
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "units": {
+    "passed": true,
+    "files": 96,
+    "tests": 807
+  },
+  "protected": [
+    {
+      "file": "content/archive.json",
+      "sha256": "51d3668a56dd215bedcd0f9ec4f9d8ef898c51ba4b0a4ea2ba83b9720a591987"
+    },
+    {
+      "file": "content/curation.json",
+      "sha256": "2d3a0d3ca4511282026c75ce7b410dccf4200f78b08d4b0f21ec3390a48fcd2f"
+    },
+    {
+      "file": "content/experiments.json",
+      "sha256": "b7519d14e07a6fa892ef7a608eb8460341b56412686f9b508af7f51d24eccd28"
+    },
+    {
+      "file": "content/github-snapshot.json",
+      "sha256": "1557bf9cfe084316234eb1605a6cd3b4d3832d52473847e09b757725423ae525"
+    },
+    {
+      "file": "content/music.json",
+      "sha256": "dbac53db006e75a0d0ebfa20ae6ffeae9139fe6230c08e4ae858ed29db4db30f"
+    },
+    {
+      "file": "content/profile.json",
+      "sha256": "cb9525a822a5b5f3ee3ff9cafb11a9ebaed6e368e711505210a91553e9eaf6d3"
+    },
+    {
+      "file": "content/projects.json",
+      "sha256": "63accfc67fdbcb8f4a540ff9a04fab988350428bd59020c899a7bb9f9c24e880"
+    },
+    {
+      "file": "content/public-project-audit.json",
+      "sha256": "c2a4c4e0ebd7b4d49d587d6070f384345331eda5e6c8b00d951b619580c935ed"
+    },
+    {
+      "file": "content/research.json",
+      "sha256": "bd21c669778e7d816e3007df74c61c90a05f14e6f7aa7938a704e3d74b950ba3"
+    },
+    {
+      "file": "content/review-workflow.json",
+      "sha256": "2c39aac08d2dde921b55aec790579a10fc39b54e1de1a9f19e838be29696bbcd"
+    },
+    {
+      "file": "content/rooms.json",
+      "sha256": "4f5d265bac0d5739be56cf54a73f83c4bd5d1719e07607fbc5753b0e33dc38ee"
+    },
+    {
+      "file": "content/selected-collection.json",
+      "sha256": "c7e104afc530f20d13f6702dd4e0d104decc77687f726ecb7f510d965f8677a1"
+    },
+    {
+      "file": "content/wallpapers.json",
+      "sha256": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f"
+    },
+    {
+      "file": "package-lock.json",
+      "sha256": "c78f717a21b8bbf6a0ba2055149b6c1f801c8fbcd898a222e0df9b5c55742030"
+    },
+    {
+      "file": "package.json",
+      "sha256": "dba1d9e70b2e1a22963ad9d39c94a29885928593ca469d11f45cf7e3013f1c30"
+    },
+    {
+      "file": "public/assets/memory-glass.glb",
+      "sha256": "7355a22c2596a966dc01fe86d4cb2efe6f3b492ea379fea1676caec08b86fd10"
+    },
+    {
+      "file": "src/audio/AudioSystem.tsx",
+      "sha256": "371e10b4e0624d7ebe50f2ca794563b6344273b5c31fee8460bc4cab129c4ad7"
+    },
+    {
+      "file": "src/audio/lyrics.d.mts",
+      "sha256": "4dd9375df49bdee8fe2c9b4f98017ac32b2fa8cad4b3bede3b6b91f857cd8695"
+    },
+    {
+      "file": "src/audio/lyrics.mjs",
+      "sha256": "2b3267268c7075125edf7c1a29aed27c6aac215a44d8c7a783af051f3d5148aa"
+    },
+    {
+      "file": "src/audio/persistence.ts",
+      "sha256": "bb19f7c05567b32357ce0a869ff7faec412ec7865788bdc494c37737939fe47f"
+    },
+    {
+      "file": "src/audio/player.ts",
+      "sha256": "15af1ee89712ef1c34a000a9bef18dc46d5e4f2cb0e913f0eaf46857ffa2e278"
+    },
+    {
+      "file": "src/audio/playlist.ts",
+      "sha256": "426058a93628e8785c3350b0ff79935fdaf288d247815f6e90ebb5f07900813d"
+    },
+    {
+      "file": "src/audio/roomMusic.ts",
+      "sha256": "3ce61320b5775a870724fc623eccc1b9a633c3151c934518ad9223143e0f1b78"
+    },
+    {
+      "file": "src/audio/signal.ts",
+      "sha256": "0836c3a6beda544c49875f5dba4cd49e846fd62ce28f1414be48498195d4589b"
+    },
+    {
+      "file": "src/audio/space.ts",
+      "sha256": "36a3d82995932b89b3cb2d0ac73d7a908f95159d074815b24106f9de7c4260e2"
+    },
+    {
+      "file": "src/systems/idb.ts",
+      "sha256": "702542836c24dde105933051b64edc60634a773e12fcf7c61f6c4b32c417aff9"
+    },
+    {
+      "file": "src/systems/identityTone.ts",
+      "sha256": "ab2f74773d4e6283b337d4a9a0029faa930ef87625397ea1fd52013ca7eb7244"
+    },
+    {
+      "file": "src/systems/image-preview.ts",
+      "sha256": "2cc83634767b3633018cc29db0f2682711f43e9d6fef8c1dd02325393209d6d5"
+    },
+    {
+      "file": "src/systems/library.ts",
+      "sha256": "34db34d91177a8e2683b472bede5798379b9aa52eb38b9bd2a38b48e971c1dae"
+    },
+    {
+      "file": "src/systems/mediaPlacement.ts",
+      "sha256": "95c7dad50d243557e6786726ac7ffdcb7fcb6bd9656d1391c50a3880385221fb"
+    },
+    {
+      "file": "src/systems/spatialLyrics.ts",
+      "sha256": "6a92e50ac4c504d715935067f5de2991dd330aeafab0ea5a864d38cd6ff2026c"
+    },
+    {
+      "file": "src/systems/store.ts",
+      "sha256": "d09cceeff59065fed3d8eb3632bcc76d45c1eb0aba0f177b5bfdb42c6a2fe6f5"
+    },
+    {
+      "file": "src/world/GlassSculpture.tsx",
+      "sha256": "4afe118347a823506293efa85f93fe28778d47e8c2f5c38f9c2835ebb284aa9a"
+    },
+    {
+      "file": "src/world/World.tsx",
+      "sha256": "2682aae4af747afc905cae422babab79817f2088f10193b84d09912e30b933cc"
+    },
+    {
+      "file": "src/worlds/court/controls.ts",
+      "sha256": "b821f3d3f11678ceabab6291e5a1dc0440ffd467217b580b329055ace48c6b49"
+    },
+    {
+      "file": "src/worlds/court/state.ts",
+      "sha256": "ffdf4fc9936ccd78887b0a344c1f81d8535bdefb12d0cf07c5154cf56a5910bd"
+    },
+    {
+      "file": "src/worlds/presence/Avatar.tsx",
+      "sha256": "e7772c744cb989a407f623e1e2f183c3ab984cb0b75fb533bdc59f154d8543c5"
+    },
+    {
+      "file": "src/worlds/presence/CameraRig.tsx",
+      "sha256": "825295cf4a1c73479ae23dc875e21469c9f8ff87005a7ccc211f5d45062d9f8c"
+    },
+    {
+      "file": "src/worlds/presence/Controls.tsx",
+      "sha256": "fff8ac744b23d4ef9474425c4be870690d922ba7384a2eb9f7244703386fc0b7"
+    },
+    {
+      "file": "src/worlds/presence/CourtFootContact.tsx",
+      "sha256": "cf9c74f5cc00233c28f9fab48fbcccaa2bcfc72b485d53434790a868ecb22ddd"
+    },
+    {
+      "file": "src/worlds/presence/Wardrobe.tsx",
+      "sha256": "0580aa48e4bbbc45b5032b557252d2659f40c6220e63caee4361f52a1b841ebe"
+    },
+    {
+      "file": "src/worlds/presence/animationContinuity.ts",
+      "sha256": "41d2fdc30770b5b2a331090d19b83202176acfcc3b25508f29cc01334eee25cb"
+    },
+    {
+      "file": "src/worlds/presence/appearance.ts",
+      "sha256": "928c1b7005c83c5e6dd897e3c1427a9302ce9fa226f3ab96119a9663659aed36"
+    },
+    {
+      "file": "src/worlds/presence/appearanceRig.ts",
+      "sha256": "a4850405eab0d2c8a8f0a59fd82807aa38c4b3fe60a72ad436cdc0d4dce443e7"
+    },
+    {
+      "file": "src/worlds/presence/assets.ts",
+      "sha256": "ffd3b56bbe0102455444cca05e688fe116d2a6c98c47ace28f1468b80318c462"
+    },
+    {
+      "file": "src/worlds/presence/avatarProfile.d.mts",
+      "sha256": "5f46b55132950115f9b122d83e184503682c9613006c4cf49048e43ef778e17f"
+    },
+    {
+      "file": "src/worlds/presence/avatarProfile.mjs",
+      "sha256": "c283ea23be6f82605418b0343d68e07510bfb9fb0682cabbc726071e9fd7254c"
+    },
+    {
+      "file": "src/worlds/presence/basketballAppearance.ts",
+      "sha256": "f7899ae2388508d6fa673bed4f62e2d795304fd6d221e7ce20f9868a89ba2a1f"
+    },
+    {
+      "file": "src/worlds/presence/basketballFootwork.ts",
+      "sha256": "3708860b6d2fe024c1582c843883860077a6172d59348e4934ec21742ed30d31"
+    },
+    {
+      "file": "src/worlds/presence/clarity.ts",
+      "sha256": "ea7c7f9a23e18285ded5a8f71380e2ac6206db24de30b27a97283f8e0a1c5a6a"
+    },
+    {
+      "file": "src/worlds/presence/courtBoom.ts",
+      "sha256": "05711014538ed4183b736ee428439e6bf4d9dee978e41ef0282bc322d0a31c47"
+    },
+    {
+      "file": "src/worlds/presence/courtFingerGrip.ts",
+      "sha256": "3c3d454d83ae20713fbfdb45e32f5d784e513347f0b0e0805be82d49478720f7"
+    },
+    {
+      "file": "src/worlds/presence/courtFraming.ts",
+      "sha256": "aaaf7a455a08974c7dd27684c1774339e606c15e13c9f9989b6e8373c1f8ebfb"
+    },
+    {
+      "file": "src/worlds/presence/courtHandRotation.ts",
+      "sha256": "8481845b811aab17471e6fad0166b2c9537ebd6c52bee2f6fdcaacc00a1dd7fd"
+    },
+    {
+      "file": "src/worlds/presence/courtLocomotion.ts",
+      "sha256": "6047de55ec486d021b4eb5c07a32e021da57069eadaa1d6f8c1d8d094d77e905"
+    },
+    {
+      "file": "src/worlds/presence/courtTorso.ts",
+      "sha256": "b4fce225a392640dab281eee62f63607551b1140ad1ee572ae7c333f15baf34c"
+    },
+    {
+      "file": "src/worlds/presence/dribbleArm.ts",
+      "sha256": "5b3c1cfa339eefd660e174e471f8cae0791388ad0e2501ac14033439b763e46f"
+    },
+    {
+      "file": "src/worlds/presence/dribbleMotion.ts",
+      "sha256": "fe9aa210f57dd4de7ecec8d54c0c6312f1e24a0a5399ad1e282908862fe6a390"
+    },
+    {
+      "file": "src/worlds/presence/dribblePalm.ts",
+      "sha256": "db82701f82d78de0522e0a602289f6d99d4c193d180fdc7ee5ffc7163053d51d"
+    },
+    {
+      "file": "src/worlds/presence/dribblePose.ts",
+      "sha256": "919cd02bd3b2124742d4c20d51089eac619845e95fafe7fe3c8d32d47f9e38fd"
+    },
+    {
+      "file": "src/worlds/presence/heldBallPose.ts",
+      "sha256": "4d0eb7abbdf22e6e3c77b3810a5ca27ae6e4458fcb9e8dbb6680cb48df410230"
+    },
+    {
+      "file": "src/worlds/presence/ik.ts",
+      "sha256": "00f0cbe7e787a2e231993820e4f77b99c3f640fb2ac6520ba774b43bf4d50da5"
+    },
+    {
+      "file": "src/worlds/presence/math.ts",
+      "sha256": "c96f49b47ab1e4063d473d902ebc3de5bea8c26000f4e2ecbd1efaf51e1e232b"
+    },
+    {
+      "file": "src/worlds/presence/riderOutline.ts",
+      "sha256": "3970d70a514b7a11a53ea67a7f2c997464673c6ecac69990e7e920e249910f9f"
+    },
+    {
+      "file": "src/worlds/presence/riderPose.ts",
+      "sha256": "00ec891ddecdc769534ea2ea4a1d74f752ac003a98e9d5eaef6cc3272cd7026c"
+    },
+    {
+      "file": "src/worlds/presence/shotGather.ts",
+      "sha256": "e1815d39323e3091de4f26fc71f3c53927c170a472b606d660c61ec650d6378c"
+    },
+    {
+      "file": "src/worlds/presence/shotHandRotation.ts",
+      "sha256": "80323aa65fc62157b7ece637cbc0b3919c49df644f65a71917e1277177b81498"
+    },
+    {
+      "file": "src/worlds/presence/shotPose.ts",
+      "sha256": "d86a1469378ad032c8253cf0cb5e414548e28a20aacc5a05b57f6fc8904e6ac9"
+    },
+    {
+      "file": "src/worlds/presence/state.ts",
+      "sha256": "dd9f34519cde5c1507716aec8c62d320cfece3c5ba7d01e3c30bd87055d6aa61"
+    },
+    {
+      "file": "src/worlds/presence/wardrobe.css",
+      "sha256": "4905306e2a32d112e5e27a94e7b32e1f19d9ab87fc4315ce1d7041d17e4f634f"
+    },
+    {
+      "file": "src/worlds/road/physics.ts",
+      "sha256": "1c0233c876f607dd760ffca5baeb941d496551f37a248cc3ff8651388f5dcf1c"
+    },
+    {
+      "file": "src/worlds/road/route.ts",
+      "sha256": "c87e0255fdc4063a7be4fec35ec663d85712987e13dab625e426917870cd5dbd"
+    },
+    {
+      "file": "src/worlds/road/state.ts",
+      "sha256": "172eabbe685ea364bb1d53ac9304774d1e2f0cd29939a76b6246b5af8959b10a"
+    }
+  ],
+  "references": {
+    "files": 17,
+    "unique": 14,
+    "productionArtworkApproved": false
+  },
+  "bundle": {
+    "entry": "assets/index-VcXUcd34.js",
+    "chunks": [
+      {
+        "file": "assets/index-VcXUcd34.js",
+        "sha256": "b96ddd8e709f96b27df6c534232d5be2284cb62ad8221168c05bebb140dd5aad",
+        "bytes": 160648,
+        "gzipBytes": 54216
+      },
+      {
+        "file": "assets/FitnessHud-BpisvuHq.js",
+        "sha256": "b90e0c5f6dda30d907082f2ed8eaec94c949f5087b7a8763b75613d1ebf8b422",
+        "bytes": 5632,
+        "gzipBytes": 2519
+      },
+      {
+        "file": "assets/video-D_5_Qeuj.js",
+        "sha256": "b87fd66a345fa79cc9a595fb4409a187cba52155dec7e071bca5ede480a20005",
+        "bytes": 8710,
+        "gzipBytes": 4062
+      },
+      {
+        "file": "assets/three-z3mnXEJz.js",
+        "sha256": "8959f74abd4f62de71837607f615dccd6c3af9165bef508a8b365e7b780b1ac4",
+        "bytes": 1185469,
+        "gzipBytes": 331727
+      },
+      {
+        "file": "assets/World-CC-tdzYk.js",
+        "sha256": "e3957f0ccc25861d4f30da411a636f951f02136c1fa81b4e9b8028298eacfada",
+        "bytes": 436207,
+        "gzipBytes": 166411
+      },
+      {
+        "file": "assets/PrivateGym-CtzNIhsH.js",
+        "sha256": "490930b82efc2e5143981510d91bb615d6751f5607ebfec5b13e2e1582933cc9",
+        "bytes": 22149,
+        "gzipBytes": 8020
+      },
+      {
+        "file": "assets/controls-DX3yljPL.js",
+        "sha256": "1dce2762c564a04bdf1f06f9776c626ce3e8e0f4ff2ae1ff3f0f0dd7cc7e634f",
+        "bytes": 43459,
+        "gzipBytes": 20136
+      },
+      {
+        "file": "assets/basketballAppearance-DB6eRK1o.js",
+        "sha256": "42853445f85b37a1fcb4246c756e40bd04a37d422c29e04221dd4b7bfc883046",
+        "bytes": 16072,
+        "gzipBytes": 5373
+      },
+      {
+        "file": "assets/Experience-DkYTXpv8.js",
+        "sha256": "8b8033e981347e0166f77e9848927838f6411d9e269fa57a84102cde918cac0c",
+        "bytes": 17411,
+        "gzipBytes": 7452
+      },
+      {
+        "file": "assets/Avatar-D4yaxnHX.js",
+        "sha256": "b7418005c89d31629d4575d162f2c523823f050f539fd235405a96c5cab1c674",
+        "bytes": 47191,
+        "gzipBytes": 15923
+      },
+      {
+        "file": "assets/Experience-PAKAguAA.js",
+        "sha256": "c9077348b375262a66c6ccb283d967c777d59c6e782089fb357dd1de8442997f",
+        "bytes": 87406,
+        "gzipBytes": 31782
+      },
+      {
+        "file": "assets/BasketballCourt-DM-Od3aj.js",
+        "sha256": "8d57e6c3783599f9977155091ca2ecde14dccafa35c187ec859d232288c527ad",
+        "bytes": 55165,
+        "gzipBytes": 18146
+      },
+      {
+        "file": "assets/ActivityHud-BIz4mBha.js",
+        "sha256": "44faa1a7a3f6e11054e494fc2da852e24503c9c006e96346730d664c05c2296a",
+        "bytes": 11498,
+        "gzipBytes": 4221
+      },
+      {
+        "file": "assets/core-fZlVZw8V.js",
+        "sha256": "b9bf530186ba291035d372e018da30ddce8a0d0fc97671ec8c6abd49370e3724",
+        "bytes": 118694,
+        "gzipBytes": 36169
+      },
+      {
+        "file": "assets/WavPackParser-D2lUHPGr.js",
+        "sha256": "267e01f62d126871aea21cff2532f857b99eb452bf30d3d7fbda943a24ef64d0",
+        "bytes": 3469,
+        "gzipBytes": 1540
+      },
+      {
+        "file": "assets/WaveParser-C_yZjxIz.js",
+        "sha256": "0fe6ac4ec3e8ea1c72ce36a65a7a1f7b6fa204075e4d438020a2a754bdf9ca74",
+        "bytes": 6611,
+        "gzipBytes": 2388
+      },
+      {
+        "file": "assets/ID3v2Parser-DKAtPop-.js",
+        "sha256": "3832c189036c65ec72e7021ce0ede2c64eacb9cb9feafd332d26eb4041469b2a",
+        "bytes": 10869,
+        "gzipBytes": 3990
+      },
+      {
+        "file": "assets/OggParser-DaqYWobZ.js",
+        "sha256": "0775f648399a8be9be5b1dfafaf1fd2e43c3f075f5aaad1ebdc92b34873d5161",
+        "bytes": 7907,
+        "gzipBytes": 2790
+      },
+      {
+        "file": "assets/AbstractID3Parser-K1AxvU4A.js",
+        "sha256": "4500f8818f0bc34d62cb09fa11a87c89dc5f86aa2dcedc82b3fdcf46cc4e1f58",
+        "bytes": 1002,
+        "gzipBytes": 490
+      },
+      {
+        "file": "assets/FlacParser-CAnKPchi.js",
+        "sha256": "5c37929d88e6980bbd971bd8844a8139c47aed3228fdb8d187d0733469c9d49b",
+        "bytes": 6944,
+        "gzipBytes": 2596
+      },
+      {
+        "file": "assets/MusepackParser-CRjF8rOH.js",
+        "sha256": "ed7385a4195bf53ad5f3554474e5d33ced3f56d5998a9d59797cae9c17e2c1d5",
+        "bytes": 5541,
+        "gzipBytes": 1934
+      },
+      {
+        "file": "assets/MpegParser-DpGlWTB4.js",
+        "sha256": "7f48f99e3f905f234bb311f13ebe49d513dc675267184c3fe45a9f85c31aae3d",
+        "bytes": 12733,
+        "gzipBytes": 4207
+      },
+      {
+        "file": "assets/MP4Parser-Bv1kU8Vp.js",
+        "sha256": "b7e8217835bf6a86524a3f3a2e49d67110cb5471236031bb3217fd30c8520027",
+        "bytes": 20666,
+        "gzipBytes": 6184
+      },
+      {
+        "file": "assets/MatroskaParser-CM9gDoV6.js",
+        "sha256": "e1d3cab27456ea7c34ff818fd11cd74bd3ccb04e9bbffc8f4e4af2faddbde0d3",
+        "bytes": 12369,
+        "gzipBytes": 4033
+      },
+      {
+        "file": "assets/DsfParser-BprsUORh.js",
+        "sha256": "0a71a2a8b59165b7d533a731e127882193b5ee3d5b977285542e62edddfcca83",
+        "bytes": 2536,
+        "gzipBytes": 1027
+      },
+      {
+        "file": "assets/DsdiffParser-BSFnuzWe.js",
+        "sha256": "454d5a2e661e00c21075f370012e411812f1d36db4877d16a40c554a6a1dfaf8",
+        "bytes": 4083,
+        "gzipBytes": 1281
+      },
+      {
+        "file": "assets/AsfParser-C-AevWPZ.js",
+        "sha256": "2178df97e331ba293da9e5d0736cae749890d871d54ec775d01b63b387c79ee5",
+        "bytes": 14977,
+        "gzipBytes": 5142
+      },
+      {
+        "file": "assets/AiffParser-CFoNXQqB.js",
+        "sha256": "f3654d4bbc7e925185ff7cab80ef614c9d1378447921e8566d65aab6915a8ad1",
+        "bytes": 3589,
+        "gzipBytes": 1540
+      }
+    ],
+    "bytes": 2329007,
+    "gzipBytes": 745299
+  }
+}

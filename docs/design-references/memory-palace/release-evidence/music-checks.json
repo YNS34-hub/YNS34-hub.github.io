@@ -1,0 +1,151 @@
+{
+  "stage": "p3-music",
+  "checkedAt": "2026-11-01T06:30:01.396Z",
+  "base": "http://127.0.0.1:5215",
+  "checks": [
+    {
+      "name": "actual-isolated-public-manifests-empty",
+      "passed": true
+    },
+    {
+      "name": "music-keeps-seven-physical-glass-fins-with-original-optical-model",
+      "passed": true,
+      "instrument": [
+        {
+          "rotationZ": -0.165,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        },
+        {
+          "rotationZ": -0.11,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        },
+        {
+          "rotationZ": -0.055,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        },
+        {
+          "rotationZ": 0,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        },
+        {
+          "rotationZ": 0.055,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        },
+        {
+          "rotationZ": 0.11,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        },
+        {
+          "rotationZ": 0.165,
+          "positionY": 0,
+          "optical": [
+            {
+              "transmission": 0.92,
+              "ior": 1.46,
+              "thickness": 0.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "music-native-public-wav-import-and-single-real-audio-element-playback",
+      "passed": true,
+      "currentId": "local-track-dc4dae5e-64e4-44e7-83f9-ee3db594c781",
+      "playing": true,
+      "progress": 0.261224,
+      "duration": 36,
+      "error": null,
+      "signal": {
+        "available": true,
+        "bass": 0.0337412722050425,
+        "mid": 0.005181314566989369,
+        "treble": 0,
+        "rms": 0.009550633929793724
+      },
+      "activeAudioElements": 1
+    },
+    {
+      "name": "music-real-analyser-drives-bounded-existing-fin-response",
+      "passed": true,
+      "samples": 50,
+      "maxAngularDeparture": 0.00020946466991729473
+    },
+    {
+      "name": "music-native-lyrics-import-seek-pause-and-chinese-active-line-preserved",
+      "passed": true,
+      "pausedPosition": 5
+    },
+    {
+      "name": "music-paused-and-reduced-motion-settle-original-fins-and-rhythm-lights",
+      "passed": true
+    },
+    {
+      "name": "music-public-fixture-audio-blob-and-lyrics-persist-in-disposable-browser",
+      "passed": true,
+      "id": "local-track-dc4dae5e-64e4-44e7-83f9-ee3db594c781",
+      "lines": 4
+    },
+    {
+      "name": "music-guide-and-return-controls-preserved",
+      "passed": true
+    },
+    {
+      "name": "music-mobile-original-listening-controls-and-import-remain-responsive",
+      "passed": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "name": "no-browser-errors-or-network-uploads",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

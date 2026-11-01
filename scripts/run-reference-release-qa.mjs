@@ -13,6 +13,7 @@ const steps = [
   ...['p2', 'p3-research', 'p3-music'].map(stage => [stage, 'check-reference-rooms.mjs', { PALACE_STAGE: stage, PALACE_CHECK_ARTIFACTS: root + '/checks' }]),
   ['court-lighting', 'check-reference-court-lighting.mjs', { PALACE_ARTIFACTS: root + '/checks/court-lighting' }],
   ['public', 'check-reference-public.mjs', { PALACE_PUBLIC_URL: process.env.PALACE_PUBLIC_URL || 'http://127.0.0.1:5217', PALACE_PUBLIC_ARTIFACTS: root + '/public' }],
+  ['review', 'check-reference-review.mjs', { PALACE_REVIEW_URL: common.PALACE_URL + '/docs/design-references/memory-palace/review-release.html', PALACE_ARTIFACTS: root + '/review' }],
 ];
 const requested = process.env.PALACE_RELEASE_STEPS?.split(','), selected = requested ? steps.filter(([name]) => requested.includes(name)) : steps;
 if (requested && requested.length !== selected.length) throw new Error('Unknown release QA step');

@@ -1,0 +1,84 @@
+{
+  "stage": "p3-research",
+  "checkedAt": "2026-11-01T06:29:22.376Z",
+  "base": "http://127.0.0.1:5215",
+  "checks": [
+    {
+      "name": "actual-isolated-public-manifests-empty",
+      "passed": true
+    },
+    {
+      "name": "research-keeps-thirteen-mathematical-rings-and-knot-with-physical-reading-furniture",
+      "passed": true,
+      "tori": 13,
+      "knots": 1,
+      "furnitureMeshes": 18,
+      "physicalMaterials": 18,
+      "furnitureBounds": {
+        "min": [
+          -13.05,
+          0,
+          -13.600000023841858
+        ],
+        "max": [
+          9.900000095367432,
+          3.299999952316284,
+          5.9643575469071415
+        ]
+      }
+    },
+    {
+      "name": "research-native-walking-approaches-but-cannot-cross-reading-desk",
+      "passed": true,
+      "before": {
+        "position": [
+          7.5,
+          1.65,
+          8.8
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "after": {
+        "position": [
+          7.5,
+          1.65,
+          5.15
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "name": "research-original-audit-work-opens-by-canvas-and-returns-without-camera-drift",
+      "passed": true
+    },
+    {
+      "name": "research-guide-and-return-controls-preserved",
+      "passed": true
+    },
+    {
+      "name": "research-mobile-real-scene-and-guide-without-overflow",
+      "passed": true,
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    {
+      "name": "no-browser-errors-or-network-uploads",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "uploads": [],
+  "passed": true
+}

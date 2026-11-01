@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Memory Palace · 发布画面对照</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#171c1b;color:#e1e5dc;font:15px/1.6 system-ui,sans-serif}main{max-width:1500px;margin:auto;padding:28px 24px 48px}h1{font-size:24px;font-weight:500;margin:0 0 8px}p{color:#afb9af;margin:8px 0 20px}a{color:#cfdfd5}.tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:22px 0}select{font:inherit;max-width:100%;padding:9px 12px;background:#29332e;color:inherit;border:1px solid #627367;border-radius:2px}label{display:flex;align-items:center;gap:10px}input{width:min(40vw,260px);accent-color:#c3d8c9}.comparison{position:relative;aspect-ratio:16/9;width:100%;background:#0e1110;overflow:hidden;margin:auto}.comparison[data-mobile="true"]{max-width:390px;aspect-ratio:390/844}.comparison img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.comparison .before{clip-path:inset(0 50% 0 0)}.divider{position:absolute;left:50%;top:0;bottom:0;width:1px;background:#e8eee6;pointer-events:none}.badge{position:absolute;top:12px;padding:3px 9px;background:#101814d9;color:#ebf2e9;font-size:12px}.left{left:12px}.right{right:12px}output{min-width:40px}.note{max-width:85ch;font-size:13px}#details{min-height:50px}@media(max-width:600px){main{padding:18px 12px 36px}h1{font-size:20px}.tools{gap:10px}label{width:100%}input{width:65vw}}
+</style>
+<main>
+  <h1>The Memory Palace · 已发布主分支 → 视觉升级</h1>
+  <p>15组真实浏览器截图。左侧为发布前主分支，右侧为本次整合版本；匹配相机和画质。拖动滑杆或用方向键比较。</p>
+  <div class="tools">
+    <label for="scene">场景 <select id="scene"></select></label>
+    <label for="amount">改动前占比 <input id="amount" type="range" min="0" max="100" value="50"><output id="value" for="amount">50%</output></label>
+  </div>
+  <div class="comparison" id="comparison">
+    <img id="after" alt="改动后的场景，同一相机和画质">
+    <img id="before" class="before" alt="改动前的场景，同一相机和画质">
+    <div class="divider" id="divider"></div><span class="badge left">改动前</span><span class="badge right">当前候选</span>
+  </div>
+  <p id="details" class="note"></p>
+  <p class="note">完整实现、验证、测量限制与参考用途见 <a href="RELEASE_20261101.md">发布整合记录</a>。概念板与独立建筑研究图仍是文档参考，没有作为展品或场景背景使用。</p>
+</main>
+<script>
+const atrium='release-evidence/atrium/';
+const views=[
+  [
+    "welcome",
+    "welcome",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/atrium/"
+  ],
+  [
+    "auxiliary",
+    "auxiliary",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/atrium/"
+  ],
+  [
+    "glass-closeup",
+    "glass-closeup",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/atrium/"
+  ],
+  [
+    "mobile-welcome",
+    "mobile-welcome",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/atrium/"
+  ],
+  [
+    "glass-life",
+    "glass-life",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/atrium/"
+  ],
+  [
+    "projects",
+    "projects",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/rooms/"
+  ],
+  [
+    "research",
+    "research",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/rooms/"
+  ],
+  [
+    "music",
+    "music",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/rooms/"
+  ],
+  [
+    "wallpapers",
+    "wallpapers",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/rooms/"
+  ],
+  [
+    "basketball",
+    "basketball",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/rooms/"
+  ],
+  [
+    "cycling",
+    "cycling",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/rooms/"
+  ],
+  [
+    "research-detail",
+    "research-detail",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/details/"
+  ],
+  [
+    "music-detail",
+    "music-detail",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/details/"
+  ],
+  [
+    "basketball-detail",
+    "basketball-detail",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/details/"
+  ],
+  [
+    "cycling-detail",
+    "cycling-detail",
+    "实际已发布主分支与整合候选；位置、朝向、视角、曝光和画质均匹配。",
+    "",
+    "release-evidence/details/"
+  ]
+];
+const select=document.querySelector('#scene'), before=document.querySelector('#before'), after=document.querySelector('#after'), amount=document.querySelector('#amount');
+for(const [i,view] of views.entries())select.add(new Option(view[0],String(i)));
+function update(){const value=amount.value;before.style.clipPath=`inset(0 ${100-value}% 0 0)`;document.querySelector('#divider').style.left=value+'%';document.querySelector('#value').value=value+'%';}
+function choose(){const [name,file,details,prefix='',basePath=atrium]=views[Number(select.value)];before.src=basePath+prefix+'before/'+file+'.png';after.src=basePath+prefix+'after/'+file+'.png';before.alt=name+'改动前';after.alt=name+'当前候选';document.querySelector('#comparison').dataset.mobile=String(file==='mobile-welcome');document.querySelector('#details').textContent=details;update();}
+select.addEventListener('change',choose);amount.addEventListener('input',update);choose();
+</script>
+</html>
